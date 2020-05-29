@@ -1,3 +1,4 @@
 rootProject.name='RxcleanNote'
 include ':app'
 include ':domain'
+include ':data'

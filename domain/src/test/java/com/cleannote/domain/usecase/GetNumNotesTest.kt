@@ -3,7 +3,7 @@ package com.cleannote.domain.usecase
 import com.cleannote.domain.interfactor.executor.PostExecutionThread
 import com.cleannote.domain.interfactor.executor.ThreadExecutor
 import com.cleannote.domain.interfactor.repository.NoteRepository
-import com.cleannote.domain.interfactor.usecases.notelist.GetNumNotes
+import com.cleannote.domain.interfactor.usecases.notelist.GetNumNotesUseCase
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.doReturn
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 
 class GetNumNotesTest {
 
-    private lateinit var getNumNotes: GetNumNotes
+    private lateinit var getNumNotes: GetNumNotesUseCase
 
     private lateinit var mockThreadExecutor: ThreadExecutor
     private lateinit var mockPostExecutionThread: PostExecutionThread
@@ -31,26 +31,26 @@ class GetNumNotesTest {
         mockNoteRepository = mock(){
             on { getNumNotes() } doReturn Flowable.just(notes)
         }
-        getNumNotes = GetNumNotes(mockNoteRepository, mockThreadExecutor, mockPostExecutionThread)
+        getNumNotes = GetNumNotesUseCase(mockNoteRepository, mockThreadExecutor, mockPostExecutionThread)
     }
 
     @Test
     fun buildUseCaseObservableCallsRepository() {
-        getNumNotes.buildUseCaseObservable(null)
+        getNumNotes.buildUseCaseFlowable(null)
         verify(mockNoteRepository).getNumNotes()
     }
 
     @Test
     fun buildUseCaseObservableComplete(){
         val testObserver =
-            getNumNotes.buildUseCaseObservable(null).test()
+            getNumNotes.buildUseCaseFlowable(null).test()
         testObserver.assertComplete()
     }
 
     @Test
     fun buildUseCaseObservableReturnData(){
         val testObserver =
-            getNumNotes.buildUseCaseObservable(null).test()
+            getNumNotes.buildUseCaseFlowable(null).test()
 
         testObserver.assertValue(notes)
     }

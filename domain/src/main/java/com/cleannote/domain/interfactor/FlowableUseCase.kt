@@ -1,4 +1,4 @@
-package com.cleannote.domain
+package com.cleannote.domain.interfactor
 
 import com.cleannote.domain.interfactor.executor.PostExecutionThread
 import com.cleannote.domain.interfactor.executor.ThreadExecutor
@@ -18,13 +18,13 @@ abstract class FlowableUseCase<T, in Params> constructor(
     /**
      * Builds a [Single] which will be used when the current [FlowableUseCase] is executed.
      */
-    protected abstract fun buildUseCaseObservable(params: Params? = null): Flowable<T>
+    protected abstract fun buildUseCaseFlowable(params: Params? = null): Flowable<T>
 
     /**
      * Executes the current use case.
      */
     open fun execute(observer: DisposableSubscriber<T>, params: Params? = null) {
-        val observable = this.buildUseCaseObservable(params)
+        val observable = this.buildUseCaseFlowable(params)
             .subscribeOn(Schedulers.from(threadExecutor))
             .observeOn(postExecutionThread.scheduler) as Flowable<T>
         addDisposable(observable.subscribeWith(observer))
