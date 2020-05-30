@@ -52,14 +52,13 @@ dependencies {
     implementation Dependencies.dagger
     implementation Dependencies.room_runtime
     implementation Dependencies.lifecycle_runtime
-    implementation Dependencies.room_ktx
     implementation Dependencies.livedata_ktx
 
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    //androidTestImplementation 'androidx.test:runner:1.2.0'
+   // androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 
-    testImplementation 'androidx.test:runner:1.2.0'
-    testImplementation 'androidx.test.ext:junit:1.1.1'
+    //testImplementation 'androidx.test:runner:1.2.0'
+    //testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation TestDependencies.junit4
     testImplementation TestDependencies.hamcrest_library
     testImplementation TestDependencies.mockito_kotlin
