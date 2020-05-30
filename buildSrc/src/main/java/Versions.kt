@@ -43,4 +43,5 @@ object Versions {
     const val hamcrest_version = "2.2"
     const val mockito_version = "2.21.0"
     const val mockito_kotlin_version = "2.2.0"
+    const val robolectric = "4.3.1"
 }
