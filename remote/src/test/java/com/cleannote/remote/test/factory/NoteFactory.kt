@@ -1,7 +1,7 @@
-package com.cleannote.cache.test.factory
+package com.cleannote.remote.test.factory
 
-import com.cleannote.cache.model.CachedNote
 import com.cleannote.data.model.NoteEntity
+import com.cleannote.remote.model.NoteModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -12,9 +12,9 @@ object NoteFactory {
         return dateFormat.format(Date())
     }
 
-    fun createCachedNote(id: String? = null,
+    fun createNoteModel(id: String? = null,
                          title: String,
-                         body: String? = null) = CachedNote(
+                         body: String? = null) = NoteModel(
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
@@ -32,8 +32,8 @@ object NoteFactory {
         updated_at = getCurrentTimestamp()
     )
 
-    fun createCachedNoteList(count: Int): List<CachedNote> = (0 until count).map {
-        createCachedNote("#$it", "title #it", "body #it") }.toList()
+    fun createNoteMoelList(count: Int): List<NoteModel> = (0 until count).map {
+        createNoteModel("#$it", "title #it", "body #it") }.toList()
 
     fun createNoteEntityList(count: Int): List<NoteEntity> = (0 until count).map {
         createNoteEntity("#$it", "title #it", "body #it")}.toList()

@@ -1,0 +1,42 @@
+import dependencies.AnnotationProcessing
+import dependencies.Dependencies
+import dependencies.Java
+import dependencies.TestDependencies
+
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+sourceCompatibility = Java.java_version
+targetCompatibility = Java.java_version
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile project(':data')
+
+    implementation Dependencies.kotlin_reflect
+    implementation Dependencies.rxJava
+    implementation Dependencies.rxKotlin
+    implementation Dependencies.rxAndroid
+    implementation Dependencies.dagger
+    implementation Dependencies.retrofit
+    implementation Dependencies.retrofit_gson
+    implementation Dependencies.retrofit_rx
+
+    testImplementation TestDependencies.junit4
+    testImplementation TestDependencies.hamcrest_library
+    testImplementation TestDependencies.mockito_kotlin
+    testImplementation TestDependencies.mockito_inline
+    testImplementation TestDependencies.jupiter_api
+    testImplementation TestDependencies.jupiter_params
+    testRuntimeOnly    TestDependencies.jupiter_engine
+
+    kapt AnnotationProcessing.dagger_compiler
+}
+

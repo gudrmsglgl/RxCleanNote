@@ -51,27 +51,17 @@ dependencies {
     implementation Dependencies.rxAndroid
     implementation Dependencies.dagger
     implementation Dependencies.room_runtime
-    implementation Dependencies.lifecycle_runtime
     implementation Dependencies.livedata_ktx
 
-    //androidTestImplementation 'androidx.test:runner:1.2.0'
-   // androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-
-    //testImplementation 'androidx.test:runner:1.2.0'
-    //testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation TestDependencies.junit4
     testImplementation TestDependencies.hamcrest_library
     testImplementation TestDependencies.mockito_kotlin
     testImplementation TestDependencies.mockito_inline
-    testImplementation TestDependencies.jupiter_api
-    testImplementation TestDependencies.jupiter_params
     testImplementation TestDependencies.robolectric
     testImplementation TestDependencies.roomTesting
     testImplementation TestDependencies.archTesting
     testImplementation TestDependencies.testCore
-    testRuntimeOnly    TestDependencies.jupiter_engine
 
-    kapt AnnotationProcessing.lifecycle_compiler
     kapt AnnotationProcessing.dagger_compiler
     kapt AnnotationProcessing.room_compiler
 }
