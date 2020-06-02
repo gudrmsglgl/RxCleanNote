@@ -1,7 +1,7 @@
-package com.cleannote.domain.interfactor
+package com.cleannote.domain.interactor
 
-import com.cleannote.domain.interfactor.executor.PostExecutionThread
-import com.cleannote.domain.interfactor.executor.ThreadExecutor
+import com.cleannote.domain.interactor.executor.PostExecutionThread
+import com.cleannote.domain.interactor.executor.ThreadExecutor
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables

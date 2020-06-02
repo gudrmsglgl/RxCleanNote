@@ -1,9 +1,9 @@
 package com.cleannote.domain.usecase
 
-import com.cleannote.domain.interfactor.executor.PostExecutionThread
-import com.cleannote.domain.interfactor.executor.ThreadExecutor
-import com.cleannote.domain.interfactor.repository.NoteRepository
-import com.cleannote.domain.interfactor.usecases.notelist.GetNumNotesUseCase
+import com.cleannote.domain.interactor.executor.PostExecutionThread
+import com.cleannote.domain.interactor.executor.ThreadExecutor
+import com.cleannote.domain.interactor.repository.NoteRepository
+import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.doReturn
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 
 class GetNumNotesTest {
 
-    private lateinit var getNumNotes: GetNumNotesUseCase
+    private lateinit var getNumNotes: GetNumNotes
 
     private lateinit var mockThreadExecutor: ThreadExecutor
     private lateinit var mockPostExecutionThread: PostExecutionThread
@@ -31,7 +31,7 @@ class GetNumNotesTest {
         mockNoteRepository = mock(){
             on { getNumNotes() } doReturn Flowable.just(notes)
         }
-        getNumNotes = GetNumNotesUseCase(mockNoteRepository, mockThreadExecutor, mockPostExecutionThread)
+        getNumNotes = GetNumNotes(mockNoteRepository, mockThreadExecutor, mockPostExecutionThread)
     }
 
     @Test

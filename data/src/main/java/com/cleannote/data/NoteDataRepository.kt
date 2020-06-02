@@ -2,7 +2,7 @@ package com.cleannote.data
 
 import com.cleannote.data.mapper.NoteMapper
 import com.cleannote.data.source.NoteDataStoreFactory
-import com.cleannote.domain.interfactor.repository.NoteRepository
+import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.model.Note
 import io.reactivex.Flowable
 import io.reactivex.Single

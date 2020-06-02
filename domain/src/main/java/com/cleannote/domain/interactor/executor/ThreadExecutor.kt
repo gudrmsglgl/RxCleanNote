@@ -1,4 +1,4 @@
-package com.cleannote.domain.interfactor.executor
+package com.cleannote.domain.interactor.executor
 
 import java.util.concurrent.Executor
 

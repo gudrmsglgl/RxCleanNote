@@ -1,7 +1,6 @@
-package com.cleannote.domain.interfactor.repository
+package com.cleannote.domain.interactor.repository
 
 import com.cleannote.domain.model.Note
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 

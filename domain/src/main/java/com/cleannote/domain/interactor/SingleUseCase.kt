@@ -1,13 +1,12 @@
-package com.cleannote.domain.interfactor
+package com.cleannote.domain.interactor
 
-import com.cleannote.domain.interfactor.executor.PostExecutionThread
-import com.cleannote.domain.interfactor.executor.ThreadExecutor
+import com.cleannote.domain.interactor.executor.PostExecutionThread
+import com.cleannote.domain.interactor.executor.ThreadExecutor
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subscribers.DisposableSubscriber
 
 abstract class SingleUseCase<T, in Params> constructor(
     private val threadExecutor: ThreadExecutor,
