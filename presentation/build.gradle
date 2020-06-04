@@ -52,6 +52,9 @@ dependencies {
     testImplementation TestDependencies.hamcrest_library
     testImplementation TestDependencies.mockito_kotlin
     testImplementation TestDependencies.mockito_inline
+    testImplementation TestDependencies.jupiter_api
+    testImplementation TestDependencies.jupiter_params
+    testRuntimeOnly    TestDependencies.jupiter_engine
 
     kapt AnnotationProcessing.dagger_compiler
 

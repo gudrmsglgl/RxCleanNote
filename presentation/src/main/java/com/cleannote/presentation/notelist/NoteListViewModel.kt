@@ -1,23 +1,24 @@
-package com.cleannote.presentation.note
+package com.cleannote.presentation.notelist
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
 import com.cleannote.domain.interactor.usecases.notelist.NoteListInteractors
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
-import io.reactivex.Flowable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class NoteListViewModel
 @Inject constructor(
-    private val noteListInteractors: NoteListInteractors,
+    //private val noteListInteractors: NoteListInteractors,
+    private val getNumNotes: GetNumNotes,
     private val noteMapper: NoteMapper
 ): ViewModel() {
 
@@ -38,21 +39,23 @@ class NoteListViewModel
     }
 
     override fun onCleared() {
-        noteListInteractors.disPoses()
+        //noteListInteractors.disPoses()
+        getNumNotes.dispose()
         super.onCleared()
     }
 
     fun fetchNotes() {
         _noteList.updateProceed(_usecaseProceed)
         _noteList.postValue(DataState.loading())
-        noteListInteractors.getNumNotes.execute(NoteListSubscriber())
+        getNumNotes.execute(NoteListSubscriber())
+        //noteListInteractors.getNumNotes.execute(NoteListSubscriber())
     }
 
     fun insertNotes(title: String){
         _insertNote.postValue(DataState.loading())
-        noteListInteractors
+        /*noteListInteractors
             .insertNewNote
-            .execute(NoteInsertSubscriber(), noteMapper.mapFromTitle(title))
+            .execute(NoteInsertSubscriber(), noteMapper.mapFromTitle(title))*/
     }
 
     inner class NoteListSubscriber: DisposableSubscriber<List<Note>>(){

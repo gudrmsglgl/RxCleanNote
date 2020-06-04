@@ -1,6 +1,9 @@
 package com.cleannote.domain.interactor.usecases.notelist
 
-class NoteListInteractors(
+import javax.inject.Inject
+
+open class NoteListInteractors
+@Inject constructor(
     val insertNewNote: InsertNewNote,
     val getNumNotes: GetNumNotes
 ){
