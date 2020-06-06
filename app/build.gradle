@@ -42,6 +42,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile project(':data')
+    compile project(':presentation')
+    compile project(':cache')
+    compile project(':remote')
+
+
     // Kotlin
     implementation Dependencies.kotlin_standard_library
     implementation Dependencies.kotlin_reflect
@@ -49,8 +56,10 @@ dependencies {
     implementation Dependencies.dagger
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
+    implementation Dependencies.room_runtime
 
     kapt AnnotationProcessing.dagger_compiler
+    kapt AnnotationProcessing.room_compiler
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout

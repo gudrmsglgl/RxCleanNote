@@ -28,6 +28,8 @@ object Dependencies {
     val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit2_version}"
     val retrofit_gson = "com.squareup.retrofit2:converter-gson:${Versions.retrofit2_version}"
     val retrofit_rx = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit2_version}"
+    val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttpVersion}"
+    val okHttpLogger = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttpVersion}"
     val markdown_processor = "com.yydcdut:markdown-processor:${Versions.markdown_processor}"
     val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJavaVersion}"
     val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlinVersion}"
