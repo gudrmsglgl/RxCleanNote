@@ -1,4 +1,4 @@
-package com.cleannote.splash
+package com.cleannote.notedetail
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,16 +12,16 @@ import com.cleannote.app.R
 /**
  * A simple [Fragment] subclass.
  */
-class SplashFragment constructor(
+class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory
-): Fragment() {
+) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_splash, container, false)
+        return inflater.inflate(R.layout.fragment_note_detail, container, false)
     }
 
 }

@@ -1,7 +1,7 @@
 package com.cleannote.injection.module
 
-import android.app.Application
 import androidx.room.Room
+import com.cleannote.NoteApplication
 import com.cleannote.cache.NoteCacheImpl
 import com.cleannote.cache.dao.CachedNoteDao
 import com.cleannote.cache.database.NoteDatabase
@@ -19,7 +19,7 @@ abstract class CacheModule {
 
         @JvmStatic
         @Provides
-        fun provideNoteDb(app: Application): NoteDatabase{
+        fun provideNoteDb(app: NoteApplication): NoteDatabase{
             return Room
                 .databaseBuilder(app, NoteDatabase::class.java, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
