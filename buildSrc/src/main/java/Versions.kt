@@ -45,4 +45,5 @@ object Versions {
     const val mockito_version = "2.21.0"
     const val mockito_kotlin_version = "2.2.0"
     const val robolectric = "4.3.1"
+    const val recyclerview = "1.2.0-alpha03"
 }

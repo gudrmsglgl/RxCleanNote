@@ -3,4 +3,4 @@ package com.cleannote.injection.module
 import dagger.Module
 
 @Module
-abstract class PresentationModule
+abstract class DomainModule

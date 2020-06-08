@@ -10,15 +10,15 @@ import dagger.Provides
 @Module
 abstract class RemoteModule {
 
-    @Module
+    /*@Module
     companion object{
 
         @JvmStatic
         @Provides
-        fun provideNoteService(){
-            return NoteServiceFactory.makeNoteService(BuildConfig.DEBUG)
+        fun provideNoteService(): Unit{
+
         }
-    }
+    }*/
 
     @Binds
     abstract fun bindNoteRemote(noteRemoteImpl: NoteRemoteImpl): NoteRemote

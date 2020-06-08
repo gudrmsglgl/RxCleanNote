@@ -20,6 +20,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -43,6 +46,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     compile project(':data')
     compile project(':presentation')
     compile project(':cache')
@@ -58,8 +62,14 @@ dependencies {
     implementation Dependencies.rxAndroid
     implementation Dependencies.room_runtime
 
+    implementation SupportDependencies.appcompat
+    implementation SupportDependencies.constraintlayout
+    implementation SupportDependencies.recyclerview
+    implementation SupportDependencies.material_design
+
     kapt AnnotationProcessing.dagger_compiler
     kapt AnnotationProcessing.room_compiler
+    kapt AnnotationProcessing.lifecycle_compiler
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout
