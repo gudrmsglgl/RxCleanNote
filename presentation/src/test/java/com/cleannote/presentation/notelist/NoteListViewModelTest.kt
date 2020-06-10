@@ -3,9 +3,7 @@ package com.cleannote.presentation.notelist
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
-import com.cleannote.domain.interactor.usecases.notelist.NoteListInteractors
 import com.cleannote.domain.model.Note
-import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
@@ -19,9 +17,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Spy
 
 @ExtendWith(InstantExecutorExtension::class)
 class NoteListViewModelTest {

@@ -5,11 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/splash_fragment_container">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="splashFragment" />
+
 
     <ImageView
         android:layout_width="@dimen/splash_logo_width"
@@ -18,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:src="@drawable/splash"
+        android:src="@drawable/splash_logo"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

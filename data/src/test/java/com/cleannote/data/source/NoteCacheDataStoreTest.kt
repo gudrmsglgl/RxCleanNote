@@ -60,6 +60,12 @@ class NoteCacheDataStoreTest {
         Assertions.assertThrows(UnsupportedOperationException::class.java, Executable {
             noteCacheDataStore.insertRemoteNewNote(noteEntity)
         })
+    }
 
+    @Test
+    fun loginReturnThrow(){
+        Assertions.assertThrows(UnsupportedOperationException::class.java){
+            noteCacheDataStore.login("")
+        }
     }
 }

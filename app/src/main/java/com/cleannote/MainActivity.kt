@@ -2,14 +2,18 @@ package com.cleannote
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.cleannote.app.R
 import com.cleannote.common.NoteFragmentFactory
+import com.cleannote.common.UIController
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), UIController {
 
     @Inject
     lateinit var fragmentFactory: NoteFragmentFactory
@@ -35,5 +39,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setFragmentFactory(){
         supportFragmentManager.fragmentFactory = fragmentFactory
+    }
+
+    override fun displayProgressBar(isProceed: Boolean) {
+        if (isProceed) progress.visibility = VISIBLE
+        else progress.visibility = GONE
     }
 }

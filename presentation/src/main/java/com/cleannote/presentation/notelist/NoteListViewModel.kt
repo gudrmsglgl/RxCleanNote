@@ -5,7 +5,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
-import com.cleannote.domain.interactor.usecases.notelist.NoteListInteractors
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
@@ -17,7 +16,6 @@ import javax.inject.Inject
 
 class NoteListViewModel
 @Inject constructor(
-    //private val noteListInteractors: NoteListInteractors,
     private val getNumNotes: GetNumNotes,
     private val noteMapper: NoteMapper
 ): ViewModel() {
@@ -39,7 +37,6 @@ class NoteListViewModel
     }
 
     override fun onCleared() {
-        //noteListInteractors.disPoses()
         getNumNotes.dispose()
         super.onCleared()
     }
@@ -48,7 +45,6 @@ class NoteListViewModel
         _noteList.updateProceed(_usecaseProceed)
         _noteList.postValue(DataState.loading())
         getNumNotes.execute(NoteListSubscriber())
-        //noteListInteractors.getNumNotes.execute(NoteListSubscriber())
     }
 
     fun insertNotes(title: String){

@@ -34,4 +34,6 @@ object Dependencies {
     val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJavaVersion}"
     val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlinVersion}"
     val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroidVersion}"
+    val timber = "com.jakewharton.timber:timber:${Versions.timber_version}"
+
 }

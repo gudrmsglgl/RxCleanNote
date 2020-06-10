@@ -14,7 +14,7 @@ open class NoteMapper @Inject constructor(
         type.id, type.title, type.body, type.updated_at, type.created_at
     )
 
-    override fun mapFromTitle(title: String): Note = Note(
+    fun mapFromTitle(title: String): Note = Note(
         id = UUID.randomUUID().toString(),
         title = title,
         body = "",

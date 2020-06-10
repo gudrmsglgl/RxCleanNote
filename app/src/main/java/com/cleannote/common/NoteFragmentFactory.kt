@@ -3,6 +3,7 @@ package com.cleannote.common
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
+import com.cleannote.mapper.UserMapper
 import com.cleannote.notedetail.NoteDetailFragment
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.presentation.ViewModelFactory
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 class NoteFragmentFactory @Inject constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val dateUtil: DateUtil
+    private val dateUtil: DateUtil,
+    private val userMapper: UserMapper
 ): FragmentFactory(){
 
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
@@ -28,7 +30,7 @@ class NoteFragmentFactory @Inject constructor(
         }
 
         SplashFragment::class.java.name -> {
-            val fragment = SplashFragment(viewModelFactory)
+            val fragment = SplashFragment(viewModelFactory, userMapper)
             fragment
         }
 

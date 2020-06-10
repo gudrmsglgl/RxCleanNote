@@ -1,21 +1,24 @@
 package com.cleannote.remote
 
 import com.cleannote.data.model.NoteEntity
+import com.cleannote.data.model.UserEntity
 import com.cleannote.data.repository.NoteRemote
 import com.cleannote.remote.mapper.NoteEntityMapper
+import com.cleannote.remote.mapper.UserEntityMapper
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import javax.inject.Inject
 
 class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
-                                         private val entityMapper: NoteEntityMapper):
+                                         private val noteEntityMapper: NoteEntityMapper,
+                                         private val userEntityMapper: UserEntityMapper):
     NoteRemote {
 
     override fun getNumNotes(): Flowable<List<NoteEntity>> {
         return noteService.getNotes(1)
             .map { noteModeles ->
                 noteModeles.map {
-                    entityMapper.mapFromRemote(it)
+                    noteEntityMapper.mapFromRemote(it)
                 }
             }
     }
@@ -28,5 +31,13 @@ class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
             noteEntity.updated_at,
             noteEntity.created_at
         )
+    }
+
+    override fun login(userId: String): Flowable<List<UserEntity>> {
+        return noteService.login(userId).map { userModels ->
+            userModels.map {
+                userEntityMapper.mapFromRemote(it)
+            }
+        }
     }
 }

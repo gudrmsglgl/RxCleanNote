@@ -1,9 +1,11 @@
 package com.cleannote.data
 
 import com.cleannote.data.mapper.NoteMapper
+import com.cleannote.data.mapper.UserMapper
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.model.Note
+import com.cleannote.domain.model.User
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.lang.Exception
@@ -13,7 +15,8 @@ class NoteDataRepository
 @Inject
 constructor(
     private val factory: NoteDataStoreFactory,
-    private val noteMapper: NoteMapper
+    private val noteMapper: NoteMapper,
+    private val userMapper: UserMapper
 ): NoteRepository{
 
     override fun getNumNotes(): Flowable<List<Note>> = factory.retrieveRemoteDataStore()
@@ -36,8 +39,11 @@ constructor(
         }
         .onErrorReturn { -1L }
 
-
-
-
-
+    override fun login(userId: String): Flowable<List<User>> = factory.retrieveRemoteDataStore()
+        .login(userId)
+        .map { users ->
+            users.map {
+                userMapper.mapFromEntity(it)
+            }
+        }
 }

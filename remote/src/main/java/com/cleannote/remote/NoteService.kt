@@ -1,6 +1,7 @@
 package com.cleannote.remote
 
 import com.cleannote.remote.model.NoteModel
+import com.cleannote.remote.model.UserModel
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Completable
@@ -11,6 +12,11 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface NoteService {
+
+    @GET("users")
+    fun login(
+        @Query("userId") userId: String
+    ): Flowable<List<UserModel>>
 
     @GET("memos")
     fun getNotes(

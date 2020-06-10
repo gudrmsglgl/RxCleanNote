@@ -1,11 +1,13 @@
 package com.cleannote.data
 
 import com.cleannote.data.mapper.NoteMapper
+import com.cleannote.data.mapper.UserMapper
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.data.source.NoteRemoteDataStore
 import com.cleannote.data.test.factory.NoteFactory
+import com.cleannote.data.test.factory.UserFactory
 import com.cleannote.domain.model.Note
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -22,10 +24,14 @@ class NoteDataRepositoryTest {
 
     private lateinit var noteDataStoreFactory: NoteDataStoreFactory
     private lateinit var noteMapper: NoteMapper
+    private lateinit var userMapper: UserMapper
 
     private lateinit var noteCacheDataStore: NoteCacheDataStore
     private lateinit var noteRemoteDataStore: NoteRemoteDataStore
     private lateinit var noteEntities: List<NoteEntity>
+
+    private val userEntities = UserFactory.userEntities()
+
     private val noteEntity = NoteFactory.createNoteEntity("#1","title#1","body#1")
     private val noteEntity2 = NoteFactory.createNoteEntity("#2","title#2","body#2")
     private val note: Note = NoteFactory.createNote("#1","title#1","body#1")
@@ -35,11 +41,11 @@ class NoteDataRepositoryTest {
 
     @BeforeEach
     fun setUp(){
-
         noteMapper = mock(){
             on { mapToEntity(note) } doReturn noteEntity
             on { mapToEntity(note2) } doReturn noteEntity2
         }
+        userMapper = mock ()
         noteEntities = NoteFactory.createNoteEntityList(10)
         noteCacheDataStore = mock {
             on { insertCacheNewNote(noteEntity) } doReturn Single.just(insertedSuccess)
@@ -51,12 +57,13 @@ class NoteDataRepositoryTest {
                 insertRemoteNewNote(noteEntity)
                 insertRemoteNewNote(noteEntity2)
             } doReturn Completable.complete()
+            on { login(UserFactory.USER_ID) } doReturn Flowable.just(userEntities)
         }
         noteDataStoreFactory = mock{
             on { retrieveRemoteDataStore() }.doReturn(noteRemoteDataStore)
             on { retrieveCacheDataStore() } doReturn noteCacheDataStore
         }
-        noteDataRepository = NoteDataRepository(noteDataStoreFactory, noteMapper)
+        noteDataRepository = NoteDataRepository(noteDataStoreFactory, noteMapper, userMapper)
     }
 
     @Test
@@ -87,5 +94,21 @@ class NoteDataRepositoryTest {
     fun insertNewNoteReturnFail(){
         val testObserver = noteDataRepository.insertNewNote(note2).test()
         testObserver.assertValue(insertedFail)
+    }
+
+    @Test
+    fun loginComplete(){
+        val test = noteDataRepository.login(UserFactory.USER_ID).test()
+        test.assertComplete()
+    }
+
+    @Test
+    fun loginReturnData(){
+        val userList = UserFactory.users()
+        userList.forEachIndexed { index, user ->
+            whenever(userMapper.mapFromEntity(userEntities[index])).thenReturn(user)
+        }
+        val test = noteDataRepository.login(UserFactory.USER_ID).test()
+        test.assertValue(userList)
     }
 }

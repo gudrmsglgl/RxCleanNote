@@ -11,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object NoteServiceFactory {
+    const val BASE_URL = "https://my-json-server.typicode.com/gudrmsglgl/memoapi/"
 
     fun makeNoteService(isDebug: Boolean): NoteService{
         val okHttpClient = makeOkHttpClient(
@@ -20,7 +21,7 @@ object NoteServiceFactory {
 
     private fun makeNoteService(okHttpClient: OkHttpClient, gson: Gson): NoteService {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://joe-birch-dsdb.squarespace.com/s/")
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
@@ -39,8 +40,8 @@ object NoteServiceFactory {
     private fun makeGson(): Gson {
         return GsonBuilder()
             .setLenient()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            //.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            //.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create()
     }
 

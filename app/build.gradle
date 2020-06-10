@@ -64,6 +64,7 @@ dependencies {
     implementation Dependencies.navigation_fragment
     implementation Dependencies.navigation_ui
     implementation Dependencies.navigation_runtime
+    implementation Dependencies.timber
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout
