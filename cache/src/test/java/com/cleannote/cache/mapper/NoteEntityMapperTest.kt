@@ -5,14 +5,14 @@ import com.cleannote.cache.test.factory.NoteFactory
 import com.cleannote.data.model.NoteEntity
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.Before
+import org.junit.Test
 
 class NoteEntityMapperTest {
 
     private lateinit var noteEntityMapper: NoteEntityMapper
 
-    @BeforeEach
+    @Before
     fun setUp() {
         noteEntityMapper = NoteEntityMapper()
     }
