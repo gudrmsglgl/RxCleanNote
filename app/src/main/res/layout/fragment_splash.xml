@@ -8,6 +8,7 @@
 
 
     <ImageView
+        android:id="@+id/splash_logo"
         android:layout_width="@dimen/splash_logo_width"
         android:layout_height="@dimen/splash_logo_width"
         app:layout_constraintTop_toTopOf="parent"

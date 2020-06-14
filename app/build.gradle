@@ -60,11 +60,14 @@ dependencies {
     implementation Dependencies.dagger
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
+    implementation Dependencies.rxbinding
     implementation Dependencies.room_runtime
     implementation Dependencies.navigation_fragment
     implementation Dependencies.navigation_ui
     implementation Dependencies.navigation_runtime
     implementation Dependencies.timber
+    implementation Dependencies.material_dialogs
+    implementation Dependencies.material_dialogs_input
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout

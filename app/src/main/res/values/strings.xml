@@ -3,4 +3,16 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Material Dialog -->
+    <string name="dialog_title_confirm">Confirm</string>
+    <string name="dialog_title_warning">Warn</string>
+    <string name="dialog_title_question">Answer</string>
+    <string name="dialog_btn_yes">Yes</string>
+    <string name="dialog_btn_no">No</string>
+    <string name="dialog_btn_confirm">OK</string>
+    <string name="dialog_login">로그인</string>
+    <string name="dialog_id_hint">아이디를 입력하세요.</string>
+    <string name="dialog_login_retry">로그인 실패 했습니다.</string>
+    <string name="dialog_login_input_dismiss">입력이 취소 되었습니다.</string>
 </resources>

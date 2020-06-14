@@ -1,6 +1,5 @@
 package com.cleannote.presentation.splash
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +14,7 @@ class SplashViewModel constructor(private val login: Login,
                                   private val userMapper: UserMapper): ViewModel() {
 
     private val TAG = "RxCleanNote"
-    private val loginId: String = "gud"
+    private var loginId: String = "gud"
 
     private val _loginResult: MutableLiveData<DataState<List<UserView>>> = MutableLiveData()
     val loginResult: LiveData<DataState<List<UserView>>>
@@ -48,5 +47,9 @@ class SplashViewModel constructor(private val login: Login,
         override fun onError(t: Throwable?) {
             _loginResult.postValue(DataState.error(t?.message))
         }
+    }
+
+    fun setUserId(id: String){
+       loginId = id
     }
 }
