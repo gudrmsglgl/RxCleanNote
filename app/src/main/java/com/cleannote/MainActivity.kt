@@ -2,7 +2,6 @@ package com.cleannote
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
@@ -14,10 +13,11 @@ import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.input.input
 import com.cleannote.app.R
 import com.cleannote.common.*
-import com.cleannote.common.InfoType.*
-import com.jakewharton.rxbinding3.view.clicks
+import com.cleannote.data.ui.InfoType
+import com.cleannote.data.ui.InfoType.*
+import com.cleannote.data.ui.UIMessage
+import com.cleannote.data.ui.UIType
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), UIController {
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), UIController {
         UIType.Dialog -> {
             makeDialog(uiMessage.message, uiMessage.infoType, buttonCallback)
         }
-        UIType.Input -> {
+        else -> {
             makeInputDialog(uiMessage.message, buttonCallback)
         }
     }
