@@ -2,5 +2,15 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorAccent">#0094DE</color>
+
+    <!-- Secondary theme colors -->
+    <color name="white">#fff</color>
+    <color name="tealDark">#0094DE</color>
+    <color name="tealLight">#9FDAF7</color>
+    <color name="link_blue">#0000EE</color>
+    <color name="app_background_color">#f2f2f2</color>
+
+    <color name="default_grey">#686868</color>
+
 </resources>

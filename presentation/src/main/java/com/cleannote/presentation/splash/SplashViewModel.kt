@@ -14,7 +14,7 @@ class SplashViewModel constructor(private val login: Login,
                                   private val userMapper: UserMapper): ViewModel() {
 
     private val TAG = "RxCleanNote"
-    private var loginId: String = "gud"
+    private var loginId: String = "gudrms"
 
     private val _loginResult: MutableLiveData<DataState<List<UserView>>> = MutableLiveData()
     val loginResult: LiveData<DataState<List<UserView>>>

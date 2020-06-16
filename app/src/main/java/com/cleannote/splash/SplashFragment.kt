@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 
 import com.cleannote.app.R
 import com.cleannote.common.*
@@ -71,6 +72,7 @@ class SplashFragment constructor(
                 | Welcome ${userView.nick} 
                 | RxClean Note App""".trimMargin()
             showToast(loginMessage)
+            findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         }?: showErrorMessage(
             message!!,
             object : ButtonCallback{
@@ -88,7 +90,7 @@ class SplashFragment constructor(
         showInputDialog(retryMessage, inputDialogCallback)
     }
 
-    val inputDialogCallback: ButtonCallback = object : ButtonCallback{
+    private val inputDialogCallback: ButtonCallback = object : ButtonCallback{
         override fun confirmProceed() {}
 
         override fun cancelProceed() {}

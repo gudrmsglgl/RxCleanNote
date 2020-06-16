@@ -20,15 +20,15 @@ class NoteListViewModel
     private val noteMapper: NoteMapper
 ): ViewModel() {
 
-    val _noteList: MutableLiveData<DataState<List<NoteView>>> = MutableLiveData()
+    private val _noteList: MutableLiveData<DataState<List<NoteView>>> = MutableLiveData()
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _noteList
 
-    val _insertNote: MutableLiveData<DataState<Long>> = MutableLiveData()
+    private val _insertNote: MutableLiveData<DataState<Long>> = MutableLiveData()
     val insertNote: LiveData<DataState<Long>>
         get() = _insertNote
 
-    val _usecaseProceed: MediatorLiveData<Boolean> = MediatorLiveData()
+    private val _usecaseProceed: MediatorLiveData<Boolean> = MediatorLiveData()
     val usecaseProceed: LiveData<Boolean>
         get() = _usecaseProceed
 
