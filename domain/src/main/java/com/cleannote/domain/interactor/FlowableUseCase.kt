@@ -13,7 +13,7 @@ abstract class FlowableUseCase<T, in Params> constructor(
     private val threadExecutor: ThreadExecutor,
     private val postExecutionThread: PostExecutionThread) {
 
-    private val disposables = CompositeDisposable()
+    private var disposables: CompositeDisposable = CompositeDisposable()
 
     protected abstract fun buildUseCaseFlowable(params: Params? = null): Flowable<T>
 
@@ -24,12 +24,19 @@ abstract class FlowableUseCase<T, in Params> constructor(
         addDisposable(observable.subscribeWith(observer))
     }
 
+    private fun getCompositeDisposable(): CompositeDisposable{
+        if (disposables.isDisposed){
+            disposables = CompositeDisposable()
+        }
+        return disposables
+    }
+
     fun dispose() {
         if (!disposables.isDisposed) disposables.dispose()
     }
 
     private fun addDisposable(disposable: Disposable) {
-        disposables.add(disposable)
+        getCompositeDisposable().add(disposable)
     }
 
 }

@@ -2,12 +2,11 @@ package com.cleannote.common
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.cleannote.data.ui.InfoType
+import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.jakewharton.rxbinding3.view.clicks
@@ -51,37 +50,39 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
 
     fun showToast(message: String) = with (uiController){
         showUIMessage(
-            UIMessage(message, UIType.Toast, InfoType.None)
+            UIMessage(message, UIType.Toast)
         )
     }
 
     fun showErrorMessage(
         message: String,
-        buttonCallback: ButtonCallback? = null
+        dialogBtnCallback: DialogBtnCallback? = null
     ) = with(uiController) {
         showUIMessage(
             UIMessage(message, UIType.Dialog, InfoType.Warning),
-            buttonCallback
+            dialogBtnCallback
         )
     }
 
     fun showConfirmMessage(
         message: String,
-        buttonCallback: ButtonCallback? = null
+        dialogBtnCallback: DialogBtnCallback? = null
     ) = with(uiController){
         showUIMessage(
             UIMessage(message, UIType.Dialog, InfoType.Confirm),
-            buttonCallback
+            dialogBtnCallback
         )
     }
 
     fun showInputDialog(
         message: String,
-        buttonCallback: ButtonCallback? = null
+        inputType: InputType,
+        inputCaptureCallback: InputCaptureCallback? = null
     ) = with(uiController){
         showUIMessage(
-            UIMessage(message, UIType.Input, InfoType.None),
-            buttonCallback
+            UIMessage(message, UIType.Input, null, inputType),
+            null,
+            inputCaptureCallback
         )
     }
 

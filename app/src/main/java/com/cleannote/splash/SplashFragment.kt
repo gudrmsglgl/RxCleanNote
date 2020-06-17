@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 
 import com.cleannote.app.R
 import com.cleannote.common.*
+import com.cleannote.data.ui.InputType
 import com.cleannote.mapper.UserMapper
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.*
@@ -38,7 +39,8 @@ class SplashFragment constructor(
             .subscribe {
                 showInputDialog(
                     getString(R.string.dialog_login),
-                    inputDialogCallback
+                    InputType.Login,
+                    inputCaptureCallback
                 )}
             .addCompositeDisposable()
     }
@@ -75,28 +77,23 @@ class SplashFragment constructor(
             findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         }?: showErrorMessage(
             message!!,
-            object : ButtonCallback{
+            object : DialogBtnCallback{
                 override fun confirmProceed() {
                     showRetryLoginDialog()
                 }
                 override fun cancelProceed() {}
 
-                override fun inputValueReceive(value: String) {}
             })
     }
 
     private fun showRetryLoginDialog(){
         val retryMessage = getString(R.string.dialog_login_retry)
-        showInputDialog(retryMessage, inputDialogCallback)
+        showInputDialog(retryMessage, InputType.Login, inputCaptureCallback)
     }
 
-    private val inputDialogCallback: ButtonCallback = object : ButtonCallback{
-        override fun confirmProceed() {}
-
-        override fun cancelProceed() {}
-
-        override fun inputValueReceive(value: String) = with(viewModel) {
-            setUserId(value)
+    private val inputCaptureCallback: InputCaptureCallback = object : InputCaptureCallback{
+        override fun onTextCaptured(text: String) = with(viewModel) {
+            setUserId(text)
             tryLogin()
         }
     }

@@ -49,7 +49,7 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
     fun submitList(list: List<NoteUiModel>) {
-        Timber.d("Adapter_list size:${list.size}")
+        Timber.tag("RxCleanNote").d("Adapter_submitList size:${list.size}")
         differ.submitList(list)
     }
 

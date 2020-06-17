@@ -13,7 +13,7 @@ abstract class SingleUseCase<T, in Params> constructor(
     private val postExecutionThread: PostExecutionThread
 ) {
 
-    private val disposables = CompositeDisposable()
+    private var disposables: CompositeDisposable = CompositeDisposable()
 
     abstract fun buildUseCaseSingle(params: Params? = null): Single<T>
 
@@ -21,12 +21,21 @@ abstract class SingleUseCase<T, in Params> constructor(
         val singleSource = this.buildUseCaseSingle(params)
             .subscribeOn(Schedulers.from(threadExecutor))
             .observeOn(postExecutionThread.scheduler) as Single<T>
-        addDisposables(singleSource.subscribeWith(observer))
+        addDisposable(singleSource.subscribeWith(observer))
+    }
+
+    private fun getCompositeDisposable(): CompositeDisposable{
+        if (disposables.isDisposed){
+            disposables = CompositeDisposable()
+        }
+        return disposables
     }
 
     fun dispose(){
         if (!disposables.isDisposed) disposables.dispose()
     }
 
-    fun addDisposables(disposable: Disposable) = disposables.add(disposable)
+    private fun addDisposable(disposable: Disposable) {
+        getCompositeDisposable().add(disposable)
+    }
 }

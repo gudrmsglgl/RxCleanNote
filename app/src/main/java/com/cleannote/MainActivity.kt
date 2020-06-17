@@ -15,6 +15,7 @@ import com.cleannote.app.R
 import com.cleannote.common.*
 import com.cleannote.data.ui.InfoType
 import com.cleannote.data.ui.InfoType.*
+import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import kotlinx.android.synthetic.main.activity_main.*
@@ -54,26 +55,27 @@ class MainActivity : AppCompatActivity(), UIController {
 
     override fun showUIMessage(
         uiMessage: UIMessage,
-        buttonCallback: ButtonCallback?
+        dialogBtnCallback: DialogBtnCallback?,
+        inputCaptureCallback: InputCaptureCallback?
     ) = when(uiMessage.uiType){
         UIType.Toast -> {
             showToast(uiMessage.message)
         }
         UIType.Dialog -> {
-            makeDialog(uiMessage.message, uiMessage.infoType, buttonCallback)
+            makeDialog(uiMessage.message, uiMessage.infoType!!, dialogBtnCallback)
         }
         else -> {
-            makeInputDialog(uiMessage.message, buttonCallback)
+            makeInputDialog(uiMessage.message, uiMessage.inputType!!, inputCaptureCallback)
         }
     }
 
     private fun makeDialog(message: String,
                            infoType: InfoType,
-                           buttonCallback: ButtonCallback?) {
+                           dialogBtnCallback: DialogBtnCallback?) {
         MaterialDialog(this).show {
             title(text = dialogTitle(infoType))
             message(text = message)
-            dialogButton(infoType, buttonCallback)
+            dialogButton(infoType, dialogBtnCallback)
             cancelable(dialogIsCancelable(infoType))
         }
     }
@@ -83,31 +85,30 @@ class MainActivity : AppCompatActivity(), UIController {
     )= when (infoType){
         Confirm -> getString(R.string.dialog_title_confirm)
         Warning -> getString(R.string.dialog_title_warning)
-        Question -> getString(R.string.dialog_title_question)
-        else -> ""
+        else -> getString(R.string.dialog_title_question)
     }
 
     private fun dialogIsCancelable(infoType: InfoType): Boolean{
-        return infoType !is Question
+        return infoType !is InfoType.Question
     }
 
     private fun MaterialDialog.dialogButton(
         infoType: InfoType,
-        buttonCallback: ButtonCallback?
+        dialogBtnCallback: DialogBtnCallback?
     ) = when(infoType){
         Question -> {
             positiveButton(R.string.dialog_btn_yes) {
-                buttonCallback?.confirmProceed()
+                dialogBtnCallback?.confirmProceed()
                 dismiss()
             }
             negativeButton(R.string.dialog_btn_no) {
-                buttonCallback?.cancelProceed()
+                dialogBtnCallback?.cancelProceed()
                 dismiss()
             }
         }
         else -> {
             positiveButton(R.string.dialog_btn_confirm) {
-                buttonCallback?.confirmProceed()
+                dialogBtnCallback?.confirmProceed()
                 dismiss()
             }
         }
@@ -115,17 +116,18 @@ class MainActivity : AppCompatActivity(), UIController {
 
     private fun makeInputDialog(
         message: String,
-        buttonCallback: ButtonCallback?
+        inputType: InputType,
+        inputCaptureCallback: InputCaptureCallback?
     ){
         MaterialDialog(this).show {
             var inputText: String? = null
             var isPositiveBtnClick = false
             message(text = message)
-            input(hint = getString(R.string.dialog_id_hint)){ _, text ->
+            input(hint = getInputHint(inputType)){ _, text ->
                 inputText = text.toString()
             }
             positiveButton {
-                buttonCallback?.inputValueReceive(inputText!!)
+                inputCaptureCallback?.onTextCaptured(inputText!!)
                 isPositiveBtnClick = true
             }
             onDismiss {
@@ -134,6 +136,11 @@ class MainActivity : AppCompatActivity(), UIController {
                 }
             }
         }
+    }
+
+    private fun getInputHint(inputType: InputType) = when(inputType){
+        InputType.Login -> getString(R.string.dialog_id_hint)
+        else -> getString(R.string.dialog_newnote_hint)
     }
 
     private fun showToast(message: String){

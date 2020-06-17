@@ -1,4 +1,4 @@
-package com.cleannote.common
+package com.cleannote.notelist
 
 import android.graphics.Rect
 import android.view.View

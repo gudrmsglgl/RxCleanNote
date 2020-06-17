@@ -1,5 +1,6 @@
 package com.cleannote.presentation.notelist
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,17 +33,19 @@ class NoteListViewModel
     val usecaseProceed: LiveData<Boolean>
         get() = _usecaseProceed
 
-    init {
+    /*init {
         fetchNotes()
-    }
+    }*/
 
     override fun onCleared() {
+        Log.d("RxCleanNote", "viewModel_onCleared()")
         getNumNotes.dispose()
         super.onCleared()
     }
 
     fun fetchNotes() {
         _noteList.updateProceed(_usecaseProceed)
+        Log.d("RxCleanNote", "viewModel_fetchNotes")
         _noteList.postValue(DataState.loading())
         getNumNotes.execute(NoteListSubscriber())
     }
@@ -58,6 +61,7 @@ class NoteListViewModel
         override fun onComplete() { _usecaseProceed.removeSource(_noteList) }
 
         override fun onNext(list: List<Note>) {
+            Log.d("RxCleanNote", "viewModel_NoteListSubscriber_onNext")
             _noteList.postValue(DataState.success(
                 list.map { noteMapper.mapToView(it) }
             ))

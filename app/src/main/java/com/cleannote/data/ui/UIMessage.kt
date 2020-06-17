@@ -1,3 +1,6 @@
 package com.cleannote.data.ui
 
-data class UIMessage(val message: String, val uiType: UIType, val infoType: InfoType)
+data class UIMessage(val message: String,
+                     val uiType: UIType,
+                     val infoType: InfoType? = null,
+                     val inputType: InputType? = null)
