@@ -7,8 +7,6 @@ import com.cleannote.mapper.NoteMapper
 import com.cleannote.mapper.UserMapper
 import com.cleannote.notedetail.NoteDetailFragment
 import com.cleannote.notelist.NoteListFragment
-import com.cleannote.presentation.ViewModelFactory
-import com.cleannote.presentation.util.DateUtil
 import com.cleannote.splash.SplashFragment
 import javax.inject.Inject
 

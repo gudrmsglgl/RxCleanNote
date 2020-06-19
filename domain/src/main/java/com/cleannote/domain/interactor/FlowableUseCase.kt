@@ -24,19 +24,15 @@ abstract class FlowableUseCase<T, in Params> constructor(
         addDisposable(observable.subscribeWith(observer))
     }
 
-    private fun getCompositeDisposable(): CompositeDisposable{
-        if (disposables.isDisposed){
-            disposables = CompositeDisposable()
-        }
-        return disposables
-    }
-
     fun dispose() {
         if (!disposables.isDisposed) disposables.dispose()
     }
 
     private fun addDisposable(disposable: Disposable) {
-        getCompositeDisposable().add(disposable)
+        if (disposables.isDisposed){
+            disposables = CompositeDisposable()
+        }
+        disposables.add(disposable)
     }
 
 }

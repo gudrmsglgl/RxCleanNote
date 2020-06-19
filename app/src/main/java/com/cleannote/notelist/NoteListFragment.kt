@@ -3,19 +3,22 @@ package com.cleannote.notelist
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 
 import com.cleannote.app.R
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.InputCaptureCallback
 import com.cleannote.data.ui.InputType
 import com.cleannote.mapper.NoteMapper
-import com.cleannote.presentation.data.State
+import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
-import com.cleannote.presentation.util.DateUtil
+import com.cleannote.common.DateUtil
+import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import kotlinx.android.synthetic.main.fragment_note_list.*
 
 /**
@@ -28,6 +31,8 @@ constructor(
     private val dateUtil: DateUtil
 ): BaseFragment(R.layout.fragment_note_list) {
 
+    private val bundle: Bundle = Bundle()
+
     private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
     private var noteAdapter: NoteListAdapter? = null
 
@@ -36,6 +41,7 @@ constructor(
         initRecyclerView()
         subscribeNoteList()
         insertNoteOnFab()
+        subscribeInsertResult()
     }
 
     override fun onResume() {
@@ -60,7 +66,14 @@ constructor(
                     InputType.NewNote,
                     object : InputCaptureCallback{
                         override fun onTextCaptured(text: String) {
-                            showToast(text)
+                            /*val noteView = noteMapper.mapFromTitle(text)
+                            val noteUiModel = noteMapper.mapToUiModel(noteView)
+                            bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+                            viewModel.insertNotes(noteView)*/
+                            val noteView = noteMapper.mapFromTitle(text)
+                            val noteUiModel = noteMapper.mapToUiModel(noteView)
+                            bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+                            findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
                         }
                     })}
             .addCompositeDisposable()
@@ -71,13 +84,12 @@ constructor(
             if ( dataState != null ){
 
                 when (dataState.status) {
-                    State.LOADING -> showLoadingProgressBar(true)
-                    State.SUCCESS -> {
+                    LOADING -> showLoadingProgressBar(true)
+                    SUCCESS -> {
                         showLoadingProgressBar(false)
-                        timber("d","subscribeNoteList_size: ${dataState.data?.size}")
                         fetchNotesToAdapter(dataState.data!!)
                     }
-                    State.ERROR -> {
+                    ERROR -> {
                         showLoadingProgressBar(false)
                         showErrorMessage(dataState.message!!)
                     }
@@ -90,4 +102,25 @@ constructor(
         .map { noteMapper.mapToUiModel(it) }
         .run { noteAdapter?.submitList(this) }
 
+    private fun subscribeInsertResult() = viewModel.insertResult.observe(viewLifecycleOwner,
+        Observer { dataState ->
+            if (dataState != null){
+                when (dataState.status) {
+                    LOADING -> showLoadingProgressBar(true)
+                    SUCCESS -> {
+                        showLoadingProgressBar(false)
+                        timber("d", "insert success: ${dataState.data}")
+                        navDetailNote()
+                    }
+                    ERROR -> {
+                        showLoadingProgressBar(false)
+                        showErrorMessage(dataState.message!!)
+                    }
+                }
+            }
+        })
+
+    private fun navDetailNote(){
+        findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
+    }
 }

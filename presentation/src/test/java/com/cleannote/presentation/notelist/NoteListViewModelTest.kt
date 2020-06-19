@@ -3,6 +3,7 @@ package com.cleannote.presentation.notelist
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
+import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.mapper.NoteMapper
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class NoteListViewModelTest {
 
     lateinit var getNumNotes: GetNumNotes
+    lateinit var insertNewNote: InsertNewNote
     lateinit var noteMapper: NoteMapper
     private lateinit var captor: KArgumentCaptor<DisposableSubscriber<List<Note>>>
     private lateinit var liveState: MutableLiveData<State>
@@ -36,9 +38,10 @@ class NoteListViewModelTest {
         stateObserver = mock()
         liveState.observeForever(stateObserver)
         captor = argumentCaptor()
+        insertNewNote = mock()
         getNumNotes = mock()
         noteMapper = mock()
-        noteListViewModel = NoteListViewModel(getNumNotes, noteMapper)
+        noteListViewModel = NoteListViewModel(getNumNotes, insertNewNote, noteMapper)
     }
 
     @AfterEach
@@ -48,13 +51,14 @@ class NoteListViewModelTest {
 
     @Test
     fun getNumNotesExecuteUseCase(){
+        noteListViewModel.fetchNotes()
         noteListViewModel.noteList
         verify(getNumNotes).execute(any(), anyOrNull())
     }
 
     @Test
     fun getNumNotesReturnLoading() {
-
+        noteListViewModel.fetchNotes()
         setCurrentState(noteListViewModel.noteList.value?.status)
 
         verify(getNumNotes).execute(captor.capture(), anyOrNull())
@@ -68,6 +72,7 @@ class NoteListViewModelTest {
 
     @Test
     fun getNumNotesReturnLoadingNoData(){
+        noteListViewModel.fetchNotes()
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(getNumNotes).execute(any(), anyOrNull())
         verify(stateObserver).onChanged(State.LOADING)
@@ -76,6 +81,7 @@ class NoteListViewModelTest {
 
     @Test
     fun getNumNotesReturnLoadingNoMessage(){
+        noteListViewModel.fetchNotes()
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(getNumNotes).execute(any(), anyOrNull())
         verify(stateObserver).onChanged(State.LOADING)
@@ -89,6 +95,9 @@ class NoteListViewModelTest {
         noteViewList.forEachIndexed { index, noteView ->
             stubNoteMapperMapToView(noteView, noteList[index])
         }
+
+        noteListViewModel.fetchNotes()
+
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(stateObserver).onChanged(State.LOADING)
 
@@ -106,6 +115,9 @@ class NoteListViewModelTest {
         noteViewList.forEachIndexed { index, noteView ->
             stubNoteMapperMapToView(noteView, noteList[index])
         }
+
+        noteListViewModel.fetchNotes()
+
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(stateObserver).onChanged(State.LOADING)
 
@@ -124,6 +136,9 @@ class NoteListViewModelTest {
         noteViewList.forEachIndexed { index, noteView ->
             stubNoteMapperMapToView(noteView, noteList[index])
         }
+
+        noteListViewModel.fetchNotes()
+
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(stateObserver).onChanged(State.LOADING)
 
@@ -137,6 +152,8 @@ class NoteListViewModelTest {
 
     @Test
     fun getNumNotesReturnError(){
+        noteListViewModel.fetchNotes()
+
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(stateObserver).onChanged(State.LOADING)
 
@@ -149,6 +166,8 @@ class NoteListViewModelTest {
 
     @Test
     fun getNumNotesReturnErrorNoData(){
+        noteListViewModel.fetchNotes()
+
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(stateObserver).onChanged(State.LOADING)
 
@@ -162,6 +181,8 @@ class NoteListViewModelTest {
 
     @Test
     fun getNumNotesReturnErrorMessage(){
+        noteListViewModel.fetchNotes()
+
         val errorMessage = "RuntimeError"
         setCurrentState(noteListViewModel.noteList.value?.status)
         verify(stateObserver).onChanged(State.LOADING)

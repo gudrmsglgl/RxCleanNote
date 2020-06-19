@@ -1,4 +1,4 @@
-package com.cleannote.presentation.util
+package com.cleannote.common
 
 import java.text.SimpleDateFormat
 import java.util.*

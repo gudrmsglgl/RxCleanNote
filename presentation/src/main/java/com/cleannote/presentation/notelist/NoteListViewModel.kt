@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
+import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class NoteListViewModel
 @Inject constructor(
     private val getNumNotes: GetNumNotes,
+    private val insertNewNote: InsertNewNote,
     private val noteMapper: NoteMapper
 ): ViewModel() {
 
@@ -26,16 +28,8 @@ class NoteListViewModel
         get() = _noteList
 
     private val _insertNote: MutableLiveData<DataState<Long>> = MutableLiveData()
-    val insertNote: LiveData<DataState<Long>>
+    val insertResult: LiveData<DataState<Long>>
         get() = _insertNote
-
-    private val _usecaseProceed: MediatorLiveData<Boolean> = MediatorLiveData()
-    val usecaseProceed: LiveData<Boolean>
-        get() = _usecaseProceed
-
-    /*init {
-        fetchNotes()
-    }*/
 
     override fun onCleared() {
         Log.d("RxCleanNote", "viewModel_onCleared()")
@@ -44,24 +38,19 @@ class NoteListViewModel
     }
 
     fun fetchNotes() {
-        _noteList.updateProceed(_usecaseProceed)
-        Log.d("RxCleanNote", "viewModel_fetchNotes")
         _noteList.postValue(DataState.loading())
         getNumNotes.execute(NoteListSubscriber())
     }
 
-    fun insertNotes(title: String){
+    fun insertNotes(noteView: NoteView){
         _insertNote.postValue(DataState.loading())
-        /*noteListInteractors
-            .insertNewNote
-            .execute(NoteInsertSubscriber(), noteMapper.mapFromTitle(title))*/
+        insertNewNote.execute(NoteInsertSubscriber(), noteMapper.mapFromView(noteView))
     }
 
     inner class NoteListSubscriber: DisposableSubscriber<List<Note>>(){
-        override fun onComplete() { _usecaseProceed.removeSource(_noteList) }
+        override fun onComplete() { }
 
         override fun onNext(list: List<Note>) {
-            Log.d("RxCleanNote", "viewModel_NoteListSubscriber_onNext")
             _noteList.postValue(DataState.success(
                 list.map { noteMapper.mapToView(it) }
             ))
@@ -71,27 +60,15 @@ class NoteListViewModel
             _noteList.postValue(DataState.error(
                 exception.message
             ))
-            _usecaseProceed.removeSource(_noteList)
         }
     }
 
     inner class NoteInsertSubscriber: DisposableSingleObserver<Long>(){
         override fun onSuccess(t: Long){
             _insertNote.postValue(DataState.success(t))
-            _usecaseProceed.removeSource(_insertNote)
         }
         override fun onError(t: Throwable) {
             _insertNote.postValue(DataState.error(t.message))
-            _usecaseProceed.removeSource(_insertNote)
-        }
-    }
-}
-
-fun <T> LiveData<DataState<T>>.updateProceed(mediatorLiveData: MediatorLiveData<Boolean>){
-    mediatorLiveData.addSource(this){
-        when (it.status){
-            is State.LOADING -> mediatorLiveData.value = false
-            else -> mediatorLiveData.value = true
         }
     }
 }

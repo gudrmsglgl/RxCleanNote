@@ -1,10 +1,15 @@
 package com.cleannote.model
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 class NoteUiModel(val id: String,
                   val title: String,
                   val body: String,
                   val updated_at: String,
-                  val created_at: String){
+                  val created_at: String): Parcelable{
+
     override fun toString(): String {
         return "Note id: $id, title: $title, body: $body, updated: $updated_at, created: $created_at"
     }
