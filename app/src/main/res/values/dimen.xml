@@ -16,6 +16,9 @@
     <dimen name="title_list_item_text_size">21sp</dimen>
     <dimen name="date_list_item_text_size">11sp</dimen>
 
+    <!-- detail item -->
+    <dimen name="view_between_spacing">7dp</dimen>
+    <dimen name="scrollview_bottom_margin">80dp</dimen>
 
     <dimen name="default_view_margin">16dp</dimen>
     <dimen name="default_view_margin_negative">-16dp</dimen>

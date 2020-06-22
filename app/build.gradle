@@ -52,8 +52,6 @@ dependencies {
     compile project(':cache')
     compile project(':remote')
 
-
-    // Kotlin
     implementation Dependencies.kotlin_standard_library
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.ktx
@@ -61,6 +59,8 @@ dependencies {
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
     implementation Dependencies.rxbinding
+    implementation Dependencies.rxbindingCore
+    implementation Dependencies.rxbindingMaterial
     implementation Dependencies.room_runtime
     implementation Dependencies.navigation_fragment
     implementation Dependencies.navigation_ui
@@ -68,6 +68,7 @@ dependencies {
     implementation Dependencies.timber
     implementation Dependencies.material_dialogs
     implementation Dependencies.material_dialogs_input
+    implementation Dependencies.markdown_processor
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout

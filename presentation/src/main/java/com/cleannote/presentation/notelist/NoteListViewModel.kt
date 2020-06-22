@@ -17,7 +17,7 @@ import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class NoteListViewModel
-@Inject constructor(
+constructor(
     private val getNumNotes: GetNumNotes,
     private val insertNewNote: InsertNewNote,
     private val noteMapper: NoteMapper

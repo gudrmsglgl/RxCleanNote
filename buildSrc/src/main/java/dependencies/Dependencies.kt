@@ -34,6 +34,10 @@ object Dependencies {
     val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJavaVersion}"
     val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlinVersion}"
     val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroidVersion}"
-    val rxbinding = "com.jakewharton.rxbinding3:rxbinding:${Versions.rxbindingVersion}"
+    val rxbinding = "com.jakewharton.rxbinding4:rxbinding:${Versions.rxbindingVersion}"
+    val rxbindingCore = "com.jakewharton.rxbinding4:rxbinding-core:${Versions.rxbindingVersion}"
+    val rxbindingMaterial = "com.jakewharton.rxbinding4:rxbinding-material:${Versions.rxbindingVersion}"
+
+
     val timber = "com.jakewharton.timber:timber:${Versions.timber_version}"
 }

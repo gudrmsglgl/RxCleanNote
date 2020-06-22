@@ -38,7 +38,6 @@
                    android:id="@+id/note_title"
                    android:textColor="#000"
                    android:textSize="22sp"
-                   android:hint="@string/text_enter_a_title"
                    android:importantForAutofill="no"
                    android:inputType="text" />
 
@@ -67,4 +66,95 @@
 
    </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:id="@+id/note_scroll_view"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorPrimaryDark"
+            android:id="@+id/note_body_container">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/view_between_spacing"
+                android:background="@color/app_background_color"
+                android:layout_gravity="bottom"
+                />
+
+            <com.yydcdut.markdown.MarkdownEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="300dp"
+                android:id="@+id/note_body"
+                android:textSize="18sp"
+                android:textColor="#000"
+                android:padding="5dp"
+                android:gravity="top"
+                android:imeOptions="flagNoExtractUi"
+                android:background="#fff"
+                android:paddingTop="@dimen/default_view_margin"
+                android:paddingStart="@dimen/default_view_margin"
+                android:paddingEnd="@dimen/default_view_margin"
+                android:hint="@string/detail_note_hint"
+                android:layout_marginTop="@dimen/default_view_margin"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/view_between_spacing"
+                android:background="@color/app_background_color"
+                android:layout_gravity="bottom"
+                >
+
+            </View>
+
+
+            <!--<LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/default_view_margin"
+                android:gravity="center_vertical"
+                android:id="@+id/container_due_date"
+
+                >
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_date_range_black_24dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_due_date"
+                    android:textColor="#000"
+                    android:textSize="15sp"
+                    android:layout_marginStart="@dimen/default_view_margin"
+                    />
+
+
+            </LinearLayout>-->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/scrollview_bottom_margin"
+                android:background="@color/app_background_color"
+                >
+
+            </View>
+
+
+        </LinearLayout>
+
+
+
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

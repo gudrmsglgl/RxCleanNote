@@ -41,7 +41,7 @@ object Versions {
     const val rxJavaVersion = "2.2.10"
     const val rxKotlinVersion = "2.2.0"
     const val rxAndroidVersion = "2.1.1"
-    const val rxbindingVersion = "3.1.0"
+    const val rxbindingVersion = "4.0.0"
     const val hamcrest_version = "2.2"
     const val mockito_version = "2.21.0"
     const val mockito_kotlin_version = "2.2.0"
