@@ -114,35 +114,6 @@
 
             </View>
 
-
-            <!--<LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/default_view_margin"
-                android:gravity="center_vertical"
-                android:id="@+id/container_due_date"
-
-                >
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_date_range_black_24dp"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text_due_date"
-                    android:textColor="#000"
-                    android:textSize="15sp"
-                    android:layout_marginStart="@dimen/default_view_margin"
-                    />
-
-
-            </LinearLayout>-->
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/scrollview_bottom_margin"

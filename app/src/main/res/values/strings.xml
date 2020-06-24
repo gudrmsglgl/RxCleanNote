@@ -6,7 +6,6 @@
 
     <string name="text_enter_a_title">Enter a title</string>
 
-    <!-- detail note -->
     <string name="detail_note_hint">노트 내용을 입력 해주세요</string>
 
     <!-- Material Dialog -->
