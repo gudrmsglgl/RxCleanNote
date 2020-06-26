@@ -9,10 +9,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.cleannote.app.R
 import com.cleannote.model.NoteUiModel
+import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.view.longClicks
+import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.android.synthetic.main.layout_note_list_item.view.*
 import timber.log.Timber
 
 class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
+    val clickNoteSubject: PublishSubject<NoteUiModel>
+        get() = _clickNoteSubject
+
+    private val _longClickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
+    val longClickNoteSubject: PublishSubject<NoteUiModel>
+        get() = _longClickNoteSubject
 
     val DIFF_CALLBACK = object : DiffUtil.ItemCallback<NoteUiModel>(){
         override fun areItemsTheSame(oldItem: NoteUiModel, newItem: NoteUiModel): Boolean {
@@ -53,13 +64,17 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         differ.submitList(list)
     }
 
-    class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
         fun bind(item: NoteUiModel) = with(itemView) {
 
-            setOnClickListener {
-                Toast.makeText(context, item.title+"normal", Toast.LENGTH_SHORT).show()
-            }
+            clicks()
+                .map { item }
+                .subscribe(_clickNoteSubject)
+
+            longClicks { true }
+                .map { item }
+                .subscribe(_longClickNoteSubject)
 
             setOnLongClickListener {
                 Toast.makeText(context, item.title+"long", Toast.LENGTH_SHORT).show()
@@ -71,5 +86,11 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         }
 
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        _clickNoteSubject.onComplete()
+        _longClickNoteSubject.onComplete()
     }
 }

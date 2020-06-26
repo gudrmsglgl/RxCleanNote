@@ -102,10 +102,11 @@ class NoteDetailFragment constructor(
 
     private fun observeFirstOptionMenu() = toolbar_primary_icon.singleClick()
         .map { isEditPrimaryMenu() }
-        .subscribe { editMenu ->
-            if (editMenu) {
+        .subscribe { isEditCancelMenu ->
+            if (isEditCancelMenu) {
                 // edit Menu cancel
-                note_title.clearFocus()
+                note_title.takeIf { it.isFocused }?.clearFocus()
+                note_body.takeIf { it.isFocused }?.clearFocus()
                 viewModel.setNoteMode(DefaultMode)
             }
             else {
@@ -118,21 +119,27 @@ class NoteDetailFragment constructor(
     private fun subscribeNoteTitleState() = viewModel.noteTitleState.observe( viewLifecycleOwner,
         Observer { titleState ->
             when (titleState) {
-                is NtExpanded -> {
-                    note_title.setText(viewModel.getNoteTile())
-                    note_title.setSelection(viewModel.getNoteTile().length)
-                }
-                is NtCollapse -> {
-                    viewModel.takeIf { it.isEditMode() }?.setNoteMode(DefaultMode)
-                    tool_bar_title.text = viewModel.getNoteTile()
-                }
+                is NtExpanded -> setNoteTitle()
+                is NtCollapse -> setToolbarTitle()
             }
         })
+
+    private fun setNoteTitle() = with(note_title){
+        setText(viewModel.getNoteTile())
+        setSelection(viewModel.getNoteTile().length)
+    }
+
+    private fun setToolbarTitle(){
+        viewModel.takeIf { it.isEditMode() }?.setNoteMode(DefaultMode)
+        tool_bar_title.text = viewModel.getNoteTile()
+    }
 
     private fun getPreviousFragmentNote(){
         arguments?.let {
             val note = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
             viewModel.setNoteTitle(note.title)
+            viewModel.setNoteBody(note.body)
+            note_body.setText(note.body)
         }
     }
 

@@ -18,6 +18,7 @@ import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.common.DateUtil
+import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import kotlinx.android.synthetic.main.fragment_note_list.*
 
@@ -34,7 +35,7 @@ constructor(
     private val bundle: Bundle = Bundle()
 
     private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
-    private var noteAdapter: NoteListAdapter? = null
+    lateinit var noteAdapter: NoteListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -42,7 +43,21 @@ constructor(
         subscribeNoteList()
         insertNoteOnFab()
         subscribeInsertResult()
+        noteClick()
+        noteLongClick()
     }
+
+    private fun noteClick() = noteAdapter.clickNoteSubject
+        .doOnNext { timber("d", "$it") }
+        .subscribe { navDetailNote(it) }
+        .addCompositeDisposable()
+
+    private fun noteLongClick() = noteAdapter.longClickNoteSubject
+        .doOnNext { timber("d", "$it") }
+        .subscribe{
+
+        }
+        .addCompositeDisposable()
 
     override fun onResume() {
         super.onResume()
@@ -100,7 +115,7 @@ constructor(
 
     private fun fetchNotesToAdapter(notes: List<NoteView>) = notes
         .map { noteMapper.mapToUiModel(it) }
-        .run { noteAdapter?.submitList(this) }
+        .run { noteAdapter.submitList(this) }
 
     private fun subscribeInsertResult() = viewModel.insertResult.observe(viewLifecycleOwner,
         Observer { dataState ->
@@ -110,7 +125,7 @@ constructor(
                     SUCCESS -> {
                         showLoadingProgressBar(false)
                         timber("d", "insert success: ${dataState.data}")
-                        navDetailNote()
+                        // TODO navDetailNote
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)
@@ -120,7 +135,13 @@ constructor(
             }
         })
 
-    private fun navDetailNote(){
+    private fun navDetailNote(noteUiModel: NoteUiModel){
+        bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
         findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        recycler_view.adapter = null
     }
 }

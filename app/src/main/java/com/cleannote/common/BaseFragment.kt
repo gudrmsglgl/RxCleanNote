@@ -89,6 +89,7 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
     override fun onDestroyView() {
         super.onDestroyView()
         disposables?.clear()
+        disposables?.dispose()
     }
 
     fun View.singleClick() =
