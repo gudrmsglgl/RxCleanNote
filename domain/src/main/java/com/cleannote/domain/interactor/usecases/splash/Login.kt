@@ -9,8 +9,8 @@ import io.reactivex.Flowable
 import javax.inject.Inject
 
 open class Login @Inject constructor(val repository: NoteRepository,
-                                threadExecutor: ThreadExecutor,
-                                postExecutionThread: PostExecutionThread):
+                                     threadExecutor: ThreadExecutor,
+                                     postExecutionThread: PostExecutionThread):
     FlowableUseCase<List<User>, String>(threadExecutor, postExecutionThread) {
 
     public override fun buildUseCaseFlowable(params: String?): Flowable<List<User>> {

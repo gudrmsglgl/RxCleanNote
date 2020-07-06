@@ -1,7 +1,10 @@
 package com.cleannote.data.source
 
 import com.cleannote.data.repository.NoteCache
+import com.cleannote.data.repository.NoteDataStore
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import io.reactivex.Single
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -32,5 +35,21 @@ class NoteDataStoreFactoryTest {
     fun retrieveRemoteDataStoreReturnsRemoteDataStore(){
         val remoteDataStore = noteDataStoreFactory.retrieveRemoteDataStore()
         assertThat(remoteDataStore, instanceOf(NoteRemoteDataStore::class.java))
+    }
+
+    @Test
+    fun retrieveDataStoreReturnCacheDataStore(){
+        whenever(noteCache.isCached(0)).thenReturn(Single.just(true))
+        val dataStore: NoteDataStore =
+            noteDataStoreFactory.retrieveDataStore(noteCache.isCached(0).blockingGet())
+        assertThat(dataStore, instanceOf(NoteCacheDataStore::class.java))
+    }
+
+    @Test
+    fun retrieveDataStoreReturnRemoteDataStore(){
+        whenever(noteCache.isCached(1)).thenReturn(Single.just(false))
+        val dataStore: NoteDataStore =
+            noteDataStoreFactory.retrieveDataStore(noteCache.isCached(1).blockingGet())
+        assertThat(dataStore, instanceOf(NoteRemoteDataStore::class.java))
     }
 }

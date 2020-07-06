@@ -5,6 +5,7 @@ import com.cleannote.remote.mapper.NoteEntityMapper
 import com.cleannote.remote.mapper.UserEntityMapper
 import com.cleannote.remote.model.NoteModel
 import com.cleannote.remote.test.factory.NoteFactory
+import com.cleannote.remote.test.factory.QueryFactory
 import com.cleannote.remote.test.factory.UserFactory
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -28,6 +29,8 @@ class NoteRemoteImplTest {
 
     private lateinit var userEntityMapper: UserEntityMapper
     private val userModels = UserFactory.makeUserModels()
+
+    private val defaultQuery = QueryFactory.makeQueryEntity()
 
     @BeforeEach
     fun setUp(){
@@ -84,5 +87,24 @@ class NoteRemoteImplTest {
         }
         val testObserver = noteRemoteImpl.login(UserFactory.USER_ID).test()
         testObserver.assertValue(userEntities)
+    }
+
+    @Test
+    fun searchNotesComplete(){
+        val noteModels = NoteFactory.createNoteMoelList(defaultQuery.limit)
+        val noteEntities = NoteFactory.createNoteEntityList(defaultQuery.limit)
+
+        whenever(noteService.searchNotes(
+            defaultQuery.page, defaultQuery.limit, defaultQuery.sort,
+            defaultQuery.order, defaultQuery.like, defaultQuery.like
+        )).thenReturn(Flowable.just(noteModels))
+
+        noteEntities.forEachIndexed { index, noteEntity ->
+            whenever(entityMapper.mapFromRemote(noteModels[index])).thenReturn(noteEntity)
+        }
+
+        val testObserver = noteRemoteImpl.searchNotes(defaultQuery).test()
+        testObserver.assertComplete()
+        testObserver.assertValue(noteEntities)
     }
 }

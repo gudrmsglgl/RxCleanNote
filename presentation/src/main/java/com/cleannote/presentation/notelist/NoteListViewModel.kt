@@ -34,6 +34,7 @@ constructor(
     override fun onCleared() {
         Log.d("RxCleanNote", "viewModel_onCleared()")
         getNumNotes.dispose()
+        insertNewNote.dispose()
         super.onCleared()
     }
 

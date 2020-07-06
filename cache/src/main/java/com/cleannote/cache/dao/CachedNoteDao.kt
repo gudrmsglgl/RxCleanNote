@@ -2,8 +2,10 @@ package com.cleannote.cache.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.cleannote.cache.model.CachedNote
+import io.reactivex.Completable
 
 @Dao
 abstract class CachedNoteDao {
@@ -14,4 +16,32 @@ abstract class CachedNoteDao {
     @Query("SELECT * FROM notes")
     abstract fun getNumNotes(): List<CachedNote>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun saveNotes(noteList: List<CachedNote>)
+
+    @Query("""
+        SELECT * FROM notes 
+        WHERE title LIKE '%' || :like || '%' 
+        OR body LIKE '%' || :like || '%'
+        ORDER BY :order DESC LIMIT (:page * :limit)
+    """)
+    abstract fun searchNotesDESC(
+        page: Int,
+        limit: Int,
+        order: String,
+        like: String
+    ): List<CachedNote>
+
+    @Query("""
+        SELECT * FROM notes 
+        WHERE title LIKE '%' || :like || '%' 
+        OR body LIKE '%' || :like || '%'
+        ORDER BY :order ASC LIMIT (:page * :limit)
+    """)
+    abstract fun searchNotesASC(
+        page: Int,
+        limit: Int,
+        order: String,
+        like: String
+    ): List<CachedNote>
 }

@@ -3,10 +3,8 @@ package com.cleannote.data.source
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.repository.NoteCache
 import com.cleannote.data.test.factory.NoteFactory
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.hamcrest.CoreMatchers.*
@@ -24,13 +22,17 @@ class NoteCacheDataStoreTest {
     private lateinit var noteCache: NoteCache
     private lateinit var noteEntity: NoteEntity
 
+    private val noteEntities = NoteFactory.createNoteEntityList(0,5)
+
     private val successInserted: Long = 1L
     @BeforeEach
     fun setUp() {
         noteEntity = NoteFactory.createNoteEntity("#1", "title#1","body#1")
         noteCache = mock{
-            on { getNumNotes() } doReturn Flowable.just(NoteFactory.createNoteEntityList(10))
+            on { getNumNotes() } doReturn Flowable.just(NoteFactory.createNoteEntityList(0,10))
             on { insertCacheNewNote(noteEntity)} doReturn Single.just(successInserted)
+            on { saveNotes(noteEntities) }.thenReturn(Completable.complete())
+            on { isCached(any()) } doReturn Single.just(true)
         }
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
@@ -67,5 +69,17 @@ class NoteCacheDataStoreTest {
         Assertions.assertThrows(UnsupportedOperationException::class.java){
             noteCacheDataStore.login("")
         }
+    }
+
+    @Test
+    fun saveNotesCompletes(){
+        val testObserver = noteCacheDataStore.saveNotes(noteEntities).test()
+        testObserver.onComplete()
+    }
+
+    @Test
+    fun isCacheCompletes(){
+        val testObserver = noteCacheDataStore.isCached(1).test()
+        testObserver.onComplete()
     }
 }

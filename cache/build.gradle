@@ -52,6 +52,7 @@ dependencies {
     implementation Dependencies.dagger
     implementation Dependencies.room_runtime
     implementation Dependencies.livedata_ktx
+    implementation Dependencies.ktx
 
     testImplementation TestDependencies.junit4
     testImplementation TestDependencies.hamcrest_library

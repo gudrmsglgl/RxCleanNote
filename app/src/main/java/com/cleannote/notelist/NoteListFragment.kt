@@ -72,32 +72,28 @@ constructor(
         }
     }
 
-    private fun insertNoteOnFab(){
-        add_new_note_fab
-            .singleClick()
-            .subscribe {
-                showInputDialog(
-                    getString(R.string.dialog_newnote),
-                    InputType.NewNote,
-                    object : InputCaptureCallback{
-                        override fun onTextCaptured(text: String) {
-                            /*val noteView = noteMapper.mapFromTitle(text)
-                            val noteUiModel = noteMapper.mapToUiModel(noteView)
-                            bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-                            viewModel.insertNotes(noteView)*/
-                            val noteView = noteMapper.mapFromTitle(text)
-                            val noteUiModel = noteMapper.mapToUiModel(noteView)
-                            bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-                            findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
-                        }
-                    })}
-            .addCompositeDisposable()
-    }
+    private fun insertNoteOnFab() = add_new_note_fab.singleClick().subscribe {
+        showInputDialog(
+            getString(R.string.dialog_newnote),
+            InputType.NewNote,
+            object : InputCaptureCallback{
+                override fun onTextCaptured(text: String) {
+                    /*val noteView = noteMapper.mapFromTitle(text)
+                           val noteUiModel = noteMapper.mapToUiModel(noteView)
+                           bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+                           viewModel.insertNotes(noteView)*/
+                    val noteView = noteMapper.mapFromTitle(text)
+                    val noteUiModel = noteMapper.mapToUiModel(noteView)
+                    bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+                    findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
+                }
+            })}
+        .addCompositeDisposable()
+
 
     private fun subscribeNoteList() = viewModel.noteList.observe(viewLifecycleOwner,
         Observer { dataState ->
             if ( dataState != null ){
-
                 when (dataState.status) {
                     LOADING -> showLoadingProgressBar(true)
                     SUCCESS -> {
@@ -109,7 +105,6 @@ constructor(
                         showErrorMessage(dataState.message!!)
                     }
                 }
-
             }
         })
 

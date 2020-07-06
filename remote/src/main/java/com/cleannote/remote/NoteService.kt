@@ -33,4 +33,13 @@ interface NoteService {
         @Field("created_at") created_at: String
     ): Completable
 
+    @GET("memos")
+    fun searchNotes(
+        @Query("_page") page: Int,
+        @Query("_limit") limit: Int,
+        @Query("_sort") sort: String,
+        @Query("_order") order: String,
+        @Query("title_like") titleLike: String,
+        @Query("body_like") bodyLike: String
+    ): Flowable<List<NoteModel>>
 }

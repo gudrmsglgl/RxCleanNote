@@ -37,4 +37,14 @@ data class CachedNote(
 
         return true
     }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + body.hashCode()
+        result = 31 * result + updated_at.hashCode()
+        result = 31 * result + created_at.hashCode()
+        return result
+    }
+
 }

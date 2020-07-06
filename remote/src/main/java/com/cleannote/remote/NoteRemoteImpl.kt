@@ -1,6 +1,7 @@
 package com.cleannote.remote
 
 import com.cleannote.data.model.NoteEntity
+import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.model.UserEntity
 import com.cleannote.data.repository.NoteRemote
 import com.cleannote.remote.mapper.NoteEntityMapper
@@ -38,6 +39,19 @@ class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
             userModels.map {
                 userEntityMapper.mapFromRemote(it)
             }
+        }
+    }
+
+    override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> {
+        return noteService.searchNotes(
+            queryEntity.page,
+            queryEntity.limit,
+            queryEntity.sort,
+            queryEntity.order,
+            queryEntity.like,
+            queryEntity.like
+        ).map { noteModels ->
+            noteModels.map { noteEntityMapper.mapFromRemote(it) }
         }
     }
 }

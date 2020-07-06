@@ -36,10 +36,10 @@ object NoteFactory {
         updated_at = getCurrentTimestamp()
     )
 
-    fun createNoteEntityList(count: Int): List<NoteEntity> = (0 until count).map {
+    fun createNoteEntityList(start:Int, count: Int): List<NoteEntity> = (start until count).map {
         createNoteEntity("#$it", "title #it", "body #it")}.toList()
 
-    fun createNoteList(count: Int): List<Note> = (0 until count).map {
+    fun createNoteList(start:Int, count: Int): List<Note> = (start until count).map {
         createNote("#$it", "title #it", "body #it")}.toList()
 
 }
