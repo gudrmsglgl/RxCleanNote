@@ -47,10 +47,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    compile project(':data')
-    compile project(':presentation')
-    compile project(':cache')
-    compile project(':remote')
+    api(project(':presentation'))
+    implementation(project(':data'))
+    implementation(project(':cache'))
+    implementation(project(':remote'))
 
     implementation Dependencies.kotlin_standard_library
     implementation Dependencies.kotlin_reflect

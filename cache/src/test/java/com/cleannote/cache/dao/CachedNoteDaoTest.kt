@@ -2,6 +2,7 @@ package com.cleannote.cache.dao
 
 import android.os.Build
 import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import com.cleannote.cache.database.NoteDatabase
 import com.cleannote.cache.test.factory.NoteFactory
 import org.hamcrest.CoreMatchers.`is`
@@ -28,7 +29,7 @@ open class CachedNoteDaoTest{
     fun setUpDb() {
         //val context = InstrumentationRegistry.getInstrumentation().targetContext
         noteDatabase = Room
-            .inMemoryDatabaseBuilder( RuntimeEnvironment.application.baseContext, NoteDatabase::class.java)
+            .inMemoryDatabaseBuilder( ApplicationProvider.getApplicationContext(), NoteDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         noteDao = noteDatabase.noteDao()

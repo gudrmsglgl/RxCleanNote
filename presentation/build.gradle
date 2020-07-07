@@ -38,7 +38,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile project(':domain')
+    api project(':domain')
 
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.rxJava
