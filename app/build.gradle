@@ -34,12 +34,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = Java.java_version
+    kapt {
+        correctErrorTypes = true
     }
 
     kotlinOptions {
-        jvmTarget = Java.java_version
+        jvmTarget = "1.8"
     }
 }
 
@@ -76,6 +76,7 @@ dependencies {
     implementation SupportDependencies.material_design
 
     kapt AnnotationProcessing.dagger_compiler
+    kapt AnnotationProcessing.dagger_android_processor
     kapt AnnotationProcessing.room_compiler
     kapt AnnotationProcessing.lifecycle_compiler
 

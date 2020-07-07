@@ -13,7 +13,8 @@ import javax.inject.Singleton
     DomainModule::class,
     PresentationModule::class,
     RemoteModule::class,
-    UiModule::class
+    UiModule::class,
+    ApplicationModule::class
 ])
 interface ApplicationComponent {
 

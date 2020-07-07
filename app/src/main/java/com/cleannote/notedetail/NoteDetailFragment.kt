@@ -176,25 +176,25 @@ class NoteDetailFragment constructor(
     private fun toolbarEditMenu(){
         activity?.let {
             toolbar_primary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_cancel_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_cancel_24dp,null))
             toolbar_secondary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_done_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_done_24dp,null))
         }
     }
 
     private fun toolbarDefaultMenu(){
         activity?.let {
             toolbar_primary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_back_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_back_24dp,null))
 
             toolbar_secondary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_delete_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_delete_24dp,null))
         }
     }
 
     private fun isEditPrimaryMenu() = toolbar_primary_icon.drawable.constantState ==
-            resources.getDrawable(R.drawable.ic_cancel_24dp).constantState
+            resources.getDrawable(R.drawable.ic_cancel_24dp,null).constantState
 
     private fun isEditSecondaryMenu() = toolbar_secondary_icon.drawable.constantState ==
-            resources.getDrawable(R.drawable.ic_done_24dp).constantState
+            resources.getDrawable(R.drawable.ic_done_24dp,null).constantState
 }
