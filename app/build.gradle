@@ -61,6 +61,7 @@ dependencies {
     implementation Dependencies.rxbinding
     implementation Dependencies.rxbindingCore
     implementation Dependencies.rxbindingMaterial
+    implementation Dependencies.rxbindingAppCompat
     implementation Dependencies.room_runtime
     implementation Dependencies.navigation_fragment
     implementation Dependencies.navigation_ui

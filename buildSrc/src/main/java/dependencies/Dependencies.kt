@@ -37,6 +37,7 @@ object Dependencies {
     val rxbinding = "com.jakewharton.rxbinding4:rxbinding:${Versions.rxbindingVersion}"
     val rxbindingCore = "com.jakewharton.rxbinding4:rxbinding-core:${Versions.rxbindingVersion}"
     val rxbindingMaterial = "com.jakewharton.rxbinding4:rxbinding-material:${Versions.rxbindingVersion}"
+    val rxbindingAppCompat =  "com.jakewharton.rxbinding4:rxbinding-appcompat:${Versions.rxbindingVersion}"
 
 
     val timber = "com.jakewharton.timber:timber:${Versions.timber_version}"

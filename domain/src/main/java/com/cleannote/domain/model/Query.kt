@@ -1,9 +1,9 @@
 package com.cleannote.domain.model
 
 data class Query(
-    val page: Int = 1,
-    val limit: Int = 5,
-    val sort: String = "updated_at",
-    val order: String = "desc",
-    val like: String = ""
+    var page: Int = 1,
+    var limit: Int = 10,
+    var sort: String = "updated_at",
+    var order: String = "desc",
+    var like: String? = null
 )

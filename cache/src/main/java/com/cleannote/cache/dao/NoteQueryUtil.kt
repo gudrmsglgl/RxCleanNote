@@ -16,8 +16,8 @@ fun CachedNoteDao.searchNoteBySorted(
     limit: Int,
     order: String,
     sort: String,
-    like: String
+    like: String?
 ): List<CachedNote> = when {
-    sort == NOTE_SORT_DESC -> searchNotesDESC(page, limit, order, like)
-    else -> searchNotesASC(page, limit, order, like)
+    sort == NOTE_SORT_DESC -> searchNotesDESC(page, limit, order, like ?: "")
+    else -> searchNotesASC(page, limit, order, like ?: "")
 }

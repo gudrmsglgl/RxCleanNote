@@ -12,15 +12,13 @@ import com.cleannote.app.R
 import com.cleannote.common.BaseFragment
 import com.cleannote.extension.*
 import com.cleannote.model.NoteUiModel
-import com.cleannote.presentation.data.NoteTitleState.*
-import com.cleannote.presentation.data.TextMode.*
-import com.cleannote.presentation.data.ToolbarState.TbCollapse
-import com.cleannote.presentation.data.ToolbarState.TbExpanded
+import com.cleannote.presentation.data.notedetail.NoteTitleState.*
+import com.cleannote.presentation.data.notedetail.TextMode.*
+import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
+import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
-import com.jakewharton.rxbinding4.view.focusChanges
-import com.jakewharton.rxbinding4.widget.textChangeEvents
 import com.jakewharton.rxbinding4.widget.textChanges
 import com.yydcdut.markdown.MarkdownProcessor
 import com.yydcdut.markdown.syntax.edit.EditFactory
@@ -151,7 +149,7 @@ class NoteDetailFragment constructor(
         .subscribe { viewModel.setToolbarState(it) }
         .addCompositeDisposable()
 
-    private fun subscribeToolbarState() = viewModel.toolbarState
+    private fun subscribeToolbarState() = viewModel.detailToolbarState
         .observe( viewLifecycleOwner, Observer { toolbarState ->
             when (toolbarState){
                 is TbCollapse -> {

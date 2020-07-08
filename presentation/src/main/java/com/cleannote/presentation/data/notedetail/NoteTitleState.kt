@@ -1,4 +1,4 @@
-package com.cleannote.presentation.data
+package com.cleannote.presentation.data.notedetail
 
 sealed class NoteTitleState {
     object NtExpanded: NoteTitleState()

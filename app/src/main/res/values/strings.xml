@@ -8,6 +8,8 @@
 
     <string name="detail_note_hint">노트 내용을 입력 해주세요</string>
 
+    <string name="text_search">노트 검색</string>
+
     <!-- Material Dialog -->
     <string name="dialog_title_confirm">Confirm</string>
     <string name="dialog_title_warning">Warn</string>

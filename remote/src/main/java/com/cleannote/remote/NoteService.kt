@@ -39,7 +39,7 @@ interface NoteService {
         @Query("_limit") limit: Int,
         @Query("_sort") sort: String,
         @Query("_order") order: String,
-        @Query("title_like") titleLike: String,
-        @Query("body_like") bodyLike: String
+        @Query("title_like") titleLike: String?,
+        @Query("body_like") bodyLike: String?
     ): Flowable<List<NoteModel>>
 }

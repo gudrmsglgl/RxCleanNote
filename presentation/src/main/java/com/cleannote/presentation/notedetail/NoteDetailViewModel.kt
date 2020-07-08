@@ -1,25 +1,25 @@
 package com.cleannote.presentation.notedetail
 
 import androidx.lifecycle.*
-import com.cleannote.presentation.data.NoteTitleState
-import com.cleannote.presentation.data.NoteTitleState.*
-import com.cleannote.presentation.data.TextMode
-import com.cleannote.presentation.data.TextMode.DefaultMode
-import com.cleannote.presentation.data.TextMode.EditMode
-import com.cleannote.presentation.data.ToolbarState
-import com.cleannote.presentation.data.ToolbarState.*
+import com.cleannote.presentation.data.notedetail.NoteTitleState
+import com.cleannote.presentation.data.notedetail.NoteTitleState.*
+import com.cleannote.presentation.data.notedetail.TextMode
+import com.cleannote.presentation.data.notedetail.TextMode.DefaultMode
+import com.cleannote.presentation.data.notedetail.TextMode.EditMode
+import com.cleannote.presentation.data.notedetail.DetailToolbarState
+import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
 
 class NoteDetailViewModel constructor(): ViewModel() {
 
     private var _noteTitle: String = ""
     private var _noteBody: String = ""
 
-    private val _toolbarState: MutableLiveData<ToolbarState> = MutableLiveData()
-    val toolbarState: LiveData<ToolbarState>
-        get() = _toolbarState
+    private val _detailToolbarState: MutableLiveData<DetailToolbarState> = MutableLiveData()
+    val detailToolbarState: LiveData<DetailToolbarState>
+        get() = _detailToolbarState
 
     val noteTitleState: LiveData<NoteTitleState>
-        get() = Transformations.map(_toolbarState){
+        get() = Transformations.map(_detailToolbarState){
             if (it is TbExpanded) NtExpanded
             else NtCollapse
         }
@@ -28,8 +28,8 @@ class NoteDetailViewModel constructor(): ViewModel() {
     val noteMode: LiveData<TextMode>
         get() = _noteMode
 
-    fun setToolbarState(state: ToolbarState){
-        _toolbarState.value = state
+    fun setToolbarState(state: DetailToolbarState){
+        _detailToolbarState.value = state
     }
 
     fun setNoteTitle(title: String) {

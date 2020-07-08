@@ -50,8 +50,8 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
 
     override fun isCached(page: Int): Single<Boolean> = Single.defer {
         val currentTime = System.currentTimeMillis()
-        val isUpdateTime = currentTime - getLastCacheTime(page) > SHOULD_PAGE_UPDATE_TIME
-        Single.just(isUpdateTime)
+        val isCache = currentTime - getLastCacheTime(page) < SHOULD_PAGE_UPDATE_TIME
+        Single.just(isCache)
     }
 
     override fun setLastCacheTime(lastCache: Long, page: Int) {

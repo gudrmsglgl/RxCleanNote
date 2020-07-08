@@ -3,7 +3,10 @@ package com.cleannote.notelist
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import androidx.core.os.bundleOf
+import android.view.inputmethod.EditorInfo
+import android.widget.LinearLayout
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,7 +23,11 @@ import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.common.DateUtil
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
+import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
+import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import kotlinx.android.synthetic.main.fragment_note_list.*
+import java.util.concurrent.TimeUnit
 
 /**
  * A simple [Fragment] subclass.
@@ -40,12 +47,27 @@ constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+        subscribeToolbar()
         subscribeNoteList()
         insertNoteOnFab()
         subscribeInsertResult()
         noteClick()
         noteLongClick()
     }
+
+    private fun subscribeToolbar() = viewModel.toolbarState.observe(viewLifecycleOwner,
+        Observer { toolbarState ->
+            when(toolbarState){
+                is SearchState -> {
+                    addSearchViewToolbarContainer()
+                    setupSearchView()
+                }
+                is MultiSelectState -> {
+
+                }
+            }
+        }
+    )
 
     private fun noteClick() = noteAdapter.clickNoteSubject
         .doOnNext { timber("d", "$it") }
@@ -61,7 +83,7 @@ constructor(
 
     override fun onResume() {
         super.onResume()
-        viewModel.fetchNotes()
+        viewModel.searchNotes()
     }
 
     private fun initRecyclerView(){
@@ -134,6 +156,35 @@ constructor(
         bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
         findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
     }
+
+    private fun addSearchViewToolbarContainer() = view?.let {
+        val searchView = View
+            .inflate(it.context, R.layout.layout_searchview_toolbar, null)
+            .apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+            }
+        toolbar_content_container.addView(searchView)
+    }
+
+    private fun setupSearchView() = toolbar_content_container
+        .findViewById<Toolbar>(R.id.searchview_toolbar)
+        .apply {
+            findViewById<SearchView>(R.id.search_view)
+                .apply {
+                    queryTextChangeEvents()
+                        .debounce(1000, TimeUnit.MILLISECONDS)
+                        .subscribe {
+                            with(viewModel){
+                                searchKeyword(it.queryText.toString())
+                                searchNotes()
+                            }
+                        }
+                }
+        }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
