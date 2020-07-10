@@ -15,6 +15,8 @@ class PreferencesHelper @Inject constructor(context: Context){
     }
 
     private val notePref: SharedPreferences
+    val pref: SharedPreferences
+        get() = notePref
 
     init {
         notePref = context.getSharedPreferences(PREF_NOTE_PACKAGE_NAME, Context.MODE_PRIVATE)

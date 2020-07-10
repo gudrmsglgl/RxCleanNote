@@ -1,5 +1,6 @@
 package com.cleannote.presentation
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
@@ -22,7 +23,8 @@ class ViewModelFactory
     private val getNumNotes: GetNumNotes,
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
-    private val noteMapper: NoteMapper
+    private val noteMapper: NoteMapper,
+    private val sharedPreferences: SharedPreferences
 ): ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -31,7 +33,7 @@ class ViewModelFactory
         SplashViewModel::class.java -> SplashViewModel(login, userMapper) as T
 
         NoteListViewModel::class.java -> NoteListViewModel(
-            getNumNotes, searchNotes, insertNewNote, noteMapper) as T
+            getNumNotes, searchNotes, insertNewNote, noteMapper, sharedPreferences) as T
 
         NoteDetailViewModel::class.java -> NoteDetailViewModel() as T
 

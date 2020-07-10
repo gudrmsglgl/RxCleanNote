@@ -30,7 +30,7 @@ constructor(
     override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> =
         noteRemote.searchNotes(queryEntity)
 
-    override fun saveNotes(notes: List<NoteEntity>, page: Int): Completable {
+    override fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable {
         throw UnsupportedOperationException()
     }
 

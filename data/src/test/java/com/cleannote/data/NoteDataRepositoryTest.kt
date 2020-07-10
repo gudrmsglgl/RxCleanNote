@@ -62,7 +62,7 @@ class NoteDataRepositoryTest {
         noteCacheDataStore = mock {
             on { insertCacheNewNote(insertSuccessNote) } doReturn Single.just(insertedSuccess)
             on { insertCacheNewNote(insertFailNote) } doReturn Single.just(insertedFail)
-            on { saveNotes(noteEntities) } doReturn Completable.complete()
+            on { saveNotes(noteEntities, defaultQueryEntity) } doReturn Completable.complete()
             on { searchNotes(defaultQueryEntity) } doReturn Flowable.just(cacheNoteEntities)
             on { isCached(1) } doReturn Single.just(false)
             on { isCached(2) } doReturn Single.just(true)
@@ -161,7 +161,7 @@ class NoteDataRepositoryTest {
             )
 
             verify(noteRemoteDataStore).searchNotes(defaultQueryEntity)
-            verify(noteCacheDataStore).saveNotes(noteEntities)
+            verify(noteCacheDataStore).saveNotes(noteEntities, defaultQueryEntity)
 
             verify(noteCacheDataStore).searchNotes(defaultQueryEntity)
         }
@@ -243,4 +243,31 @@ class NoteDataRepositoryTest {
 
         testObserver.assertValue(resultNote)
     }
+
+    @Test
+    fun searchKeywordNoteComplete(){
+        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
+        val searchedNoteEntities = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
+        val searchQuery = QueryFactory.makeQuery("#1")
+        val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
+
+        whenever(queryMapper.mapToEntity(searchQuery)).thenReturn(searchQueryEntity)
+        whenever(noteRemoteDataStore.searchNotes(searchQueryEntity))
+            .thenReturn(Flowable.just(searchedNoteEntities))
+        whenever(noteCacheDataStore.saveNotes(searchedNoteEntities, searchQueryEntity))
+            .thenReturn(Completable.complete())
+        whenever(noteCacheDataStore.searchNotes(searchQueryEntity))
+            .thenReturn(Flowable.just(searchedNoteEntities))
+        searchedNote.forEachIndexed { index, note ->
+            whenever(noteMapper.mapFromEntity(searchedNoteEntities[index])).thenReturn(note)
+        }
+
+        verify(noteCacheDataStore, never()).isCached(any())
+
+        val testObserver = noteDataRepository.searchNotes(searchQuery).test()
+        testObserver.assertComplete()
+        testObserver.assertValue(searchedNote)
+    }
+
+
 }

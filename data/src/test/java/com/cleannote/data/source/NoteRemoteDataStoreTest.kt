@@ -2,6 +2,7 @@ package com.cleannote.data.source
 
 import com.cleannote.data.repository.NoteRemote
 import com.cleannote.data.test.factory.NoteFactory
+import com.cleannote.data.test.factory.QueryFactory
 import com.cleannote.data.test.factory.UserFactory
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -60,7 +61,7 @@ class NoteRemoteDataStoreTest {
     @Test
     fun saveNotesReturnThrow(){
         Assertions.assertThrows(UnsupportedOperationException::class.java){
-            noteRemoteDataStore.saveNotes(noteEntities)
+            noteRemoteDataStore.saveNotes(noteEntities, QueryFactory.makeQueryEntity())
         }
     }
 

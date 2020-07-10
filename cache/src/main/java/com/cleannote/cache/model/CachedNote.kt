@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.cleannote.cache.database.constants.Constants
+import java.util.*
 
 @Entity(tableName = Constants.TABLE_NOTE)
 data class CachedNote(

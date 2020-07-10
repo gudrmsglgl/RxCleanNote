@@ -1,5 +1,6 @@
 package com.cleannote.common
 
+import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
@@ -14,13 +15,14 @@ class NoteFragmentFactory @Inject constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
     private val userMapper: UserMapper,
-    private val noteMapper: NoteMapper
+    private val noteMapper: NoteMapper,
+    private val sharedPreferences: SharedPreferences
 ): FragmentFactory(){
 
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(viewModelFactory, noteMapper, dateUtil)
+            val fragment = NoteListFragment(viewModelFactory, noteMapper, dateUtil, sharedPreferences)
             fragment
         }
 

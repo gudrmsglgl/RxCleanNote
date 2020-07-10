@@ -3,6 +3,7 @@ package com.cleannote.data.source
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.repository.NoteCache
 import com.cleannote.data.test.factory.NoteFactory
+import com.cleannote.data.test.factory.QueryFactory
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -73,7 +74,8 @@ class NoteCacheDataStoreTest {
 
     @Test
     fun saveNotesCompletes(){
-        val testObserver = noteCacheDataStore.saveNotes(noteEntities).test()
+        val testObserver =
+            noteCacheDataStore.saveNotes(noteEntities, QueryFactory.makeQueryEntity()).test()
         testObserver.onComplete()
     }
 

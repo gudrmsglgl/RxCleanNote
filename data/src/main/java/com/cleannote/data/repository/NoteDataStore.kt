@@ -13,6 +13,6 @@ interface NoteDataStore {
     fun insertRemoteNewNote(noteEntity: NoteEntity): Completable
     fun login(userId: String): Flowable<List<UserEntity>>
     fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>
-    fun saveNotes(notes: List<NoteEntity>, page: Int = 1): Completable
+    fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable
     fun isCached(page: Int): Single<Boolean>
 }

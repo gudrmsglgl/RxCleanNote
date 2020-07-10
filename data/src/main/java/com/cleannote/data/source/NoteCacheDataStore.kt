@@ -32,10 +32,11 @@ constructor(
     override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> =
         noteCache.searchNotes(queryEntity)
 
-    override fun saveNotes(notes: List<NoteEntity>, page: Int): Completable =
-        noteCache.saveNotes(notes, page)
+    override fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable =
+        noteCache.saveNotes(notes)
             .doOnComplete {
-                noteCache.setLastCacheTime(System.currentTimeMillis(), page)
+                if (queryEntity.like == null || queryEntity.like == "")
+                    noteCache.setLastCacheTime(System.currentTimeMillis(), queryEntity.page)
             }
 
     override fun isCached(page: Int): Single<Boolean> = noteCache.isCached(page)

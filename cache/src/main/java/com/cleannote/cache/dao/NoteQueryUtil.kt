@@ -1,5 +1,6 @@
 package com.cleannote.cache.dao
 
+import com.cleannote.cache.dao.NoteQueryUtil.Companion.NOTE_SORT_ASC
 import com.cleannote.cache.dao.NoteQueryUtil.Companion.NOTE_SORT_DESC
 import com.cleannote.cache.model.CachedNote
 
@@ -15,9 +16,9 @@ fun CachedNoteDao.searchNoteBySorted(
     page: Int,
     limit: Int,
     order: String,
-    sort: String,
     like: String?
-): List<CachedNote> = when {
-    sort == NOTE_SORT_DESC -> searchNotesDESC(page, limit, order, like ?: "")
-    else -> searchNotesASC(page, limit, order, like ?: "")
+): List<CachedNote> = when(order) {
+    NOTE_SORT_DESC -> searchNotesDESC(page, limit, like ?: "")
+    NOTE_SORT_ASC -> searchNotesASC(page, limit,  like ?: "")
+    else -> searchNotesDESC(page, limit,  like ?: "")
 }

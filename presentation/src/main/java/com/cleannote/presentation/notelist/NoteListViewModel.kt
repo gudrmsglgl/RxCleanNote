@@ -1,10 +1,14 @@
 package com.cleannote.presentation.notelist
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.cleannote.domain.PreferenceKeys.FILTER_ORDERING_KEY
+import com.cleannote.domain.PreferenceKeys.ORDER_ASC
+import com.cleannote.domain.PreferenceKeys.ORDER_DESC
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
@@ -25,15 +29,13 @@ constructor(
     private val getNumNotes: GetNumNotes,
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
-    private val noteMapper: NoteMapper
+    private val noteMapper: NoteMapper,
+    private val sharedPreferences: SharedPreferences
 ): ViewModel() {
 
-    companion object{
-        private const val SORT_ASC = "asc"
-        private const val SORT_DESC = "desc"
-    }
-
-    private val query = Query()
+    private val query = Query(
+        order = sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+    )
 
     private val _toolbarState: MutableLiveData<ListToolbarState> = MutableLiveData(SearchState)
     val toolbarState: LiveData<ListToolbarState>
@@ -71,12 +73,14 @@ constructor(
         insertNewNote.execute(NoteInsertSubscriber(), noteMapper.mapFromView(noteView))
     }
 
-    fun sortingASC() = query.apply {
-        this.sort = SORT_ASC
+    fun orderingASC(){
+        query.order = ORDER_ASC
+        sharedPreferences.edit().putString(FILTER_ORDERING_KEY, ORDER_ASC).apply()
     }
 
-    fun sortingDESC() = query.apply {
-        this.sort = SORT_DESC
+    fun orderingDESC(){
+        query.order = ORDER_DESC
+        sharedPreferences.edit().putString(FILTER_ORDERING_KEY, ORDER_DESC).apply()
     }
 
     fun searchKeyword(search: String) = query.apply {

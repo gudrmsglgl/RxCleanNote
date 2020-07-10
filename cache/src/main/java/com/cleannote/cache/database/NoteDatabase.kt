@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.cleannote.cache.dao.CachedNoteDao
 import com.cleannote.cache.model.CachedNote
 import javax.inject.Inject

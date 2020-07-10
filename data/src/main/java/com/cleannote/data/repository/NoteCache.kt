@@ -10,7 +10,7 @@ interface NoteCache {
     fun getNumNotes(): Flowable<List<NoteEntity>>
     fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long>
     fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>
-    fun saveNotes(notes: List<NoteEntity>, page:Int = 1): Completable
+    fun saveNotes(notes: List<NoteEntity>): Completable
     fun isCached(page: Int): Single<Boolean>
     fun setLastCacheTime(lastCache: Long, page: Int = 1)
 }

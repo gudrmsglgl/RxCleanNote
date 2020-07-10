@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
+import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.mapper.NoteMapper
@@ -24,6 +25,7 @@ class NoteListViewModelTest {
 
     lateinit var getNumNotes: GetNumNotes
     lateinit var insertNewNote: InsertNewNote
+    lateinit var searchNotes: SearchNotes
     lateinit var noteMapper: NoteMapper
     private lateinit var captor: KArgumentCaptor<DisposableSubscriber<List<Note>>>
     private lateinit var liveState: MutableLiveData<State>
@@ -40,8 +42,9 @@ class NoteListViewModelTest {
         captor = argumentCaptor()
         insertNewNote = mock()
         getNumNotes = mock()
+        searchNotes = mock()
         noteMapper = mock()
-        noteListViewModel = NoteListViewModel(getNumNotes, insertNewNote, noteMapper)
+        noteListViewModel = NoteListViewModel(getNumNotes, searchNotes, insertNewNote, noteMapper)
     }
 
     @AfterEach

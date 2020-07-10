@@ -36,14 +36,13 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
             queryEntity.page,
             queryEntity.limit,
             queryEntity.order,
-            queryEntity.sort,
             queryEntity.like)
         ).map { cachedNotes ->
             cachedNotes.map { entityMapper.mapFromCached(it) }
         }
     }
 
-    override fun saveNotes(notes: List<NoteEntity>, page: Int): Completable = Completable.defer {
+    override fun saveNotes(notes: List<NoteEntity>): Completable = Completable.defer {
         noteDao.saveNotes(notes.map { entityMapper.mapToCached(it) })
         Completable.complete()
     }
