@@ -1,10 +1,9 @@
 package com.cleannote.injection.module
 
-import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import com.cleannote.NoteApplication
-import com.cleannote.domain.PreferenceKeys.PREF_NOTE_PACKAGE_NAME
+import com.cleannote.domain.Constants.PREF_NOTE_PACKAGE_NAME
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

@@ -1,6 +1,7 @@
 package com.cleannote.notelist
 
 import android.content.SharedPreferences
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -15,6 +17,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -29,8 +33,9 @@ import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.common.DateUtil
-import com.cleannote.domain.PreferenceKeys.FILTER_ORDERING_KEY
-import com.cleannote.domain.PreferenceKeys.ORDER_DESC
+import com.cleannote.common.OnBackPressListener
+import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
@@ -51,16 +56,20 @@ constructor(
     private val noteMapper: NoteMapper,
     private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences
-): BaseFragment(R.layout.fragment_note_list) {
+): BaseFragment(R.layout.fragment_note_list),
+    OnBackPressListener,
+    SwipeRefreshLayout.OnRefreshListener, TouchAdapter{
 
     private val bundle: Bundle = Bundle()
 
     private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
     lateinit var noteAdapter: NoteListAdapter
+    lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+        swipe_refresh.setOnRefreshListener(this)
         subscribeToolbar()
         subscribeNoteList()
         insertNoteOnFab()
@@ -85,13 +94,19 @@ constructor(
 
     private fun noteClick() = noteAdapter.clickNoteSubject
         .doOnNext { timber("d", "$it") }
-        .subscribe { navDetailNote(it) }
+        .subscribe {
+            if (!it.isShowMenu){
+                navDetailNote(it)
+            }
+            else
+                showToast("${it.title} delete")
+        }
         .addCompositeDisposable()
 
     private fun noteLongClick() = noteAdapter.longClickNoteSubject
         .doOnNext { timber("d", "$it") }
         .subscribe{
-
+            noteAdapter.transItemMenu(it)
         }
         .addCompositeDisposable()
 
@@ -104,7 +119,14 @@ constructor(
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
             noteAdapter = NoteListAdapter()
+            itemTouchHelper = ItemTouchHelper(
+                NoteItemTouchHelperCallback(
+                    this@NoteListFragment,
+                    ColorDrawable(resources.getColor(R.color.colorPrimaryDark))
+                )
+            )
             adapter = noteAdapter
+            itemTouchHelper.attachToRecyclerView(this)
         }
     }
 
@@ -251,4 +273,27 @@ constructor(
         super.onDestroyView()
         recycler_view.adapter = null
     }
+
+    override fun onSwiped(position: Int) {
+        noteAdapter.transItemMenu(position)
+
+    }
+
+    override fun onRefresh() {
+        swipe_refresh.isRefreshing = false
+        with(viewModel){
+            clearQuery()
+            searchNotes()
+        }
+    }
+
+    override fun shouldBackPress(): Boolean {
+        if (noteAdapter.isShowMenu()){
+            noteAdapter.hideMenu()
+            return false
+        } else
+            return true
+    }
+
+    override fun isSwiped(): Boolean = noteAdapter.isShowMenu()
 }

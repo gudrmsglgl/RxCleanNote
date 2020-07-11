@@ -3,26 +3,26 @@ package com.cleannote.presentation.notelist
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.cleannote.domain.PreferenceKeys.FILTER_ORDERING_KEY
-import com.cleannote.domain.PreferenceKeys.ORDER_ASC
-import com.cleannote.domain.PreferenceKeys.ORDER_DESC
+import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_ASC
+import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
+import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
+import com.cleannote.domain.Constants.SORT_UPDATED_AT
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.presentation.data.DataState
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.notelist.ListToolbarState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.subscribers.DisposableSubscriber
-import javax.inject.Inject
 
 class NoteListViewModel
 constructor(
@@ -90,6 +90,14 @@ constructor(
     fun nextPage(){
         query.apply { this.page += 1 }
         searchNotes()
+    }
+
+    fun clearQuery() = query.apply {
+        page = QUERY_DEFAULT_PAGE
+        limit = QUERY_DEFAULT_LIMIT
+        sort = SORT_UPDATED_AT
+        order = sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+        like  = null
     }
 
     inner class NoteListSubscriber: DisposableSubscriber<List<Note>>(){

@@ -64,7 +64,7 @@ class NoteCacheImplTest {
     fun saveNoteCompleteSaveData(){
         val saveNoteSize = 10
         val noteEntities = NoteFactory.createNoteEntityList(saveNoteSize)
-        noteCacheImpl.saveNotes(noteEntities, 1).test()
+        noteCacheImpl.saveNotes(noteEntities).test()
         checkNoteTableRows(saveNoteSize)
     }
 

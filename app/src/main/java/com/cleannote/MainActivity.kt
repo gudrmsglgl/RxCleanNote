@@ -147,4 +147,17 @@ class MainActivity : AppCompatActivity(), UIController {
         Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 
+    override fun onBackPressed() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        fragment
+            ?.childFragmentManager
+            ?.fragments
+            ?.forEach {
+                when (it){
+                    is OnBackPressListener -> if (it.shouldBackPress()) super.onBackPressed()
+                    else -> super.onBackPressed()
+                }
+            }
+    }
+
 }
