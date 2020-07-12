@@ -23,7 +23,7 @@ abstract class CachedNoteDao {
         SELECT * FROM notes 
         WHERE title LIKE '%' || :like || '%' 
         OR body LIKE '%' || :like || '%'
-        ORDER BY updated_at DESC LIMIT (:page * :limit)
+        ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit)
     """)
     abstract fun searchNotesDESC(
         page: Int,
@@ -35,7 +35,7 @@ abstract class CachedNoteDao {
         SELECT * FROM notes 
         WHERE title LIKE '%' || :like || '%' 
         OR body LIKE '%' || :like || '%'
-        ORDER BY updated_at ASC LIMIT (:page * :limit)
+        ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit)
     """)
     abstract fun searchNotesASC(
         page: Int,

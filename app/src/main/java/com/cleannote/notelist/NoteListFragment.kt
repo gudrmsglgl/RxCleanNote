@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -18,7 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -41,6 +40,7 @@ import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
+import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.widget.checkedChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
@@ -57,8 +57,7 @@ constructor(
     private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences
 ): BaseFragment(R.layout.fragment_note_list),
-    OnBackPressListener,
-    SwipeRefreshLayout.OnRefreshListener, TouchAdapter{
+    OnBackPressListener, TouchAdapter {
 
     private val bundle: Bundle = Bundle()
 
@@ -69,7 +68,7 @@ constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
-        swipe_refresh.setOnRefreshListener(this)
+        onRefresh()
         subscribeToolbar()
         subscribeNoteList()
         insertNoteOnFab()
@@ -127,6 +126,16 @@ constructor(
             )
             adapter = noteAdapter
             itemTouchHelper.attachToRecyclerView(this)
+            scrollEvents()
+                .filter { it.dy > 0 }
+                .map {
+                    (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() ==
+                    it.view.adapter?.itemCount?.minus(1)
+                }
+                .filter { isLastPosition -> isLastPosition }
+                .subscribe { viewModel.nextPage() }
+                .addCompositeDisposable()
+
         }
     }
 
@@ -136,14 +145,8 @@ constructor(
             InputType.NewNote,
             object : InputCaptureCallback{
                 override fun onTextCaptured(text: String) {
-                    /*val noteView = noteMapper.mapFromTitle(text)
-                           val noteUiModel = noteMapper.mapToUiModel(noteView)
-                           bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-                           viewModel.insertNotes(noteView)*/
                     val noteView = noteMapper.mapFromTitle(text)
-                    val noteUiModel = noteMapper.mapToUiModel(noteView)
-                    bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-                    findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
+                    viewModel.insertNotes(noteView)
                 }
             })}
         .addCompositeDisposable()
@@ -166,19 +169,23 @@ constructor(
         })
 
     private fun fetchNotesToAdapter(notes: List<NoteView>) {
-        val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
-        noteAdapter.submitList(noteUiModels)
+        timber("d", "notes size: ${notes.size}")
+        if (notes.isNotEmpty()){
+            val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
+            noteAdapter.submitList(noteUiModels)
+        }
     }
 
-    private fun subscribeInsertResult() = viewModel.insertResult.observe(viewLifecycleOwner,
-        Observer { dataState ->
+    private fun subscribeInsertResult() = viewModel.insertResult
+        .observe(viewLifecycleOwner, Observer { dataState ->
             if (dataState != null){
                 when (dataState.status) {
                     LOADING -> showLoadingProgressBar(true)
                     SUCCESS -> {
                         showLoadingProgressBar(false)
-                        timber("d", "insert success: ${dataState.data}")
-                        // TODO navDetailNote
+                        val noteUiModel = noteMapper.mapToUiModel(dataState.data!!)
+                        bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+                        findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)
@@ -276,11 +283,11 @@ constructor(
 
     override fun onSwiped(position: Int) {
         noteAdapter.transItemMenu(position)
-
     }
 
-    override fun onRefresh() {
+    private fun onRefresh() = swipe_refresh.setOnRefreshListener {
         swipe_refresh.isRefreshing = false
+        noteAdapter.clearNotes()
         with(viewModel){
             clearQuery()
             searchNotes()

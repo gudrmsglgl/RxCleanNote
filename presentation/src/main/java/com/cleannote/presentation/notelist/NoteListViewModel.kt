@@ -17,6 +17,7 @@ import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.presentation.data.DataState
+import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.notelist.ListToolbarState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.mapper.NoteMapper
@@ -45,8 +46,8 @@ constructor(
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _noteList
 
-    private val _insertNote: MutableLiveData<DataState<Long>> = MutableLiveData()
-    val insertResult: LiveData<DataState<Long>>
+    private val _insertNote: SingleLiveEvent<DataState<NoteView>> = SingleLiveEvent()
+    val insertResult: SingleLiveEvent<DataState<NoteView>>
         get() = _insertNote
 
     override fun onCleared() {
@@ -70,7 +71,8 @@ constructor(
 
     fun insertNotes(noteView: NoteView){
         _insertNote.postValue(DataState.loading())
-        insertNewNote.execute(NoteInsertSubscriber(), noteMapper.mapFromView(noteView))
+        insertNewNote
+            .execute(NoteInsertSubscriber(noteView), noteMapper.mapFromView(noteView))
     }
 
     fun orderingASC(){
@@ -88,8 +90,12 @@ constructor(
     }
 
     fun nextPage(){
-        query.apply { this.page += 1 }
-        searchNotes()
+        _noteList.value?.data?.let {
+            if (it.size == query.limit){
+                query.apply { this.page += 1 }
+                searchNotes()
+            }
+        }
     }
 
     fun clearQuery() = query.apply {
@@ -116,9 +122,11 @@ constructor(
         }
     }
 
-    inner class NoteInsertSubscriber: DisposableSingleObserver<Long>(){
+    inner class NoteInsertSubscriber(private val noteView: NoteView)
+        : DisposableSingleObserver<Long>()
+    {
         override fun onSuccess(t: Long){
-            _insertNote.postValue(DataState.success(t))
+            _insertNote.postValue(DataState.success(noteView))
         }
         override fun onError(t: Throwable) {
             _insertNote.postValue(DataState.error(t.message))

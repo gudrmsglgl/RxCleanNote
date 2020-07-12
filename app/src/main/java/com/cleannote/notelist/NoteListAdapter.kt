@@ -16,6 +16,8 @@ import timber.log.Timber
 
 class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    val notes: MutableList<NoteUiModel> = mutableListOf()
+
     companion object{
         private const val MENU_ITEM = 1
         private const val DEFAULT_ITEM = 2
@@ -77,7 +79,11 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun submitList(list: List<NoteUiModel>) {
         Timber.tag("RxCleanNote").d("Adapter_submitList size:${list.size}")
-        differ.submitList(list)
+        if (list.isNotEmpty()) {
+            notes.addAll(list)
+            differ.submitList(notes)
+            notifyDataSetChanged()
+        }
     }
 
     fun transItemMenu(position: Int){
@@ -142,5 +148,11 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         super.onDetachedFromRecyclerView(recyclerView)
         _clickNoteSubject.onComplete()
         _longClickNoteSubject.onComplete()
+    }
+
+    fun clearNotes() {
+        notes.clear()
+        differ.submitList(notes)
+        notifyDataSetChanged()
     }
 }

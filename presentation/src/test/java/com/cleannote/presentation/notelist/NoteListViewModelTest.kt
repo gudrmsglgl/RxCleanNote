@@ -1,5 +1,6 @@
 package com.cleannote.presentation.notelist
 
+import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
@@ -27,6 +28,8 @@ class NoteListViewModelTest {
     lateinit var insertNewNote: InsertNewNote
     lateinit var searchNotes: SearchNotes
     lateinit var noteMapper: NoteMapper
+    lateinit var sharedPreferences: SharedPreferences
+
     private lateinit var captor: KArgumentCaptor<DisposableSubscriber<List<Note>>>
     private lateinit var liveState: MutableLiveData<State>
     private lateinit var stateObserver: Observer<State>
@@ -44,7 +47,9 @@ class NoteListViewModelTest {
         getNumNotes = mock()
         searchNotes = mock()
         noteMapper = mock()
-        noteListViewModel = NoteListViewModel(getNumNotes, searchNotes, insertNewNote, noteMapper)
+        sharedPreferences = mock()
+        noteListViewModel = NoteListViewModel(
+            getNumNotes, searchNotes, insertNewNote, noteMapper, sharedPreferences)
     }
 
     @AfterEach
