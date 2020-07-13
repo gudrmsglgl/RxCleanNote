@@ -6,6 +6,7 @@ import com.cleannote.data.model.UserEntity
 import com.cleannote.data.repository.NoteRemote
 import com.cleannote.remote.mapper.NoteEntityMapper
 import com.cleannote.remote.mapper.UserEntityMapper
+import com.cleannote.remote.model.NoteModel
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import javax.inject.Inject
@@ -50,7 +51,9 @@ class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
             queryEntity.order,
             queryEntity.like,
             queryEntity.like
-        ).map { noteModels ->
+        ).doOnError {
+            emptyList<NoteModel>()
+        }.map { noteModels ->
             noteModels.map { noteEntityMapper.mapFromRemote(it) }
         }
     }

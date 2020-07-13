@@ -34,6 +34,7 @@ import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.common.DateUtil
 import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
@@ -109,10 +110,6 @@ constructor(
         }
         .addCompositeDisposable()
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.searchNotes()
-    }
 
     private fun initRecyclerView(){
         recycler_view.apply {
@@ -127,12 +124,14 @@ constructor(
             adapter = noteAdapter
             itemTouchHelper.attachToRecyclerView(this)
             scrollEvents()
-                .filter { it.dy > 0 }
+                .filter { it.dy > 0}
                 .map {
                     (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() ==
                     it.view.adapter?.itemCount?.minus(1)
                 }
-                .filter { isLastPosition -> isLastPosition }
+                .filter { isLastPosition ->
+                    isLastPosition && viewModel.isExistNextPage()
+                }
                 .subscribe { viewModel.nextPage() }
                 .addCompositeDisposable()
 
@@ -225,12 +224,7 @@ constructor(
             queryTextChangeEvents()
                 .skipInitialValue()
                 .debounce(1000, TimeUnit.MILLISECONDS)
-                .subscribe {
-                    with(viewModel){
-                        searchKeyword(it.queryText.toString())
-                        searchNotes()
-                    }
-                }
+                .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
                 .addCompositeDisposable()
         }
 
@@ -263,12 +257,14 @@ constructor(
                 BiFunction { resRadioBtn: Int, _: Unit ->
                     resRadioBtn
                 })
-                .subscribe { resId ->
-                    if (resId == R.id.radio_btn_desc)
-                        viewModel.orderingDESC()
+                .map {
+                    if (it == R.id.radio_btn_desc)
+                        ORDER_DESC
                     else
-                        viewModel.orderingASC()
-                    viewModel.searchNotes()
+                        ORDER_ASC
+                }
+                .subscribe { order ->
+                    viewModel.setOrdering(order)
                     dismiss()
                 }
 
@@ -287,11 +283,7 @@ constructor(
 
     private fun onRefresh() = swipe_refresh.setOnRefreshListener {
         swipe_refresh.isRefreshing = false
-        noteAdapter.clearNotes()
-        with(viewModel){
-            clearQuery()
-            searchNotes()
-        }
+        viewModel.clearQuery()
     }
 
     override fun shouldBackPress(): Boolean {

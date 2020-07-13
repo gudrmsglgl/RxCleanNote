@@ -29,7 +29,8 @@ class SplashFragment constructor(
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.tryLogin()
+        //viewModel.tryLogin()
+        findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         logoClickListener()
         subscribeLoginResult()
     }
