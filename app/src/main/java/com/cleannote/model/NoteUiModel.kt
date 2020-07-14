@@ -5,9 +5,9 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class NoteUiModel(val id: String,
-                  val title: String,
-                  val body: String,
-                  val updated_at: String,
+                  var title: String,
+                  var body: String,
+                  var updated_at: String,
                   val created_at: String,
                   var isShowMenu: Boolean = false): Parcelable{
 

@@ -3,6 +3,8 @@ package com.cleannote.notedetail
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -38,6 +40,7 @@ class NoteDetailFragment constructor(
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -75
 
+    lateinit var noteUiModel: NoteUiModel
     private val viewModel: NoteDetailViewModel by viewModels { viewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,6 +113,12 @@ class NoteDetailFragment constructor(
             else {
                 // default Menu back
                 //TODO:: Note update & hidekeyboard
+                timber("d","NoteDetailFragment_Before onBack: $noteUiModel")
+                noteUiModel.body = "afterOnBack"
+                setFragmentResult("requestOnBack",
+                    bundleOf(NOTE_DETAIL_BUNDLE_KEY to noteUiModel)
+                )
+
                 findNavController().popBackStack()
             }
         }.addCompositeDisposable()
@@ -134,10 +143,10 @@ class NoteDetailFragment constructor(
 
     private fun getPreviousFragmentNote(){
         arguments?.let {
-            val note = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
-            viewModel.setNoteTitle(note.title)
-            viewModel.setNoteBody(note.body)
-            note_body.setText(note.body)
+            noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
+            viewModel.setNoteTitle(noteUiModel.title)
+            viewModel.setNoteBody(noteUiModel.body)
+            note_body.setText(noteUiModel.body)
         }
     }
 

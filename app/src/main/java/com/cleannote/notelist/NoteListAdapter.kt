@@ -122,7 +122,6 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             note_timestamp.text = item.updated_at
 
         }
-
     }
 
     inner class NoteMenuHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

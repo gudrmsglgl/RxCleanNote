@@ -12,6 +12,7 @@ import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -76,6 +77,9 @@ constructor(
         subscribeInsertResult()
         noteClick()
         noteLongClick()
+        setFragmentResultListener("requestOnBack"){ key, bundle ->
+            timber("d","setFragmentResultListener key: $key , bundle: ${bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)}")
+        }
     }
 
     private fun subscribeToolbar() = viewModel.toolbarState.observe(viewLifecycleOwner,
@@ -183,8 +187,7 @@ constructor(
                     SUCCESS -> {
                         showLoadingProgressBar(false)
                         val noteUiModel = noteMapper.mapToUiModel(dataState.data!!)
-                        bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-                        findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
+                        navDetailNote(noteUiModel)
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)

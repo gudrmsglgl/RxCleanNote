@@ -55,6 +55,7 @@ dependencies {
     implementation Dependencies.kotlin_standard_library
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.ktx
+    implementation Dependencies.fragment_ktx
     implementation Dependencies.dagger
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid

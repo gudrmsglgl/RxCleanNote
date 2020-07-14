@@ -73,9 +73,9 @@ constructor(
         super.onCleared()
     }
 
-    private fun searchNotes(){
+    fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
-        Log.d("RxCleanNote", getQuery().toString())
+        //Log.d("RxCleanNote", getQuery().toString())
         searchNotes.execute(NoteListSubscriber(), getQuery())
     }
 

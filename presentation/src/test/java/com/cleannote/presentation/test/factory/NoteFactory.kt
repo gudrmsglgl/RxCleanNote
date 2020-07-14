@@ -32,9 +32,9 @@ object NoteFactory {
         updated_at = getCurrentTimestamp()
     )
 
-    fun createNoteList(count: Int): List<Note> = (0 until count).map {
+    fun createNoteList(start:Int, count: Int): List<Note> = (start until count).map {
         createNote("title #it") }.toList()
 
-    fun createNoteViewList(count: Int): List<NoteView> = (0 until count).map {
+    fun createNoteViewList(start:Int, count: Int): List<NoteView> = (start until count).map {
         createNoteView("title #it") }.toList()
 }
