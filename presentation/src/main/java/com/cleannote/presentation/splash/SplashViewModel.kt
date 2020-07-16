@@ -1,7 +1,11 @@
 package com.cleannote.presentation.splash
 
+import android.util.Log
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.cleannote.domain.interactor.usecases.splash.Login
 import com.cleannote.domain.model.User
@@ -10,10 +14,11 @@ import com.cleannote.presentation.mapper.UserMapper
 import com.cleannote.presentation.model.UserView
 import io.reactivex.subscribers.DisposableSubscriber
 
-class SplashViewModel constructor(private val login: Login,
-                                  private val userMapper: UserMapper): ViewModel() {
+class SplashViewModel
+@ViewModelInject constructor(private val login: Login,
+                             private val userMapper: UserMapper,
+                             @Assisted private val savedStateHandle: SavedStateHandle): ViewModel() {
 
-    private val TAG = "RxCleanNote"
     private var loginId: String = "gudrms"
 
     private val _loginResult: MutableLiveData<DataState<List<UserView>>> = MutableLiveData()
@@ -51,5 +56,10 @@ class SplashViewModel constructor(private val login: Login,
 
     fun setUserId(id: String){
        loginId = id
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        login.dispose()
     }
 }

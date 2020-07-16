@@ -4,6 +4,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'dagger.hilt.android.plugin'
 
 android {
     compileSdkVersion 29
@@ -56,7 +57,8 @@ dependencies {
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.ktx
     implementation Dependencies.fragment_ktx
-    implementation Dependencies.dagger
+    implementation Dependencies.dagger_hilt
+    implementation Dependencies.hilt_jetpack
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
     implementation Dependencies.rxbinding
@@ -78,8 +80,8 @@ dependencies {
     implementation SupportDependencies.recyclerview
     implementation SupportDependencies.material_design
 
-    kapt AnnotationProcessing.dagger_compiler
-    kapt AnnotationProcessing.dagger_android_processor
+    kapt AnnotationProcessing.dagger_hilt_compiler
+    kapt AnnotationProcessing.hilt_JetpackCompiler
     kapt AnnotationProcessing.room_compiler
     kapt AnnotationProcessing.lifecycle_compiler
 

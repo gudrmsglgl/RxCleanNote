@@ -2,6 +2,8 @@ package com.cleannote.presentation.notelist
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_DESC
@@ -24,12 +26,14 @@ import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.subscribers.DisposableSubscriber
 
 class NoteListViewModel
+@ViewModelInject
 constructor(
     private val getNumNotes: GetNumNotes,
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
     private val noteMapper: NoteMapper,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    @Assisted private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
@@ -64,7 +68,6 @@ constructor(
     }
 
     override fun onCleared() {
-        Log.d("RxCleanNote", "viewModel_onCleared()")
         getNumNotes.dispose()
         searchNotes.dispose()
         insertNewNote.dispose()
@@ -75,7 +78,6 @@ constructor(
 
     fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
-        //Log.d("RxCleanNote", getQuery().toString())
         searchNotes.execute(NoteListSubscriber(), getQuery())
     }
 
@@ -87,7 +89,10 @@ constructor(
 
     fun setOrdering(ordering: String){
         loadedNotes.clear()
-        _query.value = getQuery().apply { order = ordering }
+        _query.value = getQuery().apply {
+            page = 1
+            order = ordering
+        }
     }
 
     fun searchKeyword(search: String) {
@@ -125,9 +130,6 @@ constructor(
         override fun onNext(list: List<Note>) {
             loadedNotes.addAll(list.map { noteMapper.mapToView(it) })
             _mediatorNoteList.postValue(DataState.success(loadedNotes))
-            /*_mediatorNoteList.postValue(DataState.success(
-                list.map { noteMapper.mapToView(it) }
-            ))*/
         }
 
         override fun onError(exception: Throwable){

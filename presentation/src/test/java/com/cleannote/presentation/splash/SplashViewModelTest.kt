@@ -2,6 +2,7 @@ package com.cleannote.presentation.splash
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import com.cleannote.domain.interactor.usecases.splash.Login
 import com.cleannote.domain.model.User
 import com.cleannote.presentation.data.State
@@ -28,6 +29,7 @@ class SplashViewModelTest {
     lateinit var loginUseCase: Login
     lateinit var userMapper: UserMapper
     lateinit var viewModel: SplashViewModel
+    lateinit var savedStateHandle: SavedStateHandle
 
     @BeforeEach
     fun init(){
@@ -37,7 +39,8 @@ class SplashViewModelTest {
         captor = argumentCaptor()
         loginUseCase = mock()
         userMapper = mock()
-        viewModel = SplashViewModel(loginUseCase, userMapper)
+        savedStateHandle = mock()
+        viewModel = SplashViewModel(loginUseCase, userMapper, savedStateHandle)
     }
 
     @AfterEach

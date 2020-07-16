@@ -12,6 +12,7 @@ import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -44,17 +45,15 @@ import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.widget.checkedChanges
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import java.util.concurrent.TimeUnit
 
-/**
- * A simple [Fragment] subclass.
- */
+@AndroidEntryPoint
 class NoteListFragment
 constructor(
-    private val viewModelFactory: ViewModelProvider.Factory,
     private val noteMapper: NoteMapper,
     private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences
@@ -63,7 +62,7 @@ constructor(
 
     private val bundle: Bundle = Bundle()
 
-    private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
+    private val viewModel: NoteListViewModel by viewModels()
     lateinit var noteAdapter: NoteListAdapter
     lateinit var itemTouchHelper: ItemTouchHelper
 
@@ -122,7 +121,7 @@ constructor(
             itemTouchHelper = ItemTouchHelper(
                 NoteItemTouchHelperCallback(
                     this@NoteListFragment,
-                    ColorDrawable(resources.getColor(R.color.colorPrimaryDark))
+                    ColorDrawable(ContextCompat.getColor(context, R.color.colorPrimaryDark))
                 )
             )
             adapter = noteAdapter
@@ -130,8 +129,7 @@ constructor(
             scrollEvents()
                 .filter { it.dy > 0}
                 .map {
-                    (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() ==
-                    it.view.adapter?.itemCount?.minus(1)
+                    (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() >= it.view.adapter?.itemCount?.minus(1)!!
                 }
                 .filter { isLastPosition ->
                     isLastPosition && viewModel.isExistNextPage()
@@ -173,10 +171,8 @@ constructor(
 
     private fun fetchNotesToAdapter(notes: List<NoteView>) {
         timber("d", "notes size: ${notes.size}")
-        if (notes.isNotEmpty()){
-            val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
-            noteAdapter.submitList(noteUiModels)
-        }
+        val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
+        noteAdapter.submitList(noteUiModels)
     }
 
     private fun subscribeInsertResult() = viewModel.insertResult

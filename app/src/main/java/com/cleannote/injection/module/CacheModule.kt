@@ -1,5 +1,6 @@
 package com.cleannote.injection.module
 
+import android.content.Context
 import androidx.room.Room
 import com.cleannote.NoteApplication
 import com.cleannote.cache.NoteCacheImpl
@@ -10,30 +11,34 @@ import com.cleannote.data.repository.NoteCache
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Singleton
 
 @Module
+@InstallIn(ActivityComponent::class)
 abstract class CacheModule {
 
-    @Module
-    companion object{
-
-        @JvmStatic
+    companion object {
+        @ActivityScoped
         @Provides
-        fun provideNoteDb(app: NoteApplication): NoteDatabase{
+        fun provideNoteDb(@ApplicationContext context: Context): NoteDatabase{
             return Room
-                .databaseBuilder(app, NoteDatabase::class.java, DATABASE_NAME)
+                .databaseBuilder(context, NoteDatabase::class.java, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
                 .build()
         }
 
-        @JvmStatic
+        @ActivityScoped
         @Provides
         fun provideCacheNoteDao(db: NoteDatabase): CachedNoteDao{
             return db.noteDao()
         }
-
     }
-
+    @ActivityScoped
     @Binds
     abstract fun bindNoteCache(noteCacheImpl: NoteCacheImpl): NoteCache
 

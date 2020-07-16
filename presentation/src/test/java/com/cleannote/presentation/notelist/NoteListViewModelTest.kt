@@ -3,6 +3,7 @@ package com.cleannote.presentation.notelist
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
@@ -36,6 +37,7 @@ class NoteListViewModelTest {
     lateinit var searchNotes: SearchNotes
     lateinit var noteMapper: NoteMapper
     lateinit var sharedPreferences: SharedPreferences
+    lateinit var savedStateHandle: SavedStateHandle
 
     private lateinit var noteCaptor: KArgumentCaptor<DisposableSubscriber<List<Note>>>
     private lateinit var queryCaptor: KArgumentCaptor<Query>
@@ -59,11 +61,12 @@ class NoteListViewModelTest {
         getNumNotes = mock()
         searchNotes = mock()
         noteMapper = mock()
+        savedStateHandle = mock()
         sharedPreferences = mock{
             on { getString(FILTER_ORDERING_KEY, ORDER_DESC) } doReturn ORDER_DESC
         }
         noteListViewModel = NoteListViewModel(
-            getNumNotes, searchNotes, insertNewNote, noteMapper, sharedPreferences)
+            getNumNotes, searchNotes, insertNewNote, noteMapper, sharedPreferences, savedStateHandle)
     }
 
     @AfterEach

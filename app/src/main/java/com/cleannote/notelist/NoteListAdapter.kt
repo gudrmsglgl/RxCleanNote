@@ -82,7 +82,7 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun transItemMenu(position: Int){
         val transNotes = differ.currentList.apply {
-            forEachIndexed { index, noteUiModel ->
+            forEachIndexed { index, _ ->
                 if (index == position)
                     get(index).apply { isShowMenu = true }
                 else
@@ -98,7 +98,7 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun hideMenu() = differ.currentList.apply {
-        forEachIndexed { index, noteUiModel ->
+        forEachIndexed { index, _ ->
             get(index).apply { isShowMenu = false }
         }
     }.run {

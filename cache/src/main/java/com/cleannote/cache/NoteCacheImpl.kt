@@ -1,5 +1,6 @@
 package com.cleannote.cache
 
+import android.content.SharedPreferences
 import com.cleannote.cache.dao.CachedNoteDao
 import com.cleannote.cache.dao.searchNoteBySorted
 import com.cleannote.cache.mapper.NoteEntityMapper
@@ -13,10 +14,14 @@ import javax.inject.Inject
 
 class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
                                         private val entityMapper: NoteEntityMapper,
-                                        private val preferencesHelper: PreferencesHelper):
+                                        private val sharedPreferences: SharedPreferences):
     NoteCache {
 
-    private val SHOULD_PAGE_UPDATE_TIME = (60 * 3 * 1000).toLong()
+
+    companion object{
+        private const val SHOULD_PAGE_UPDATE_TIME = (60 * 3 * 1000).toLong()
+        private const val PREF_KEY_LAST_CACHE = "last_cache_page_"
+    }
 
     override fun getNumNotes(): Flowable<List<NoteEntity>> = Flowable.defer {
         Flowable.just(noteDao.getNumNotes())
@@ -54,8 +59,8 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
     }
 
     override fun setLastCacheTime(lastCache: Long, page: Int) {
-        preferencesHelper.setLastCacheTime(lastCache, page)
+        sharedPreferences.edit().putLong(PREF_KEY_LAST_CACHE+page, lastCache).apply()
     }
 
-    private fun getLastCacheTime(page: Int) = preferencesHelper.getLastCacheTime(page)
+    fun getLastCacheTime(page: Int): Long = sharedPreferences.getLong(PREF_KEY_LAST_CACHE+page,0)
 }
