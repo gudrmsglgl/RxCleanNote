@@ -263,7 +263,6 @@ constructor(
                         ORDER_ASC
                 }
                 .subscribe { order ->
-                    sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
                     viewModel.setOrdering(order)
                     dismiss()
                 }

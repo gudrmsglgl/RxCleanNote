@@ -89,10 +89,8 @@ constructor(
 
     fun setOrdering(ordering: String){
         loadedNotes.clear()
-        _query.value = getQuery().apply {
-            page = 1
-            order = ordering
-        }
+        _query.value = getQuery().apply { order = ordering }
+        sharedPreferences.edit().putString(FILTER_ORDERING_KEY, ordering).apply()
     }
 
     fun searchKeyword(search: String) {
