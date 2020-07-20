@@ -18,11 +18,9 @@ import com.cleannote.data.ui.InfoType.*
 import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), UIController {
 
     @Inject
@@ -31,15 +29,15 @@ class MainActivity : AppCompatActivity(), UIController {
     private var appBarConfiguration: AppBarConfiguration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //inject()
-        super.onCreate(savedInstanceState)
+        inject()
         setFragmentFactory()
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
 
-    /*private fun inject(){
+    private fun inject(){
         (application as NoteApplication).applicationComponent.inject(this)
-    }*/
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment)

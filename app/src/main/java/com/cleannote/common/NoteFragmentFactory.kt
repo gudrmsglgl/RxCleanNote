@@ -9,12 +9,10 @@ import com.cleannote.mapper.UserMapper
 import com.cleannote.notedetail.NoteDetailFragment
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.splash.SplashFragment
-import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class NoteFragmentFactory @Inject constructor(
-    //private val viewModelFactory: ViewModelProvider.Factory,
+    private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
     private val userMapper: UserMapper,
     private val noteMapper: NoteMapper,
@@ -24,17 +22,17 @@ class NoteFragmentFactory @Inject constructor(
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(noteMapper, dateUtil, sharedPreferences)
+            val fragment = NoteListFragment(viewModelFactory, noteMapper, dateUtil, sharedPreferences)
             fragment
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment()
+            val fragment = NoteDetailFragment(viewModelFactory)
             fragment
         }
 
         SplashFragment::class.java.name -> {
-            val fragment = SplashFragment(userMapper)
+            val fragment = SplashFragment(viewModelFactory, userMapper)
             fragment
         }
 

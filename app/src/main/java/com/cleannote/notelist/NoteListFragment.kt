@@ -45,15 +45,14 @@ import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.widget.checkedChanges
-import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import java.util.concurrent.TimeUnit
 
-@AndroidEntryPoint
 class NoteListFragment
 constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
     private val noteMapper: NoteMapper,
     private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences
@@ -62,7 +61,7 @@ constructor(
 
     private val bundle: Bundle = Bundle()
 
-    private val viewModel: NoteListViewModel by viewModels()
+    private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
     lateinit var noteAdapter: NoteListAdapter
     lateinit var itemTouchHelper: ItemTouchHelper
 
@@ -129,7 +128,8 @@ constructor(
             scrollEvents()
                 .filter { it.dy > 0}
                 .map {
-                    (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() >= it.view.adapter?.itemCount?.minus(1)!!
+                    (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() ==
+                    it.view.adapter?.itemCount?.minus(1)
                 }
                 .filter { isLastPosition ->
                     isLastPosition && viewModel.isExistNextPage()
@@ -263,6 +263,7 @@ constructor(
                         ORDER_ASC
                 }
                 .subscribe { order ->
+                    sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
                     viewModel.setOrdering(order)
                     dismiss()
                 }

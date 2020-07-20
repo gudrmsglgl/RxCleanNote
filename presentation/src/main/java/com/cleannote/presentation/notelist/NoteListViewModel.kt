@@ -2,8 +2,6 @@ package com.cleannote.presentation.notelist
 
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_DESC
@@ -26,14 +24,12 @@ import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.subscribers.DisposableSubscriber
 
 class NoteListViewModel
-@ViewModelInject
 constructor(
     private val getNumNotes: GetNumNotes,
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
     private val noteMapper: NoteMapper,
-    private val sharedPreferences: SharedPreferences,
-    @Assisted private val savedStateHandle: SavedStateHandle
+    private val sharedPreferences: SharedPreferences
 ): ViewModel() {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
@@ -89,8 +85,10 @@ constructor(
 
     fun setOrdering(ordering: String){
         loadedNotes.clear()
-        _query.value = getQuery().apply { order = ordering }
-        sharedPreferences.edit().putString(FILTER_ORDERING_KEY, ordering).apply()
+        _query.value = getQuery().apply {
+            page = 1
+            order = ordering
+        }
     }
 
     fun searchKeyword(search: String) {

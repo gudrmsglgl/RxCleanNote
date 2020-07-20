@@ -6,7 +6,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'dagger.hilt.android.plugin'
 
 android {
     compileSdkVersion 29
@@ -34,9 +33,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kapt {
-        correctErrorTypes = true
-    }
 }
 
 dependencies {
@@ -48,8 +44,7 @@ dependencies {
     implementation Dependencies.rxJava
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
-    implementation Dependencies.dagger_hilt
-    implementation Dependencies.hilt_jetpack
+    implementation Dependencies.dagger
     implementation Dependencies.livedata_ktx
     implementation Dependencies.viewmodel_ktx
 
@@ -61,6 +56,6 @@ dependencies {
     testImplementation TestDependencies.jupiter_params
     testRuntimeOnly    TestDependencies.jupiter_engine
 
-    kapt AnnotationProcessing.dagger_hilt_compiler
-    kapt AnnotationProcessing.hilt_JetpackCompiler
+    kapt AnnotationProcessing.dagger_compiler
+
 }

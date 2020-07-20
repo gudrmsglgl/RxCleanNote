@@ -1,7 +1,5 @@
 package com.cleannote.presentation.notedetail
 
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.cleannote.presentation.data.notedetail.NoteTitleState
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
@@ -11,11 +9,7 @@ import com.cleannote.presentation.data.notedetail.TextMode.EditMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
 
-class NoteDetailViewModel
-@ViewModelInject
-constructor(
-    @Assisted private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+class NoteDetailViewModel constructor(): ViewModel() {
 
     private var _noteTitle: String = ""
     private var _noteBody: String = ""

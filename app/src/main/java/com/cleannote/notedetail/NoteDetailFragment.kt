@@ -3,7 +3,6 @@ package com.cleannote.notedetail
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -25,23 +24,24 @@ import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import com.yydcdut.markdown.MarkdownProcessor
 import com.yydcdut.markdown.syntax.edit.EditFactory
-import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
-
-
+/**
+ * A simple [Fragment] subclass.
+ */
 const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
 
-@AndroidEntryPoint
-class NoteDetailFragment: BaseFragment(R.layout.fragment_note_detail) {
+class NoteDetailFragment constructor(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : BaseFragment(R.layout.fragment_note_detail) {
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -75
 
     lateinit var noteUiModel: NoteUiModel
-    private val viewModel: NoteDetailViewModel by viewModels()
+    private val viewModel: NoteDetailViewModel by viewModels { viewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -183,19 +183,19 @@ class NoteDetailFragment: BaseFragment(R.layout.fragment_note_detail) {
     private fun toolbarEditMenu(){
         activity?.let {
             toolbar_primary_icon
-                .setImageDrawable(ContextCompat.getDrawable(it, R.drawable.ic_cancel_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_cancel_24dp,null))
             toolbar_secondary_icon
-                .setImageDrawable(ContextCompat.getDrawable(it,R.drawable.ic_done_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_done_24dp,null))
         }
     }
 
     private fun toolbarDefaultMenu(){
         activity?.let {
             toolbar_primary_icon
-                .setImageDrawable(ContextCompat.getDrawable(it, R.drawable.ic_arrow_back_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_back_24dp,null))
 
             toolbar_secondary_icon
-                .setImageDrawable(ContextCompat.getDrawable(it, R.drawable.ic_delete_24dp))
+                .setImageDrawable(resources.getDrawable(R.drawable.ic_delete_24dp,null))
         }
     }
 

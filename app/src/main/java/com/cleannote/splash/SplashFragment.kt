@@ -1,7 +1,6 @@
 package com.cleannote.splash
 
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -16,18 +15,20 @@ import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.UserView
 import com.cleannote.presentation.splash.SplashViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_splash.*
 
-@AndroidEntryPoint
+/**
+ * A simple [Fragment] subclass.
+ */
 class SplashFragment constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
     private val userMapper: UserMapper
 ): BaseFragment(R.layout.fragment_splash) {
 
-    private val viewModel: SplashViewModel by viewModels()
+    private val viewModel: SplashViewModel by viewModels { viewModelFactory }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         //viewModel.tryLogin()
         findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         logoClickListener()
