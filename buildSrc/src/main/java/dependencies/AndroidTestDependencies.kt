@@ -15,4 +15,5 @@ object AndroidTestDependencies {
     val navigation_testing = "androidx.navigation:navigation-testing:${Versions.nav_components}"
 
     val instrumentation_runner = "androidx.test.runner.AndroidJUnitRunner"
+    val mockitoAndroid = "org.mockito:mockito-android:${Versions.mockitoAndroidVersion}"
 }

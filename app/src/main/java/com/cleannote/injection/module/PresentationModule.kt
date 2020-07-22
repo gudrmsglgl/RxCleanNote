@@ -11,6 +11,4 @@ abstract class PresentationModule{
     @Binds
     abstract fun bindViewModelFactory(noteViewModelFactory: ViewModelFactory): ViewModelProvider.Factory
 
-
-
 }

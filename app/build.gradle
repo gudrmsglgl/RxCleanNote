@@ -16,7 +16,7 @@ android {
         versionCode Application.version_code
         versionName Application.version_name
 
-        testInstrumentationRunner AndroidTestDependencies.instrumentation_runner
+        testInstrumentationRunner "com.cleannote.MyTestRunner"
     }
 
     buildTypes {
@@ -82,6 +82,7 @@ dependencies {
     kapt AnnotationProcessing.dagger_android_processor
     kapt AnnotationProcessing.room_compiler
     kapt AnnotationProcessing.lifecycle_compiler
+    kaptAndroidTest AnnotationProcessing.dagger_compiler
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout
@@ -90,4 +91,11 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation TestDependencies.mockito_kotlin
+    androidTestImplementation AndroidTestDependencies.mockitoAndroid
+
+    // androidx.test
+    def androidx_test_runner = "1.2.0"
+    androidTestImplementation "androidx.test:runner:$androidx_test_runner"
+
 }

@@ -45,6 +45,8 @@ object Versions {
     const val hamcrest_version = "2.2"
     const val mockito_version = "2.21.0"
     const val mockito_kotlin_version = "2.2.0"
+    const val mockitoAndroidVersion = "2.8.47"
+
     const val robolectric = "4.3.1"
     const val recyclerview = "1.2.0-alpha03"
     const val timber_version = "4.7.1"
