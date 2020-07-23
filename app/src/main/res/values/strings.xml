@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">RxcleanNote</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="recyclerview_no_data">데이터가 존재하지 않습니다.</string>
 
     <string name="text_enter_a_title">Enter a title</string>
 

@@ -10,7 +10,7 @@ import com.cleannote.cache.dao.CachedNoteDao
 import com.cleannote.cache.database.NoteDatabase
 import com.cleannote.data.repository.NoteCache
 import com.cleannote.domain.Constants
-import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockito_kotlin.mock
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

@@ -5,6 +5,8 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -112,7 +114,6 @@ constructor(
         }
         .addCompositeDisposable()
 
-
     private fun initRecyclerView(){
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
@@ -136,7 +137,6 @@ constructor(
                 }
                 .subscribe { viewModel.nextPage() }
                 .addCompositeDisposable()
-
         }
     }
 
@@ -171,8 +171,17 @@ constructor(
 
     private fun fetchNotesToAdapter(notes: List<NoteView>) {
         timber("d", "notes size: ${notes.size}")
+        showEmptyData(notes.isEmpty())
         val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
         noteAdapter.submitList(noteUiModels)
+    }
+
+    private fun showEmptyData(isEmptyData: Boolean) = if (isEmptyData) {
+        recycler_view.visibility = GONE
+        tv_no_data.visibility = VISIBLE
+    } else {
+        recycler_view.visibility = VISIBLE
+        tv_no_data.visibility = GONE
     }
 
     private fun subscribeInsertResult() = viewModel.insertResult

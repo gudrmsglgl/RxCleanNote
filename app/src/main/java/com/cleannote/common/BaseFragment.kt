@@ -28,11 +28,7 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        try{
-            uiController = context as UIController
-        }catch (e: ClassCastException) {
-            timber("d","$context must implement com.cleannote.common.UIController")
-        }
+        setUIController(mockController = null)
     }
 
     fun timber(type: String, message: String){
@@ -84,6 +80,16 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
             null,
             inputCaptureCallback
         )
+    }
+
+    fun setUIController(mockController: UIController?){
+        if (mockController != null) this.uiController = mockController
+        else
+            try{
+                uiController = context as UIController
+            }catch (e: ClassCastException) {
+                timber("d","$context must implement com.cleannote.common.UIController")
+            }
     }
 
     override fun onDestroyView() {

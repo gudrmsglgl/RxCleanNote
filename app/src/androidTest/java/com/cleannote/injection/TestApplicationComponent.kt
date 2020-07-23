@@ -5,6 +5,7 @@ import com.cleannote.TestBaseApplication
 import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.injection.module.*
+import com.cleannote.ui.NoteListFragmentTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -30,4 +31,5 @@ interface TestApplicationComponent: ApplicationComponent {
         fun create(@BindsInstance testApplication: TestBaseApplication): TestApplicationComponent
     }
 
+    fun inject(noteListFragmentTest: NoteListFragmentTest)
 }
