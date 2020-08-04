@@ -73,6 +73,8 @@ constructor(
     }
 
     fun searchNotes(){
+        Log.d("RxCleanNote", "searchNotes getQuery: ${getQuery()}")
+
         _mediatorNoteList.postValue(DataState.loading())
         searchNotes.execute(NoteListSubscriber(), getQuery())
     }
@@ -103,6 +105,7 @@ constructor(
     }
 
     fun nextPage(){
+        Log.d("RxCleanNote", "nextPage In")
         _query.value = getQuery().apply { page += 1 }
     }
 

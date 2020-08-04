@@ -3,10 +3,10 @@ package com.cleannote.injection
 import com.cleannote.data.executor.JobExecutor
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
-import com.nhaarman.mockito_kotlin.mock
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import io.mockk.mockk
 import javax.inject.Singleton
 
 @Module
@@ -17,7 +17,7 @@ abstract class TestDataModule {
         @Provides
         @JvmStatic
         @Singleton
-        fun provideNoteRepository(): NoteRepository = mock()
+        fun provideNoteRepository(): NoteRepository = mockk()
     }
 
 

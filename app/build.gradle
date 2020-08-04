@@ -72,6 +72,7 @@ dependencies {
     implementation Dependencies.material_dialogs
     implementation Dependencies.material_dialogs_input
     implementation Dependencies.markdown_processor
+    implementation AndroidTestDependencies.idling_resource
 
     implementation SupportDependencies.appcompat
     implementation SupportDependencies.constraintlayout
@@ -91,9 +92,13 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    androidTestImplementation TestDependencies.mockitoTest
-    androidTestImplementation AndroidTestDependencies.mockitoAndroid
+    /*androidTestImplementation TestDependencies.mockitoTest
+    androidTestImplementation AndroidTestDependencies.mockitoAndroid*/
+    androidTestImplementation AndroidTestDependencies.mockk_android
     androidTestImplementation AndroidTestDependencies.fragment_testing
+    androidTestImplementation AndroidTestDependencies.espresso_contrib
+    androidTestImplementation AndroidTestDependencies.idling_resource
+    androidTestImplementation TestDependencies.archTesting
 
     // androidx.test
     def androidx_test_runner = "1.2.0"

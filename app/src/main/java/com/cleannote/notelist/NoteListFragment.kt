@@ -3,6 +3,7 @@ package com.cleannote.notelist
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.View.GONE
@@ -22,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -40,6 +42,7 @@ import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.espresso.EspressoIdlingResource
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
@@ -126,16 +129,27 @@ constructor(
             )
             adapter = noteAdapter
             itemTouchHelper.attachToRecyclerView(this)
+
             scrollEvents()
-                .filter { it.dy > 0}
-                .map {
-                    (it.view.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() ==
+                /*.filter {
+                    timber("d", "${it.dy}")
+                    it.dy >= 0}*/
+                .filter {
+                    timber("d", "findLastCompletelyVisibleItemPosition: ${(it.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()}")
+                    (it.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition() ==
                     it.view.adapter?.itemCount?.minus(1)
                 }
-                .filter { isLastPosition ->
-                    isLastPosition && viewModel.isExistNextPage()
+                .filter {
+                    viewModel.isExistNextPage()
                 }
-                .subscribe { viewModel.nextPage() }
+                /*.filter { isLastPosition ->
+                    timber("d","isLastPosition: $isLastPosition")
+                    isLastPosition && viewModel.isExistNextPage()
+                }*/
+                .subscribe {
+                    timber("d", "doOnSubscribe2")
+                    viewModel.nextPage()
+                }
                 .addCompositeDisposable()
         }
     }

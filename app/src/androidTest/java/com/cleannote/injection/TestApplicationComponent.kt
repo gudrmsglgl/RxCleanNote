@@ -3,6 +3,7 @@ package com.cleannote.injection
 import com.cleannote.NoteApplication
 import com.cleannote.TestBaseApplication
 import com.cleannote.domain.interactor.executor.PostExecutionThread
+import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.injection.module.*
 import com.cleannote.ui.NoteListFragmentTest
@@ -25,6 +26,8 @@ interface TestApplicationComponent: ApplicationComponent {
     fun provideNoteRepository(): NoteRepository
 
     fun providePostExecutionThread(): PostExecutionThread
+
+    fun provideThreadExecutor(): ThreadExecutor
 
     @Component.Factory
     interface Factory{

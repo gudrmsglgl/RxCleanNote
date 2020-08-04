@@ -1,19 +1,14 @@
 package com.cleannote.injection
 
-import android.content.Context
 import androidx.room.Room
-import com.cleannote.NoteApplication
 import com.cleannote.TestBaseApplication
-import com.cleannote.cache.NoteCacheImpl
 import com.cleannote.cache.PreferencesHelper
 import com.cleannote.cache.dao.CachedNoteDao
 import com.cleannote.cache.database.NoteDatabase
 import com.cleannote.data.repository.NoteCache
-import com.cleannote.domain.Constants
-import com.nhaarman.mockito_kotlin.mock
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import io.mockk.mockk
 import javax.inject.Singleton
 
 @Module
@@ -37,11 +32,11 @@ object TestCacheModule {
     @Provides
     @JvmStatic
     @Singleton
-    fun provideNoteCache(): NoteCache = mock()
+    fun provideNoteCache(): NoteCache = mockk()
 
     @Provides
     @JvmStatic
     @Singleton
-    fun providePreferencesHelper(): PreferencesHelper = mock()
+    fun providePreferencesHelper(): PreferencesHelper = mockk()
 
 }
