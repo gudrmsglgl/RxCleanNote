@@ -2,16 +2,24 @@ package com.cleannote.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.common.UIController
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.HEspresso.NoteListScreen
+import com.cleannote.HEspresso.recycler.NRecyclerItem
+import com.cleannote.app.R
 import com.cleannote.injection.TestApplicationComponent
+import com.cleannote.notelist.NoteListAdapter
+import com.cleannote.notelist.NoteListAdapter.NoteViewHolder
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
+import com.cleannote.test.util.RecyclerViewMatcher
 import com.cleannote.test.util.SchedulerRule
 import io.mockk.every
 import io.mockk.mockk
@@ -58,12 +66,14 @@ class NoteListFragmentTest: BaseTest() {
             factory = fragmentFactory
         )
 
-        screen{
-            recyclerView{
+        screen {
+            recyclerView {
                 isNotDisplayed()
             }
-            nonDataTestView{
+
+            noDataTextView {
                 isVisible()
+                hasText(R.string.recyclerview_no_data)
             }
         }
     }
@@ -75,12 +85,26 @@ class NoteListFragmentTest: BaseTest() {
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        screen{
-            recyclerView{
+        screen {
+
+            recyclerView {
                 isDisplayed()
                 hasSize(notes.size)
+
+                firstItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(notes[0].title)
+                    }
+                }
+
+                lastItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(notes[notes.lastIndex].title)
+                    }
+                }
             }
-            nonDataTestView{
+
+            noDataTextView {
                 isGone()
             }
         }
