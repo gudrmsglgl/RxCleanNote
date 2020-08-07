@@ -5,17 +5,11 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.cleannote.HEspresso.assertion.BaseAssertion
+import com.cleannote.HEspresso.view.NBaseView
 import com.cleannote.notelist.NoteListAdapter
 
-class NRecyclerView(@IdRes val idRes: Int): BaseAssertion,
+class NRecyclerView(@IdRes val idRes: Int): NBaseView<NRecyclerView>(withId(idRes)),
     RecyclerAdapterAssertion, RecyclerActions {
-
-    override val viewInteraction: ViewInteraction
-        get() = onView(withId(idRes))
-
-    operator fun invoke(function: NRecyclerView.() -> Unit){
-        function(this)
-    }
 
     inline fun <reified T: NRecyclerItem<*>> childAt(position: Int, function: T.() -> Unit){
         function(NRecyclerItem<T>(this.idRes, position) as T)

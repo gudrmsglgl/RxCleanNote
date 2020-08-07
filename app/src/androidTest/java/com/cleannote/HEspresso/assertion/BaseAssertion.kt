@@ -20,6 +20,10 @@ interface BaseAssertion {
         ))
     }
 
+    fun doesNotExist(){
+        viewInteraction.check(ViewAssertions.doesNotExist())
+    }
+
     fun isVisible(){
         viewInteraction.check(
             ViewAssertions.matches(

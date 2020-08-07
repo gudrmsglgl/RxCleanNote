@@ -31,6 +31,15 @@ interface TextViewAssertions: BaseAssertion {
         )
     }
 
+    fun isChecked(){
+        viewInteraction.check(
+            ViewAssertions.matches(ViewMatchers.isChecked())
+        )
+    }
 
-
+    fun isNotChecked(){
+        viewInteraction.check(
+            ViewAssertions.matches(ViewMatchers.isNotChecked())
+        )
+    }
 }

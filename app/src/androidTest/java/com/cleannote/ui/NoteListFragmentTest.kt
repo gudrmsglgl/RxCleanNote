@@ -3,6 +3,8 @@ package com.cleannote.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.ViewAssertion
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
@@ -106,6 +108,49 @@ class NoteListFragmentTest: BaseTest() {
 
             noDataTextView {
                 isGone()
+            }
+        }
+
+    }
+
+    @Test
+    fun filterDialogDisplayed(){
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), QueryFactory.makeQuery())
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+
+            toolbar {
+
+                filterMenu {
+                    isDisplayed()
+                    hasDrawable(R.drawable.ic_filter_list_grey_24dp)
+                    click()
+                }
+
+                filterDialog {
+                    mainTitle {
+                        isDisplayed()
+                        hasText(R.string.filter_title)
+                    }
+                    subTitle {
+                        isDisplayed()
+                        hasText(R.string.filter_desc)
+                    }
+                    radioBtnAsc {
+                        click()
+                        isChecked()
+                    }
+                    radioBtnDesc {
+                        isNotChecked()
+                    }
+                    pressBack()
+                    idle(500L)
+                    doesNotExist()
+                }
+
             }
         }
 
