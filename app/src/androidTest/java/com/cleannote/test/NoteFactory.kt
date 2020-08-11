@@ -25,6 +25,11 @@ object NoteFactory {
         updated_at = "2020-07-${date} 12:00:$date"
     )
 
-    fun makeNotes(start: Int, end: Int) =
-        (start until end).map { makeNote(title = "$it TestTitle", date = it.toString()) }
+    fun makeNotes(start: Int, end: Int): List<Note> =
+        if (start < end)
+            (start until end).map { makeNote(title = "$it TestTitle", date = it.toString()) }
+        else
+            (start downTo end).map { makeNote(title = "$it TestTitle", date = it.toString()) }
+
+
 }

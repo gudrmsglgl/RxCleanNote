@@ -188,6 +188,7 @@ constructor(
         showEmptyData(notes.isEmpty())
         val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
         noteAdapter.submitList(noteUiModels)
+        EspressoIdlingResource.decrement()
     }
 
     private fun showEmptyData(isEmptyData: Boolean) = if (isEmptyData) {
@@ -288,6 +289,7 @@ constructor(
                 .subscribe { order ->
                     sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
                     viewModel.setOrdering(order)
+                    EspressoIdlingResource.increment()
                     dismiss()
                 }
 

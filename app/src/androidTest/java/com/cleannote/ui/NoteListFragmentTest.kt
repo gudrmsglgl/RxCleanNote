@@ -1,5 +1,7 @@
 package com.cleannote.ui
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
@@ -14,6 +16,10 @@ import com.cleannote.domain.model.Query
 import com.cleannote.HEspresso.NoteListScreen
 import com.cleannote.HEspresso.recycler.NRecyclerItem
 import com.cleannote.app.R
+import com.cleannote.domain.Constants
+import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_ASC
+import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.injection.TestApplicationComponent
 import com.cleannote.notelist.NoteListAdapter
 import com.cleannote.notelist.NoteListAdapter.NoteViewHolder
@@ -23,10 +29,13 @@ import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
 import com.cleannote.test.util.RecyclerViewMatcher
 import com.cleannote.test.util.SchedulerRule
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Flowable
 import org.junit.Before
+import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -116,8 +125,9 @@ class NoteListFragmentTest: BaseTest() {
     @Test
     fun filterDialogDisplayed(){
         val notes = NoteFactory.makeNotes(0, 10)
-        stubNoteRepositoryGetNotes(Flowable.just(notes), QueryFactory.makeQuery())
-
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        stubSharedPreference(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), query)
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         screen {
@@ -146,6 +156,10 @@ class NoteListFragmentTest: BaseTest() {
                     radioBtnDesc {
                         isNotChecked()
                     }
+                    sortBtn {
+                        isDisplayed()
+                        hasText(R.string.filter_btn_ok)
+                    }
                     pressBack()
                     idle(500L)
                     doesNotExist()
@@ -156,6 +170,44 @@ class NoteListFragmentTest: BaseTest() {
 
     }
 
+    @Test
+    fun filterOrderingDESC(){
+        val defaultNotes = NoteFactory.makeNotes(0, 10)
+        val defaultQuery =  QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        stubSharedPreference(defaultQuery.order)
+        stubNoteRepositoryGetNotes(Flowable.just(defaultNotes), defaultQuery)
+
+        val orderedNotes = NoteFactory.makeNotes(10,0)
+        val orderQuery = QueryFactory.makeQuery().apply { order = ORDER_DESC }
+        stubSharedPreference(orderQuery.order)
+        stubNoteRepositoryGetNotes(Flowable.just(orderedNotes), orderQuery)
+        
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            toolbar{
+                filterMenu {
+                    click()
+                }
+                filterDialog {
+                    radioBtnDesc.click()
+                    sortBtn.click()
+                }
+            }
+            recyclerView {
+                firstItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(orderedNotes[0].title)
+                    }
+                }
+                lastItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(orderedNotes[orderedNotes.lastIndex].title)
+                    }
+                }
+            }
+        }
+    }
 
     private fun setupUIController() = with(fragmentFactory){
         uiController = mockUIController
@@ -166,6 +218,16 @@ class NoteListFragmentTest: BaseTest() {
             getComponent().provideNoteRepository().searchNotes(query ?: any())
         } returns data
     }
+
+    private fun stubSharedPreference(order: String){
+        every {
+            getComponent().provideSharedPreferences().getString(FILTER_ORDERING_KEY, ORDER_DESC)
+        }.returns(order)
+        every {
+            getComponent().provideSharedPreferences().edit().putString(any(), any()).apply()
+        } just Runs
+    }
+
 
     override fun injectTest() {
         (application.applicationComponent as TestApplicationComponent)

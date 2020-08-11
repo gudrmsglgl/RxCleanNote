@@ -1,5 +1,7 @@
 package com.cleannote.injection
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.cleannote.NoteApplication
 import com.cleannote.TestBaseApplication
 import com.cleannote.domain.interactor.executor.PostExecutionThread
@@ -24,6 +26,8 @@ import javax.inject.Singleton
 interface TestApplicationComponent: ApplicationComponent {
 
     fun provideNoteRepository(): NoteRepository
+
+    fun provideSharedPreferences(): SharedPreferences
 
     fun providePostExecutionThread(): PostExecutionThread
 

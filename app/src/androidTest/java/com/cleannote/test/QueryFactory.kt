@@ -9,7 +9,7 @@ object QueryFactory {
         page = Constants.QUERY_DEFAULT_PAGE ,
         limit = QUERY_DEFAULT_LIMIT,
         sort = Constants.SORT_UPDATED_AT,
-        order = Constants.ORDER_ASC,
+        order = Constants.ORDER_DESC,
         like  = null
     )
 }
