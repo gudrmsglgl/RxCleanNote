@@ -1,9 +1,11 @@
 package com.cleannote.HEspresso.assertion
 
+import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.*
 
 interface BaseAssertion {
     val viewInteraction: ViewInteraction

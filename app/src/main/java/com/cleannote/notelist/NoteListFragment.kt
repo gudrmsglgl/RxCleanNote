@@ -3,8 +3,6 @@ package com.cleannote.notelist
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -23,7 +21,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -188,7 +185,6 @@ constructor(
         showEmptyData(notes.isEmpty())
         val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
         noteAdapter.submitList(noteUiModels)
-        EspressoIdlingResource.decrement()
     }
 
     private fun showEmptyData(isEmptyData: Boolean) = if (isEmptyData) {
@@ -289,7 +285,6 @@ constructor(
                 .subscribe { order ->
                     sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
                     viewModel.setOrdering(order)
-                    EspressoIdlingResource.increment()
                     dismiss()
                 }
 

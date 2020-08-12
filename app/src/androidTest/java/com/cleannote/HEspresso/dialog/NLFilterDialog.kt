@@ -15,5 +15,5 @@ class NLFilterDialog(private val viewMatcher: Matcher<View>):
     val subTitle = NTextView(ViewMatchers.withId(R.id.filter_option_desc))
     val radioBtnDesc = NButton(ViewMatchers.withText(R.string.radio_btn_desc))
     val radioBtnAsc = NButton(ViewMatchers.withText(R.string.radio_btn_asc))
-    val sortBtn = NButton(ViewMatchers.withText(R.string.filter_btn_ok))
+    val sortBtn = NButton(ViewMatchers.withId(R.id.filter_btn_ok))
 }

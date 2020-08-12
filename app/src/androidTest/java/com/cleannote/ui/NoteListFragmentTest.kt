@@ -9,6 +9,7 @@ import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.common.UIController
 import com.cleannote.domain.model.Note
@@ -71,7 +72,9 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun emptyNoteNotDisplayed(){
-        stubNoteRepositoryGetNotes(Flowable.just(emptyList()))
+        val query = QueryFactory.makeQuery()
+        stubInitOrdering(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(emptyList()), query)
 
         val scenario = launchFragmentInContainer<NoteListFragment>(
             factory = fragmentFactory
@@ -92,7 +95,9 @@ class NoteListFragmentTest: BaseTest() {
     @Test
     fun notesDisplayed(){
         val notes = NoteFactory.makeNotes(1,11)
-        stubNoteRepositoryGetNotes(Flowable.just(notes), QueryFactory.makeQuery())
+        val query = QueryFactory.makeQuery()
+        stubInitOrdering(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -126,7 +131,7 @@ class NoteListFragmentTest: BaseTest() {
     fun filterDialogDisplayed(){
         val notes = NoteFactory.makeNotes(0, 10)
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        stubSharedPreference(query.order)
+        stubInitOrdering(query.order)
         stubNoteRepositoryGetNotes(Flowable.just(notes), query)
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -174,12 +179,12 @@ class NoteListFragmentTest: BaseTest() {
     fun filterOrderingDESC(){
         val defaultNotes = NoteFactory.makeNotes(0, 10)
         val defaultQuery =  QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        stubSharedPreference(defaultQuery.order)
+        stubInitOrdering(defaultQuery.order)
         stubNoteRepositoryGetNotes(Flowable.just(defaultNotes), defaultQuery)
 
         val orderedNotes = NoteFactory.makeNotes(10,0)
         val orderQuery = QueryFactory.makeQuery().apply { order = ORDER_DESC }
-        stubSharedPreference(orderQuery.order)
+        stubSaveOrdering(orderQuery.order)
         stubNoteRepositoryGetNotes(Flowable.just(orderedNotes), orderQuery)
         
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
@@ -195,14 +200,10 @@ class NoteListFragmentTest: BaseTest() {
                 }
             }
             recyclerView {
+                hasSize(orderedNotes.size)
                 firstItem<NRecyclerItem<NoteViewHolder>> {
                     itemTitle {
                         hasText(orderedNotes[0].title)
-                    }
-                }
-                lastItem<NRecyclerItem<NoteViewHolder>> {
-                    itemTitle {
-                        hasText(orderedNotes[orderedNotes.lastIndex].title)
                     }
                 }
             }
@@ -219,15 +220,19 @@ class NoteListFragmentTest: BaseTest() {
         } returns data
     }
 
-    private fun stubSharedPreference(order: String){
-        every {
-            getComponent().provideSharedPreferences().getString(FILTER_ORDERING_KEY, ORDER_DESC)
-        }.returns(order)
-        every {
-            getComponent().provideSharedPreferences().edit().putString(any(), any()).apply()
-        } just Runs
-    }
+    private fun stubInitOrdering(order: String) = every {
+        getComponent()
+            .provideSharedPreferences()
+            .getString(FILTER_ORDERING_KEY, ORDER_DESC)
+    }.returns(order)
 
+    private fun stubSaveOrdering(order: String) = every {
+        getComponent()
+            .provideSharedPreferences()
+            .edit()
+            .putString(any(), any())
+            .apply()
+    } just Runs
 
     override fun injectTest() {
         (application.applicationComponent as TestApplicationComponent)

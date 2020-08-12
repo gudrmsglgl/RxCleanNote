@@ -17,6 +17,11 @@ android {
         versionName Application.version_name
 
         testInstrumentationRunner "com.cleannote.MyTestRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     buildTypes {
@@ -40,6 +45,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.0'
     }
 }
 
@@ -103,6 +112,7 @@ dependencies {
     // androidx.test
     def androidx_test_runner = "1.2.0"
     androidTestImplementation "androidx.test:runner:$androidx_test_runner"
+    androidTestUtil 'androidx.test:orchestrator:1.2.0'
 
     debugImplementation AndroidTestDependencies.fragment_testing
 }
