@@ -28,7 +28,7 @@ class NRecyclerView(@IdRes val idRes: Int): NBaseView<NRecyclerView>(withId(idRe
         childAt(0, function)
     }
 
-    inline fun <reified T: NRecyclerItem<*>> lastItem(function: T.() -> Unit){
-        childAt(getSize()-1, function)
+    inline fun <reified T: NRecyclerItem<*>> visibleLastItem(function: T.() -> Unit){
+        childAt(getLastVisiblePosition(), function)
     }
 }

@@ -112,12 +112,6 @@ class NoteListFragmentTest: BaseTest() {
                         hasText(notes[0].title)
                     }
                 }
-
-                lastItem<NRecyclerItem<NoteViewHolder>> {
-                    itemTitle {
-                        hasText(notes[notes.lastIndex].title)
-                    }
-                }
             }
 
             noDataTextView {
@@ -204,6 +198,11 @@ class NoteListFragmentTest: BaseTest() {
                 firstItem<NRecyclerItem<NoteViewHolder>> {
                     itemTitle {
                         hasText(orderedNotes[0].title)
+                    }
+                }
+                visibleLastItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(orderedNotes[getLastVisiblePosition()].title)
                     }
                 }
             }

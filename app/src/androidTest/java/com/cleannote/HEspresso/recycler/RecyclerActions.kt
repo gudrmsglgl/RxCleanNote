@@ -1,6 +1,7 @@
 package com.cleannote.HEspresso.recycler
 
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
@@ -26,5 +27,22 @@ interface RecyclerActions: BaseActions {
             }
         })
         return size
+    }
+
+    fun getLastVisiblePosition(): Int {
+        var lastVisiblePosition = 0
+
+        viewInteraction.perform(object : ViewAction{
+            override fun getDescription(): String = "Get RecyclerView Item LastVisible size"
+
+            override fun getConstraints(): Matcher<View> =
+                Matchers.allOf(ViewMatchers.isAssignableFrom(RecyclerView::class.java), ViewMatchers.isDisplayed())
+
+            override fun perform(uiController: UiController?, view: View?) {
+                if (view is RecyclerView)
+                    lastVisiblePosition = (view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+            }
+        })
+        return lastVisiblePosition
     }
 }
