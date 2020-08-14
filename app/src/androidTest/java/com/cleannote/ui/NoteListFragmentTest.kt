@@ -1,34 +1,23 @@
 package com.cleannote.ui
 
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.ViewAssertion
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.cleannote.common.UIController
-import com.cleannote.domain.model.Note
-import com.cleannote.domain.model.Query
 import com.cleannote.HEspresso.NoteListScreen
 import com.cleannote.HEspresso.recycler.NRecyclerItem
 import com.cleannote.app.R
-import com.cleannote.domain.Constants
+import com.cleannote.common.UIController
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.domain.model.Note
+import com.cleannote.domain.model.Query
 import com.cleannote.injection.TestApplicationComponent
-import com.cleannote.notelist.NoteListAdapter
 import com.cleannote.notelist.NoteListAdapter.NoteViewHolder
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
-import com.cleannote.test.util.RecyclerViewMatcher
 import com.cleannote.test.util.SchedulerRule
 import io.mockk.Runs
 import io.mockk.every
@@ -36,7 +25,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Flowable
 import org.junit.Before
-import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -203,6 +191,41 @@ class NoteListFragmentTest: BaseTest() {
                 visibleLastItem<NRecyclerItem<NoteViewHolder>> {
                     itemTitle {
                         hasText(orderedNotes[getLastVisiblePosition()].title)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun searchViewSetQueryReturnNotes(){
+        val query = QueryFactory.makeQuery()
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), query)
+
+        val text = "searchNote"
+        val searchQuery = QueryFactory.makeQuery().apply { like = text }
+        val note = NoteFactory.makeNote(title = "searchText", date = "03")
+        val searchedNotes = listOf(note)
+        stubNoteRepositoryGetNotes(Flowable.just(searchedNotes), searchQuery)
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            toolbar {
+                searchView {
+                    searchBtn.click()
+                    searchEditView {
+                        searchText(text)
+                    }
+                }
+                idle(1500) // for RxDebounce(1000)
+            }
+            recyclerView {
+                firstItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(searchedNotes[0].title)
                     }
                 }
             }
