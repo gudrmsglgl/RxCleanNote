@@ -232,6 +232,28 @@ class NoteListFragmentTest: BaseTest() {
         }
     }
 
+    @Test
+    fun swipeAbleRecyclerView(){
+        val query = QueryFactory.makeQuery()
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), query)
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            recyclerView {
+                firstItem<NRecyclerItem<NoteViewHolder>> {
+                    swipeLeft()
+                    swipeDeleteMode {
+                        deleteImg.hasDrawable(R.drawable.ic_delete_24dp)
+                        deleteText.hasText(R.string.item_menu_delete)
+                    }
+                }
+            }
+        }
+    }
+
     private fun setupUIController() = with(fragmentFactory){
         uiController = mockUIController
     }

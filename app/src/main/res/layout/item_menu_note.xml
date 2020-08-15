@@ -16,12 +16,14 @@
         app:layout_constraintRight_toRightOf="parent">
 
         <ImageView
+            android:id="@+id/swipe_delete_img"
             android:src="@drawable/ic_delete_24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>
 
         <TextView
+            android:id="@+id/swipe_delete_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/item_menu_delete"
