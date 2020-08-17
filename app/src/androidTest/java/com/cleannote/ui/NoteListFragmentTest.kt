@@ -254,6 +254,43 @@ class NoteListFragmentTest: BaseTest() {
         }
     }
 
+    @Test
+    fun scrollRecyclerViewReturnNextNotes(){
+        val initQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(initQuery.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), initQuery)
+
+        val nextQuery = QueryFactory.makeQuery().apply {
+            order = ORDER_ASC
+            page = 2 }
+        val nextNotes = NoteFactory.makeNotes(10,20)
+        stubNoteRepositoryGetNotes(Flowable.just(nextNotes), nextQuery)
+
+        val endQuery = QueryFactory.makeQuery().apply {
+            order = ORDER_ASC
+            page = 3 }
+        val endNotes: List<Note> = emptyList()
+        stubNoteRepositoryGetNotes(Flowable.just(endNotes), endQuery)
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            recyclerView {
+                idle(1000)
+                swipeUp()
+                hasSize(notes.size + nextNotes.size)
+                scrollToEnd()
+                visibleLastItem<NRecyclerItem<NoteViewHolder>> {
+                    itemTitle {
+                        hasText(nextNotes[getLastVisiblePosition()-notes.size].title) // nextNote[0~9], so minus notes.size: 19 - 10
+                    }
+                }
+                idle(3000)
+            }
+        }
+    }
+
     private fun setupUIController() = with(fragmentFactory){
         uiController = mockUIController
     }

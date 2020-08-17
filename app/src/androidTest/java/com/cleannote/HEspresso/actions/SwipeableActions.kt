@@ -1,6 +1,6 @@
 package com.cleannote.HEspresso.actions
 
-import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.*
 
 interface SwipeableActions: BaseActions {
 
@@ -12,4 +12,12 @@ interface SwipeableActions: BaseActions {
         viewInteraction.perform(ViewActions.swipeRight())
     }
 
+    fun swipeUp() {
+        viewInteraction.perform(GeneralSwipeAction(
+            Swipe.SLOW,
+            GeneralLocation.BOTTOM_CENTER,
+            GeneralLocation.TOP_CENTER,
+            Press.FINGER
+        ))
+    }
 }
