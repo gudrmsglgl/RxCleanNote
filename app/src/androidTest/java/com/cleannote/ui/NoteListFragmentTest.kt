@@ -24,20 +24,20 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Flowable
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import io.reactivex.Scheduler
+import io.reactivex.android.plugins.RxAndroidPlugins
+import io.reactivex.disposables.Disposable
+import io.reactivex.internal.schedulers.ExecutorScheduler
+import io.reactivex.plugins.RxJavaPlugins
+import io.reactivex.schedulers.Schedulers
+import org.junit.*
 import org.junit.runner.RunWith
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class NoteListFragmentTest: BaseTest() {
-
-    @get: Rule
-    val schedulerRule = SchedulerRule()
-
-    @get: Rule
-    val instantTaskRule = InstantTaskExecutorRule()
 
     @get: Rule
     val espressoIdlingResourceRule = EspressoIdlingResourceRule()
@@ -228,6 +228,40 @@ class NoteListFragmentTest: BaseTest() {
                         hasText(searchedNotes[0].title)
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun searchViewSetQueryReturnNoData(){
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), query)
+
+        val text = "empty"
+        val searchQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC; like = text }
+        val emptyNotes = emptyList<Note>()
+        stubNoteRepositoryGetNotes(Flowable.just(emptyNotes), searchQuery)
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            toolbar {
+                searchView {
+                    searchBtn.click()
+                    searchEditView {
+                        searchText(text)
+                    }
+                }
+                idle(1500) // for RxDebounce(1000)
+            }
+            recyclerView {
+                isGone()
+            }
+            noDataTextView {
+                isVisible()
+                hasText(R.string.recyclerview_no_data)
             }
         }
     }
