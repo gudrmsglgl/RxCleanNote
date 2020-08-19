@@ -1,10 +1,12 @@
 package com.cleannote.ui
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import com.cleannote.HEspresso.MainActivityScreen
 import com.cleannote.HEspresso.NoteListScreen
 import com.cleannote.HEspresso.recycler.NRecyclerItem
+import com.cleannote.MainActivity
 import com.cleannote.app.R
 import com.cleannote.common.UIController
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
@@ -18,22 +20,13 @@ import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
-import com.cleannote.test.util.SchedulerRule
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Flowable
-import io.reactivex.Scheduler
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.disposables.Disposable
-import io.reactivex.internal.schedulers.ExecutorScheduler
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import org.junit.*
 import org.junit.runner.RunWith
-import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
@@ -42,6 +35,7 @@ class NoteListFragmentTest: BaseTest() {
     @get: Rule
     val espressoIdlingResourceRule = EspressoIdlingResourceRule()
 
+    val activity = MainActivityScreen
     val screen = NoteListScreen
 
     init {
@@ -321,6 +315,33 @@ class NoteListFragmentTest: BaseTest() {
                     }
                 }
                 idle(3000)
+            }
+        }
+    }
+
+    @Test
+    fun clickFabDisplayInputDialog(){
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositoryGetNotes(Flowable.just(notes), query)
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        screen {
+            insertBtn {
+                click()
+            }
+        }
+        activity {
+            newNoteDialog {
+                message {
+                    hasText(R.string.dialog_newnote)
+                }
+                editTitle {
+                    hasHint(R.string.dialog_newnote_hint)
+                    typeText("FabTest")
+                }
             }
         }
     }
