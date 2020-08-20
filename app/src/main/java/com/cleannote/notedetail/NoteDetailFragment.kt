@@ -45,7 +45,7 @@ class NoteDetailFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupMarkdown()
+        //setupMarkdown()
         getPreviousFragmentNote()
 
         observeAppBarChange()
@@ -172,13 +172,13 @@ class NoteDetailFragment constructor(
             }
         })
 
-    private fun setupMarkdown(){
+   /* private fun setupMarkdown(){
         activity?.run {
             val markdownProcessor = MarkdownProcessor(this)
             markdownProcessor.factory(EditFactory.create())
             markdownProcessor.live(note_body)
         }
-    }
+    }*/
 
     private fun toolbarEditMenu(){
         activity?.let {

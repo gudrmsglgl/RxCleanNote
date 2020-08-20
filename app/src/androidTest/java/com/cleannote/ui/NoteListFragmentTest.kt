@@ -3,8 +3,8 @@ package com.cleannote.ui
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.cleannote.HEspresso.MainActivityScreen
-import com.cleannote.HEspresso.NoteListScreen
+import com.cleannote.ui.screen.MainActivityScreen
+import com.cleannote.ui.screen.NoteListScreen
 import com.cleannote.HEspresso.recycler.NRecyclerItem
 import com.cleannote.MainActivity
 import com.cleannote.app.R
@@ -328,12 +328,12 @@ class NoteListFragmentTest: BaseTest() {
 
         ActivityScenario.launch(MainActivity::class.java)
 
-        screen {
-            insertBtn {
-                click()
-            }
-        }
         activity {
+            noteListScreen {
+                insertBtn {
+                    click()
+                }
+            }
             newNoteDialog {
                 message {
                     hasText(R.string.dialog_newnote)
@@ -371,7 +371,6 @@ class NoteListFragmentTest: BaseTest() {
     } just Runs
 
     override fun injectTest() {
-        (application.applicationComponent as TestApplicationComponent)
-            .inject(this)
+        getComponent().inject(this)
     }
 }

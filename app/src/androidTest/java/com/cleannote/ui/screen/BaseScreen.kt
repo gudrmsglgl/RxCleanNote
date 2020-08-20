@@ -1,4 +1,4 @@
-package com.cleannote.HEspresso
+package com.cleannote.ui.screen
 
 import android.view.View
 import androidx.test.espresso.Espresso

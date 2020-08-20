@@ -8,6 +8,7 @@ import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.injection.module.*
+import com.cleannote.ui.NoteDetailFragmentTest
 import com.cleannote.ui.NoteListFragmentTest
 import dagger.BindsInstance
 import dagger.Component
@@ -39,4 +40,5 @@ interface TestApplicationComponent: ApplicationComponent {
     }
 
     fun inject(noteListFragmentTest: NoteListFragmentTest)
+    fun inject(noteDetailFragmentTest: NoteDetailFragmentTest)
 }

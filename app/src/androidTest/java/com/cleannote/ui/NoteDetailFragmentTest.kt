@@ -1,16 +1,68 @@
 package com.cleannote.ui
 
+import androidx.core.os.bundleOf
+import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import junit.framework.Assert.assertEquals
+import com.cleannote.app.R
+import com.cleannote.common.UIController
+import com.cleannote.model.NoteUiModel
+import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.NoteDetailFragment
+import com.cleannote.test.NoteFactory
+import com.cleannote.ui.screen.DetailNoteScreen
+import io.mockk.mockk
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class NoteDetailFragmentTest {
+class NoteDetailFragmentTest: BaseTest() {
+
+    @Inject
+    lateinit var fragmentFactory: TestNoteFragmentFactory
+
+    val mockUIController = mockk<UIController>(relaxUnitFun = true)
+    val screen = DetailNoteScreen
+    private val note: NoteUiModel
+
+    init {
+        injectTest()
+        note = NoteFactory.makeNoteUiModel(title = "testTitle",body = "testBody", date = "20")
+    }
+
+    @Before
+    fun setup(){
+        setupUIController()
+    }
 
     @Test
-    fun doNoting(){
-        println("hi")
-        assertEquals(1,1)
+    fun noteDetailDisplayed(){
+
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        )
+
+        screen {
+            noteTitle {
+                hasText(note.title)
+            }
+            scrollview {
+                body {
+                    hasHint(R.string.detail_note_hint)
+                    hasText(note.body)
+                }
+                idle(1500)
+            }
+        }
+    }
+
+    override fun injectTest() {
+        getComponent().inject(this)
+    }
+
+    private fun setupUIController(){
+        fragmentFactory.uiController = mockUIController
     }
 }
