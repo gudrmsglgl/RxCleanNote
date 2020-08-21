@@ -2,6 +2,9 @@ package com.cleannote.ui
 
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.app.R
 import com.cleannote.common.UIController
@@ -45,6 +48,14 @@ class NoteDetailFragmentTest: BaseTest() {
         )
 
         screen {
+            toolbar {
+                primaryMenu {
+                    hasDrawable(R.drawable.ic_arrow_back_24dp)
+                }
+                secondMenu {
+                    hasDrawable(R.drawable.ic_delete_24dp)
+                }
+            }
             noteTitle {
                 hasText(note.title)
             }
@@ -54,6 +65,46 @@ class NoteDetailFragmentTest: BaseTest() {
                     hasText(note.body)
                 }
                 idle(1500)
+            }
+        }
+    }
+
+    @Test
+    fun noteTitleCollapseExpandedThenToolbarSetTitle(){
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        )
+        screen {
+            noteTitle {
+                hasText(note.title)
+            }
+            scrollview.body.swipeUp()
+            toolbar.toolbarTitle.hasText(note.title)
+            scrollview.body.swipeDown()
+            noteTitle.hasText(note.title)
+        }
+    }
+
+    @Test
+    fun noteTitleBodyEditModeChangePrimaryIconMenu(){
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        )
+        screen {
+            toolbar {
+                primaryMenu.hasDrawable(R.drawable.ic_arrow_back_24dp)
+                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
+            }
+            noteTitle {
+                typeText("changeTitle")
+                idle(1500)
+            }
+            // change drawable
+            toolbar {
+                primaryMenu.hasDrawable(R.drawable.ic_cancel_24dp)
+                secondMenu.hasDrawable(R.drawable.ic_done_24dp)
             }
         }
     }

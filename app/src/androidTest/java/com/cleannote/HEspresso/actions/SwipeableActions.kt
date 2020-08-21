@@ -20,4 +20,13 @@ interface SwipeableActions: BaseActions {
             Press.FINGER
         ))
     }
+
+    fun swipeDown() {
+        viewInteraction.perform(GeneralSwipeAction(
+            Swipe.SLOW,
+            GeneralLocation.TOP_CENTER,
+            GeneralLocation.BOTTOM_CENTER,
+            Press.FINGER
+        ))
+    }
 }
