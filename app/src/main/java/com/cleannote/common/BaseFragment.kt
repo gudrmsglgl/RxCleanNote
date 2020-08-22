@@ -1,9 +1,13 @@
 package com.cleannote.common
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import com.cleannote.data.ui.InfoType
 import com.cleannote.data.ui.InputType
@@ -103,5 +107,17 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
 
     fun Disposable.addCompositeDisposable(){
         disposables?.add(this)
+    }
+
+    fun Drawable?.equalDrawable(@DrawableRes drawable: Int): Boolean = activity?.let{
+        val loadDrawableBitmap  = ContextCompat.getDrawable(it, drawable)?.toBitmap()
+        if (loadDrawableBitmap == null || this == null)
+            false
+        else
+            this.toBitmap().sameAs(loadDrawableBitmap)
+    }?: false
+
+    fun getDrawable(@DrawableRes drawable: Int) = activity?.let {
+        ContextCompat.getDrawable(it.applicationContext, drawable)
     }
 }

@@ -1,5 +1,6 @@
 package com.cleannote.presentation.notedetail
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.presentation.data.notedetail.NoteTitleState
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*

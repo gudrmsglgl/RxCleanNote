@@ -21,10 +21,12 @@ import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.widget.textChangeEvents
 import com.jakewharton.rxbinding4.widget.textChanges
 import com.yydcdut.markdown.MarkdownProcessor
 import com.yydcdut.markdown.syntax.edit.EditFactory
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
@@ -45,48 +47,49 @@ class NoteDetailFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //setupMarkdown()
         getPreviousFragmentNote()
+
+        noteTitleChangeSource()
+        editDoneSource()
 
         observeAppBarChange()
         subscribeToolbarState()
         subscribeNoteTitleState()
 
-        observeTitleChange()
-        observeBodyChange()
         subscribeNoteMode()
         observeFirstOptionMenu()
     }
 
-    private fun observeTitleChange() = Observable.combineLatest(
-        note_title
-            .textChanges()
-            .filter { note_title.isFocused }
-            .doOnNext { viewModel.setNoteMode(EditMode) },
-        toolbar_secondary_icon
-            .clicks()
-            .filter { isEditSecondaryMenu() }
-            .doOnNext { note_title.clearFocus(); viewModel.setNoteMode(DefaultMode) },
-        BiFunction { text: CharSequence, _:Unit ->
-            text.toString()
-        })
-        .subscribe { viewModel.setNoteTitle(it) }
+    private fun noteTitleChangeSource() = note_title
+        .textChanges()
+        .filter { note_title.isFocused }
+        .subscribe { _ ->
+            viewModel.setNoteMode(EditMode)
+        }
         .addCompositeDisposable()
 
-    private fun observeBodyChange() = Observable.combineLatest(
+    private fun editDoneSource() = toolbar_secondary_icon
+        .clicks()
+        .filter { isEditDoneMenu() }
+        .subscribe {
+            with(viewModel) {
+                setNoteTitle(note_title.text.toString())
+                setNoteMode(DefaultMode)
+            }
+        }
+        .addCompositeDisposable()
+
+    /*private fun observeBodyChange() = Observable.combineLatest(
         note_body
             .textChanges()
             .filter { note_body.isFocused }
             .doOnNext { viewModel.setNoteMode(EditMode) },
-        toolbar_secondary_icon
-            .clicks()
-            .filter { isEditSecondaryMenu() }
-            .doOnNext { note_body.clearFocus(); viewModel.setNoteMode(DefaultMode) },
+        editDoneSource,
         BiFunction { text: CharSequence, _:Unit ->
             text.toString()
         })
         .subscribe { viewModel.setNoteBody(it) }
-        .addCompositeDisposable()
+        .addCompositeDisposable()*/
 
     private fun subscribeNoteMode() = viewModel.noteMode
         .observe( viewLifecycleOwner, Observer {  mode ->
@@ -95,6 +98,7 @@ class NoteDetailFragment constructor(
                     toolbarEditMenu()
                 }
                 is DefaultMode -> {
+                    releaseFocus()
                     toolbarDefaultMenu()
                     view?.hideKeyboard()
                 }
@@ -102,12 +106,11 @@ class NoteDetailFragment constructor(
         })
 
     private fun observeFirstOptionMenu() = toolbar_primary_icon.singleClick()
-        .map { isEditPrimaryMenu() }
+        .map { isEditCancelMenu() }
         .subscribe { isEditCancelMenu ->
             if (isEditCancelMenu) {
                 // edit Menu cancel
-                note_title.takeIf { it.isFocused }?.clearFocus()
-                note_body.takeIf { it.isFocused }?.clearFocus()
+                releaseFocus()
                 viewModel.setNoteMode(DefaultMode)
             }
             else {
@@ -172,13 +175,6 @@ class NoteDetailFragment constructor(
             }
         })
 
-   /* private fun setupMarkdown(){
-        activity?.run {
-            val markdownProcessor = MarkdownProcessor(this)
-            markdownProcessor.factory(EditFactory.create())
-            markdownProcessor.live(note_body)
-        }
-    }*/
 
     private fun toolbarEditMenu(){
         activity?.let {
@@ -199,9 +195,17 @@ class NoteDetailFragment constructor(
         }
     }
 
-    private fun isEditPrimaryMenu() = toolbar_primary_icon.drawable.constantState ==
-            resources.getDrawable(R.drawable.ic_cancel_24dp,null).constantState
+    /*private fun isEditPrimaryMenu() = toolbar_primary_icon.drawable.constantState ==
+            resources.getDrawable(R.drawable.ic_cancel_24dp,null).constantState*/
 
-    private fun isEditSecondaryMenu() = toolbar_secondary_icon.drawable.constantState ==
-            resources.getDrawable(R.drawable.ic_done_24dp,null).constantState
+    private fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable
+        .equalDrawable(R.drawable.ic_cancel_24dp)
+
+    private fun isEditDoneMenu(): Boolean = toolbar_secondary_icon.drawable
+        .equalDrawable(R.drawable.ic_done_24dp)
+
+    private fun releaseFocus(){
+        note_title.takeIf { it.isFocused }?.clearFocus()
+        note_body.takeIf { it.isFocused }?.clearFocus()
+    }
 }

@@ -87,25 +87,33 @@ class NoteDetailFragmentTest: BaseTest() {
     }
 
     @Test
-    fun noteTitleBodyEditModeChangePrimaryIconMenu(){
+    fun noteTitleEditModeThenChangeIconMenu(){
         launchFragmentInContainer<NoteDetailFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         )
         screen {
-            toolbar {
-                primaryMenu.hasDrawable(R.drawable.ic_arrow_back_24dp)
-                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
-            }
-            noteTitle {
-                typeText("changeTitle")
-                idle(1500)
-            }
-            // change drawable
+            noteTitle.typeText("test")
             toolbar {
                 primaryMenu.hasDrawable(R.drawable.ic_cancel_24dp)
                 secondMenu.hasDrawable(R.drawable.ic_done_24dp)
             }
+        }
+    }
+
+    @Test
+    fun noteTitleEditDoneThenChangeIconMenu(){
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        )
+        screen {
+            noteTitle.typeText("test")
+            toolbar {
+                secondMenu.click()
+                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
+            }
+            noteTitle.isFocused(false)
         }
     }
 
