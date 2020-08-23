@@ -9,11 +9,11 @@ import com.cleannote.presentation.data.notedetail.TextMode.DefaultMode
 import com.cleannote.presentation.data.notedetail.TextMode.EditMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
+import com.cleannote.presentation.model.NoteView
 
 class NoteDetailViewModel constructor(): ViewModel() {
 
-    private var _noteTitle: String = ""
-    private var _noteBody: String = ""
+    private lateinit var note: NoteView
 
     private val _detailToolbarState: MutableLiveData<DetailToolbarState> = MutableLiveData()
     val detailToolbarState: LiveData<DetailToolbarState>
@@ -33,11 +33,7 @@ class NoteDetailViewModel constructor(): ViewModel() {
         _detailToolbarState.value = state
     }
 
-    fun setNoteTitle(title: String) {
-        _noteTitle = title.trimEnd()
-    }
-
-    fun getNoteTile() = _noteTitle
+    fun getNoteTile() = note.title
 
     fun setNoteMode(mode: TextMode){
         _noteMode.value = mode
@@ -47,9 +43,14 @@ class NoteDetailViewModel constructor(): ViewModel() {
         return _noteMode.value is EditMode
     }
 
-    fun setNoteBody(body: String){
-        _noteBody = body.trimEnd()
+    fun getNoteBody() = note.body
+
+    fun setNote(noteView: NoteView){
+        note = noteView
     }
 
-    fun getNoteBody() = _noteBody
+    fun deleteNote(noteView: NoteView) {
+        note = noteView
+    }
+
 }

@@ -18,4 +18,7 @@ open class NoteMapper @Inject constructor(private val dateUtil: DateUtil): Mappe
         created_at = dateUtil.getCurrentTimestamp(),
         updated_at = dateUtil.getCurrentTimestamp()
     )
+
+    override fun mapToView(type: NoteUiModel): NoteView =
+        NoteView(type.id, type.title, type.body, type.updated_at, type.created_at)
 }

@@ -1,5 +1,6 @@
 package com.cleannote.mapper
 
-interface Mapper<out U, in V> {
+interface Mapper<U,V> {
     fun mapToUiModel(type: V): U
+    fun mapToView(type: U): V
 }

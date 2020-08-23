@@ -27,7 +27,7 @@ class NoteFragmentFactory @Inject constructor(
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory)
+            val fragment = NoteDetailFragment(viewModelFactory, noteMapper)
             fragment
         }
 

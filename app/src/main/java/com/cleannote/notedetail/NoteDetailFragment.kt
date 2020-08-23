@@ -3,8 +3,6 @@ package com.cleannote.notedetail
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.cleannote.app.R
 import com.cleannote.common.BaseFragment
 import com.cleannote.extension.*
+import com.cleannote.mapper.NoteMapper
 import com.cleannote.model.NoteUiModel
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
@@ -21,13 +20,7 @@ import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
-import com.jakewharton.rxbinding4.widget.textChangeEvents
 import com.jakewharton.rxbinding4.widget.textChanges
-import com.yydcdut.markdown.MarkdownProcessor
-import com.yydcdut.markdown.syntax.edit.EditFactory
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
@@ -37,7 +30,8 @@ import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
 
 class NoteDetailFragment constructor(
-    private val viewModelFactory: ViewModelProvider.Factory
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val noteMapper: NoteMapper
 ) : BaseFragment(R.layout.fragment_note_detail) {
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -75
@@ -49,15 +43,17 @@ class NoteDetailFragment constructor(
         super.onViewCreated(view, savedInstanceState)
         getPreviousFragmentNote()
 
+        appBarOffSetChangeSource()
         noteTitleChangeSource()
-        editDoneSource()
+        noteBodyChangeSource()
 
-        observeAppBarChange()
+        menuPrimarySource()
+        menuSecondarySource()
+
         subscribeToolbarState()
         subscribeNoteTitleState()
 
         subscribeNoteMode()
-        observeFirstOptionMenu()
     }
 
     private fun noteTitleChangeSource() = note_title
@@ -68,28 +64,11 @@ class NoteDetailFragment constructor(
         }
         .addCompositeDisposable()
 
-    private fun editDoneSource() = toolbar_secondary_icon
-        .clicks()
-        .filter { isEditDoneMenu() }
-        .subscribe {
-            with(viewModel) {
-                setNoteTitle(note_title.text.toString())
-                setNoteMode(DefaultMode)
-            }
-        }
+    private fun noteBodyChangeSource() = note_body
+        .textChanges()
+        .filter { note_body.isFocused }
+        .subscribe { viewModel.setNoteMode(EditMode) }
         .addCompositeDisposable()
-
-    /*private fun observeBodyChange() = Observable.combineLatest(
-        note_body
-            .textChanges()
-            .filter { note_body.isFocused }
-            .doOnNext { viewModel.setNoteMode(EditMode) },
-        editDoneSource,
-        BiFunction { text: CharSequence, _:Unit ->
-            text.toString()
-        })
-        .subscribe { viewModel.setNoteBody(it) }
-        .addCompositeDisposable()*/
 
     private fun subscribeNoteMode() = viewModel.noteMode
         .observe( viewLifecycleOwner, Observer {  mode ->
@@ -99,32 +78,50 @@ class NoteDetailFragment constructor(
                 }
                 is DefaultMode -> {
                     releaseFocus()
+                    fetchNoteUi()
                     toolbarDefaultMenu()
                     view?.hideKeyboard()
                 }
             }
         })
 
-    private fun observeFirstOptionMenu() = toolbar_primary_icon.singleClick()
+    private fun menuPrimarySource() = toolbar_primary_icon.clicks()
         .map { isEditCancelMenu() }
-        .subscribe { isEditCancelMenu ->
-            if (isEditCancelMenu) {
-                // edit Menu cancel
-                releaseFocus()
-                viewModel.setNoteMode(DefaultMode)
-            }
-            else {
-                // default Menu back
-                //TODO:: Note update & hidekeyboard
-                timber("d","NoteDetailFragment_Before onBack: $noteUiModel")
-                noteUiModel.body = "afterOnBack"
-                setFragmentResult("requestOnBack",
-                    bundleOf(NOTE_DETAIL_BUNDLE_KEY to noteUiModel)
-                )
+        .doOnNext { cancelMenu ->
+            if (cancelMenu) viewModel.setNoteMode(DefaultMode)
+            else findNavController().popBackStack()
+        }
+        .subscribe {
+            releaseFocus()
+        }
+        .addCompositeDisposable()
 
-                findNavController().popBackStack()
+    private fun menuSecondarySource() = toolbar_secondary_icon.clicks()
+        .map { isEditDoneMenu() }
+        .subscribe { doneMenu ->
+            if (doneMenu) setNote()
+            else deleteNote()
+        }
+        .addCompositeDisposable()
+
+    private fun setNote() = with(viewModel){
+        setNote(noteMapper.mapToView(
+            noteUiModel.apply {
+                title = note_title.text.toString()
+                body = note_body.text.toString()
             }
-        }.addCompositeDisposable()
+        ))
+        setNoteMode(DefaultMode)
+    }
+
+    private fun deleteNote() = with(viewModel) {
+        deleteNote(noteMapper.mapToView(noteUiModel))
+    }
+
+    private fun fetchNoteUi(){
+        setNoteTitle()
+        setNoteBody()
+    }
 
     private fun subscribeNoteTitleState() = viewModel.noteTitleState.observe( viewLifecycleOwner,
         Observer { titleState ->
@@ -139,6 +136,11 @@ class NoteDetailFragment constructor(
         setSelection(viewModel.getNoteTile().length)
     }
 
+    private fun setNoteBody() = with(note_body){
+        setText(viewModel.getNoteBody())
+        setSelection(viewModel.getNoteBody().length)
+    }
+
     private fun setToolbarTitle(){
         viewModel.takeIf { it.isEditMode() }?.setNoteMode(DefaultMode)
         tool_bar_title.text = viewModel.getNoteTile()
@@ -147,13 +149,11 @@ class NoteDetailFragment constructor(
     private fun getPreviousFragmentNote(){
         arguments?.let {
             noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
-            viewModel.setNoteTitle(noteUiModel.title)
-            viewModel.setNoteBody(noteUiModel.body)
-            note_body.setText(noteUiModel.body)
+            viewModel.setNote(noteMapper.mapToView(noteUiModel))
         }
     }
 
-    private fun observeAppBarChange() = app_bar.offsetChanges()
+    private fun appBarOffSetChangeSource() = app_bar.offsetChanges()
         .map { offset ->
             if (offset < COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD) TbCollapse
             else TbExpanded
@@ -175,7 +175,6 @@ class NoteDetailFragment constructor(
             }
         })
 
-
     private fun toolbarEditMenu(){
         activity?.let {
             toolbar_primary_icon
@@ -194,9 +193,6 @@ class NoteDetailFragment constructor(
                 .setImageDrawable(resources.getDrawable(R.drawable.ic_delete_24dp,null))
         }
     }
-
-    /*private fun isEditPrimaryMenu() = toolbar_primary_icon.drawable.constantState ==
-            resources.getDrawable(R.drawable.ic_cancel_24dp,null).constantState*/
 
     private fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable
         .equalDrawable(R.drawable.ic_cancel_24dp)

@@ -37,7 +37,7 @@ class TestNoteFragmentFactory
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory)
+            val fragment = NoteDetailFragment(viewModelFactory, noteMapper)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }
