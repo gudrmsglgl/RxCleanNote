@@ -11,13 +11,13 @@ import io.reactivex.subscribers.DisposableSubscriber
 
 abstract class FlowableUseCase<T, in Params> constructor(
     private val threadExecutor: ThreadExecutor,
-    private val postExecutionThread: PostExecutionThread) {
+    private val postExecutionThread: PostExecutionThread): UseCase<DisposableSubscriber<T>, Params> {
 
     private var disposables: CompositeDisposable = CompositeDisposable()
 
     protected abstract fun buildUseCaseFlowable(params: Params? = null): Flowable<T>
 
-    open fun execute(observer: DisposableSubscriber<T>, params: Params? = null) {
+    override fun execute(observer: DisposableSubscriber<T>, params: Params?) {
         val observable = this.buildUseCaseFlowable(params)
             .subscribeOn(Schedulers.from(threadExecutor))
             .observeOn(postExecutionThread.scheduler) as Flowable<T>

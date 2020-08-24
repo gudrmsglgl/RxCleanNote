@@ -17,6 +17,7 @@ import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
+import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
@@ -73,10 +74,13 @@ class NoteDetailFragment constructor(
     private fun subscribeNoteMode() = viewModel.noteMode
         .observe( viewLifecycleOwner, Observer {  mode ->
             when (mode) {
+                is InitMode -> {
+                    fetchNoteUi()
+                }
                 is EditMode -> {
                     toolbarEditMenu()
                 }
-                is DefaultMode -> {
+                is EditDoneMode -> {
                     releaseFocus()
                     fetchNoteUi()
                     toolbarDefaultMenu()
@@ -88,7 +92,7 @@ class NoteDetailFragment constructor(
     private fun menuPrimarySource() = toolbar_primary_icon.clicks()
         .map { isEditCancelMenu() }
         .doOnNext { cancelMenu ->
-            if (cancelMenu) viewModel.setNoteMode(DefaultMode)
+            if (cancelMenu) viewModel.setNoteMode(EditDoneMode)
             else findNavController().popBackStack()
         }
         .subscribe {
@@ -99,19 +103,19 @@ class NoteDetailFragment constructor(
     private fun menuSecondarySource() = toolbar_secondary_icon.clicks()
         .map { isEditDoneMenu() }
         .subscribe { doneMenu ->
-            if (doneMenu) setNote()
+            if (doneMenu) setNote(EditDoneMode)
             else deleteNote()
         }
         .addCompositeDisposable()
 
-    private fun setNote() = with(viewModel){
+    private fun setNote(mode: TextMode) = with(viewModel){
         setNote(noteMapper.mapToView(
             noteUiModel.apply {
                 title = note_title.text.toString()
                 body = note_body.text.toString()
             }
         ))
-        setNoteMode(DefaultMode)
+        setNoteMode(mode)
     }
 
     private fun deleteNote() = with(viewModel) {
@@ -142,14 +146,14 @@ class NoteDetailFragment constructor(
     }
 
     private fun setToolbarTitle(){
-        viewModel.takeIf { it.isEditMode() }?.setNoteMode(DefaultMode)
+        viewModel.takeIf { it.isEditMode() }?.setNoteMode(EditDoneMode)
         tool_bar_title.text = viewModel.getNoteTile()
     }
 
     private fun getPreviousFragmentNote(){
         arguments?.let {
             noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
-            viewModel.setNote(noteMapper.mapToView(noteUiModel))
+            setNote(InitMode)
         }
     }
 

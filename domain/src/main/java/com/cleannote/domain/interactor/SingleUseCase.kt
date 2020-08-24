@@ -11,13 +11,13 @@ import io.reactivex.schedulers.Schedulers
 abstract class SingleUseCase<T, in Params> constructor(
     private val threadExecutor: ThreadExecutor,
     private val postExecutionThread: PostExecutionThread
-) {
+): UseCase<DisposableSingleObserver<T>, Params> {
 
     private var disposables: CompositeDisposable = CompositeDisposable()
 
     abstract fun buildUseCaseSingle(params: Params? = null): Single<T>
 
-    open fun execute(observer: DisposableSingleObserver<T>, params: Params? = null){
+    override fun execute(observer: DisposableSingleObserver<T>, params: Params?){
         val singleSource = this.buildUseCaseSingle(params)
             .subscribeOn(Schedulers.from(threadExecutor))
             .observeOn(postExecutionThread.scheduler) as Single<T>
