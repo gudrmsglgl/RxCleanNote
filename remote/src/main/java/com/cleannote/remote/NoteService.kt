@@ -18,12 +18,6 @@ interface NoteService {
         @Query("userId") userId: String
     ): Flowable<List<UserModel>>
 
-    @GET("memos")
-    fun getNotes(
-        @Query("_page") page: Int,
-        @Query("_limit") limit: Int = 2
-    ): Flowable<List<NoteModel>>
-
     @POST
     fun insertNote(
         @Field("id") id: String,

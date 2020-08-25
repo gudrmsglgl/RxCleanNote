@@ -2,26 +2,23 @@ package com.cleannote.presentation.notedetail
 
 import androidx.lifecycle.*
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
-import com.cleannote.presentation.R
+import com.cleannote.presentation.common.BaseViewModel
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.notedetail.NoteTitleState
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode
-import com.cleannote.presentation.data.notedetail.TextMode.EditDoneMode
-import com.cleannote.presentation.data.notedetail.TextMode.EditMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
+import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.subscribers.DisposableSubscriber
-import javax.inject.Inject
 
 class NoteDetailViewModel
 constructor(
     private val updateNote: UpdateNote,
     private val noteMapper: NoteMapper
-): ViewModel() {
+): BaseViewModel(updateNote) {
 
     private lateinit var note: NoteView
 
@@ -39,7 +36,7 @@ constructor(
             else NtCollapse
         }
 
-    private val _noteMode: MutableLiveData<TextMode> = MutableLiveData(EditDoneMode)
+    private val _noteMode: MutableLiveData<TextMode> = MutableLiveData()
     val noteMode: LiveData<TextMode>
         get() = _noteMode
 
@@ -53,7 +50,15 @@ constructor(
         _noteMode.value = mode
         if (mode is EditDoneMode){
             _updatedNote.postValue(DataState.loading())
-            updateNote.execute(updateObserver, noteMapper.mapFromView(note))
+            updateNote.execute(
+                onSuccess = {
+                    _updatedNote.postValue(DataState.success(note))
+                },
+                onError = {
+                    _updatedNote.postValue(DataState.error("update note fail"))
+                },
+                params = noteMapper.mapFromView(note)
+            )
         }
     }
 

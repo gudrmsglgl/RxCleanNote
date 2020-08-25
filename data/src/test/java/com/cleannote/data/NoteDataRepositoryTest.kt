@@ -69,7 +69,6 @@ class NoteDataRepositoryTest {
             on { isCached(3) } doReturn Single.just( false )
         }
         noteRemoteDataStore = mock{
-            on { getNumNotes() }.doReturn(Flowable.just(noteEntities))
             on {
                 insertRemoteNewNote(insertSuccessNote)
                 insertRemoteNewNote(insertFailNote)
@@ -84,18 +83,6 @@ class NoteDataRepositoryTest {
             on { retrieveDataStore(false) } doReturn noteRemoteDataStore
         }
         noteDataRepository = NoteDataRepository(noteDataStoreFactory, noteMapper, userMapper, queryMapper)
-    }
-
-    @Test
-    fun getNumNoteComplete(){
-        val notes: List<Note> = NoteFactory.createNoteList(0,10)
-        // note 를 기준으로 잡고 assert 로 확인 가능 맵핑 됬는 지
-        notes.forEachIndexed { index, note ->
-            whenever(noteMapper.mapFromEntity(noteEntities[index])).thenReturn(note)
-        }
-        val testObserver = noteDataRepository.getNumNotes().test()
-        testObserver.assertComplete()
-        testObserver.assertValue(notes)
     }
 
     @Test

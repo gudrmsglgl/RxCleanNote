@@ -16,15 +16,6 @@ class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
                                          private val userEntityMapper: UserEntityMapper):
     NoteRemote {
 
-    override fun getNumNotes(): Flowable<List<NoteEntity>> {
-        return noteService.getNotes(1)
-            .map { noteModeles ->
-                noteModeles.map {
-                    noteEntityMapper.mapFromRemote(it)
-                }
-            }
-    }
-
     override fun insertRemoteNewNote(noteEntity: NoteEntity): Completable {
         return noteService.insertNote(
             noteEntity.id,

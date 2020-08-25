@@ -16,8 +16,6 @@ constructor(
     private val noteRemote: NoteRemote
 ): NoteDataStore {
 
-    override fun getNumNotes(): Flowable<List<NoteEntity>> = noteRemote.getNumNotes()
-
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> {
         throw UnsupportedOperationException()
     }

@@ -1,7 +1,7 @@
 package com.cleannote.presentation.data.notedetail
 
 sealed class TextMode: Mode {
-    object InitMode: TextMode(){
+    object DefaultMode: TextMode(){
         override fun isEditMode(): Boolean  = false
     }
 

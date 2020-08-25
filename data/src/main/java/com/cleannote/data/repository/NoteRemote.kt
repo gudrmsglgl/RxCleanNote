@@ -8,7 +8,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 
 interface NoteRemote {
-    fun getNumNotes(): Flowable<List<NoteEntity>>
     fun insertRemoteNewNote(noteEntity: NoteEntity): Completable
     fun login(userId: String): Flowable<List<UserEntity>>
     fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>

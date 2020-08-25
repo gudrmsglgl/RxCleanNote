@@ -16,8 +16,6 @@ constructor(
     private val noteCache: NoteCache
 ): NoteDataStore {
 
-    override fun getNumNotes(): Flowable<List<NoteEntity>> = noteCache.getNumNotes()
-
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> =
         noteCache.insertCacheNewNote(noteEntity)
 

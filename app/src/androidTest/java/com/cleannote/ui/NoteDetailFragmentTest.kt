@@ -101,7 +101,7 @@ class NoteDetailFragmentTest: BaseTest() {
         }
     }
 
-    @Test
+    /*@Test
     fun noteTitleEditDoneThenChangeIconMenu(){
         launchFragmentInContainer<NoteDetailFragment>(
             factory = fragmentFactory,
@@ -115,7 +115,7 @@ class NoteDetailFragmentTest: BaseTest() {
             }
             noteTitle.isFocused(false)
         }
-    }
+    }*/
 
     override fun injectTest() {
         getComponent().inject(this)

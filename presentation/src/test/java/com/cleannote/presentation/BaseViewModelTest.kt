@@ -9,6 +9,10 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.mockito.verification.VerificationMode
 
+typealias OnSuccess<T> = (T) -> Unit
+typealias OnError = (Throwable) -> Unit
+typealias Complete = () -> Unit
+
 abstract class BaseViewModelTest {
 
     lateinit var viewModelState: MutableLiveData<State>
@@ -24,10 +28,19 @@ abstract class BaseViewModelTest {
         else verify(stateObserver, verificationMode).onChanged(state)
     }
 
-    fun <T, Param> verifyUseCaseExecute(
-        useCase: UseCase<T, Param>,
-        observer: KArgumentCaptor<T>,
-        param: KArgumentCaptor<Param>
-    ) = verify(useCase).execute(observer.capture(), param.capture())
+
+    fun <T, Param> UseCase<T, Param>.verifyExecute(
+        onSuccessCaptor: KArgumentCaptor<OnSuccess<T>>,
+        onErrorCaptor: KArgumentCaptor<OnError>,
+        afterFinishedCaptor: KArgumentCaptor<Complete>,
+        onCompleteCaptor: KArgumentCaptor<Complete>,
+        paramCaptor: KArgumentCaptor<Param>
+    ) = verify(this).execute(onSuccess = onSuccessCaptor.capture(),
+                                            onError = onErrorCaptor.capture(),
+                                            afterFinished = afterFinishedCaptor.capture(),
+                                            onComplete = onCompleteCaptor.capture(),
+                                            params = paramCaptor.capture()
+    )
+
 
 }

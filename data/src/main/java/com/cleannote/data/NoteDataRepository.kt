@@ -12,10 +12,7 @@ import com.cleannote.domain.model.Query
 import com.cleannote.domain.model.User
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
-import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.rxkotlin.zipWith
 import java.lang.Exception
 import javax.inject.Inject
@@ -28,14 +25,6 @@ constructor(
     private val userMapper: UserMapper,
     private val queryMapper: QueryMapper
 ): NoteRepository{
-
-    override fun getNumNotes(): Flowable<List<Note>> = factory.retrieveRemoteDataStore()
-        .getNumNotes()
-        .map { listNoteEntity ->
-            listNoteEntity.map {
-                noteMapper.mapFromEntity(it)
-            }
-        }
 
     override fun insertNewNote(note: Note): Single<Long> = factory.retrieveCacheDataStore()
         .insertCacheNewNote(noteMapper.mapToEntity(note))
@@ -99,6 +88,10 @@ constructor(
         .flatMap {
             loadCacheNoteEntitiesToDomain(queryEntity)
         }
+
+    override fun updateNote(note: Note): Flowable<Unit> {
+        TODO("Not yet implemented")
+    }
 
     /*override fun searchNotes(query: Query): Flowable<List<Note>> {
         val queryEntity = queryMapper.mapToEntity(query)

@@ -9,7 +9,6 @@ import io.reactivex.Single
 
 interface NoteRepository {
 
-    fun getNumNotes(): Flowable<List<Note>>
     fun insertNewNote(note: Note): Single<Long>
     fun login(userId: String): Flowable<List<User>>
     fun searchNotes(query: Query): Flowable<List<Note>>

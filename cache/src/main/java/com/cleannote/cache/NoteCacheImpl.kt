@@ -18,13 +18,6 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
 
     private val SHOULD_PAGE_UPDATE_TIME = (60 * 3 * 1000).toLong()
 
-    override fun getNumNotes(): Flowable<List<NoteEntity>> = Flowable.defer {
-        Flowable.just(noteDao.getNumNotes())
-    }.map { cachedNotes ->
-        cachedNotes.map {
-            entityMapper.mapFromCached(it)
-        }
-    }
 
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> =
         Single.defer{

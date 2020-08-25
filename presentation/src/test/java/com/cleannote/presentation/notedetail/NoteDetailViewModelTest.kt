@@ -4,7 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.BaseViewModelTest
+import com.cleannote.presentation.Complete
+import com.cleannote.presentation.OnError
+import com.cleannote.presentation.OnSuccess
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.LOADING
+import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.TextMode.EditDoneMode
 import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
@@ -20,15 +25,21 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
+
 @ExtendWith(InstantExecutorExtension::class)
 class NoteDetailViewModelTest: BaseViewModelTest() {
+
 
     private lateinit var viewModel: NoteDetailViewModel
 
     private lateinit var updateNote: UpdateNote
     private lateinit var noteMapper: NoteMapper
 
-    private lateinit var updateNoteCaptor: KArgumentCaptor<DisposableSubscriber<Unit>>
+    private lateinit var onSuccessNoteCaptor: KArgumentCaptor<OnSuccess<Unit>>
+    private lateinit var onErrorNoteCaptor: KArgumentCaptor<OnError>
+    private lateinit var afterFinishedCaptor: KArgumentCaptor<Complete>
+    private lateinit var onCompleteCaptor: KArgumentCaptor<Complete>
+
     private lateinit var updateParamCaptor: KArgumentCaptor<Note>
 
     private val note = NoteFactory.createNote("testNote")
@@ -39,7 +50,11 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         updateNote = mock()
         noteMapper = mock()
 
-        updateNoteCaptor = argumentCaptor()
+        onSuccessNoteCaptor = argumentCaptor()
+        onErrorNoteCaptor = argumentCaptor()
+        afterFinishedCaptor = argumentCaptor()
+        onCompleteCaptor = argumentCaptor()
+
         updateParamCaptor = argumentCaptor()
 
         viewModelState = MutableLiveData()
@@ -57,16 +72,28 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     fun updateNoteExecuteUseCase(){
         stubNoteMapper(noteView, note)
         whenUpdateNote(noteView)
-        verifyUseCaseExecute(updateNote, updateNoteCaptor, updateParamCaptor)
+        verifyUpdateNoteExecute()
     }
 
     @Test
     fun updateNoteStateLoadingReturnNoData(){
         stubNoteMapper(noteView, note)
         whenUpdateNote(noteView)
-        verifyUseCaseExecute(updateNote, updateNoteCaptor, updateParamCaptor)
+        verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
         verifyUpdateViewModelData(null)
+    }
+
+    @Test
+    fun updateNoteStateSuccessReturnNote(){
+        stubNoteMapper(noteView, note)
+        whenUpdateNote(noteView)
+        verifyUpdateNoteExecute()
+        verifyViewModelDataState(LOADING)
+
+        onSuccessUpdateNote()
+        verifyViewModelDataState(SUCCESS)
+        verifyUpdateViewModelData(noteView)
     }
 
     private fun stubNoteMapper(noteView: NoteView, note: Note){
@@ -92,4 +119,18 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         }
     }
 
+    private fun verifyUpdateNoteExecute(){
+        updateNote.verifyExecute(
+            onSuccessNoteCaptor,
+            onErrorNoteCaptor,
+            afterFinishedCaptor,
+            onCompleteCaptor,
+            updateParamCaptor
+        )
+    }
+
+    private fun onSuccessUpdateNote(){
+        onSuccessNoteCaptor.firstValue.invoke(Unit)
+        setViewModelState(viewModel.updatedNote.value?.status)
+    }
 }

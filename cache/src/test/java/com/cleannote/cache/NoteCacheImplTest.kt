@@ -28,11 +28,6 @@ class NoteCacheImplTest {
 
     private val noteCacheImpl = NoteCacheImpl(noteDao, entityMapper, preferencesHelper)
 
-    @Test
-    fun getNumNotesComplete(){
-        val testObserver = noteCacheImpl.getNumNotes().test()
-        testObserver.assertComplete()
-    }
 
     @Test
     fun insertNotesComplete(){

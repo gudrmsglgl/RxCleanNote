@@ -74,13 +74,10 @@ class NoteDetailFragment constructor(
     private fun subscribeNoteMode() = viewModel.noteMode
         .observe( viewLifecycleOwner, Observer {  mode ->
             when (mode) {
-                is InitMode -> {
-                    fetchNoteUi()
-                }
                 is EditMode -> {
                     toolbarEditMenu()
                 }
-                is EditDoneMode -> {
+                else -> {
                     releaseFocus()
                     fetchNoteUi()
                     toolbarDefaultMenu()
@@ -92,7 +89,7 @@ class NoteDetailFragment constructor(
     private fun menuPrimarySource() = toolbar_primary_icon.clicks()
         .map { isEditCancelMenu() }
         .doOnNext { cancelMenu ->
-            if (cancelMenu) viewModel.setNoteMode(EditDoneMode)
+            if (cancelMenu) viewModel.setNoteMode(DefaultMode)
             else findNavController().popBackStack()
         }
         .subscribe {
@@ -103,18 +100,14 @@ class NoteDetailFragment constructor(
     private fun menuSecondarySource() = toolbar_secondary_icon.clicks()
         .map { isEditDoneMenu() }
         .subscribe { doneMenu ->
-            if (doneMenu) setNote(EditDoneMode)
+            if (doneMenu) setNote(noteUiModel, EditDoneMode)
             else deleteNote()
         }
         .addCompositeDisposable()
 
-    private fun setNote(mode: TextMode) = with(viewModel){
-        setNote(noteMapper.mapToView(
-            noteUiModel.apply {
-                title = note_title.text.toString()
-                body = note_body.text.toString()
-            }
-        ))
+    private fun setNote(noteUiModel: NoteUiModel, mode: TextMode) = with(viewModel){
+        setNote(noteMapper.mapToView(noteUiModel))
+        timber("d","noteTItle:${noteUiModel.title} body:${noteUiModel.body}")
         setNoteMode(mode)
     }
 
@@ -146,14 +139,14 @@ class NoteDetailFragment constructor(
     }
 
     private fun setToolbarTitle(){
-        viewModel.takeIf { it.isEditMode() }?.setNoteMode(EditDoneMode)
+        viewModel.takeIf { it.isEditMode() }?.setNoteMode(DefaultMode)
         tool_bar_title.text = viewModel.getNoteTile()
     }
 
     private fun getPreviousFragmentNote(){
         arguments?.let {
             noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
-            setNote(InitMode)
+            setNote(noteUiModel, DefaultMode)
         }
     }
 

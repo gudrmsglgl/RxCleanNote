@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
-import com.cleannote.domain.interactor.usecases.notelist.GetNumNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.interactor.usecases.splash.Login
@@ -21,7 +20,6 @@ class ViewModelFactory
 @Inject constructor(
     private val login: Login,
     private val userMapper: UserMapper,
-    private val getNumNotes: GetNumNotes,
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
     private val updateNote: UpdateNote,
@@ -35,7 +33,7 @@ class ViewModelFactory
         SplashViewModel::class.java -> SplashViewModel(login, userMapper) as T
 
         NoteListViewModel::class.java -> NoteListViewModel(
-            getNumNotes, searchNotes, insertNewNote, noteMapper, sharedPreferences) as T
+            searchNotes, insertNewNote, noteMapper, sharedPreferences) as T
 
         NoteDetailViewModel::class.java -> NoteDetailViewModel(updateNote, noteMapper) as T
 

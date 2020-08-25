@@ -1,3 +1,4 @@
+/*
 package com.cleannote.presentation.splash
 
 import androidx.lifecycle.MutableLiveData
@@ -130,4 +131,4 @@ class SplashViewModelTest {
     private fun stubUserMapperMapToView(userView: UserView, user: User){
         whenever(userMapper.mapToView(user)).thenReturn(userView)
     }
-}
+}*/

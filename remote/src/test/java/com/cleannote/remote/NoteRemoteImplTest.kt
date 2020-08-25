@@ -42,30 +42,11 @@ class NoteRemoteImplTest {
             on { insertNote(noteEntity.id, noteEntity.title,
                 noteEntity.body, noteEntity.updated_at, noteEntity.created_at)
             } doReturn Completable.complete()
-            on { getNotes(1, count) } doReturn Flowable.just(noteModels)
             on { login(UserFactory.USER_ID) } doReturn Flowable.just(userModels)
         }
         noteRemoteImpl = NoteRemoteImpl(noteService, entityMapper, userEntityMapper)
     }
 
-    @Test
-    fun getNumNotesComplete(){
-        noteModels.forEachIndexed { index, noteModel ->
-            whenever(entityMapper.mapFromRemote(noteModel)).thenReturn(noteEntities[index])
-        }
-        val testObserver = noteRemoteImpl.getNumNotes().test()
-        testObserver.assertComplete()
-    }
-
-    @Test
-    fun getNumNotesReturnData(){
-        noteModels.forEachIndexed { index, noteModel ->
-            whenever(entityMapper.mapFromRemote(noteModel)).thenReturn(noteEntities[index])
-        }
-        val testObserver = noteRemoteImpl.getNumNotes().test()
-        println(testObserver.values())
-        testObserver.assertValue(noteEntities)
-    }
 
     @Test
     fun insertNewNoteComplete(){
