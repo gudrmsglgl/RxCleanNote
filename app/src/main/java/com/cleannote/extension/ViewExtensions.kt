@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.view.View
+import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 
@@ -17,6 +18,10 @@ fun View.invisible() {
 
 fun View.gone() {
     visibility = View.GONE
+}
+
+fun View.isVisible(): Boolean {
+    return (visibility == VISIBLE)
 }
 
 fun View.fadeIn() {

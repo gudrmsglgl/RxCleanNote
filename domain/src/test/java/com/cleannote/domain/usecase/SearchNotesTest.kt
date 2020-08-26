@@ -1,10 +1,12 @@
 package com.cleannote.domain.usecase
 
+import com.cleannote.domain.BaseDomainTest
 import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
+import com.cleannote.domain.model.Query
 import com.cleannote.domain.test.factory.NoteFactory
 import com.cleannote.domain.test.factory.QueryFactory
 import com.nhaarman.mockitokotlin2.any
@@ -15,11 +17,8 @@ import io.reactivex.Flowable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class SearchNotesTest {
+class SearchNotesTest: BaseDomainTest<List<Note>, Query>() {
 
-    private lateinit var repository: NoteRepository
-    private lateinit var threadExecutor: ThreadExecutor
-    private lateinit var postExecutionThread: PostExecutionThread
     private lateinit var searchNotes: SearchNotes
 
     private lateinit var notes: List<Note>
@@ -36,33 +35,40 @@ class SearchNotesTest {
             on { searchNotes(defaultQuery) }.thenReturn(Flowable.just(notes))
             on { searchNotes(searchQuery) }.thenReturn(Flowable.just(searchedNote))
         }
-        threadExecutor = mock()
-        postExecutionThread = mock()
+        mockRxSchedulers()
         searchNotes = SearchNotes(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
     fun buildUseCaseCallRepository(){
-        searchNotes.buildUseCaseFlowable(defaultQuery)
-        verify(repository).searchNotes(defaultQuery)
+        whenBuildFlowableUseCase(defaultQuery)
+        verifyRepositoryCall(defaultQuery)
     }
 
     @Test
     fun buildUseCaseObservableComplete(){
-        val test = searchNotes.buildUseCaseFlowable(defaultQuery).test()
-        verify(repository).searchNotes(defaultQuery)
+        val test = whenBuildFlowableUseCase(defaultQuery).test()
+        verifyRepositoryCall(defaultQuery)
         test.assertComplete()
     }
 
     @Test
     fun buildUseCaseDefaultQueryReturnNotes(){
-        val test = searchNotes.buildUseCaseFlowable(defaultQuery).test()
+        val test = whenBuildFlowableUseCase(defaultQuery).test()
         test.assertValue(notes)
     }
 
     @Test
     fun buildUseCaseSearchQuery(){
-        val test = searchNotes.buildUseCaseFlowable(searchQuery).test()
+        val test = whenBuildFlowableUseCase(searchQuery).test()
         test.assertValue(searchedNote)
+    }
+
+    override fun whenBuildFlowableUseCase(param: Query?): Flowable<List<Note>> {
+        return searchNotes.buildUseCaseFlowable(param)
+    }
+
+    override fun verifyRepositoryCall(param: Query?) {
+        verify(repository).searchNotes(param!!)
     }
 }

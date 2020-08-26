@@ -7,6 +7,7 @@ interface UIController {
     fun showUIMessage(uiMessage: UIMessage,
                       dialogBtnCallback: DialogBtnCallback? = null,
                       inputCaptureCallback: InputCaptureCallback? = null)
+    fun isDisplayProgressBar(): Boolean
 }
 
 interface DialogBtnCallback{

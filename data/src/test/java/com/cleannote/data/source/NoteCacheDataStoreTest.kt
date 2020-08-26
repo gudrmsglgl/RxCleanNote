@@ -30,7 +30,6 @@ class NoteCacheDataStoreTest {
     fun setUp() {
         noteEntity = NoteFactory.createNoteEntity("#1", "title#1","body#1")
         noteCache = mock{
-            on { getNumNotes() } doReturn Flowable.just(NoteFactory.createNoteEntityList(0,10))
             on { insertCacheNewNote(noteEntity)} doReturn Single.just(successInserted)
             on { saveNotes(noteEntities) }.thenReturn(Completable.complete())
             on { isCached(any()) } doReturn Single.just(true)
@@ -38,12 +37,6 @@ class NoteCacheDataStoreTest {
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
 
-    @Test
-    fun getNumNotesCompletes() {
-        val testObserver = noteCacheDataStore.getNumNotes().test()
-        verify(noteCache).getNumNotes()
-        testObserver.assertComplete()
-    }
 
     @Test
     fun insertCacheNewNoteCompletes(){

@@ -15,7 +15,7 @@ class UpdateNote
     postExecutionThread: PostExecutionThread
 ) : FlowableUseCase<Unit, Note>(threadExecutor, postExecutionThread) {
 
-    override fun buildUseCaseFlowable(params: Note?): Flowable<Unit> {
+    public override fun buildUseCaseFlowable(params: Note?): Flowable<Unit> {
        return repository.updateNote(params!!)
     }
 }

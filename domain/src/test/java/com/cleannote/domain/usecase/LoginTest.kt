@@ -1,5 +1,6 @@
 package com.cleannote.domain.usecase
 
+import com.cleannote.domain.BaseDomainTest
 import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
@@ -14,49 +15,55 @@ import io.reactivex.Maybe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class LoginTest {
-
-    private lateinit var mockThreadExecutor: ThreadExecutor
-    private lateinit var mockPostExecutionThread: PostExecutionThread
-    private lateinit var repository: NoteRepository
+class LoginTest: BaseDomainTest<List<User>, String>() {
 
     private lateinit var login: Login
+
+    private val successUserParam = "successId"
     private val successRetData = UserFactory.createUsers(1)
+
+    private val failUserParam = "failId"
     private val failRetData: Flowable<List<User>> = Flowable.empty()
 
     @BeforeEach
     fun init(){
-        mockThreadExecutor = mock()
-        mockPostExecutionThread = mock()
+        mockRxSchedulers()
         repository = mock{
-            on { login("failId") } doReturn failRetData
-            on { login("successId") } doReturn Flowable.just(successRetData)
+            on { login(failUserParam) } doReturn failRetData
+            on { login(successUserParam) } doReturn Flowable.just(successRetData)
         }
-        login = Login(repository, mockThreadExecutor, mockPostExecutionThread)
+        login = Login(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
     fun buildUseCaseCallRepository(){
-        login.buildUseCaseFlowable("successId")
-        verify(repository).login("successId")
+        whenBuildFlowableUseCase(successUserParam)
+        verifyRepositoryCall(successUserParam)
     }
 
     @Test
     fun buildUseCaseComplete(){
-        val testObserver = login.buildUseCaseFlowable("successId").test()
+        val testObserver = whenBuildFlowableUseCase(successUserParam).test()
         testObserver.assertComplete()
     }
 
     @Test
     fun buildUseCaseReturnSuccess(){
-        val testObserver = login.buildUseCaseFlowable("successId").test()
+        val testObserver =  whenBuildFlowableUseCase(successUserParam).test()
         testObserver.assertValue(successRetData)
     }
 
     @Test
     fun buildUseCaseReturnEmpty(){
-        val testObserver = login.buildUseCaseFlowable("failId").test()
+        val testObserver =  whenBuildFlowableUseCase(failUserParam).test()
         testObserver.assertNoValues()
     }
 
+    override fun whenBuildFlowableUseCase(param: String?): Flowable<List<User>> {
+        return login.buildUseCaseFlowable(param)
+    }
+
+    override fun verifyRepositoryCall(param: String?) {
+        verify(repository).login(param!!)
+    }
 }

@@ -28,6 +28,7 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         disposables = CompositeDisposable()
+        hideProgressBar()
     }
 
     override fun onAttach(context: Context) {
@@ -100,6 +101,11 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
         super.onDestroyView()
         disposables?.clear()
         disposables?.dispose()
+    }
+
+    private fun hideProgressBar() = with(uiController){
+        if (isDisplayProgressBar())
+            displayProgressBar(false)
     }
 
     fun View.singleClick() =

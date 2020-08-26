@@ -18,6 +18,8 @@ import com.cleannote.data.ui.InfoType.*
 import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
+import com.cleannote.extension.isVisible
+import com.cleannote.extension.visible
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
@@ -52,6 +54,8 @@ class MainActivity : AppCompatActivity(), UIController {
         if (isProceed) progress.visibility = VISIBLE
         else progress.visibility = GONE
     }
+
+    override fun isDisplayProgressBar(): Boolean = progress.isVisible()
 
     override fun showUIMessage(
         uiMessage: UIMessage,
