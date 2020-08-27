@@ -51,11 +51,12 @@ constructor(
         if (mode is EditDoneMode){
             _updatedNote.postValue(DataState.loading())
             updateNote.execute(
-                onSuccess = {
-                    _updatedNote.postValue(DataState.success(note))
-                },
+                onSuccess = {},
                 onError = {
                     _updatedNote.postValue(DataState.error("update note fail"))
+                },
+                onComplete = {
+                    _updatedNote.postValue(DataState.success(note))
                 },
                 params = noteMapper.mapFromView(note)
             )
@@ -75,18 +76,5 @@ constructor(
     fun deleteNote(noteView: NoteView) {
         note = noteView
     }
-
-    private val updateObserver = object: DisposableSubscriber<Unit>(){
-        override fun onComplete() {}
-
-        override fun onNext(t: Unit?) {
-            _updatedNote.postValue(DataState.success(note))
-        }
-
-        override fun onError(t: Throwable?) {
-            _updatedNote.postValue(DataState.error("update note fail"))
-        }
-    }
-
 
 }

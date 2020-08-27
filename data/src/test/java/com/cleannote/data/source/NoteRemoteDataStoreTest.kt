@@ -24,19 +24,12 @@ class NoteRemoteDataStoreTest {
     @BeforeEach
     fun setUp(){
         noteRemote = mock{
-            on { getNumNotes() }.doReturn(Flowable.just(NoteFactory.createNoteEntityList(0,10)))
             on { insertRemoteNewNote(noteEntity) } doReturn Completable.complete()
             on { login(UserFactory.USER_ID) } doReturn Flowable.just(UserFactory.userEntities())
         }
         noteRemoteDataStore = NoteRemoteDataStore(noteRemote)
     }
 
-    @Test
-    fun getNumNotesCompletes(){
-        val testObserver = noteRemoteDataStore.getNumNotes().test()
-        verify(noteRemote).getNumNotes()
-        testObserver.assertComplete()
-    }
 
     @Test
     fun insertRemoteNewNoteComplete(){

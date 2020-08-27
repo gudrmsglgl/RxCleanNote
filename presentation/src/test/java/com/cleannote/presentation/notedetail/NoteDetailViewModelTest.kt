@@ -130,7 +130,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     }
 
     private fun onSuccessUpdateNote(){
-        onSuccessNoteCaptor.firstValue.invoke(Unit)
+        onCompleteCaptor.firstValue.invoke()
         setViewModelState(viewModel.updatedNote.value?.status)
     }
 }

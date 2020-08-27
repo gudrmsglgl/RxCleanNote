@@ -5,9 +5,10 @@ import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.nhaarman.mockitokotlin2.mock
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
-abstract class BaseDomainTest<T,Param> {
+abstract class BaseDomainTest<Param> {
     protected lateinit var repository: NoteRepository
 
     protected lateinit var threadExecutor: ThreadExecutor
@@ -17,8 +18,6 @@ abstract class BaseDomainTest<T,Param> {
         threadExecutor = mock()
         postExecutionThread = mock()
     }
-
-    abstract fun whenBuildFlowableUseCase(param: Param?): Flowable<T>
 
     abstract fun verifyRepositoryCall(param: Param?)
 }

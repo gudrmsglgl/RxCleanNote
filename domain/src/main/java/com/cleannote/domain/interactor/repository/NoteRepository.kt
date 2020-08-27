@@ -12,6 +12,6 @@ interface NoteRepository {
     fun insertNewNote(note: Note): Single<Long>
     fun login(userId: String): Flowable<List<User>>
     fun searchNotes(query: Query): Flowable<List<Note>>
-    fun updateNote(note: Note): Flowable<Unit>
+    fun updateNote(note: Note): Completable
 
 }

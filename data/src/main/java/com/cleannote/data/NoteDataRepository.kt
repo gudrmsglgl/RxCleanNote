@@ -89,7 +89,7 @@ constructor(
             loadCacheNoteEntitiesToDomain(queryEntity)
         }
 
-    override fun updateNote(note: Note): Flowable<Unit> {
+    override fun updateNote(note: Note): Completable {
         TODO("Not yet implemented")
     }
 
