@@ -21,14 +21,9 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteDataRepositoryTest {
-
-    private lateinit var noteDataRepository: NoteDataRepository
+class NoteDataRepositoryTest: BaseRepositoryTest() {
 
     private lateinit var noteDataStoreFactory: NoteDataStoreFactory
-    private lateinit var noteMapper: NoteMapper
-    private lateinit var userMapper: UserMapper
-    private lateinit var queryMapper: QueryMapper
 
     private lateinit var noteCacheDataStore: NoteCacheDataStore
     private lateinit var noteRemoteDataStore: NoteRemoteDataStore
@@ -53,7 +48,7 @@ class NoteDataRepositoryTest {
             on { mapToEntity(defaultQuery) } doReturn defaultQueryEntity
         }
         noteMapper = mock(){
-            on { mapToEntity(successNote) } doReturn insertSuccessNote
+            //on { mapToEntity(successNote) } doReturn insertSuccessNote
             on { mapToEntity(failNote) } doReturn insertFailNote
         }
         userMapper = mock ()
@@ -87,14 +82,20 @@ class NoteDataRepositoryTest {
 
     @Test
     fun insertNewNoteComplete(){
-        val testObserver = noteDataRepository.insertNewNote(successNote).test()
-        testObserver.assertComplete()
+        successNote stubTo insertSuccessNote
+
+        whenInsertNote(successNote)
+            .test()
+            .assertComplete()
     }
 
     @Test
     fun insertNewNoteReturnSuccess(){
-        val testObserver = noteDataRepository.insertNewNote(successNote).test()
-        testObserver.assertValue(insertedSuccess)
+        successNote stubTo insertSuccessNote
+
+        whenInsertNote(successNote)
+            .test()
+            .assertValue(insertedSuccess)
     }
 
     @Test
@@ -238,23 +239,35 @@ class NoteDataRepositoryTest {
         val searchQuery = QueryFactory.makeQuery("#1")
         val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
 
-        whenever(queryMapper.mapToEntity(searchQuery)).thenReturn(searchQueryEntity)
-        whenever(noteRemoteDataStore.searchNotes(searchQueryEntity))
-            .thenReturn(Flowable.just(searchedNoteEntities))
-        whenever(noteCacheDataStore.saveNotes(searchedNoteEntities, searchQueryEntity))
-            .thenReturn(Completable.complete())
-        whenever(noteCacheDataStore.searchNotes(searchQueryEntity))
-            .thenReturn(Flowable.just(searchedNoteEntities))
+        searchQuery stubTo searchQueryEntity
+        noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedNoteEntities)
+        noteCacheDataStore stubSaveNotes (Triple(searchedNoteEntities, searchQueryEntity, Completable.complete()))
+        noteCacheDataStore stubSearchNotes (searchQueryEntity to searchedNoteEntities)
+
         searchedNote.forEachIndexed { index, note ->
-            whenever(noteMapper.mapFromEntity(searchedNoteEntities[index])).thenReturn(note)
+            searchedNoteEntities[index] stubTo note
         }
 
         verify(noteCacheDataStore, never()).isCached(any())
 
-        val testObserver = noteDataRepository.searchNotes(searchQuery).test()
-        testObserver.assertComplete()
-        testObserver.assertValue(searchedNote)
+        whenSearchNotes(searchQuery)
+            .test()
+            .assertValue(searchedNote)
+            .assertComplete()
+
     }
 
+    @Test
+    fun updateNoteComplete(){
+        val updateNote = NoteFactory.createNote(title = "updateNote")
+        val updateNoteEntity = NoteFactory.createNoteEntity(title = "updateNote")
+
+        updateNote stubTo updateNoteEntity
+        noteCacheDataStore stubUpdateNote (updateNoteEntity to Completable.complete())
+
+        whenUpdateNote(updateNote)
+            .test()
+            .assertComplete()
+    }
 
 }

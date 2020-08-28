@@ -38,4 +38,7 @@ constructor(
             }
 
     override fun isCached(page: Int): Single<Boolean> = noteCache.isCached(page)
+
+    override fun updateNote(noteEntity: NoteEntity): Completable = noteCache.updateNote(noteEntity)
+
 }

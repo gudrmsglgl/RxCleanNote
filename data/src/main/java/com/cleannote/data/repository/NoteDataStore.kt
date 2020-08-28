@@ -14,4 +14,5 @@ interface NoteDataStore {
     fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>
     fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable
     fun isCached(page: Int): Single<Boolean>
+    fun updateNote(noteEntity: NoteEntity): Completable
 }

@@ -64,4 +64,11 @@ class NoteRemoteDataStoreTest {
             noteRemoteDataStore.isCached(0)
         }
     }
+
+    @Test
+    fun updateNoteReturnThrow(){
+        Assertions.assertThrows(UnsupportedOperationException::class.java){
+            noteRemoteDataStore.updateNote(noteEntity)
+        }
+    }
 }

@@ -36,4 +36,7 @@ constructor(
         throw UnsupportedOperationException()
     }
 
+    override fun updateNote(noteEntity: NoteEntity): Completable {
+        throw UnsupportedOperationException()
+    }
 }

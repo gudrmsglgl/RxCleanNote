@@ -89,9 +89,9 @@ constructor(
             loadCacheNoteEntitiesToDomain(queryEntity)
         }
 
-    override fun updateNote(note: Note): Completable {
-        TODO("Not yet implemented")
-    }
+    override fun updateNote(note: Note): Completable = factory
+        .retrieveCacheDataStore()
+        .updateNote(noteMapper.mapToEntity(note))
 
     /*override fun searchNotes(query: Query): Flowable<List<Note>> {
         val queryEntity = queryMapper.mapToEntity(query)

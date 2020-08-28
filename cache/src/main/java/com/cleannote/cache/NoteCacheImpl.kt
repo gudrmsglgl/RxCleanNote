@@ -50,5 +50,9 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
         preferencesHelper.setLastCacheTime(lastCache, page)
     }
 
+    override fun updateNote(noteEntity: NoteEntity): Completable {
+        TODO("Not yet implemented")
+    }
+
     private fun getLastCacheTime(page: Int) = preferencesHelper.getLastCacheTime(page)
 }

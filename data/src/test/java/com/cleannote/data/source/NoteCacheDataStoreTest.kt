@@ -33,6 +33,7 @@ class NoteCacheDataStoreTest {
             on { insertCacheNewNote(noteEntity)} doReturn Single.just(successInserted)
             on { saveNotes(noteEntities) }.thenReturn(Completable.complete())
             on { isCached(any()) } doReturn Single.just(true)
+            on { updateNote(noteEntity) } doReturn Completable.complete()
         }
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
@@ -77,4 +78,27 @@ class NoteCacheDataStoreTest {
         val testObserver = noteCacheDataStore.isCached(1).test()
         testObserver.onComplete()
     }
+
+    @Test
+    fun updateNoteCallNoteCache(){
+        whenCacheDataStoreUpdateNote(noteEntity)
+        verifyCacheCallUpdateNote(noteEntity)
+    }
+
+    @Test
+    fun updateNoteAssertComplete(){
+        whenCacheDataStoreUpdateNote(noteEntity)
+            .test()
+            .assertComplete()
+    }
+
+    private fun whenCacheDataStoreUpdateNote(param: NoteEntity) =
+        noteCacheDataStore.updateNote(param)
+
+    private fun verifyCacheCallUpdateNote(param: NoteEntity){
+        verify(noteCache).updateNote(param)
+    }
+
 }
+
+
