@@ -48,4 +48,8 @@ class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
             noteModels.map { noteEntityMapper.mapFromRemote(it) }
         }
     }
+
+    override fun updateNote(noteEntity: NoteEntity): Completable {
+        TODO("Not yet implemented")
+    }
 }

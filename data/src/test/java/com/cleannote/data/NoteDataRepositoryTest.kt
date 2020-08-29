@@ -1,8 +1,5 @@
 package com.cleannote.data
 
-import com.cleannote.data.mapper.NoteMapper
-import com.cleannote.data.mapper.QueryMapper
-import com.cleannote.data.mapper.UserMapper
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
@@ -21,42 +18,28 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteDataRepositoryTest: BaseRepositoryTest() {
+class NoteDataRepositoryTest: BaseDataTest() {
 
     private lateinit var noteDataStoreFactory: NoteDataStoreFactory
 
     private lateinit var noteCacheDataStore: NoteCacheDataStore
     private lateinit var noteRemoteDataStore: NoteRemoteDataStore
+
     private lateinit var noteEntities: List<NoteEntity>
     private lateinit var cacheNoteEntities: List<NoteEntity>
-
-    private val userEntities = UserFactory.userEntities()
-
-    private val insertSuccessNote = NoteFactory.createNoteEntity("#1","title#1","body#1")
-    private val insertFailNote = NoteFactory.createNoteEntity("#2","title#2","body#2")
-    private val successNote: Note = NoteFactory.createNote("#1","title#1","body#1")
-    private val failNote: Note = NoteFactory.createNote("#2", "title#2", "body#2")
     private val defaultQuery = QueryFactory.makeQuery()
     private val defaultQueryEntity = QueryFactory.makeQueryEntity()
 
-    private val insertedSuccess = 1L
-    private val insertedFail = -1L
-
     @BeforeEach
     fun setUp(){
-        queryMapper = mock{
+        queryMapper = mock(){
             on { mapToEntity(defaultQuery) } doReturn defaultQueryEntity
         }
-        noteMapper = mock(){
-            //on { mapToEntity(successNote) } doReturn insertSuccessNote
-            on { mapToEntity(failNote) } doReturn insertFailNote
-        }
+        noteMapper = mock()
         userMapper = mock ()
         noteEntities = NoteFactory.createNoteEntityList(0,10)
         cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
         noteCacheDataStore = mock {
-            on { insertCacheNewNote(insertSuccessNote) } doReturn Single.just(insertedSuccess)
-            on { insertCacheNewNote(insertFailNote) } doReturn Single.just(insertedFail)
             on { saveNotes(noteEntities, defaultQueryEntity) } doReturn Completable.complete()
             on { searchNotes(defaultQueryEntity) } doReturn Flowable.just(cacheNoteEntities)
             on { isCached(1) } doReturn Single.just(false)
@@ -64,11 +47,6 @@ class NoteDataRepositoryTest: BaseRepositoryTest() {
             on { isCached(3) } doReturn Single.just( false )
         }
         noteRemoteDataStore = mock{
-            on {
-                insertRemoteNewNote(insertSuccessNote)
-                insertRemoteNewNote(insertFailNote)
-            } doReturn Completable.complete()
-            on { login(UserFactory.USER_ID) } doReturn Flowable.just(userEntities)
             on { searchNotes(defaultQueryEntity) } doReturn Flowable.just(noteEntities)
         }
         noteDataStoreFactory = mock{
@@ -81,62 +59,145 @@ class NoteDataRepositoryTest: BaseRepositoryTest() {
     }
 
     @Test
-    fun insertNewNoteComplete(){
-        successNote stubTo insertSuccessNote
+    fun whenInsertNewNoteThenCallCacheRemoteDataStore(){
+        val insertNote: Note = NoteFactory.createNote(title = "title#1")
+        val insertNoteEntity = NoteFactory.createNoteEntity(title = "title#1")
+        val insertSuccess = 1L
 
-        whenInsertNote(successNote)
+        insertNote stubTo insertNoteEntity
+        noteCacheDataStore stubInsertNote (insertNoteEntity to insertSuccess)
+        noteRemoteDataStore stubInsertNote (insertNoteEntity to Completable.complete())
+
+        whenDataRepositoryInsertNote(insertNote)
+            .test()
+            .assertComplete()
+
+        noteCacheDataStore.verifyInsertNote(insertNoteEntity)
+        noteRemoteDataStore.verifyInsertNote(insertNoteEntity)
+    }
+
+    @Test
+    fun insertNewNoteReturnLongValue(){
+        val insertNote: Note = NoteFactory.createNote(title = "title#1")
+        val insertNoteEntity = NoteFactory.createNoteEntity(title = "title#1")
+        val insertSuccess = 1L
+
+        insertNote stubTo insertNoteEntity
+        noteCacheDataStore stubInsertNote (insertNoteEntity to insertSuccess)
+        noteRemoteDataStore stubInsertNote (insertNoteEntity to Completable.complete())
+
+
+        whenDataRepositoryInsertNote(insertNote)
+            .test()
+            .assertValue(insertSuccess)
+    }
+
+    @Test
+    fun whenInsertNewNoteReturnFail(){
+        val failNote = NoteFactory.createNote(title = "failNote")
+        val failNoteEntity = NoteFactory.createNoteEntity(title = "failNote")
+        val insertFail = -1L
+
+        failNote stubTo failNoteEntity
+        noteCacheDataStore stubInsertNote (failNoteEntity to insertFail)
+
+        whenDataRepositoryInsertNote(failNote)
+            .test()
+            .assertValue(insertFail)
+    }
+
+    @Test
+    fun whenInsertNewNoteFailThenNotCallRemote(){
+        val failNote = NoteFactory.createNote(title = "failNote")
+        val failNoteEntity = NoteFactory.createNoteEntity(title = "failNote")
+        val insertFail = -1L
+
+        failNote stubTo failNoteEntity
+        noteCacheDataStore stubInsertNote (failNoteEntity to insertFail)
+
+        whenDataRepositoryInsertNote(failNote)
+        noteRemoteDataStore.verifyInsertNote(failNoteEntity, never())
+    }
+
+    @Test
+    fun whenLoginThenComplete(){
+        val userID = UserFactory.USER_ID
+        val userEntities = UserFactory.userEntities()
+
+        noteRemoteDataStore stubLogin (userID to userEntities)
+
+        whenDataRepositoryLogin(userID)
             .test()
             .assertComplete()
     }
 
     @Test
-    fun insertNewNoteReturnSuccess(){
-        successNote stubTo insertSuccessNote
-
-        whenInsertNote(successNote)
-            .test()
-            .assertValue(insertedSuccess)
-    }
-
-    @Test
-    fun insertNewNoteReturnFail(){
-        val testObserver = noteDataRepository.insertNewNote(failNote).test()
-        testObserver.assertValue(insertedFail)
-    }
-
-    @Test
-    fun loginComplete(){
-        val test = noteDataRepository.login(UserFactory.USER_ID).test()
-        test.assertComplete()
-    }
-
-    @Test
-    fun loginReturnData(){
+    fun whenLoginReturnUsers(){
+        val userID = UserFactory.USER_ID
         val userList = UserFactory.users()
+        val userEntities = UserFactory.userEntities()
+
+        noteRemoteDataStore stubLogin (userID to userEntities)
+
         userList.forEachIndexed { index, user ->
             whenever(userMapper.mapFromEntity(userEntities[index])).thenReturn(user)
         }
-        val test = noteDataRepository.login(UserFactory.USER_ID).test()
-        test.assertValue(userList)
+
+        whenDataRepositoryLogin(userID)
+            .test()
+            .assertValue(userList)
     }
 
     @Test
-    fun searchNotesComplete(){
+    fun whenSearchNotesThenComplete(){
+        val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
         val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
         resultNote.forEachIndexed { index, note ->
-            whenever(noteMapper.mapFromEntity(cacheNoteEntities[index])).thenReturn(note)
+            cacheNoteEntities[index] stubTo note
         }
-        val testObserver = noteDataRepository.searchNotes(defaultQuery).test()
+
+        val defaultQuery = QueryFactory.makeQuery()
+        val defaultQueryEntity = QueryFactory.makeQueryEntity()
+        defaultQuery stubTo defaultQueryEntity
+
+        noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
+        noteRemoteDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
+        noteCacheDataStore stubSaveNotes (Triple(cacheNoteEntities, defaultQueryEntity, Completable.complete()))
+        noteCacheDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
+
+        val testObserver = whenDataRepositorySearchNotes(defaultQuery).test()
         testObserver.assertComplete()
     }
 
     @Test
-    fun searchNotesSaveCacheFromRemoteData(){
+    fun whenSearchNotesThenReturnNotes(){
+        val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
         val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
         resultNote.forEachIndexed { index, note ->
-            whenever(noteMapper.mapFromEntity(cacheNoteEntities[index])).thenReturn(note)
+            cacheNoteEntities[index] stubTo note
         }
-        val testObserver = noteDataRepository.searchNotes(defaultQuery).test()
+
+        val defaultQuery = QueryFactory.makeQuery()
+        val defaultQueryEntity = QueryFactory.makeQueryEntity()
+        defaultQuery stubTo defaultQueryEntity
+
+        noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
+        noteRemoteDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
+        noteCacheDataStore stubSaveNotes (Triple(cacheNoteEntities, defaultQueryEntity, Completable.complete()))
+        noteCacheDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+            .assertValue(resultNote)
+    }
+
+    @Test
+    fun whenSearchNotesSaveCacheFromRemoteData(){
+        val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
+        resultNote.forEachIndexed { index, note ->
+            cacheNoteEntities[index] stubTo note
+        }
+        val testObserver = whenDataRepositorySearchNotes(defaultQuery).test()
 
         inOrder(noteRemoteDataStore, noteCacheDataStore, noteDataStoreFactory) {
             verify(noteCacheDataStore).isCached(defaultQueryEntity.page)
@@ -155,7 +216,7 @@ class NoteDataRepositoryTest: BaseRepositoryTest() {
         }
         testObserver.assertValue(resultNote)
     }
-
+    /*
     @Test
     fun searchNotesNotCallRemoteOnlyCacheData(){
         val nextPageQuery = QueryFactory.makeQuery(page = 2)
@@ -250,12 +311,12 @@ class NoteDataRepositoryTest: BaseRepositoryTest() {
 
         verify(noteCacheDataStore, never()).isCached(any())
 
-        whenSearchNotes(searchQuery)
+        whenDataRepositorySearchNotes(searchQuery)
             .test()
             .assertValue(searchedNote)
             .assertComplete()
 
-    }
+    }*/
 
     @Test
     fun updateNoteComplete(){
