@@ -25,30 +25,13 @@ class NoteDataRepositoryTest: BaseDataTest() {
     private lateinit var noteCacheDataStore: NoteCacheDataStore
     private lateinit var noteRemoteDataStore: NoteRemoteDataStore
 
-    private lateinit var noteEntities: List<NoteEntity>
-    private lateinit var cacheNoteEntities: List<NoteEntity>
-    private val defaultQuery = QueryFactory.makeQuery()
-    private val defaultQueryEntity = QueryFactory.makeQueryEntity()
-
     @BeforeEach
     fun setUp(){
-        queryMapper = mock(){
-            on { mapToEntity(defaultQuery) } doReturn defaultQueryEntity
-        }
+        queryMapper = mock()
         noteMapper = mock()
         userMapper = mock ()
-        noteEntities = NoteFactory.createNoteEntityList(0,10)
-        cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
-        noteCacheDataStore = mock {
-            on { saveNotes(noteEntities, defaultQueryEntity) } doReturn Completable.complete()
-            on { searchNotes(defaultQueryEntity) } doReturn Flowable.just(cacheNoteEntities)
-            on { isCached(1) } doReturn Single.just(false)
-            on { isCached(2) } doReturn Single.just(true)
-            on { isCached(3) } doReturn Single.just( false )
-        }
-        noteRemoteDataStore = mock{
-            on { searchNotes(defaultQueryEntity) } doReturn Flowable.just(noteEntities)
-        }
+        noteCacheDataStore = mock()
+        noteRemoteDataStore = mock()
         noteDataStoreFactory = mock{
             on { retrieveRemoteDataStore() } doReturn noteRemoteDataStore
             on { retrieveCacheDataStore() } doReturn noteCacheDataStore
@@ -171,6 +154,7 @@ class NoteDataRepositoryTest: BaseDataTest() {
 
     @Test
     fun whenSearchNotesThenReturnNotes(){
+        val remoteNoteEntities = NoteFactory.createNoteEntityList(0, 10)
         val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
         val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
         resultNote.forEachIndexed { index, note ->
@@ -182,8 +166,8 @@ class NoteDataRepositoryTest: BaseDataTest() {
         defaultQuery stubTo defaultQueryEntity
 
         noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
-        noteRemoteDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
-        noteCacheDataStore stubSaveNotes (Triple(cacheNoteEntities, defaultQueryEntity, Completable.complete()))
+        noteRemoteDataStore stubSearchNotes (defaultQueryEntity to remoteNoteEntities)
+        noteCacheDataStore stubSaveNotes (Triple(remoteNoteEntities, defaultQueryEntity, Completable.complete()))
         noteCacheDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
 
         whenDataRepositorySearchNotes(defaultQuery)
@@ -193,121 +177,132 @@ class NoteDataRepositoryTest: BaseDataTest() {
 
     @Test
     fun whenSearchNotesSaveCacheFromRemoteData(){
+        val defaultQuery = QueryFactory.makeQuery()
+        val defaultQueryEntity = QueryFactory.makeQueryEntity()
+        defaultQuery stubTo defaultQueryEntity
+
+        val remoteNoteEntities = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
         val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
         resultNote.forEachIndexed { index, note ->
             cacheNoteEntities[index] stubTo note
         }
-        val testObserver = whenDataRepositorySearchNotes(defaultQuery).test()
+
+        noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
+        noteRemoteDataStore stubSearchNotes (defaultQueryEntity to remoteNoteEntities)
+        noteCacheDataStore stubSaveNotes (Triple(remoteNoteEntities, defaultQueryEntity, Completable.complete()))
+        noteCacheDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
+
+        whenDataRepositorySearchNotes(defaultQuery).test()
 
         inOrder(noteRemoteDataStore, noteCacheDataStore, noteDataStoreFactory) {
-            verify(noteCacheDataStore).isCached(defaultQueryEntity.page)
-            assertThat(noteCacheDataStore.isCached(defaultQueryEntity.page).blockingGet(), `is`(false))
 
-            verify(noteDataStoreFactory).retrieveDataStore(false)
-            assertThat(
-                noteDataStoreFactory.retrieveDataStore(false),
-                instanceOf(NoteRemoteDataStore::class.java)
-            )
+            with(noteCacheDataStore){
+                verifyIsCached(defaultQueryEntity.page)
+                assertIsCached(defaultQueryEntity.page , false)
+            }
 
-            verify(noteRemoteDataStore).searchNotes(defaultQueryEntity)
-            verify(noteCacheDataStore).saveNotes(noteEntities, defaultQueryEntity)
+            noteDataStoreFactory.verifyRetrieveDataStore(false)
 
-            verify(noteCacheDataStore).searchNotes(defaultQueryEntity)
+            noteRemoteDataStore.verifySearchNote(defaultQueryEntity)
+
+            with(noteCacheDataStore) {
+                verifySaveNote(remoteNoteEntities, defaultQueryEntity)
+                verifySearchNote(defaultQueryEntity)
+            }
+
         }
-        testObserver.assertValue(resultNote)
     }
-    /*
+
     @Test
-    fun searchNotesNotCallRemoteOnlyCacheData(){
+    fun whenSearchNotesThenNotCallRemoteOnlyCacheData(){
         val nextPageQuery = QueryFactory.makeQuery(page = 2)
         val nextPageQueryEntity = QueryFactory.makeQueryEntity(page = 2)
-        val nextCachedNoteEntities = NoteFactory.createNoteEntityList(10,20)
-        whenever(queryMapper.mapToEntity(nextPageQuery)).thenReturn(nextPageQueryEntity)
+        nextPageQuery stubTo nextPageQueryEntity
 
+        val nextCachedNoteEntities = NoteFactory.createNoteEntityList(10,20)
         val resultNote: List<Note> = NoteFactory.createNoteList(10,20)
         resultNote.forEachIndexed { index, note ->
-            whenever(noteMapper.mapFromEntity(nextCachedNoteEntities[index])).thenReturn(note)
+            nextCachedNoteEntities[index] stubTo note
         }
 
-        whenever(noteCacheDataStore.searchNotes(nextPageQueryEntity))
-            .thenReturn(Flowable.just(nextCachedNoteEntities))
+        noteCacheDataStore stubPageIsCache (nextPageQueryEntity.page to true)
+        noteCacheDataStore stubSearchNotes (nextPageQueryEntity to nextCachedNoteEntities)
 
-        val testObserver = noteDataRepository.searchNotes(nextPageQuery).test()
+        whenDataRepositorySearchNotes(nextPageQuery).test()
 
         inOrder(noteRemoteDataStore, noteCacheDataStore, noteDataStoreFactory){
-            verify(noteCacheDataStore).isCached(nextPageQueryEntity.page)
-            assertThat(noteCacheDataStore.isCached(nextPageQueryEntity.page).blockingGet(), `is`(true))
 
-            verify(noteDataStoreFactory).retrieveDataStore(true)
-            assertThat(
-                noteDataStoreFactory.retrieveDataStore(true),
-                instanceOf(NoteCacheDataStore::class.java)
-            )
+            with (noteCacheDataStore){
+                verifyIsCached(nextPageQueryEntity.page)
+                assertIsCached(nextPageQueryEntity.page, true)
+            }
 
-            verify(noteRemoteDataStore, never()).searchNotes(nextPageQueryEntity)
-            verify(noteCacheDataStore, never()).saveNotes(any(), any())
+            noteDataStoreFactory.verifyRetrieveDataStore(true)
 
-            verify(noteCacheDataStore).searchNotes(nextPageQueryEntity)
+            noteRemoteDataStore.verifySearchNote(nextPageQueryEntity, never())
+
+            with (noteCacheDataStore) {
+                verifySaveNote(nextCachedNoteEntities, nextPageQueryEntity, never())
+                verifySearchNote(nextPageQueryEntity)
+            }
         }
-
-        testObserver.assertValue(resultNote)
     }
 
     @Test
-    fun searchNotesNextPageNoData(){
+    fun whenSearchNotesNextPageThenNoData(){
         val nextPageQuery = QueryFactory.makeQuery(page = 3)
         val nextPageQueryEntity = QueryFactory.makeQueryEntity(page = 3)
+        nextPageQuery stubTo nextPageQueryEntity
+
         val nextRemoteNoteEntities = emptyList<NoteEntity>()
         val nextCachedNoteEntities = emptyList<NoteEntity>()
-        whenever(queryMapper.mapToEntity(nextPageQuery)).thenReturn(nextPageQueryEntity)
 
         val resultNote: List<Note> = emptyList()
         resultNote.forEachIndexed { index, note ->
-            whenever(noteMapper.mapFromEntity(nextCachedNoteEntities[index])).thenReturn(note)
+            nextCachedNoteEntities[index] stubTo note
         }
 
-        whenever(noteRemoteDataStore.searchNotes(nextPageQueryEntity))
-            .thenReturn(Flowable.just(nextRemoteNoteEntities))
+        noteCacheDataStore stubPageIsCache (nextPageQueryEntity.page to false)
+        noteRemoteDataStore stubSearchNotes (nextPageQueryEntity to nextRemoteNoteEntities)
+        noteCacheDataStore stubSearchNotes (nextPageQueryEntity to nextCachedNoteEntities)
 
-        whenever(noteCacheDataStore.searchNotes(nextPageQueryEntity))
-            .thenReturn(Flowable.just(nextCachedNoteEntities))
-
-        val testObserver = noteDataRepository.searchNotes(nextPageQuery).test()
+        whenDataRepositorySearchNotes(nextPageQuery).test()
 
         inOrder(noteRemoteDataStore, noteCacheDataStore, noteDataStoreFactory){
-            verify(noteCacheDataStore).isCached(nextPageQueryEntity.page)
-            assertThat(noteCacheDataStore.isCached(nextPageQueryEntity.page).blockingGet(), `is`(false))
 
-            verify(noteDataStoreFactory).retrieveDataStore(false)
-            assertThat(
-                noteDataStoreFactory.retrieveDataStore(false),
-                instanceOf(NoteRemoteDataStore::class.java)
-            )
+            with (noteCacheDataStore) {
+                verifyIsCached(nextPageQueryEntity.page)
+                assertIsCached(nextPageQueryEntity.page , false)
+            }
 
-            verify(noteRemoteDataStore).searchNotes(nextPageQueryEntity)
-            verify(noteCacheDataStore, never()).saveNotes(any(), any())
+            noteDataStoreFactory.verifyRetrieveDataStore(false)
 
-            verify(noteCacheDataStore).searchNotes(nextPageQueryEntity)
+            noteRemoteDataStore.verifySearchNote(nextPageQueryEntity)
+
+            with (noteCacheDataStore) {
+                verifySaveNote(nextRemoteNoteEntities, nextPageQueryEntity, never())
+                verifySearchNote(nextPageQueryEntity)
+            }
         }
-
-        testObserver.assertValue(resultNote)
     }
 
     @Test
-    fun searchKeywordNoteComplete(){
-        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
-        val searchedNoteEntities = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
+    fun whenSearchKeywordNoteThenComplete(){
         val searchQuery = QueryFactory.makeQuery("#1")
         val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
-
         searchQuery stubTo searchQueryEntity
-        noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedNoteEntities)
-        noteCacheDataStore stubSaveNotes (Triple(searchedNoteEntities, searchQueryEntity, Completable.complete()))
-        noteCacheDataStore stubSearchNotes (searchQueryEntity to searchedNoteEntities)
 
+        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
+        val searchedRemoteNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
+        val searchedCacheNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
         searchedNote.forEachIndexed { index, note ->
-            searchedNoteEntities[index] stubTo note
+            searchedCacheNotes[index] stubTo note
         }
+
+        noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedRemoteNotes)
+        noteCacheDataStore stubSaveNotes (Triple(searchedRemoteNotes, searchQueryEntity, Completable.complete()))
+        noteCacheDataStore stubSearchNotes (searchQueryEntity to searchedCacheNotes)
 
         verify(noteCacheDataStore, never()).isCached(any())
 
@@ -315,11 +310,61 @@ class NoteDataRepositoryTest: BaseDataTest() {
             .test()
             .assertValue(searchedNote)
             .assertComplete()
-
-    }*/
+    }
 
     @Test
-    fun updateNoteComplete(){
+    fun whenSearchKeywordNoteThenSaveCacheLoadCache(){
+        val searchQuery = QueryFactory.makeQuery("#1")
+        val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
+        searchQuery stubTo searchQueryEntity
+
+        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
+        val searchedRemoteNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
+        val searchedCacheNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
+        searchedNote.forEachIndexed { index, note ->
+            searchedCacheNotes[index] stubTo note
+        }
+
+        noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedRemoteNotes)
+        noteCacheDataStore stubSaveNotes (Triple(searchedRemoteNotes, searchQueryEntity, Completable.complete()))
+        noteCacheDataStore stubSearchNotes (searchQueryEntity to searchedCacheNotes)
+
+        whenDataRepositorySearchNotes(searchQuery).test()
+
+        noteRemoteDataStore.verifySearchNote(searchQueryEntity)
+        with (noteCacheDataStore) {
+            verifySaveNote(searchedRemoteNotes, searchQueryEntity)
+            verifySearchNote(searchQueryEntity)
+        }
+    }
+
+    @Test
+    fun whenSearchKeywordNoteRemoteNoDataCacheExistData_ThenNotSaveCacheReturnCacheData(){
+        val searchQuery = QueryFactory.makeQuery("#1")
+        val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
+        searchQuery stubTo searchQueryEntity
+
+        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
+        val searchedRemoteNotes = emptyList<NoteEntity>()
+        val searchedCacheNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
+        searchedNote.forEachIndexed { index, note ->
+            searchedCacheNotes[index] stubTo note
+        }
+
+        noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedRemoteNotes)
+        noteCacheDataStore stubSearchNotes (searchQueryEntity to searchedCacheNotes)
+
+        whenDataRepositorySearchNotes(searchQuery).test()
+
+        noteRemoteDataStore.verifySearchNote(searchQueryEntity)
+        with(noteCacheDataStore){
+            verifySaveNote(searchedRemoteNotes, searchQueryEntity, never())
+            verifySearchNote(searchQueryEntity)
+        }
+    }
+
+    @Test
+    fun whenUpdateNoteThenComplete(){
         val updateNote = NoteFactory.createNote(title = "updateNote")
         val updateNoteEntity = NoteFactory.createNoteEntity(title = "updateNote")
 
@@ -331,4 +376,20 @@ class NoteDataRepositoryTest: BaseDataTest() {
             .assertComplete()
     }
 
+    @Test
+    fun whenUpdateNoteThenNoValue(){
+        val updateNote = NoteFactory.createNote(title = "updateNote")
+        val updateNoteEntity = NoteFactory.createNoteEntity(title = "updateNote")
+
+        updateNote stubTo updateNoteEntity
+        noteCacheDataStore stubUpdateNote (updateNoteEntity to Completable.complete())
+
+        whenUpdateNote(updateNote)
+            .test()
+            .assertComplete()
+            .assertNoValues()
+
+        verify(noteDataStoreFactory).retrieveCacheDataStore()
+        verify(noteDataStoreFactory, never()).retrieveRemoteDataStore()
+    }
 }

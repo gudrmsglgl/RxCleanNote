@@ -18,7 +18,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.mockito.verification.VerificationMode
 
@@ -71,10 +73,6 @@ abstract class BaseDataTest {
         whenever(this.searchNotes(stubEntities.first)).thenReturn(Flowable.just(stubEntities.second))
     }
 
-    infix fun NoteDataStore.stubSaveNotes(stubs: Triple<List<NoteEntity>, QueryEntity, Completable>){
-        whenever(this.saveNotes(stubs.first, stubs.second)).thenReturn(stubs.third)
-    }
-
     infix fun NoteDataStore.stubUpdateNote(stub: Pair<NoteEntity, Completable>){
         whenever(this.updateNote(stub.first)).thenReturn(stub.second)
     }
@@ -101,4 +99,23 @@ abstract class BaseDataTest {
         this.isCached(page).blockingGet(),
         `is`(expectBool)
     )
+
+    fun NoteDataStoreFactory.verifyRetrieveDataStore(expectBool: Boolean){
+        verify(this).retrieveDataStore(expectBool)
+    }
+
+    fun NoteRemoteDataStore.verifySearchNote(queryEntity: QueryEntity, verifyMode: VerificationMode?=null){
+        verify(this, verifyMode ?: times(1)).searchNotes(queryEntity)
+    }
+
+    fun NoteCacheDataStore.verifySaveNote(
+        remoteNotes: List<NoteEntity>,
+        queryEntity: QueryEntity,
+        verifyMode: VerificationMode? = null){
+            verify(this, verifyMode ?: times(1)).saveNotes(remoteNotes, queryEntity)
+        }
+
+    fun NoteCacheDataStore.verifySearchNote(queryEntity: QueryEntity, verifyMode: VerificationMode?=null){
+        verify(this, verifyMode ?: times(1)).searchNotes(queryEntity)
+    }
 }
