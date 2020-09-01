@@ -42,14 +42,14 @@ class NoteRemoteImpl @Inject constructor(private val noteService: NoteService,
             queryEntity.order,
             queryEntity.like,
             queryEntity.like
-        ).doOnError {
-            emptyList<NoteModel>()
-        }.map { noteModels ->
+        ).onErrorResumeNext(
+            Flowable.just(emptyList())
+        ).map { noteModels ->
             noteModels.map { noteEntityMapper.mapFromRemote(it) }
         }
     }
 
     override fun updateNote(noteEntity: NoteEntity): Completable {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 }

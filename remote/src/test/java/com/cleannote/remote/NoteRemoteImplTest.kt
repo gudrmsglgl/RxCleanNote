@@ -1,23 +1,21 @@
 package com.cleannote.remote
 
 import com.cleannote.data.model.NoteEntity
-import com.cleannote.remote.mapper.NoteEntityMapper
+import com.cleannote.remote.common.BaseRemote
 import com.cleannote.remote.mapper.UserEntityMapper
 import com.cleannote.remote.model.NoteModel
 import com.cleannote.remote.test.factory.NoteFactory
 import com.cleannote.remote.test.factory.QueryFactory
 import com.cleannote.remote.test.factory.UserFactory
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.RuntimeException
 
-class NoteRemoteImplTest {
-    private lateinit var entityMapper: NoteEntityMapper
-    private lateinit var noteService: NoteService
+class NoteRemoteImplTest: BaseRemote() {
 
     private lateinit var noteRemoteImpl: NoteRemoteImpl
 
@@ -36,7 +34,7 @@ class NoteRemoteImplTest {
     fun setUp(){
         noteModels = NoteFactory.createNoteMoelList(count)
         noteEntities = NoteFactory.createNoteEntityList(count)
-        entityMapper = mock()
+        noteEntityMapper = mock()
         userEntityMapper = mock()
         noteService = mock{
             on { insertNote(noteEntity.id, noteEntity.title,
@@ -44,7 +42,7 @@ class NoteRemoteImplTest {
             } doReturn Completable.complete()
             on { login(UserFactory.USER_ID) } doReturn Flowable.just(userModels)
         }
-        noteRemoteImpl = NoteRemoteImpl(noteService, entityMapper, userEntityMapper)
+        noteRemoteImpl = NoteRemoteImpl(noteService, noteEntityMapper, userEntityMapper)
     }
 
 
@@ -75,17 +73,31 @@ class NoteRemoteImplTest {
         val noteModels = NoteFactory.createNoteMoelList(defaultQuery.limit)
         val noteEntities = NoteFactory.createNoteEntityList(defaultQuery.limit)
 
-        whenever(noteService.searchNotes(
-            defaultQuery.page, defaultQuery.limit, defaultQuery.sort,
-            defaultQuery.order, defaultQuery.like, defaultQuery.like
-        )).thenReturn(Flowable.just(noteModels))
-
+        noteService stubSearchNotes (defaultQuery to noteModels)
         noteEntities.forEachIndexed { index, noteEntity ->
-            whenever(entityMapper.mapFromRemote(noteModels[index])).thenReturn(noteEntity)
+            noteModels[index] stubTo noteEntity
         }
 
         val testObserver = noteRemoteImpl.searchNotes(defaultQuery).test()
         testObserver.assertComplete()
         testObserver.assertValue(noteEntities)
+    }
+
+    @Test
+    fun searchNotesThrowErrorThenEmpty() {
+        noteService stubSearchNotesThrow (defaultQuery to RuntimeException())
+
+        noteRemoteImpl.searchNotes(defaultQuery)
+            .test()
+            .assertValue(emptyList())
+
+    }
+
+    @Test
+    fun updateNoteThrowUnsupportedOperationException(){
+        val updateNoteEntity = NoteFactory.createNoteEntity(title = "test")
+        Assertions.assertThrows(UnsupportedOperationException::class.java){
+            noteRemoteImpl.updateNote(updateNoteEntity)
+        }
     }
 }
