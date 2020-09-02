@@ -7,11 +7,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object NoteFactory {
-    val dateFormat: SimpleDateFormat = SimpleDateFormat()
 
-    private fun getCurrentTimestamp(): String {
-        return dateFormat.format(Date())
-    }
 
     fun makeNote(
         id: String? = null,

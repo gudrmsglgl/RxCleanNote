@@ -1,9 +1,10 @@
 package com.cleannote.cache.test.factory
 
+import com.cleannote.cache.dao.NoteQueryUtil.Companion.NOTE_SORT_DESC
 import com.cleannote.data.model.QueryEntity
 
 object QueryFactory {
-    fun makeQueryEntity(search: String = "", page: Int = 1) = QueryEntity(
-        page,10,"updated_at","desc", search
+    fun makeQueryEntity(search: String = "", page: Int = 1, order: String = NOTE_SORT_DESC, limit: Int = 5) = QueryEntity(
+        page, limit,"updated_at", order, search
     )
 }

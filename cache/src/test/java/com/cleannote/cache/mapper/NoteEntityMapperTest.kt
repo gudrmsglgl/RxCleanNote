@@ -19,7 +19,7 @@ class NoteEntityMapperTest {
 
     @Test
     fun mapToCachedMapsData(){
-        val noteEntity = NoteFactory.createNoteEntity("#1","title#1","body#1")
+        val noteEntity = NoteFactory.createNoteEntity("#1","title#1","body#1","20")
         val cachedNote = noteEntityMapper.mapToCached(noteEntity)
 
         assertNoteDataEquality(noteEntity, cachedNote)
@@ -27,7 +27,7 @@ class NoteEntityMapperTest {
 
     @Test
     fun mapFromCachedMapsData(){
-        val cachedNote = NoteFactory.createCachedNote("#1","title#1","body#1")
+        val cachedNote = NoteFactory.createCachedNote("#1","title#1","body#1","20")
         val noteEntity = noteEntityMapper.mapFromCached(cachedNote)
 
         assertNoteDataEquality(noteEntity, cachedNote)

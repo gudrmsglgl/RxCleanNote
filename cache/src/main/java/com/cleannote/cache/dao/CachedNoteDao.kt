@@ -1,9 +1,6 @@
 package com.cleannote.cache.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.cleannote.cache.model.CachedNote
 import io.reactivex.Completable
 
@@ -42,4 +39,7 @@ abstract class CachedNoteDao {
         limit: Int,
         like: String
     ): List<CachedNote>
+
+    @Update
+    abstract fun updateNote(note: CachedNote)
 }
