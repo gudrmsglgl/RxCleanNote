@@ -3,6 +3,8 @@ package com.cleannote.notedetail
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -10,9 +12,12 @@ import androidx.navigation.fragment.findNavController
 
 import com.cleannote.app.R
 import com.cleannote.common.BaseFragment
+import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.mapper.NoteMapper
 import com.cleannote.model.NoteUiModel
+import com.cleannote.presentation.data.State
+import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
@@ -29,10 +34,12 @@ import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
  * A simple [Fragment] subclass.
  */
 const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
+const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
 class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val noteMapper: NoteMapper
+    private val noteMapper: NoteMapper,
+    private val dateUtil: DateUtil
 ) : BaseFragment(R.layout.fragment_note_detail) {
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -75
@@ -55,7 +62,15 @@ class NoteDetailFragment constructor(
         subscribeNoteTitleState()
 
         subscribeNoteMode()
+        subscribeUpdateNote()
     }
+
+    private fun subscribeUpdateNote() = viewModel.updatedNote
+        .observe(viewLifecycleOwner, Observer {
+            if (it != null && it.status == SUCCESS){
+                showToast(getString(R.string.updateNote))
+            }
+        })
 
     private fun noteTitleChangeSource() = note_title
         .textChanges()
@@ -77,6 +92,12 @@ class NoteDetailFragment constructor(
                 is EditMode -> {
                     toolbarEditMenu()
                 }
+                is EditDoneMode -> {
+                    releaseFocus()
+                    fetchNoteUi()
+                    toolbarDefaultMenu()
+                    view?.hideKeyboard()
+                }
                 else -> {
                     releaseFocus()
                     fetchNoteUi()
@@ -90,7 +111,10 @@ class NoteDetailFragment constructor(
         .map { isEditCancelMenu() }
         .doOnNext { cancelMenu ->
             if (cancelMenu) viewModel.setNoteMode(DefaultMode)
-            else findNavController().popBackStack()
+            else {
+                setFragmentResult(NOTE_DETAIL_BUNDLE_KEY , bundleOf())
+                findNavController().popBackStack()
+            }
         }
         .subscribe {
             releaseFocus()
@@ -100,10 +124,16 @@ class NoteDetailFragment constructor(
     private fun menuSecondarySource() = toolbar_secondary_icon.clicks()
         .map { isEditDoneMenu() }
         .subscribe { doneMenu ->
-            if (doneMenu) setNote(noteUiModel, EditDoneMode)
+            if (doneMenu) setNote(getUpdatedNote(), EditDoneMode)
             else deleteNote()
         }
         .addCompositeDisposable()
+
+    private fun getUpdatedNote(): NoteUiModel = noteUiModel.apply {
+        title = note_title.text.toString()
+        body = note_body.text.toString()
+        updated_at = dateUtil.getCurrentTimestamp()
+    }
 
     private fun setNote(noteUiModel: NoteUiModel, mode: TextMode) = with(viewModel){
         setNote(noteMapper.mapToView(noteUiModel))

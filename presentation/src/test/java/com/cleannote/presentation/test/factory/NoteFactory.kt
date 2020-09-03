@@ -23,9 +23,10 @@ object NoteFactory {
     )
 
     fun createNoteView(
-        title: String
+        title: String,
+        pkId: Int? = null
     ) = NoteView(
-        id = UUID.randomUUID().toString(),
+        id = "#$pkId" ?: UUID.randomUUID().toString(),
         title = title,
         body = "",
         created_at = getCurrentTimestamp(),
@@ -36,5 +37,5 @@ object NoteFactory {
         createNote("title #it") }.toList()
 
     fun createNoteViewList(start:Int, count: Int): List<NoteView> = (start until count).map {
-        createNoteView("title #it") }.toList()
+        createNoteView("title #it", it) }.toList()
 }

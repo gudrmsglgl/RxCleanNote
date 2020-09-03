@@ -22,12 +22,12 @@ class NoteFragmentFactory @Inject constructor(
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(viewModelFactory, noteMapper, dateUtil, sharedPreferences)
+            val fragment = NoteListFragment(viewModelFactory, noteMapper, sharedPreferences)
             fragment
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory, noteMapper)
+            val fragment = NoteDetailFragment(viewModelFactory, noteMapper, dateUtil)
             fragment
         }
 

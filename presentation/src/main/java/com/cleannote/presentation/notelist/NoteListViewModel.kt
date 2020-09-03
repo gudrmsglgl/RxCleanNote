@@ -88,6 +88,15 @@ constructor(
             params = noteMapper.mapFromView(noteView))
     }
 
+    fun updateNote(updateNoteView: NoteView){
+        with(loadedNotes){
+            val updateIndex = indexOfFirst { it.id == updateNoteView.id }
+            removeAt(updateIndex)
+            add(updateIndex, updateNoteView)
+        }
+        _mediatorNoteList.value = DataState.success(loadedNotes)
+    }
+
     fun setOrdering(ordering: String){
         loadedNotes.clear()
         _query.value = getQuery().apply {

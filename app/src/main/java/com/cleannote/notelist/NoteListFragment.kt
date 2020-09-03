@@ -42,6 +42,7 @@ import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.espresso.EspressoIdlingResource
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
@@ -56,7 +57,6 @@ class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val noteMapper: NoteMapper,
-    private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences
 ): BaseFragment(R.layout.fragment_note_list),
     OnBackPressListener, TouchAdapter {
@@ -77,8 +77,13 @@ constructor(
         subscribeInsertResult()
         noteClick()
         noteLongClick()
-        setFragmentResultListener("requestOnBack"){ key, bundle ->
+        setFragmentResultListener(REQUEST_KEY_ON_BACK){ key, bundle ->
             timber("d","setFragmentResultListener key: $key , bundle: ${bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)}")
+            bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
+                viewModel.updateNote(
+                    noteMapper.mapToView(it)
+                )
+            }
         }
     }
 

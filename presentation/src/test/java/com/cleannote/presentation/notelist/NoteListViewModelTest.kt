@@ -226,6 +226,39 @@ class NoteListViewModelTest: BaseViewModelTest() {
         verifyInsertNoteData(null)
     }
 
+    @Test
+    fun updateNote(){
+        val noteList = NoteFactory.createNoteList(0, 10)
+        val noteViewList = NoteFactory.createNoteViewList(0,10)
+        noteViewList.forEachIndexed { index, noteView ->
+            whenever(noteMapper.mapToView(noteList[index])).thenReturn(noteView)
+        }
+        whenSearchNoteSaveState()
+        verifySearchNoteExecute()
+        verifyViewModelDataState(LOADING)
+
+        whenSuccessOnNextNoteList(noteList)
+        verifyViewModelDataState(SUCCESS)
+        verifyNoteListData(noteViewList)
+
+        val updateIndex = 2
+        val updateNoteView = NoteFactory.createNoteView("update", updateIndex)
+        whenUpdateNote(updateNoteView)
+
+        verifyNoteUpdate(updateIndex, updateNoteView)
+    }
+
+    private fun whenUpdateNote(updateNote: NoteView){
+        noteListViewModel.updateNote(updateNote)
+        setViewModelState(noteListViewModel.noteList.value?.status)
+    }
+
+    private fun verifyNoteUpdate(index: Int, updateNoteView: NoteView){
+        assertThat(
+            noteListViewModel.noteList.value?.data?.get(index),
+            `is`(updateNoteView)
+        )
+    }
 
     private fun whenSearchNoteSaveState(){
         noteListViewModel.searchNotes()
