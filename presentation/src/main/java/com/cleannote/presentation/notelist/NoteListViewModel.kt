@@ -28,7 +28,7 @@ constructor(
 ): BaseViewModel(searchNotes, insertNewNote) {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
-        order = sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+        order = loadOrderingOnSharedPreference()
     ))
 
     private val _toolbarState: MutableLiveData<ListToolbarState> = MutableLiveData(SearchState)
@@ -89,10 +89,18 @@ constructor(
     }
 
     fun updateNote(updateNoteView: NoteView){
+        val updatedIndex = loadedNotes.indexOfFirst { it.id == updateNoteView.id }
         with(loadedNotes){
             val updateIndex = indexOfFirst { it.id == updateNoteView.id }
-            removeAt(updateIndex)
-            add(updateIndex, updateNoteView)
+            if (this[updateIndex] == updateNoteView)
+                return
+            else {
+                removeAt(updateIndex)
+                if (loadOrderingOnSharedPreference() == ORDER_DESC)
+                    add(0, updateNoteView)
+                else
+                    add(loadedNotes.size, updateNoteView)
+            }
         }
         _mediatorNoteList.value = DataState.success(loadedNotes)
     }
@@ -111,7 +119,7 @@ constructor(
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
             sort = SORT_UPDATED_AT
-            order = sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+            order = loadOrderingOnSharedPreference()
             like = search
         })
     }
@@ -129,13 +137,15 @@ constructor(
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
             sort = SORT_UPDATED_AT
-            order = sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+            order = loadOrderingOnSharedPreference()
             like  = null
         }
     }
 
     private fun getQuery() = _query.value ?: Query(
-        order = sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+        order = loadOrderingOnSharedPreference()
     )
 
+    private fun loadOrderingOnSharedPreference() = sharedPreferences
+        .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
 }

@@ -30,9 +30,6 @@ import com.jakewharton.rxbinding4.widget.textChanges
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
-/**
- * A simple [Fragment] subclass.
- */
 const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
 const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
@@ -112,7 +109,7 @@ class NoteDetailFragment constructor(
         .doOnNext { cancelMenu ->
             if (cancelMenu) viewModel.setNoteMode(DefaultMode)
             else {
-                setFragmentResult(NOTE_DETAIL_BUNDLE_KEY , bundleOf())
+                setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to noteUiModel))
                 findNavController().popBackStack()
             }
         }
@@ -133,6 +130,7 @@ class NoteDetailFragment constructor(
         title = note_title.text.toString()
         body = note_body.text.toString()
         updated_at = dateUtil.getCurrentTimestamp()
+        timber("d", "updated_at: ${updated_at}")
     }
 
     private fun setNote(noteUiModel: NoteUiModel, mode: TextMode) = with(viewModel){

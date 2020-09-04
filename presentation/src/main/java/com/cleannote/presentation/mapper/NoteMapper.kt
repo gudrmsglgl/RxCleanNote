@@ -11,6 +11,6 @@ open class NoteMapper @Inject constructor(): Mapper<NoteView, Note>{
     )
 
     fun mapFromView(type: NoteView) = Note(
-        type.id, type.title, type.body, type.created_at, type.updated_at
+        type.id, type.title, type.body, type.updated_at, type.created_at
     )
 }

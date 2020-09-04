@@ -30,6 +30,12 @@ object NoteFactory {
         updated_at = "2020-07-${date} 12:00:$date"
     )
 
+    fun oneOfNotesUpdate(notes: List<NoteEntity>, index: Int, title: String?, body: String?, updateTime: String) =
+        notes[index]
+            .copy(id = notes[index].id, title = title ?: notes[index].title,
+                body = body ?: notes[index].body, created_at = notes[index].created_at, updated_at = updateTime)
+
+
     fun createCachedNoteList(start:Int = 0, end: Int): List<CachedNote> =
         (start until end)
             .map {

@@ -16,6 +16,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.text.SimpleDateFormat
+import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
@@ -122,23 +124,28 @@ class NoteCacheImplTest {
     @Test
     fun updateNote(){
         val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
-        val selectIndex = 1
+        val selectIndex = 2
         val updateTitle = "updated"
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes).test()
 
-        //  date = 1 -> b/c date sorting
-        val updateNote = NoteFactory.createNoteEntity(id = "#$selectIndex", title = updateTitle, date = "1")
+        val updateNote =
+            NoteFactory.oneOfNotesUpdate(notes, selectIndex, title= updateTitle, body = null, updateTime = getCurTime())
+
         noteCacheImpl.updateNote(updateNote).test()
             .assertComplete()
             .assertNoValues()
 
         val allNotes = noteCacheImpl.searchNotes(query).test().values()[0]
-        assertThat(allNotes[selectIndex].title, `is`(updateNote.title))
+
+        assertThat(allNotes[notes.lastIndex].title, `is`(updateNote.title))
     }
 
     private fun checkNoteTableRows(expectedRow: Int){
         val numberOfRows = noteDao.getNumNotes().size
         assertThat(numberOfRows, `is`(expectedRow))
     }
+
+    private fun getCurTime() =
+        SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())
 }

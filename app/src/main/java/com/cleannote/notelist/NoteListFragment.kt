@@ -78,7 +78,6 @@ constructor(
         noteClick()
         noteLongClick()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ key, bundle ->
-            timber("d","setFragmentResultListener key: $key , bundle: ${bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)}")
             bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
                 viewModel.updateNote(
                     noteMapper.mapToView(it)
@@ -114,7 +113,7 @@ constructor(
 
     private fun noteLongClick() = noteAdapter.longClickNoteSubject
         .doOnNext { timber("d", "$it") }
-        .subscribe{
+        .subscribe {
             noteAdapter.transItemMenu(it)
         }
         .addCompositeDisposable()

@@ -17,6 +17,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.text.SimpleDateFormat
+import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
@@ -96,19 +98,25 @@ open class CachedNoteDaoTest{
     }
 
     @Test
-    fun updateNote(){
+    fun updateNoteThenSortingTopDESC(){
+        val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
+
         val updateTitle = "updateTitle"
         val selectedIndex = 1
 
         val cacheNotes = NoteFactory.createCachedNoteList(end = 5)
         saveNotes(cacheNotes)
 
-        val selectedNote = cacheNotes[selectedIndex]
-        selectedNote.apply { title = updateTitle }
-        updateNote(selectedNote)
+        val updateCacheNote = cacheNotes[selectedIndex]
+        updateCacheNote.apply {
+            title = updateTitle
+            updated_at = getCurTime()
+        }
+        updateNote(updateCacheNote)
 
-        val allNotes = loadAllNotes()
-        assertUpdateTitle(allNotes[selectedIndex], updateTitle)
+        val allNotes = noteDao.searchNoteBySorted(query.page, query.limit, query.order, query.like)
+
+        assertThat(allNotes[0], `is`(updateCacheNote))
     }
 
     private fun saveNotes(notes: List<CachedNote>) = with(noteDao){
@@ -124,4 +132,8 @@ open class CachedNoteDaoTest{
     private fun assertUpdateTitle(updatedNote: CachedNote, updateTitle: String) {
         assertThat(updatedNote.title, `is`(updateTitle))
     }
+
+    private fun getCurTime() =
+        SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())
+
 }

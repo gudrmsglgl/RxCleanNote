@@ -225,7 +225,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         verifyInsertNoteErrorMessage(errorMessage)
         verifyInsertNoteData(null)
     }
-
+/*
     @Test
     fun updateNote(){
         val noteList = NoteFactory.createNoteList(0, 10)
@@ -246,7 +246,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         whenUpdateNote(updateNoteView)
 
         verifyNoteUpdate(updateIndex, updateNoteView)
-    }
+    }*/
 
     private fun whenUpdateNote(updateNote: NoteView){
         noteListViewModel.updateNote(updateNote)
