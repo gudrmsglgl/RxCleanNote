@@ -34,8 +34,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     lateinit var searchNotes: SearchNotes
 
-    lateinit var noteMapper: NoteMapper
-
     lateinit var sharedPreferences: SharedPreferences
 
     private lateinit var noteListOnSuccessCaptor: KArgumentCaptor<OnSuccess<List<Note>>>
@@ -86,7 +84,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         verifyViewModelDataState(LOADING)
-        verifyNoteListData(null)
+        assertViewModelNotesEqual(null)
     }
 
     @Test
@@ -94,7 +92,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         val noteList = NoteFactory.createNoteList(0, 10)
         val noteViewList = NoteFactory.createNoteViewList(0,10)
         noteViewList.forEachIndexed { index, noteView ->
-            whenever(noteMapper.mapToView(noteList[index])).thenReturn(noteView)
+            noteList[index] stubTo noteView
         }
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
@@ -102,7 +100,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
         whenSuccessOnNextNoteList(noteList)
         verifyViewModelDataState(SUCCESS)
-        verifyNoteListData(noteViewList)
+        assertViewModelNotesEqual(noteViewList)
     }
 
     @Test
@@ -115,8 +113,8 @@ class NoteListViewModelTest: BaseViewModelTest() {
         whenErrorOnNextNoteList(errorMessage)
         verifyViewModelDataState(ERROR)
 
-        verifyNoteListErrorMessage(errorMessage)
-        verifyNoteListData(null)
+        assertViewModelNotesMessage(errorMessage)
+        assertViewModelNotesEqual(null)
     }
 
     @Test
@@ -126,22 +124,22 @@ class NoteListViewModelTest: BaseViewModelTest() {
         val noteViewList = NoteFactory.createNoteViewList(0,20)
         noteViewList.forEachIndexed { index, noteView ->
             if (index < 10)
-                whenever(noteMapper.mapToView(p1NoteList[index])).thenReturn(noteView)
+                p1NoteList[index] stubTo noteView
             else
-                whenever(noteMapper.mapToView(p2NoteList[index-10])).thenReturn(noteView)
+                p2NoteList[index-10] stubTo noteView
         }
 
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         whenSuccessOnNextNoteList(p1NoteList)
-        verifyNoteListSize(p1NoteList.size)
+        assertViewModelNotesSize(p1NoteList.size)
 
         whenNextSearchNotesSaveState()
         assertThat(queryCaptor.firstValue.page, `is`(2))
         whenSuccessOnNextNoteList(p2NoteList)
         verifyViewModelDataState(LOADING, times(2))
         verifyViewModelDataState(SUCCESS, times(2))
-        verifyNoteListSize(p1NoteList.size + p2NoteList.size)
+        assertViewModelNotesSize(p1NoteList.size + p2NoteList.size)
     }
 
     @Test
@@ -177,12 +175,12 @@ class NoteListViewModelTest: BaseViewModelTest() {
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         whenSuccessOnNextNoteList(nonKeyWordNoteList)
-        verifyNoteListSize(nonKeyWordNoteList.size)
+        assertViewModelNotesSize(nonKeyWordNoteList.size)
 
         noteListViewModel.searchKeyword(keyword)
         whenSearchNoteSaveState()
         whenSuccessOnNextNoteList(keyWordNoteList)
-        verifyNoteListSize(keyWordNoteList.size)
+        assertViewModelNotesSize(keyWordNoteList.size)
     }
 
     @Test
@@ -198,7 +196,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         whenInsertNoteSaveState(insertedNoteView)
         verifyInsertNoteExecute()
         verifyViewModelDataState(LOADING)
-        verifyInsertNoteData(null)
+        assertViewModelInsertNoteEqual(null)
     }
 
     @Test
@@ -209,7 +207,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         verifyViewModelDataState(LOADING)
         whenInsertedSuccessSaveState()
         verifyViewModelDataState(SUCCESS)
-        verifyInsertNoteData(insertedNoteView)
+        assertViewModelInsertNoteEqual(insertedNoteView)
     }
 
     @Test
@@ -222,16 +220,16 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
         whenErrorOnNextInsertNote(errorMessage)
         verifyViewModelDataState(ERROR)
-        verifyInsertNoteErrorMessage(errorMessage)
-        verifyInsertNoteData(null)
+        assertViewModelInsertMessage(errorMessage)
+        assertViewModelInsertNoteEqual(null)
     }
-/*
+
     @Test
-    fun updateNote(){
+    fun updateNoteSuccessThenSortingTop(){
         val noteList = NoteFactory.createNoteList(0, 10)
         val noteViewList = NoteFactory.createNoteViewList(0,10)
         noteViewList.forEachIndexed { index, noteView ->
-            whenever(noteMapper.mapToView(noteList[index])).thenReturn(noteView)
+            noteList[index] stubTo noteView
         }
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
@@ -239,21 +237,44 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
         whenSuccessOnNextNoteList(noteList)
         verifyViewModelDataState(SUCCESS)
-        verifyNoteListData(noteViewList)
+        assertViewModelNotesEqual(noteViewList)
 
         val updateIndex = 2
-        val updateNoteView = NoteFactory.createNoteView("update", updateIndex)
+        val updateTitle = "updateTitle"
+        val updateNoteView = NoteFactory.oneOfNotesUpdate(noteViewList, updateIndex, updateTitle, null)
         whenUpdateNote(updateNoteView)
 
-        verifyNoteUpdate(updateIndex, updateNoteView)
-    }*/
+        checkViewModelNotesUpdate(index = 0, updateNoteView = updateNoteView)
+    }
+
+    @Test
+    fun equalNoteNotUpdate(){
+        val noteList = NoteFactory.createNoteList(0, 10)
+        val noteViewList = NoteFactory.createNoteViewList(0,10)
+        noteViewList.forEachIndexed { index, noteView ->
+            noteList[index] stubTo noteView
+        }
+        whenSearchNoteSaveState()
+        verifySearchNoteExecute()
+        verifyViewModelDataState(LOADING)
+
+        whenSuccessOnNextNoteList(noteList)
+        verifyViewModelDataState(SUCCESS)
+        assertViewModelNotesEqual(noteViewList)
+
+        val updateIndex = 2
+        val updateNoteView = noteViewList[updateIndex]
+        whenUpdateNote(updateNoteView)
+
+        assertViewModelNotesEqual(noteViewList) // when update then not sorting b/c equal note don't execute update
+    }
 
     private fun whenUpdateNote(updateNote: NoteView){
         noteListViewModel.updateNote(updateNote)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
-    private fun verifyNoteUpdate(index: Int, updateNoteView: NoteView){
+    private fun checkViewModelNotesUpdate(index: Int, updateNoteView: NoteView){
         assertThat(
             noteListViewModel.noteList.value?.data?.get(index),
             `is`(updateNoteView)
@@ -288,8 +309,8 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     private fun givenStubInsertNote(): NoteView{
-        val insertedNoteView = NoteFactory.createNoteView("#1")
-        whenever(noteMapper.mapFromView(insertedNoteView)).thenReturn(NoteFactory.createNote("#1"))
+        val insertedNoteView = NoteFactory.createNoteView(title="insertTitle", date = "1")
+        whenever(noteMapper.mapFromView(insertedNoteView)).thenReturn(NoteFactory.createNote(title="insertTitle", date = "1"))
         return insertedNoteView
     }
 
@@ -308,7 +329,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         setViewModelState(noteListViewModel.insertResult.value?.status)
     }
 
-    private fun verifyNoteListData(expectedData: List<NoteView>?){
+    private fun assertViewModelNotesEqual(expectedData: List<NoteView>?){
         if (expectedData == null) {
             assertThat(noteListViewModel.noteList.value?.data, `is`(nullValue()))
         } else {
@@ -319,7 +340,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         }
     }
 
-    private fun verifyInsertNoteData(expectedData: NoteView?){
+    private fun assertViewModelInsertNoteEqual(expectedData: NoteView?){
         if (expectedData == null) {
             assertThat(noteListViewModel.insertResult.value?.data, `is`(nullValue()))
         } else {
@@ -330,15 +351,15 @@ class NoteListViewModelTest: BaseViewModelTest() {
         }
     }
 
-    private fun verifyNoteListSize(expectedSize: Int){
+    private fun assertViewModelNotesSize(expectedSize: Int){
         assertThat(noteListViewModel.noteList.value?.data?.size, `is`(expectedSize))
     }
 
-    private fun verifyNoteListErrorMessage(message: String) {
+    private fun assertViewModelNotesMessage(message: String) {
         assertThat(noteListViewModel.noteList.value?.message, `is`(message))
     }
 
-    private fun verifyInsertNoteErrorMessage(message: String) {
+    private fun assertViewModelInsertMessage(message: String) {
         assertThat(noteListViewModel.insertResult.value?.message, `is`(message))
     }
 

@@ -13,29 +13,41 @@ object NoteFactory {
     }
 
     fun createNote(
-        title: String
+        id: String? = null,
+        title: String,
+        body: String? = null,
+        date: String
     ) = Note(
-        id = UUID.randomUUID().toString(),
+        id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = "",
-        created_at = getCurrentTimestamp(),
-        updated_at = getCurrentTimestamp()
+        created_at = "2020-07-${date} 12:00:$date",
+        updated_at = "2020-07-${date} 12:00:$date"
     )
 
     fun createNoteView(
+        id: String? = null,
         title: String,
-        pkId: Int? = null
+        body: String? = null,
+        date: String
     ) = NoteView(
-        id = "#$pkId" ?: UUID.randomUUID().toString(),
+        id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = "",
-        created_at = getCurrentTimestamp(),
-        updated_at = getCurrentTimestamp()
+        created_at = "2020-07-${date} 12:00:$date",
+        updated_at = "2020-07-${date} 12:00:$date"
     )
 
+    fun oneOfNotesUpdate(notes: List<NoteView>, index: Int, title: String?, body: String?) =
+        notes[index]
+            .copy(id = notes[index].id, title = title ?: notes[index].title,
+                body = body ?: notes[index].body, created_at = notes[index].created_at, updated_at = getCurrentTimestamp())
+
     fun createNoteList(start:Int, count: Int): List<Note> = (start until count).map {
-        createNote("title #it") }.toList()
+        createNote("#$it", "title #it", "body #it", it.toString()) }.toList()
 
     fun createNoteViewList(start:Int, count: Int): List<NoteView> = (start until count).map {
-        createNoteView("title #it", it) }.toList()
+        createNoteView("#$it", "title #it", "body #it", it.toString()) }.toList()
+
+
 }

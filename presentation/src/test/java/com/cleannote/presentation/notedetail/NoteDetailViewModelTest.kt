@@ -7,16 +7,13 @@ import com.cleannote.presentation.BaseViewModelTest
 import com.cleannote.presentation.Complete
 import com.cleannote.presentation.OnError
 import com.cleannote.presentation.OnSuccess
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.LOADING
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.TextMode.EditDoneMode
-import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.*
-import io.reactivex.subscribers.DisposableSubscriber
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -33,7 +30,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     private lateinit var viewModel: NoteDetailViewModel
 
     private lateinit var updateNote: UpdateNote
-    private lateinit var noteMapper: NoteMapper
 
     private lateinit var onSuccessNoteCaptor: KArgumentCaptor<OnSuccess<Unit>>
     private lateinit var onErrorNoteCaptor: KArgumentCaptor<OnError>
@@ -42,8 +38,8 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     private lateinit var updateParamCaptor: KArgumentCaptor<Note>
 
-    private val note = NoteFactory.createNote("testNote")
-    private val noteView = NoteFactory.createNoteView("testNote")
+    private val note = NoteFactory.createNote(title = "testNote", date = "1")
+    private val noteView = NoteFactory.createNoteView(title = "testNote", date = "1")
 
     @BeforeEach
     fun setUp(){
@@ -70,34 +66,30 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun updateNoteExecuteUseCase(){
-        stubNoteMapper(noteView, note)
+        noteView stubTo note
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
     }
 
     @Test
     fun updateNoteStateLoadingReturnNoData(){
-        stubNoteMapper(noteView, note)
+        noteView stubTo note
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
-        verifyUpdateViewModelData(null)
+        assertViewModelUpdateNoteEqual(null)
     }
 
     @Test
     fun updateNoteStateSuccessReturnNote(){
-        stubNoteMapper(noteView, note)
+        noteView stubTo note
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
 
         onSuccessUpdateNote()
         verifyViewModelDataState(SUCCESS)
-        verifyUpdateViewModelData(noteView)
-    }
-
-    private fun stubNoteMapper(noteView: NoteView, note: Note){
-        whenever(noteMapper.mapFromView(noteView)).thenReturn(note)
+        assertViewModelUpdateNoteEqual(noteView)
     }
 
     private fun whenUpdateNote(noteView: NoteView){
@@ -108,7 +100,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         setViewModelState(viewModel.updatedNote.value?.status)
     }
 
-    private fun verifyUpdateViewModelData(expectedData: NoteView?){
+    private fun assertViewModelUpdateNoteEqual(expectedData: NoteView?){
         if (expectedData == null) {
             assertThat(viewModel.updatedNote.value?.data, `is`(nullValue()))
         } else {
