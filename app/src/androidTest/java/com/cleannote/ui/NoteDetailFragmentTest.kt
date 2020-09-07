@@ -13,7 +13,9 @@ import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NoteDetailFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.ui.screen.DetailNoteScreen
+import io.mockk.every
 import io.mockk.mockk
+import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,10 +30,10 @@ class NoteDetailFragmentTest: BaseTest() {
     val mockUIController = mockk<UIController>(relaxUnitFun = true)
     val screen = DetailNoteScreen
     private val note: NoteUiModel
-
+    private val titleText = "testTitle"
     init {
         injectTest()
-        note = NoteFactory.makeNoteUiModel(title = "testTitle",body = "testBody", date = "20")
+        note = NoteFactory.makeNoteUiModel(title = titleText, body = "testBody", date = "20")
     }
 
     @Before
@@ -101,8 +103,10 @@ class NoteDetailFragmentTest: BaseTest() {
         }
     }
 
-    /*@Test
+    @Test
     fun noteTitleEditDoneThenChangeIconMenu(){
+        stubNoteRepositoryUpdate()
+
         launchFragmentInContainer<NoteDetailFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
@@ -115,13 +119,37 @@ class NoteDetailFragmentTest: BaseTest() {
             }
             noteTitle.isFocused(false)
         }
-    }*/
+    }
+
+    @Test
+    fun noteTitleUpdateCancelThenRevertText(){
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        )
+        screen {
+            noteTitle.typeText("test")
+            toolbar {
+                primaryMenu.click()
+                primaryMenu.hasDrawable(R.drawable.ic_arrow_back_24dp)
+            }
+            noteTitle.isFocused(false)
+            noteTitle.hasText(titleText)
+        }
+    }
+
+    private fun stubNoteRepositoryUpdate(){
+        every {
+            getComponent().provideNoteRepository().updateNote(any())
+        }.returns(Completable.complete())
+    }
 
     override fun injectTest() {
         getComponent().inject(this)
     }
 
     private fun setupUIController(){
+        every { mockUIController.isDisplayProgressBar() }.returns(false)
         fragmentFactory.uiController = mockUIController
     }
 }

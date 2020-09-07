@@ -29,7 +29,7 @@ class TestNoteFragmentFactory
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(viewModelFactory, noteMapper, dateUtil, sharedPreferences)
+            val fragment = NoteListFragment(viewModelFactory, noteMapper, sharedPreferences)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }
@@ -37,7 +37,7 @@ class TestNoteFragmentFactory
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory, noteMapper)
+            val fragment = NoteDetailFragment(viewModelFactory, noteMapper, dateUtil)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }
