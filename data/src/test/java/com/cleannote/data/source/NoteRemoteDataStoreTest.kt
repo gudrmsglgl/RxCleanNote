@@ -71,4 +71,11 @@ class NoteRemoteDataStoreTest {
             noteRemoteDataStore.updateNote(noteEntity)
         }
     }
+
+    @Test
+    fun deleteNoteReturnThrow(){
+        Assertions.assertThrows(UnsupportedOperationException::class.java){
+            noteRemoteDataStore.deleteNote(noteEntity)
+        }
+    }
 }

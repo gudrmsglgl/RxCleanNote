@@ -13,5 +13,5 @@ interface NoteRepository {
     fun login(userId: String): Flowable<List<User>>
     fun searchNotes(query: Query): Flowable<List<Note>>
     fun updateNote(note: Note): Completable
-
+    fun deleteNote(note: Note): Completable
 }

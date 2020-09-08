@@ -93,6 +93,10 @@ constructor(
         .retrieveCacheDataStore()
         .updateNote(noteMapper.mapToEntity(note))
 
+    override fun deleteNote(note: Note): Completable = factory
+        .retrieveCacheDataStore()
+        .deleteNote(noteMapper.mapToEntity(note))
+
     /*override fun searchNotes(query: Query): Flowable<List<Note>> {
         val queryEntity = queryMapper.mapToEntity(query)
         return factory.retrieveRemoteDataStore().searchNotes(queryEntity)

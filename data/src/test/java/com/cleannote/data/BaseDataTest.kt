@@ -77,6 +77,10 @@ abstract class BaseDataTest {
         whenever(this.updateNote(stub.first)).thenReturn(stub.second)
     }
 
+    infix fun NoteCacheDataStore.stubDeleteNote(stub: Pair<NoteEntity, Completable>){
+        whenever(this.deleteNote(stub.first)).thenReturn(stub.second)
+    }
+
     fun whenDataRepositoryInsertNote(note: Note) = noteDataRepository.insertNewNote(note)
     fun NoteDataStore.verifyInsertNote(noteEntity: NoteEntity, verifyMode: VerificationMode? = null){
         if (this is NoteCacheDataStore)
@@ -90,6 +94,8 @@ abstract class BaseDataTest {
     fun whenDataRepositorySearchNotes(query: Query) = noteDataRepository.searchNotes(query)
 
     fun whenUpdateNote(note: Note) = noteDataRepository.updateNote(note)
+
+    fun whenDataRepositoryDeleteNote(note: Note) = noteDataRepository.deleteNote(note)
 
     fun NoteCacheDataStore.verifyIsCached(page: Int){
         verify(this).isCached(page)
@@ -117,5 +123,9 @@ abstract class BaseDataTest {
 
     fun NoteCacheDataStore.verifySearchNote(queryEntity: QueryEntity, verifyMode: VerificationMode?=null){
         verify(this, verifyMode ?: times(1)).searchNotes(queryEntity)
+    }
+
+    fun NoteCacheDataStore.verifyDeleteNote(noteEntity: NoteEntity, verifyMode: VerificationMode? = null){
+        verify(this,verifyMode ?: times(1)).deleteNote(noteEntity)
     }
 }

@@ -29,7 +29,7 @@ class UpdateNoteTest: BaseDomainTest<Note>(), CompletableUseCaseBuilder<Note> {
 
     @Test
     fun updateNoteCallRepository(){
-        whenBuildUseCase(paramNote)
+        whenBuildUseCase(paramNote).test()
         verifyRepositoryCall(paramNote)
     }
 

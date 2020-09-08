@@ -12,5 +12,6 @@ interface NoteCache {
     fun saveNotes(notes: List<NoteEntity>): Completable
     fun isCached(page: Int): Single<Boolean>
     fun setLastCacheTime(lastCache: Long, page: Int = 1)
-    fun updateNote(noteEntity: NoteEntity):Completable
+    fun updateNote(noteEntity: NoteEntity): Completable
+    fun deleteNote(noteEntity: NoteEntity): Completable
 }

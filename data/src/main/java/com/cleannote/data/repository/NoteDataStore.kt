@@ -15,4 +15,5 @@ interface NoteDataStore {
     fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable
     fun isCached(page: Int): Single<Boolean>
     fun updateNote(noteEntity: NoteEntity): Completable
+    fun deleteNote(noteEntity: NoteEntity): Completable
 }

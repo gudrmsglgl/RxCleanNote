@@ -34,7 +34,7 @@ class LoginTest: BaseDomainTest<String>(), FlowableUseCaseBuilder<List<User>, St
 
     @Test
     fun buildUseCaseCallRepository(){
-        whenBuildUseCase(successUserParam)
+        whenBuildUseCase(successUserParam).test()
         verifyRepositoryCall(successUserParam)
     }
 

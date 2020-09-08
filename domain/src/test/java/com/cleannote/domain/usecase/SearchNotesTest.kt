@@ -37,7 +37,7 @@ class SearchNotesTest: BaseDomainTest<Query>(), FlowableUseCaseBuilder<List<Note
 
     @Test
     fun buildUseCaseCallRepository(){
-        whenBuildUseCase(defaultQuery)
+        whenBuildUseCase(defaultQuery).test()
         verifyRepositoryCall(defaultQuery)
     }
 

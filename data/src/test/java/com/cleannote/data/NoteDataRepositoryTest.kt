@@ -392,4 +392,20 @@ class NoteDataRepositoryTest: BaseDataTest() {
         verify(noteDataStoreFactory).retrieveCacheDataStore()
         verify(noteDataStoreFactory, never()).retrieveRemoteDataStore()
     }
+
+    @Test
+    fun whenDeleteNoteThenComplete(){
+        val deleteNote = NoteFactory.createNote(title = "deleteNote")
+        val deleteNoteEntity = NoteFactory.createNoteEntity(title = "deleteNote")
+
+        deleteNote stubTo deleteNoteEntity
+        noteCacheDataStore stubDeleteNote (deleteNoteEntity to Completable.complete())
+
+        whenDataRepositoryDeleteNote(deleteNote)
+            .test()
+            .assertComplete()
+            .assertNoValues()
+
+        noteCacheDataStore.verifyDeleteNote(deleteNoteEntity)
+    }
 }
