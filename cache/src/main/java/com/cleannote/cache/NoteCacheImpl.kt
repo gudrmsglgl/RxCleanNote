@@ -57,5 +57,12 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
         Completable.complete()
     }
 
+    override fun deleteNote(noteEntity: NoteEntity): Completable = Completable.defer {
+        noteDao.deleteNote(
+            entityMapper.mapToCached(noteEntity)
+        )
+        Completable.complete()
+    }
+
     private fun getLastCacheTime(page: Int) = preferencesHelper.getLastCacheTime(page)
 }

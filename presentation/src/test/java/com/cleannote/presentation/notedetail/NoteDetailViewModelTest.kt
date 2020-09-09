@@ -1,6 +1,7 @@
 package com.cleannote.presentation.notedetail
 
 import androidx.lifecycle.MutableLiveData
+import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.BaseViewModelTest
@@ -30,13 +31,14 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     private lateinit var viewModel: NoteDetailViewModel
 
     private lateinit var updateNote: UpdateNote
+    private lateinit var deleteNote: DeleteNote
 
     private lateinit var onSuccessNoteCaptor: KArgumentCaptor<OnSuccess<Unit>>
     private lateinit var onErrorNoteCaptor: KArgumentCaptor<OnError>
     private lateinit var afterFinishedCaptor: KArgumentCaptor<Complete>
     private lateinit var onCompleteCaptor: KArgumentCaptor<Complete>
 
-    private lateinit var updateParamCaptor: KArgumentCaptor<Note>
+    private lateinit var noteParamCaptor: KArgumentCaptor<Note>
 
     private val note = NoteFactory.createNote(title = "testNote", date = "1")
     private val noteView = NoteFactory.createNoteView(title = "testNote", date = "1")
@@ -45,18 +47,19 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     fun setUp(){
         updateNote = mock()
         noteMapper = mock()
+        deleteNote = mock()
 
         onSuccessNoteCaptor = argumentCaptor()
         onErrorNoteCaptor = argumentCaptor()
         afterFinishedCaptor = argumentCaptor()
         onCompleteCaptor = argumentCaptor()
 
-        updateParamCaptor = argumentCaptor()
+        noteParamCaptor = argumentCaptor()
 
         viewModelState = MutableLiveData()
         viewModelState.observeForever(stateObserver)
 
-        viewModel = NoteDetailViewModel(updateNote, noteMapper)
+        viewModel = NoteDetailViewModel(updateNote, deleteNote, noteMapper)
     }
 
     @AfterEach
@@ -92,12 +95,55 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         assertViewModelUpdateNoteEqual(noteView)
     }
 
+    @Test
+    fun deleteNoteExecuteUseCase(){
+        noteView stubTo note
+        whenDeleteNote(noteView)
+        verifyDeleteNoteExecute()
+    }
+
+    @Test
+    fun deleteNoteStateLoadingNoData(){
+        noteView stubTo note
+        whenDeleteNote(noteView)
+        verifyDeleteNoteExecute()
+        verifyViewModelDataState(LOADING)
+        assertViewModelDeleteNoteEqual(null)
+    }
+
+    @Test
+    fun deleteNoteStateSuccessReturnNote(){
+        noteView stubTo note
+        whenDeleteNote(noteView)
+        verifyDeleteNoteExecute()
+        verifyViewModelDataState(LOADING)
+
+        onSuccessDeleteNote()
+        verifyViewModelDataState(SUCCESS)
+        assertViewModelDeleteNoteEqual(noteView)
+    }
+
     private fun whenUpdateNote(noteView: NoteView){
         with(viewModel) {
             setNote(noteView)
             setNoteMode(EditDoneMode)
         }
         setViewModelState(viewModel.updatedNote.value?.status)
+    }
+
+    private fun onSuccessUpdateNote(){
+        onCompleteCaptor.firstValue.invoke()
+        setViewModelState(viewModel.updatedNote.value?.status)
+    }
+
+    private fun verifyUpdateNoteExecute(){
+        updateNote.verifyExecute(
+            onSuccessNoteCaptor,
+            onErrorNoteCaptor,
+            afterFinishedCaptor,
+            onCompleteCaptor,
+            noteParamCaptor
+        )
     }
 
     private fun assertViewModelUpdateNoteEqual(expectedData: NoteView?){
@@ -111,18 +157,36 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         }
     }
 
-    private fun verifyUpdateNoteExecute(){
-        updateNote.verifyExecute(
+    private fun whenDeleteNote(noteView: NoteView){
+        viewModel.deleteNote(noteView)
+        setViewModelState(viewModel.deletedNote.value?.status)
+    }
+
+    private fun verifyDeleteNoteExecute(){
+        deleteNote.verifyExecute(
             onSuccessNoteCaptor,
             onErrorNoteCaptor,
             afterFinishedCaptor,
             onCompleteCaptor,
-            updateParamCaptor
+            noteParamCaptor
         )
     }
 
-    private fun onSuccessUpdateNote(){
-        onCompleteCaptor.firstValue.invoke()
-        setViewModelState(viewModel.updatedNote.value?.status)
+    private fun assertViewModelDeleteNoteEqual(expectedData: NoteView?){
+        if (expectedData == null) {
+            assertThat(viewModel.deletedNote.value?.data, `is`(nullValue()))
+        } else {
+            assertThat(
+                viewModel.deletedNote.value?.data,
+                `is`(expectedData)
+            )
+        }
     }
+
+    private fun onSuccessDeleteNote(){
+        onCompleteCaptor.firstValue.invoke()
+        setViewModelState(viewModel.deletedNote.value?.status)
+    }
+
+
 }

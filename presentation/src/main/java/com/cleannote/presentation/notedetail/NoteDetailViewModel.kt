@@ -2,6 +2,7 @@ package com.cleannote.presentation.notedetail
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.presentation.common.BaseViewModel
 import com.cleannote.presentation.data.DataState
@@ -18,6 +19,7 @@ import io.reactivex.subscribers.DisposableSubscriber
 class NoteDetailViewModel
 constructor(
     private val updateNote: UpdateNote,
+    private val deleteNote: DeleteNote,
     private val noteMapper: NoteMapper
 ): BaseViewModel(updateNote) {
 
@@ -26,6 +28,10 @@ constructor(
     private val _updatedNote = MutableLiveData<DataState<NoteView>>()
     val updatedNote: LiveData<DataState<NoteView>>
         get() = _updatedNote
+
+    private val _deletedNote = MutableLiveData<DataState<NoteView>>()
+    val deletedNote: LiveData<DataState<NoteView>>
+        get() = _deletedNote
 
     private val _detailToolbarState: MutableLiveData<DetailToolbarState> = MutableLiveData()
     val detailToolbarState: LiveData<DetailToolbarState>
@@ -64,6 +70,20 @@ constructor(
         }
     }
 
+    fun deleteNote(noteView: NoteView) {
+        _deletedNote.postValue(DataState.loading())
+        deleteNote.execute(
+            onSuccess = {},
+            onError = {
+                _deletedNote.postValue(DataState.error("delete note fail"))
+            },
+            onComplete = {
+                _deletedNote.postValue(DataState.success(noteView))
+            },
+            params = noteMapper.mapFromView(noteView)
+        )
+    }
+
     fun isEditMode(): Boolean{
         return _noteMode.value is EditMode
     }
@@ -71,10 +91,6 @@ constructor(
     fun getNoteBody() = note.body
 
     fun setNote(noteView: NoteView){
-        note = noteView
-    }
-
-    fun deleteNote(noteView: NoteView) {
         note = noteView
     }
 

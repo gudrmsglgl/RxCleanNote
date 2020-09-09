@@ -9,7 +9,7 @@ import com.cleannote.cache.database.NoteDatabase
 import com.cleannote.cache.model.CachedNote
 import com.cleannote.cache.test.factory.NoteFactory
 import com.cleannote.cache.test.factory.QueryFactory
-import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
@@ -59,7 +59,7 @@ open class CachedNoteDaoTest{
     @Test
     fun saveNotes(){
         val cacheNotes = NoteFactory.createCachedNoteList(end = 5)
-        noteDao.saveNotes(cacheNotes)
+        whenSaveNotes(cacheNotes)
 
         val allNote = loadAllNotes()
         assertThat(cacheNotes.size, `is`(allNote.size))
@@ -69,7 +69,7 @@ open class CachedNoteDaoTest{
     fun getCacheNotes(){
         val cachedNotes = NoteFactory.createCachedNoteList(end = 5)
 
-        saveNotes(cachedNotes)
+        whenSaveNotes(cachedNotes)
 
         val retrieveNotes = noteDao.getNumNotes()
         assertThat(retrieveNotes, `is`(cachedNotes))
@@ -80,7 +80,7 @@ open class CachedNoteDaoTest{
         val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
         val cacheNotes = NoteFactory.createCachedNoteList(end = 5)
 
-        saveNotes(cacheNotes)
+        whenSaveNotes(cacheNotes)
 
         val searchNotes = noteDao.searchNoteBySorted(query.page, query.limit, query.order, query.like)
         assertThat(searchNotes, `is`(cacheNotes))
@@ -91,7 +91,7 @@ open class CachedNoteDaoTest{
         val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
         val cacheNotes = NoteFactory.createCachedNoteList(end = 5)
 
-        saveNotes(cacheNotes)
+        whenSaveNotes(cacheNotes)
 
         val searchNotes = noteDao.searchNoteBySorted(query.page, query.limit, query.order, query.like)
         assertThat(searchNotes.asReversed(), `is`(cacheNotes))
@@ -105,25 +105,42 @@ open class CachedNoteDaoTest{
         val selectedIndex = 1
 
         val cacheNotes = NoteFactory.createCachedNoteList(end = 5)
-        saveNotes(cacheNotes)
+        whenSaveNotes(cacheNotes)
 
         val updateCacheNote = cacheNotes[selectedIndex]
         updateCacheNote.apply {
             title = updateTitle
             updated_at = getCurTime()
         }
-        updateNote(updateCacheNote)
+        whenUpdateNote(updateCacheNote)
 
         val allNotes = noteDao.searchNoteBySorted(query.page, query.limit, query.order, query.like)
 
         assertThat(allNotes[0], `is`(updateCacheNote))
     }
 
-    private fun saveNotes(notes: List<CachedNote>) = with(noteDao){
+    @Test
+    fun deleteNote(){
+        val cacheNotes = NoteFactory.createCachedNoteList(end = 5)
+        whenSaveNotes(cacheNotes)
+        assertThat(loadAllNotes().size, `is`(cacheNotes.size))
+
+        val deleteIndex = 1
+        val deleteNote = cacheNotes[deleteIndex]
+        whenDeleteNote(deleteNote)
+        assertThat(loadAllNotes(), not(hasItem(deleteNote)))
+        assertThat(loadAllNotes().size, `is`(cacheNotes.size - 1))
+    }
+
+    private fun whenDeleteNote(note: CachedNote){
+        noteDao.deleteNote(note)
+    }
+
+    private fun whenSaveNotes(notes: List<CachedNote>) = with(noteDao){
         saveNotes(notes)
     }
 
-    private fun updateNote(note: CachedNote) {
+    private fun whenUpdateNote(note: CachedNote) {
         noteDao.updateNote(note)
     }
 

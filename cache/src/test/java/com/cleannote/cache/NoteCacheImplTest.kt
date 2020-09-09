@@ -10,7 +10,7 @@ import com.cleannote.cache.database.NoteDatabase
 import com.cleannote.cache.mapper.NoteEntityMapper
 import com.cleannote.cache.test.factory.NoteFactory
 import com.cleannote.cache.test.factory.QueryFactory
-import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -139,6 +139,25 @@ class NoteCacheImplTest {
         val allNotes = noteCacheImpl.searchNotes(query).test().values()[0]
 
         assertThat(allNotes[notes.lastIndex].title, `is`(updateNote.title))
+    }
+
+    @Test
+    fun deleteNote(){
+        val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
+
+        val notes = NoteFactory.createNoteEntityList(end = 5)
+        noteCacheImpl.saveNotes(notes).test()
+
+        val deleteIndex = 1
+        val deleteNote = notes[deleteIndex]
+
+        noteCacheImpl.deleteNote(deleteNote).test()
+            .assertComplete()
+            .assertNoValues()
+
+        val allNotes = noteCacheImpl.searchNotes(query).test().values()[0]
+
+        assertThat(allNotes, not(hasItem(deleteNote)))
     }
 
     private fun checkNoteTableRows(expectedRow: Int){

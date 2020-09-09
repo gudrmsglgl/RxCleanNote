@@ -42,4 +42,7 @@ abstract class CachedNoteDao {
 
     @Update
     abstract fun updateNote(note: CachedNote)
+
+    @Delete
+    abstract fun deleteNote(note: CachedNote)
 }
