@@ -269,6 +269,33 @@ class NoteListViewModelTest: BaseViewModelTest() {
         assertViewModelNotesEqual(noteViewList) // when update then not sorting b/c equal note don't execute update
     }
 
+    @Test
+    fun deleteNoteStateSuccess(){
+        val noteList = NoteFactory.createNoteList(0, 10)
+        val noteViewList = NoteFactory.createNoteViewList(0, 10).toMutableList()
+        noteViewList.forEachIndexed { index, noteView ->
+            noteList[index] stubTo noteView
+        }
+
+        whenSearchNoteSaveState()
+        verifySearchNoteExecute()
+        whenSuccessOnNextNoteList(noteList)
+
+        val deleteIndex = 2
+        val deleteNoteView = noteViewList[deleteIndex]
+        noteViewList.remove(deleteNoteView)
+
+        whenDeleteNote(deleteNoteView)
+        verifyViewModelDataState(SUCCESS, times(2))
+        assertViewModelNotesSize(noteViewList.size)
+        assertViewModelNotesEqual(noteViewList)
+    }
+
+    private fun whenDeleteNote(deleteNoteView: NoteView){
+        noteListViewModel.deleteNote(deleteNoteView)
+        setViewModelState(noteListViewModel.noteList.value?.status)
+    }
+
     private fun whenUpdateNote(updateNote: NoteView){
         noteListViewModel.updateNote(updateNote)
         setViewModelState(noteListViewModel.noteList.value?.status)

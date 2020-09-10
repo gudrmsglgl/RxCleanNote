@@ -89,7 +89,6 @@ constructor(
     }
 
     fun updateNote(updateNoteView: NoteView){
-        val updatedIndex = loadedNotes.indexOfFirst { it.id == updateNoteView.id }
         with(loadedNotes){
             val updateIndex = indexOfFirst { it.id == updateNoteView.id }
             if (this[updateIndex] == updateNoteView)
@@ -102,6 +101,11 @@ constructor(
                     add(loadedNotes.size, updateNoteView)
             }
         }
+        _mediatorNoteList.value = DataState.success(loadedNotes)
+    }
+
+    fun deleteNote(deletedNoteView: NoteView){
+        loadedNotes.remove(deletedNoteView)
         _mediatorNoteList.value = DataState.success(loadedNotes)
     }
 

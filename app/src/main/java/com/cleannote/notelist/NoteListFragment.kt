@@ -42,6 +42,7 @@ import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.espresso.EspressoIdlingResource
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
 import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
@@ -78,11 +79,8 @@ constructor(
         noteClick()
         noteLongClick()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ key, bundle ->
-            bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
-                viewModel.updateNote(
-                    noteMapper.mapToView(it)
-                )
-            }
+            requestUpdate(bundle)
+            requestDelete(bundle)
         }
     }
 
@@ -293,6 +291,18 @@ constructor(
                 }
 
             onDismiss { source.dispose() }
+        }
+    }
+
+    private fun requestUpdate(bundle: Bundle){
+        bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
+            viewModel.updateNote(noteMapper.mapToView(it))
+        }
+    }
+
+    private fun requestDelete(bundle: Bundle){
+        bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_DELETE_KEY)?.let {
+            viewModel.deleteNote(noteMapper.mapToView(it))
         }
     }
 

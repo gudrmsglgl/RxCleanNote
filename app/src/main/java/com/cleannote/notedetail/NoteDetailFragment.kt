@@ -1,7 +1,6 @@
 package com.cleannote.notedetail
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
@@ -16,7 +15,6 @@ import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.mapper.NoteMapper
 import com.cleannote.model.NoteUiModel
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
@@ -31,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
 const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
+const val NOTE_DETAIL_DELETE_KEY = "com.cleannote.notedetail.request_onback_delete"
 const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
 class NoteDetailFragment constructor(
@@ -60,12 +59,22 @@ class NoteDetailFragment constructor(
 
         subscribeNoteMode()
         subscribeUpdateNote()
+        subscribeDeleteNote()
     }
 
     private fun subscribeUpdateNote() = viewModel.updatedNote
         .observe(viewLifecycleOwner, Observer {
             if (it != null && it.status == SUCCESS){
-                showToast(getString(R.string.updateNote))
+                showToast(getString(R.string.updateSuccessMsg))
+            }
+        })
+
+    private fun subscribeDeleteNote() = viewModel.deletedNote
+        .observe( viewLifecycleOwner, Observer {
+            if (it != null && it.status == SUCCESS){
+                showToast(getString(R.string.deleteSuccessMsg))
+                setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_DELETE_KEY to noteUiModel))
+                findNavController().popBackStack()
             }
         })
 

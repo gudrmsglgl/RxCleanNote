@@ -33,5 +33,7 @@
     <string name="dialog_newnote">새노트</string>
     <string name="dialog_newnote_hint">타이틀 입력 해주세요.</string>
 
-    <string name="updateNote">업데이트 되었습니다.</string>
+    <string name="updateSuccessMsg">업데이트 되었습니다.</string>
+    <string name="deleteSuccessMsg">삭제 되었습니다.</string>
+
 </resources>

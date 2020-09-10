@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -20,7 +22,11 @@ import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.cleannote.extension.isVisible
 import com.cleannote.extension.visible
+import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.NoteDetailFragment
+import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), UIController {
@@ -159,6 +165,10 @@ class MainActivity : AppCompatActivity(), UIController {
             ?.forEach {
                 when (it){
                     is OnBackPressListener -> if (it.shouldBackPress()) super.onBackPressed()
+                    is NoteDetailFragment -> {
+                        it.setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_BUNDLE_KEY to  it.noteUiModel))
+                        findNavController(R.id.nav_host_fragment).popBackStack()
+                    }
                     else -> super.onBackPressed()
                 }
             }
