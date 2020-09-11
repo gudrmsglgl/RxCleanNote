@@ -94,7 +94,7 @@ open class CachedNoteDaoTest{
         whenSaveNotes(cacheNotes)
 
         val searchNotes = noteDao.searchNoteBySorted(query.page, query.limit, query.order, query.like)
-        assertThat(searchNotes.asReversed(), `is`(cacheNotes))
+        assertThat(searchNotes, `is`(cacheNotes.asReversed()))
     }
 
     @Test
@@ -145,10 +145,6 @@ open class CachedNoteDaoTest{
     }
 
     private fun loadAllNotes() = noteDao.getNumNotes()
-
-    private fun assertUpdateTitle(updatedNote: CachedNote, updateTitle: String) {
-        assertThat(updatedNote.title, `is`(updateTitle))
-    }
 
     private fun getCurTime() =
         SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())

@@ -9,10 +9,22 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.cleannote.TestBaseApplication
+import com.cleannote.common.UIController
+import com.cleannote.domain.Constants
+import com.cleannote.domain.model.Note
+import com.cleannote.domain.model.Query
 import com.cleannote.injection.TestApplicationComponent
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.reactivex.Completable
+import io.reactivex.Flowable
 import org.hamcrest.Matcher
 
 abstract class BaseTest {
+
+    val mockUIController: UIController = mockk(relaxUnitFun = true)
 
     val application: TestBaseApplication
         = ApplicationProvider.getApplicationContext() as TestBaseApplication
@@ -21,5 +33,38 @@ abstract class BaseTest {
         return application.applicationComponent as TestApplicationComponent
     }
 
+    fun stubInitOrdering(order: String) = every {
+        getComponent()
+            .provideSharedPreferences()
+            .getString(Constants.FILTER_ORDERING_KEY, Constants.ORDER_DESC)
+    }.returns(order)
+
+    fun stubNoteRepositorySearchNotes(data: Flowable<List<Note>>, query: Query? = null) {
+        every {
+            getComponent().provideNoteRepository().searchNotes(query ?: any())
+        } returns data
+    }
+
+    fun stubSaveOrdering(order: String) = every {
+        getComponent()
+            .provideSharedPreferences()
+            .edit()
+            .putString(any(), any())
+            .apply()
+    } just Runs
+
+    fun stubNoteRepositoryUpdate(){
+        every {
+            getComponent().provideNoteRepository().updateNote(any())
+        }.returns(Completable.complete())
+    }
+
+    fun stubNoteRepositoryDelete(){
+        every {
+            getComponent().provideNoteRepository().deleteNote(any())
+        }.returns(Completable.complete())
+    }
+
+    abstract fun setupUIController()
     abstract fun injectTest()
 }

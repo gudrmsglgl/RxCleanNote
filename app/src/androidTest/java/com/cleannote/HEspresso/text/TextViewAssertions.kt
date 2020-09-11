@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import com.cleannote.HEspresso.assertion.BaseAssertion
+import org.hamcrest.Matchers
 
 interface TextViewAssertions: BaseAssertion {
 
@@ -27,6 +28,14 @@ interface TextViewAssertions: BaseAssertion {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withText(resId)
+            )
+        )
+    }
+
+    fun containText(text: String) {
+        viewInteraction.check(
+            ViewAssertions.matches(
+                ViewMatchers.withText(Matchers.containsString(text))
             )
         )
     }

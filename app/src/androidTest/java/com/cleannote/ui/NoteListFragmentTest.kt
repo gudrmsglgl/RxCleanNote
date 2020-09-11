@@ -44,8 +44,6 @@ class NoteListFragmentTest: BaseTest() {
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
 
-    val mockUIController: UIController = mockk(relaxUnitFun = true)
-
     @Before
     fun setup(){
         setupUIController()
@@ -57,7 +55,7 @@ class NoteListFragmentTest: BaseTest() {
         stubInitOrdering(query.order)
         stubNoteRepositorySearchNotes(Flowable.just(emptyList()), query)
 
-        val scenario = launchFragmentInContainer<NoteListFragment>(
+        launchFragmentInContainer<NoteListFragment>(
             factory = fragmentFactory
         )
 
@@ -345,29 +343,10 @@ class NoteListFragmentTest: BaseTest() {
         }
     }
 
-    private fun setupUIController() = with(fragmentFactory){
-        uiController = mockUIController
+    override fun setupUIController(){
+        every { mockUIController.isDisplayProgressBar() }.returns(false)
+        fragmentFactory.uiController = mockUIController
     }
-
-    private fun stubNoteRepositorySearchNotes(data: Flowable<List<Note>>, query: Query? = null) {
-        every {
-            getComponent().provideNoteRepository().searchNotes(query ?: any())
-        } returns data
-    }
-
-    private fun stubInitOrdering(order: String) = every {
-        getComponent()
-            .provideSharedPreferences()
-            .getString(FILTER_ORDERING_KEY, ORDER_DESC)
-    }.returns(order)
-
-    private fun stubSaveOrdering(order: String) = every {
-        getComponent()
-            .provideSharedPreferences()
-            .edit()
-            .putString(any(), any())
-            .apply()
-    } just Runs
 
     override fun injectTest() {
         getComponent().inject(this)

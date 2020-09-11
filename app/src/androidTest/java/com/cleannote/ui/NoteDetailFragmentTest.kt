@@ -27,10 +27,10 @@ class NoteDetailFragmentTest: BaseTest() {
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
 
-    val mockUIController = mockk<UIController>(relaxUnitFun = true)
     val screen = DetailNoteScreen
     private val note: NoteUiModel
     private val titleText = "testTitle"
+
     init {
         injectTest()
         note = NoteFactory.makeNoteUiModel(title = titleText, body = "testBody", date = "20")
@@ -138,17 +138,11 @@ class NoteDetailFragmentTest: BaseTest() {
         }
     }
 
-    private fun stubNoteRepositoryUpdate(){
-        every {
-            getComponent().provideNoteRepository().updateNote(any())
-        }.returns(Completable.complete())
-    }
-
     override fun injectTest() {
         getComponent().inject(this)
     }
 
-    private fun setupUIController(){
+    override fun setupUIController(){
         every { mockUIController.isDisplayProgressBar() }.returns(false)
         fragmentFactory.uiController = mockUIController
     }

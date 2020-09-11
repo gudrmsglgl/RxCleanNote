@@ -10,6 +10,7 @@ import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.injection.module.*
 import com.cleannote.ui.NoteDetailFragmentTest
 import com.cleannote.ui.NoteListFragmentTest
+import com.cleannote.ui.NotesNavigationTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -41,4 +42,5 @@ interface TestApplicationComponent: ApplicationComponent {
 
     fun inject(noteListFragmentTest: NoteListFragmentTest)
     fun inject(noteDetailFragmentTest: NoteDetailFragmentTest)
+    fun inject(notesNavigationTest: NotesNavigationTest)
 }
