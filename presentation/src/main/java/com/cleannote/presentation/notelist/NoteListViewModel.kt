@@ -7,6 +7,7 @@ import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
 import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
 import com.cleannote.domain.Constants.SORT_UPDATED_AT
+import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Query
@@ -23,9 +24,10 @@ class NoteListViewModel
 constructor(
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
+    private val deleteNote: DeleteNote,
     private val noteMapper: NoteMapper,
     private val sharedPreferences: SharedPreferences
-): BaseViewModel(searchNotes, insertNewNote) {
+): BaseViewModel(searchNotes, insertNewNote, deleteNote) {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
         order = loadOrderingOnSharedPreference()
@@ -88,7 +90,7 @@ constructor(
             params = noteMapper.mapFromView(noteView))
     }
 
-    fun updateNote(updateNoteView: NoteView){
+    fun notifyUpdatedNote(updateNoteView: NoteView){
         with(loadedNotes){
             val updateIndex = indexOfFirst { it.id == updateNoteView.id }
             if (this[updateIndex] == updateNoteView)
@@ -104,9 +106,24 @@ constructor(
         _mediatorNoteList.value = DataState.success(loadedNotes)
     }
 
-    fun deleteNote(deletedNoteView: NoteView){
+    fun notifyDeletedNote(deletedNoteView: NoteView){
         loadedNotes.remove(deletedNoteView)
         _mediatorNoteList.value = DataState.success(loadedNotes)
+    }
+
+    fun deleteNote(deletedNoteView: NoteView){
+        _mediatorNoteList.postValue(DataState.loading())
+        deleteNote.execute(
+            onSuccess = {},
+            onError = {
+                _mediatorNoteList.postValue(DataState.error("삭제에 실패 했습니다."))
+            },
+            onComplete = {
+                loadedNotes.remove(deletedNoteView)
+                _mediatorNoteList.postValue(DataState.success(loadedNotes))
+            },
+            params = noteMapper.mapFromView(deletedNoteView)
+        )
     }
 
     fun setOrdering(ordering: String){

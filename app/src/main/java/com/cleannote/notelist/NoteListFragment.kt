@@ -34,12 +34,10 @@ import com.cleannote.mapper.NoteMapper
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
-import com.cleannote.common.DateUtil
 import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
-import com.cleannote.espresso.EspressoIdlingResource
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
@@ -53,7 +51,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import java.util.concurrent.TimeUnit
-
+//TODO:: delete usecase success -> toast msg
 class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
@@ -104,8 +102,9 @@ constructor(
             if (!it.isShowMenu){
                 navDetailNote(it)
             }
-            else
-                showToast("${it.title} delete")
+            else{
+                showDeleteDialog(it)
+            }
         }
         .addCompositeDisposable()
 
@@ -294,15 +293,35 @@ constructor(
         }
     }
 
+    private fun showDeleteDialog(deleteMemo: NoteUiModel) = activity?.let {
+        MaterialDialog(it).show {
+            title(R.string.delete_title)
+            val dialogMessage = """
+                ${deleteMemo.title}
+                ${getString(R.string.delete_message)}
+            """.trimIndent()
+            message(text = dialogMessage)
+            positiveButton(R.string.delete_ok){
+                viewModel.deleteNote(noteMapper.mapToView(deleteMemo))
+            }
+            negativeButton(R.string.delete_cancel){
+                showToast(getString(R.string.deleteCancelMsg))
+                noteAdapter.hideMenu()
+                dismiss()
+            }
+            cancelable(false)
+        }
+    }
+
     private fun requestUpdate(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
-            viewModel.updateNote(noteMapper.mapToView(it))
+            viewModel.notifyUpdatedNote(noteMapper.mapToView(it))
         }
     }
 
     private fun requestDelete(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_DELETE_KEY)?.let {
-            viewModel.deleteNote(noteMapper.mapToView(it))
+            viewModel.notifyDeletedNote(noteMapper.mapToView(it))
         }
     }
 

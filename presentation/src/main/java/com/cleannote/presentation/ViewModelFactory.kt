@@ -35,7 +35,7 @@ class ViewModelFactory
         SplashViewModel::class.java -> SplashViewModel(login, userMapper) as T
 
         NoteListViewModel::class.java -> NoteListViewModel(
-            searchNotes, insertNewNote, noteMapper, sharedPreferences) as T
+            searchNotes, insertNewNote, deleteNote, noteMapper, sharedPreferences) as T
 
         NoteDetailViewModel::class.java -> NoteDetailViewModel(updateNote, deleteNote, noteMapper) as T
 

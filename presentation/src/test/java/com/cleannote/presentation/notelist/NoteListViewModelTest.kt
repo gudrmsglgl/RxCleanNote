@@ -14,7 +14,6 @@ import com.cleannote.presentation.Complete
 import com.cleannote.presentation.OnError
 import com.cleannote.presentation.OnSuccess
 import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
@@ -292,12 +291,12 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     private fun whenDeleteNote(deleteNoteView: NoteView){
-        noteListViewModel.deleteNote(deleteNoteView)
+        noteListViewModel.notifyDeletedNote(deleteNoteView)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
     private fun whenUpdateNote(updateNote: NoteView){
-        noteListViewModel.updateNote(updateNote)
+        noteListViewModel.notifyUpdatedNote(updateNote)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
