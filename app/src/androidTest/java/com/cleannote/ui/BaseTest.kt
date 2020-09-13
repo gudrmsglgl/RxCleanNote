@@ -45,6 +45,12 @@ abstract class BaseTest {
         } returns data
     }
 
+    fun stubThrowableNoteRepositorySearchNotes(throwable: Throwable, query: Query? = null) {
+        every {
+            getComponent().provideNoteRepository().searchNotes(query ?: any())
+        } returns Flowable.error(throwable)
+    }
+
     fun stubSaveOrdering(order: String) = every {
         getComponent()
             .provideSharedPreferences()

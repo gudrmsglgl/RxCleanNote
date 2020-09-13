@@ -12,6 +12,8 @@ import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Query
 import com.cleannote.presentation.common.BaseViewModel
+import com.cleannote.presentation.common.Constants.FAIL_DELETE_MSG
+import com.cleannote.presentation.common.Constants.SUCCESS_DELETE_MSG
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.State.SUCCESS

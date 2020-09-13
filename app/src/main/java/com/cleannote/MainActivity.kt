@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.afollestad.materialdialogs.MaterialDialog
@@ -158,16 +159,16 @@ class MainActivity : AppCompatActivity(), UIController {
     }
 
     override fun onBackPressed() {
-        val fragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        fragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        navHostFragment
             ?.childFragmentManager
             ?.fragments
-            ?.forEach {
-                when (it){
-                    is OnBackPressListener -> if (it.shouldBackPress()) super.onBackPressed()
-                    is NoteDetailFragment -> {
-                        it.setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_BUNDLE_KEY to  it.noteUiModel))
-                        findNavController(R.id.nav_host_fragment).popBackStack()
+            ?.forEach { fragment ->
+                when (fragment){
+                    is OnBackPressListener -> if (fragment.shouldBackPress()) super.onBackPressed()
+                    is NoteDetailFragment -> with(fragment){
+                        setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_BUNDLE_KEY to  noteUiModel))
+                        findNavController().popBackStack()
                     }
                     else -> super.onBackPressed()
                 }

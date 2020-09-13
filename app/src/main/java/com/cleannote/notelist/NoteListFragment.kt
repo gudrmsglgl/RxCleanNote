@@ -32,7 +32,6 @@ import com.cleannote.common.InputCaptureCallback
 import com.cleannote.data.ui.InputType
 import com.cleannote.mapper.NoteMapper
 import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
@@ -44,6 +43,7 @@ import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
 import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
+import com.cleannote.presentation.model.NoteView
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.widget.checkedChanges
@@ -51,7 +51,6 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import java.util.concurrent.TimeUnit
-//TODO:: delete usecase success -> toast msg
 class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
@@ -171,6 +170,7 @@ constructor(
                     LOADING -> showLoadingProgressBar(true)
                     SUCCESS -> {
                         showLoadingProgressBar(false)
+                        successMsg(dataState.message)
                         fetchNotesToAdapter(dataState.data!!)
                     }
                     ERROR -> {
@@ -195,6 +195,8 @@ constructor(
         recycler_view.visibility = VISIBLE
         tv_no_data.visibility = GONE
     }
+
+    private fun successMsg(msg: String?) = msg?.let { showToast(it) }
 
     private fun subscribeInsertResult() = viewModel.insertResult
         .observe(viewLifecycleOwner, Observer { dataState ->

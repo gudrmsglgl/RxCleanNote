@@ -101,6 +101,22 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
+    fun notesThrowableThenMessage(){
+        // TODO :: Error Dialog Test
+        val query = QueryFactory.makeQuery()
+        stubInitOrdering(query.order)
+        stubThrowableNoteRepositorySearchNotes(RuntimeException("Test In Error"), query)
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        activity {
+            screen{
+                idle(5000)
+            }
+        }
+    }
+
+    @Test
     fun filterDialogDisplayed(){
         val notes = NoteFactory.makeNotes(0, 10)
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }

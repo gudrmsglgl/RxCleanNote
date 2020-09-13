@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.afollestad.materialdialogs.MaterialDialog
 
 import com.cleannote.app.R
 import com.cleannote.common.BaseFragment
@@ -131,7 +132,7 @@ class NoteDetailFragment constructor(
         .map { isEditDoneMenu() }
         .subscribe { doneMenu ->
             if (doneMenu) setNote(getUpdatedNote(), EditDoneMode)
-            else deleteNote()
+            else showDeleteDialog(noteUiModel)
         }
         .addCompositeDisposable()
 
@@ -139,7 +140,6 @@ class NoteDetailFragment constructor(
         title = note_title.text.toString()
         body = note_body.text.toString()
         updated_at = dateUtil.getCurrentTimestamp()
-        timber("d", "updated_at: ${updated_at}")
     }
 
     private fun setNote(noteUiModel: NoteUiModel, mode: TextMode) = with(viewModel){
@@ -148,8 +148,19 @@ class NoteDetailFragment constructor(
         setNoteMode(mode)
     }
 
-    private fun deleteNote() = with(viewModel) {
-        deleteNote(noteMapper.mapToView(noteUiModel))
+    private fun showDeleteDialog(deleteMemo: NoteUiModel) = activity?.let {
+        MaterialDialog(it).show {
+            title(R.string.delete_title)
+            message(R.string.delete_message)
+            positiveButton(R.string.delete_ok){
+                viewModel.deleteNote(noteMapper.mapToView(deleteMemo))
+            }
+            negativeButton(R.string.delete_cancel){
+                showToast(getString(R.string.deleteCancelMsg))
+                dismiss()
+            }
+            cancelable(false)
+        }
     }
 
     private fun fetchNoteUi(){
