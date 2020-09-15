@@ -71,6 +71,12 @@ abstract class BaseTest {
         }.returns(Completable.complete())
     }
 
+    fun stubThrowableNoteRepositoryDelete(throwable: Throwable){
+        every {
+            getComponent().provideNoteRepository().deleteNote(any())
+        }.returns(Completable.error(throwable))
+    }
+
     abstract fun setupUIController()
     abstract fun injectTest()
 }

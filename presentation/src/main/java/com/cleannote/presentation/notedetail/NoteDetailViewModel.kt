@@ -6,6 +6,7 @@ import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.presentation.common.BaseViewModel
 import com.cleannote.presentation.data.DataState
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.notedetail.NoteTitleState
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode
@@ -24,6 +25,7 @@ constructor(
 ): BaseViewModel(updateNote) {
 
     private lateinit var note: NoteView
+    private lateinit var tempNote: NoteView
 
     private val _updatedNote = MutableLiveData<DataState<NoteView>>()
     val updatedNote: LiveData<DataState<NoteView>>
@@ -51,24 +53,33 @@ constructor(
         _detailToolbarState.value = state
     }
 
-    fun getNoteTile() = note.title
-
     fun setNoteMode(mode: TextMode){
         _noteMode.value = mode
-        if (mode is EditDoneMode){
+    }
+
+    fun setNote(noteParam: Pair<NoteView, TextMode>){
+        val curNoteView = noteParam.first
+        val curMode = noteParam.second
+        setNoteMode(curMode)
+
+        tempNote = curNoteView
+
+        if (curMode is EditDoneMode){
             _updatedNote.postValue(DataState.loading())
             updateNote.execute(
                 onSuccess = {},
                 onError = {
-                    _updatedNote.postValue(DataState.error("update note fail"))
+                    _updatedNote.postValue(DataState(State.ERROR, note, it.message))
                 },
                 onComplete = {
+                    note = tempNote
                     _updatedNote.postValue(DataState.success(note))
                 },
-                params = noteMapper.mapFromView(note)
+                params = noteMapper.mapFromView(tempNote)
             )
         }
     }
+
 
     fun deleteNote(noteView: NoteView) {
         _deletedNote.postValue(DataState.loading())
@@ -86,12 +97,6 @@ constructor(
 
     fun isEditMode(): Boolean{
         return _noteMode.value is EditMode
-    }
-
-    fun getNoteBody() = note.body
-
-    fun setNote(noteView: NoteView){
-        note = noteView
     }
 
 }

@@ -102,14 +102,18 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun notesThrowableThenMessage(){
-        // TODO :: Error Dialog Test
+        val errorMsg = "Test Error"
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
-        stubThrowableNoteRepositorySearchNotes(RuntimeException("Test In Error"), query)
+        stubThrowableNoteRepositorySearchNotes(RuntimeException(errorMsg), query)
 
         ActivityScenario.launch(MainActivity::class.java)
 
         activity {
+            errorDialog {
+                title.hasText(R.string.dialog_title_warning)
+                positiveBtn.click()
+            }
             screen{
                 idle(5000)
             }

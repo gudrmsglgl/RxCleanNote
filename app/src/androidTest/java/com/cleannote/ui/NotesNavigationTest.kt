@@ -131,6 +131,13 @@ class NotesNavigationTest: BaseTest() {
                 toolbar {
                     secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
                     secondMenu.click()
+                    deleteDialog {
+                        title.hasText(R.string.delete_title)
+                        positiveBtn.click()
+                    }
+                    deleteSuccessToast {
+                        isDisplayed()
+                    }
                 }
             }
             noteListScreen.recyclerView {
@@ -139,6 +146,42 @@ class NotesNavigationTest: BaseTest() {
                     itemTitle.hasText(notes[1].title)
                 }
             }
+        }
+    }
+
+    @Test
+    fun detailFragmentSecondaryMenuOfDeleteErrorThenDontNavListFragment(){
+        val errorMsg = "TestRuntimeError"
+        val notes = NoteFactory.makeNotes(5,0)
+        val query = QueryFactory.makeQuery()
+        stubInitOrdering(query.order)
+        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubThrowableNoteRepositoryDelete(RuntimeException(errorMsg))
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        mainActivityScreen {
+            noteListScreen {
+                recyclerView {
+                    firstItem<NRecyclerItem<NoteListAdapter.NoteViewHolder>> {
+                        click()
+                    }
+                }
+            }
+            noteDetailScreen {
+                toolbar {
+                    secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
+                    secondMenu.click()
+                    deleteDialog {
+                        title.hasText(R.string.delete_title)
+                        positiveBtn.click()
+                    }
+                    deleteErrorToast{
+                        isDisplayed()
+                    }
+                }
+            }
+            idle(5000)
         }
     }
 
