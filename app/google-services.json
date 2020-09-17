@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "361936205383",
+    "firebase_url": "https://rxcleannote-e2008.firebaseio.com",
+    "project_id": "rxcleannote-e2008",
+    "storage_bucket": "rxcleannote-e2008.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361936205383:android:9db4124c90f6942fb16362",
+        "android_client_info": {
+          "package_name": "com.cleannote.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361936205383-j6tsbo2qd6b2mo3m1q3b5ss2r0ph938g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cleannote.app",
+            "certificate_hash": "8774131ec2d391673d937922dfabd0791330563b"
+          }
+        },
+        {
+          "client_id": "361936205383-c4jhkdi0llm4k3padcdg0hmoq94oq2mk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRW35viYr7KiTkwHgz7B6df_9aiEIiaA0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361936205383-c4jhkdi0llm4k3padcdg0hmoq94oq2mk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

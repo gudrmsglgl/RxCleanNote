@@ -170,12 +170,12 @@ constructor(
                     LOADING -> showLoadingProgressBar(true)
                     SUCCESS -> {
                         showLoadingProgressBar(false)
-                        successMsg(dataState.message)
                         fetchNotesToAdapter(dataState.data!!)
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)
-                        showErrorMessage(dataState.message!!)
+                        showErrorMessage(getString(R.string.searchErrorMsg))
+                        dataState.sendFirebaseThrowable()
                     }
                 }
             }
@@ -196,8 +196,6 @@ constructor(
         tv_no_data.visibility = GONE
     }
 
-    private fun successMsg(msg: String?) = msg?.let { showToast(it) }
-
     private fun subscribeInsertResult() = viewModel.insertResult
         .observe(viewLifecycleOwner, Observer { dataState ->
             if (dataState != null){
@@ -210,7 +208,8 @@ constructor(
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)
-                        showErrorMessage(dataState.message!!)
+                        showErrorMessage(getString(R.string.insertErrorMsg))
+                        dataState.sendFirebaseThrowable()
                     }
                 }
             }

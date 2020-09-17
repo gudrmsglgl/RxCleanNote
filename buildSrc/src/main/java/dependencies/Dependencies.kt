@@ -21,7 +21,6 @@ object Dependencies {
     val leak_canary = "com.squareup.leakcanary:leakcanary-android:${Versions.leak_canary}"
     val firebase_firestore = "com.google.firebase:firebase-firestore-ktx:${Versions.firebase_firestore}"
     val firebase_auth = "com.google.firebase:firebase-auth:${Versions.firebase_auth}"
-    val firebase_analytics = "com.google.firebase:firebase-analytics:${Versions.firebase_analytics}"
     val firebase_crashlytics = "com.crashlytics.sdk.android:crashlytics:${Versions.firebase_crashlytics}"
     val lifecycle_runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.lifecycle_version}"
     val livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle_version}"
@@ -40,6 +39,9 @@ object Dependencies {
     val rxbindingMaterial = "com.jakewharton.rxbinding4:rxbinding-material:${Versions.rxbindingVersion}"
     val rxbindingAppCompat =  "com.jakewharton.rxbinding4:rxbinding-appcompat:${Versions.rxbindingVersion}"
     val rxbindingRecyclerView = "com.jakewharton.rxbinding4:rxbinding-recyclerview:${Versions.rxbindingVersion}"
-
+    val firebaseAnalytics =  "com.google.firebase:firebase-analytics:${Versions.firebase_analytics}"
+    val firebaseAnalyticsKTX =  "com.google.firebase:firebase-analytics-ktx:${Versions.firebase_analytics}"
+    val firebaseCrashtics =  "com.google.firebase:firebase-crashlytics:${Versions.firebase_crashlytics}"
+    val firebaseCrashticsKTX = "com.google.firebase:firebase-crashlytics-ktx:${Versions.firebase_crashlytics}"
     val timber = "com.jakewharton.timber:timber:${Versions.timber_version}"
 }

@@ -1,12 +1,10 @@
 package com.cleannote.presentation.notedetail
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.presentation.common.BaseViewModel
 import com.cleannote.presentation.data.DataState
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.notedetail.NoteTitleState
 import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode
@@ -15,7 +13,6 @@ import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.mapper.NoteMapper
 import com.cleannote.presentation.model.NoteView
-import io.reactivex.subscribers.DisposableSubscriber
 
 class NoteDetailViewModel
 constructor(
@@ -69,7 +66,7 @@ constructor(
             updateNote.execute(
                 onSuccess = {},
                 onError = {
-                    _updatedNote.postValue(DataState(State.ERROR, note, it.message))
+                    _updatedNote.postValue(DataState.error(it, note))
                 },
                 onComplete = {
                     note = tempNote
@@ -86,7 +83,7 @@ constructor(
         deleteNote.execute(
             onSuccess = {},
             onError = {
-                _deletedNote.postValue(DataState.error("delete note fail"))
+                _deletedNote.postValue(DataState.error(it))
             },
             onComplete = {
                 _deletedNote.postValue(DataState.success(noteView))

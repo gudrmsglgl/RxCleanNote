@@ -23,6 +23,7 @@ import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges
@@ -73,6 +74,7 @@ class NoteDetailFragment constructor(
                         fetchNoteUi(noteUiModel)
                     }
                     is ERROR -> {
+                        it.sendFirebaseThrowable()
                         showToast(getString(R.string.deleteErrorMsg))
                         fetchNoteUi(noteUiModel)
                     }
@@ -91,6 +93,7 @@ class NoteDetailFragment constructor(
                         findNavController().popBackStack()
                     }
                     is ERROR -> {
+                        it.sendFirebaseThrowable()
                         showToast(getString(R.string.deleteErrorMsg))
                     }
                     else -> {}

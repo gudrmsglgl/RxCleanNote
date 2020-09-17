@@ -26,6 +26,9 @@ import com.cleannote.extension.visible
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NoteDetailFragment
 import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,11 +40,14 @@ class MainActivity : AppCompatActivity(), UIController {
 
     private var appBarConfiguration: AppBarConfiguration? = null
 
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     override fun onCreate(savedInstanceState: Bundle?) {
         inject()
         setFragmentFactory()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        firebaseAnalytics = Firebase.analytics
     }
 
     private fun inject(){

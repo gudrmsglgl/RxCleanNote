@@ -19,8 +19,6 @@ object Versions {
     const val leak_canary = "2.0-alpha-3"
     const val swipe_refresh_layout = "1.1.0-alpha03"
     const val firebase_firestore = "21.4.2"
-    const val firebase_analytics = "17.4.0"
-    const val firebase_crashlytics = "2.10.1"
     const val firebase_auth = "19.3.0"
     const val espresso_core = "3.1.1"
     const val espresso_idling_resource = "3.2.0"
@@ -50,4 +48,6 @@ object Versions {
     const val robolectric = "4.3.1"
     const val recyclerview = "1.2.0-alpha03"
     const val timber_version = "4.7.1"
+    const val firebase_analytics = "17.5.0"
+    const val firebase_crashlytics = "17.2.1"
 }

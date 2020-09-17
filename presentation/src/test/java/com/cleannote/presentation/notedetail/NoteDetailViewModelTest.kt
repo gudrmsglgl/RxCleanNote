@@ -125,8 +125,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     private fun whenUpdateNote(noteView: NoteView){
         with(viewModel) {
-            setNote(noteView)
-            setNoteMode(EditDoneMode)
+            setNote((noteView to EditDoneMode))
         }
         setViewModelState(viewModel.updatedNote.value?.status)
     }

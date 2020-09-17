@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-
+apply plugin: 'com.google.firebase.crashlytics'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -81,7 +81,8 @@ dependencies {
     implementation Dependencies.timber
     implementation Dependencies.material_dialogs
     implementation Dependencies.material_dialogs_input
-    implementation Dependencies.markdown_processor
+    implementation Dependencies.firebaseAnalyticsKTX
+    implementation Dependencies.firebaseCrashticsKTX
     implementation AndroidTestDependencies.idling_resource
 
     implementation SupportDependencies.appcompat
@@ -115,3 +116,4 @@ dependencies {
 
     debugImplementation AndroidTestDependencies.fragment_testing
 }
+apply plugin: 'com.google.gms.google-services'

@@ -13,6 +13,8 @@ import com.cleannote.data.ui.InfoType
 import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
+import com.cleannote.presentation.data.DataState
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.rxbinding4.view.clicks
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -123,7 +125,7 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
             this.toBitmap().sameAs(loadDrawableBitmap)
     }?: false
 
-    fun getDrawable(@DrawableRes drawable: Int) = activity?.let {
-        ContextCompat.getDrawable(it.applicationContext, drawable)
+    fun <T> DataState<T>.sendFirebaseThrowable(){
+        this.throwable?.let { FirebaseCrashlytics.getInstance().recordException(it) }
     }
 }

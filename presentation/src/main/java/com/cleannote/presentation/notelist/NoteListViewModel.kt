@@ -73,9 +73,7 @@ constructor(
                     _mediatorNoteList.postValue(DataState.success(loadedNotes))
                 },
                 onError = {
-                    _mediatorNoteList.postValue(DataState.error(
-                        it.message
-                    ))
+                    _mediatorNoteList.postValue(DataState.error(it))
                 },
                 params = getQuery())
     }
@@ -87,7 +85,7 @@ constructor(
                 _insertNote.postValue(DataState.success(noteView))
             },
             onError = {
-                _insertNote.postValue(DataState.error(it.message))
+                _insertNote.postValue(DataState.error(it))
             },
             params = noteMapper.mapFromView(noteView))
     }
@@ -113,12 +111,13 @@ constructor(
         _mediatorNoteList.value = DataState.success(loadedNotes)
     }
 
+    // TODO:: 삭제 singleLiveData 만들어서 onError 시 OnComplete 시 View 단에서 처리를 다르게 하기, 단 데이터는 notelist 로 처리
     fun deleteNote(deletedNoteView: NoteView){
         _mediatorNoteList.postValue(DataState.loading())
         deleteNote.execute(
             onSuccess = {},
             onError = {
-                _mediatorNoteList.postValue(DataState.error("삭제에 실패 했습니다."))
+                _mediatorNoteList.postValue(DataState.error(it))
             },
             onComplete = {
                 loadedNotes.remove(deletedNoteView)
