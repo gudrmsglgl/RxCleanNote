@@ -73,6 +73,7 @@ constructor(
         subscribeNoteList()
         insertNoteOnFab()
         subscribeInsertResult()
+        subscribeDeleteResult()
         noteClick()
         noteLongClick()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ key, bundle ->
@@ -210,6 +211,24 @@ constructor(
                         showLoadingProgressBar(false)
                         showErrorMessage(getString(R.string.insertErrorMsg))
                         dataState.sendFirebaseThrowable()
+                    }
+                }
+            }
+        })
+
+    private fun subscribeDeleteResult() = viewModel.deleteResult
+        .observe( viewLifecycleOwner, Observer {
+            if (it != null) {
+                when (it.status) {
+                    LOADING -> showLoadingProgressBar(true)
+                    SUCCESS -> {
+                        showLoadingProgressBar(false)
+                        showToast(getString(R.string.deleteSuccessMsg))
+                    }
+                    ERROR -> {
+                        showLoadingProgressBar(false)
+                        showErrorMessage(getString(R.string.deleteErrorMsg))
+                        it.sendFirebaseThrowable()
                     }
                 }
             }

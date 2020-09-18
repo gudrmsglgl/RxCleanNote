@@ -33,7 +33,7 @@ class SplashFragment constructor(
         //viewModel.tryLogin()
         findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         logoClickListener()
-        subscribeLoginResult()
+        //subscribeLoginResult()
     }
 
     private fun logoClickListener(){
@@ -47,7 +47,7 @@ class SplashFragment constructor(
             .addCompositeDisposable()
     }
 
-    private fun subscribeLoginResult() = viewModel.loginResult
+    /*private fun subscribeLoginResult() = viewModel.loginResult
         .observe(viewLifecycleOwner,
             Observer {
                 if (it != null) handleLoginDS(it.status, it.data, it.message)
@@ -67,7 +67,7 @@ class SplashFragment constructor(
             showLoadingProgressBar(false)
             showErrorMessage(message!!)
         }
-    }
+    }*/
 
     private fun showSuccessLoginUser(data: List<UserView>?, message: String?){
         data?.let {

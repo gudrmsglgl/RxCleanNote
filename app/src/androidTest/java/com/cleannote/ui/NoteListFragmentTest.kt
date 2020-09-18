@@ -50,7 +50,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun emptyNoteNotDisplayed(){
+    fun searchNotesEmptyThenNoteNotDisplayed(){
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
         stubNoteRepositorySearchNotes(Flowable.just(emptyList()), query)
@@ -72,7 +72,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun notesDisplayed(){
+    fun searchNoteSuccessThenNotesDisplayed(){
         val notes = NoteFactory.makeNotes(1,11)
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
@@ -101,7 +101,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun notesThrowableThenMessage(){
+    fun notesThrowableThenErrorDialogMessage(){
         val errorMsg = "Test Error"
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
@@ -113,9 +113,6 @@ class NoteListFragmentTest: BaseTest() {
             errorDialog {
                 title.hasText(R.string.dialog_title_warning)
                 positiveBtn.click()
-            }
-            screen{
-                idle(5000)
             }
         }
     }
@@ -360,6 +357,69 @@ class NoteListFragmentTest: BaseTest() {
                     typeText("FabTest")
                 }
             }
+        }
+    }
+
+    @Test
+    fun noteLongClickDeleteSuccessThenNotesDelete(){
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositoryDelete()
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        screen {
+            recyclerView{
+                firstItem<NRecyclerItem<NoteViewHolder>> {
+                    longClick()
+                    swipeDeleteMode {
+                        deleteImg.click()
+                    }
+                }
+            }
+            deleteDialog {
+                title.hasText(R.string.delete_title)
+                positiveBtn.click()
+            }
+            deleteSuccessToast.isDisplayed()
+            recyclerView.hasSize(notes.size.minus(1))
+        }
+    }
+
+    @Test
+    fun noteLongClickDeleteErrorThenDontDeleteNotes(){
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubThrowableNoteRepositoryDelete(RuntimeException())
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        activity {
+            noteListScreen {
+                recyclerView{
+                    firstItem<NRecyclerItem<NoteViewHolder>> {
+                        longClick()
+                        swipeDeleteMode {
+                            deleteImg.click()
+                        }
+                    }
+                }
+                deleteDialog {
+                    title.hasText(R.string.delete_title)
+                    positiveBtn.click()
+                }
+            }
+
+            errorDialog {
+                title.hasText(R.string.dialog_title_warning)
+                positiveBtn.click()
+            }
+
+            noteListScreen.recyclerView.hasSize(notes.size)
         }
     }
 

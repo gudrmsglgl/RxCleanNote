@@ -24,12 +24,10 @@ class SplashViewModel constructor(private val login: Login,
         login.execute(
             onSuccess = {
                 _loginResult.postValue(DataState.success(
-                    data = setUser(it),
-                    message = setMessage(it)
-                ))
+                    data = setUser(it)))
             },
             onError = {
-                _loginResult.postValue(DataState.error(it.message))
+                _loginResult.postValue(DataState.error(it))
             },
             params =  loginId)
     }

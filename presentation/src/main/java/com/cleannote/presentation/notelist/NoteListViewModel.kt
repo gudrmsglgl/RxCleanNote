@@ -48,6 +48,10 @@ constructor(
     val insertResult: SingleLiveEvent<DataState<NoteView>>
         get() = _insertNote
 
+    private val _deleteResult: SingleLiveEvent<DataState<NoteView>> = SingleLiveEvent()
+    val deleteResult: SingleLiveEvent<DataState<NoteView>>
+        get() = _deleteResult
+
     init {
         with(_mediatorNoteList) {
             addSource(_insertNote){
@@ -111,15 +115,17 @@ constructor(
         _mediatorNoteList.value = DataState.success(loadedNotes)
     }
 
-    // TODO:: 삭제 singleLiveData 만들어서 onError 시 OnComplete 시 View 단에서 처리를 다르게 하기, 단 데이터는 notelist 로 처리
     fun deleteNote(deletedNoteView: NoteView){
-        _mediatorNoteList.postValue(DataState.loading())
+        //_mediatorNoteList.postValue(DataState.loading())
+        _deleteResult.postValue(DataState.loading())
         deleteNote.execute(
             onSuccess = {},
             onError = {
-                _mediatorNoteList.postValue(DataState.error(it))
+                _deleteResult.postValue(DataState.error(it))
+                //_mediatorNoteList.postValue(DataState.error(it))
             },
             onComplete = {
+                _deleteResult.postValue(DataState.success(deletedNoteView))
                 loadedNotes.remove(deletedNoteView)
                 _mediatorNoteList.postValue(DataState.success(loadedNotes))
             },

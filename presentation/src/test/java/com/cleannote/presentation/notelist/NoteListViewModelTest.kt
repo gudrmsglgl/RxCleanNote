@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
@@ -29,17 +30,19 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(InstantExecutorExtension::class)
 class NoteListViewModelTest: BaseViewModelTest() {
 
-    lateinit var insertNewNote: InsertNewNote
-
     lateinit var searchNotes: SearchNotes
+    lateinit var insertNewNote: InsertNewNote
+    lateinit var deleteNote: DeleteNote
 
     lateinit var sharedPreferences: SharedPreferences
 
     private lateinit var noteListOnSuccessCaptor: KArgumentCaptor<OnSuccess<List<Note>>>
     private lateinit var queryCaptor: KArgumentCaptor<Query>
 
+    private lateinit var deleteSuccessCaptor: KArgumentCaptor<OnSuccess<Nothing>>
+
     private lateinit var insertNoteOnSuccessCaptor: KArgumentCaptor<OnSuccess<Long>>
-    private lateinit var insertNoteParam: KArgumentCaptor<Note>
+    private lateinit var noteParam: KArgumentCaptor<Note>
 
     private lateinit var onErrorCaptor: KArgumentCaptor<OnError>
     private lateinit var afterFinishedCaptor: KArgumentCaptor<Complete>
@@ -55,6 +58,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
         initMock()
         initNoteListCaptor()
+        deleteSuccessCaptor = argumentCaptor()
         initInsertNoteCaptor()
         initCommonCaptor()
 
@@ -63,7 +67,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         }
 
         noteListViewModel = NoteListViewModel(
-            searchNotes, insertNewNote, noteMapper, sharedPreferences)
+            searchNotes, insertNewNote, deleteNote, noteMapper, sharedPreferences)
     }
 
     @AfterEach
@@ -104,15 +108,15 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     @Test
     fun searchNotesStateErrorReturnErrorMessageNoData(){
-        val errorMessage = "stubErrorMessage"
+        val throwable = RuntimeException()
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         verifyViewModelDataState(LOADING)
 
-        whenErrorOnNextNoteList(errorMessage)
+        whenErrorOnNextNoteList(throwable)
         verifyViewModelDataState(ERROR)
 
-        assertViewModelNotesMessage(errorMessage)
+        assertViewModelNotesHasThrowable(throwable)
         assertViewModelNotesEqual(null)
     }
 
@@ -211,20 +215,20 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     @Test
     fun insertNoteErrorReturnErrorMessageNoData(){
-        val errorMessage = "TestError"
+        val throwable = RuntimeException()
         val insertedNoteView = givenStubInsertNote()
         whenInsertNoteSaveState(insertedNoteView)
         verifyInsertNoteExecute()
         verifyViewModelDataState(LOADING)
 
-        whenErrorOnNextInsertNote(errorMessage)
+        whenErrorOnNextInsertNote(throwable)
         verifyViewModelDataState(ERROR)
-        assertViewModelInsertMessage(errorMessage)
+        assertViewModelInsertResultHasThrowable(throwable)
         assertViewModelInsertNoteEqual(null)
     }
 
     @Test
-    fun updateNoteSuccessThenSortingTop(){
+    fun notifyUpdateNoteSuccessThenSortingTop(){
         val noteList = NoteFactory.createNoteList(0, 10)
         val noteViewList = NoteFactory.createNoteViewList(0,10)
         noteViewList.forEachIndexed { index, noteView ->
@@ -269,7 +273,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     @Test
-    fun deleteNoteStateSuccess(){
+    fun notifyDeleteNoteStateSuccess(){
         val noteList = NoteFactory.createNoteList(0, 10)
         val noteViewList = NoteFactory.createNoteViewList(0, 10).toMutableList()
         noteViewList.forEachIndexed { index, noteView ->
@@ -284,13 +288,44 @@ class NoteListViewModelTest: BaseViewModelTest() {
         val deleteNoteView = noteViewList[deleteIndex]
         noteViewList.remove(deleteNoteView)
 
-        whenDeleteNote(deleteNoteView)
+        whenNotifyDeleteNote(deleteNoteView)
         verifyViewModelDataState(SUCCESS, times(2))
         assertViewModelNotesSize(noteViewList.size)
         assertViewModelNotesEqual(noteViewList)
     }
 
+    @Test
+    fun deleteNoteExecuteStateSuccess(){
+        val deleteNoteView = NoteFactory.createNoteView(title = "deleted", date = "1")
+        val deleteNote = NoteFactory.createNote(title = "deleted", date = "1")
+        deleteNoteView stubTo deleteNote
+
+        whenDeleteNote(deleteNoteView)
+        verifyDeleteNoteExecute()
+        whenDeleteSuccessSaveState()
+        assertViewModelDeleteResultEqual(deleteNoteView)
+    }
+
+    @Test
+    fun deleteNoteStateError(){
+        val throwable = RuntimeException()
+        val deleteNoteView = NoteFactory.createNoteView(title = "deleted", date = "1")
+        val deleteNote = NoteFactory.createNote(title = "deleted", date = "1")
+        deleteNoteView stubTo deleteNote
+
+        whenDeleteNote(deleteNoteView)
+        verifyDeleteNoteExecute()
+        whenErrorOnNextDeleteNote(throwable)
+        assertViewModelDeleteResultHasThrowable(throwable)
+        assertViewModelDeleteResultEqual(null)
+    }
+
     private fun whenDeleteNote(deleteNoteView: NoteView){
+        noteListViewModel.deleteNote(deleteNoteView)
+        setViewModelState(noteListViewModel.deleteResult.value?.status)
+    }
+
+    private fun whenNotifyDeleteNote(deleteNoteView: NoteView){
         noteListViewModel.notifyDeletedNote(deleteNoteView)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
@@ -325,13 +360,13 @@ class NoteListViewModelTest: BaseViewModelTest() {
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
-    private fun whenErrorOnNextNoteList(message: String) {
-        onErrorCaptor.firstValue.invoke(RuntimeException(message))
+    private fun whenErrorOnNextNoteList(throwable: Throwable) {
+        onErrorCaptor.firstValue.invoke(throwable)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
     private fun verifyInsertNoteExecute(){
-        insertNewNote.verifyExecute(insertNoteOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, insertNoteParam)
+        insertNewNote.verifyExecute(insertNoteOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, noteParam)
     }
 
     private fun givenStubInsertNote(): NoteView{
@@ -350,8 +385,18 @@ class NoteListViewModelTest: BaseViewModelTest() {
         setViewModelState(noteListViewModel.insertResult.value?.status)
     }
 
-    private fun whenErrorOnNextInsertNote(message: String){
-        onErrorCaptor.firstValue.invoke(RuntimeException(message))
+    private fun whenDeleteSuccessSaveState(){
+        onCompleteCaptor.firstValue.invoke()
+        setViewModelState(noteListViewModel.deleteResult.value?.status)
+    }
+
+    private fun whenErrorOnNextDeleteNote(throwable: Throwable){
+        onErrorCaptor.firstValue.invoke(throwable)
+        setViewModelState(noteListViewModel.deleteResult.value?.status)
+    }
+
+    private fun whenErrorOnNextInsertNote(throwable: Throwable){
+        onErrorCaptor.firstValue.invoke(throwable)
         setViewModelState(noteListViewModel.insertResult.value?.status)
     }
 
@@ -377,20 +422,39 @@ class NoteListViewModelTest: BaseViewModelTest() {
         }
     }
 
+    private fun assertViewModelDeleteResultEqual(expectedData: NoteView?){
+        if (expectedData == null) {
+            assertThat(noteListViewModel.deleteResult.value?.data, `is`(nullValue()))
+        } else {
+            assertThat(
+                noteListViewModel.deleteResult.value?.data,
+                `is`(expectedData)
+            )
+        }
+    }
+
     private fun assertViewModelNotesSize(expectedSize: Int){
         assertThat(noteListViewModel.noteList.value?.data?.size, `is`(expectedSize))
     }
 
-    private fun assertViewModelNotesMessage(message: String) {
-        assertThat(noteListViewModel.noteList.value?.message, `is`(message))
+    private fun assertViewModelNotesHasThrowable(throwable: Throwable) {
+        assertThat(noteListViewModel.noteList.value?.throwable, `is`(throwable))
     }
 
-    private fun assertViewModelInsertMessage(message: String) {
-        assertThat(noteListViewModel.insertResult.value?.message, `is`(message))
+    private fun assertViewModelInsertResultHasThrowable(throwable: Throwable) {
+        assertThat(noteListViewModel.insertResult.value?.throwable, `is`(throwable))
+    }
+
+    private fun assertViewModelDeleteResultHasThrowable(throwable: Throwable) {
+        assertThat(noteListViewModel.deleteResult.value?.throwable, `is`(throwable))
     }
 
     private fun verifySearchNoteExecute(){
         searchNotes.verifyExecute(noteListOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, queryCaptor)
+    }
+
+    private fun verifyDeleteNoteExecute(){
+        deleteNote.verifyExecute(deleteSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, noteParam)
     }
 
     private fun initNoteListCaptor(){
@@ -400,7 +464,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     private fun initInsertNoteCaptor(){
         insertNoteOnSuccessCaptor = argumentCaptor()
-        insertNoteParam = argumentCaptor()
+        noteParam = argumentCaptor()
     }
 
     private fun initCommonCaptor(){
@@ -410,8 +474,9 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     private fun initMock(){
-        insertNewNote = mock()
         searchNotes = mock()
+        insertNewNote = mock()
+        deleteNote = mock()
         noteMapper = mock()
     }
 }
