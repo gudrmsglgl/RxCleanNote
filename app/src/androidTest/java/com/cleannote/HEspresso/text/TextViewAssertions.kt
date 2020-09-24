@@ -5,6 +5,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import com.cleannote.HEspresso.assertion.BaseAssertion
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.not
 
 interface TextViewAssertions: BaseAssertion {
 
@@ -36,6 +37,14 @@ interface TextViewAssertions: BaseAssertion {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withText(Matchers.containsString(text))
+            )
+        )
+    }
+
+    fun notContainText(text: String){
+        viewInteraction.check(
+            ViewAssertions.matches(
+                ViewMatchers.withText(not(text))
             )
         )
     }

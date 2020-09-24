@@ -1,6 +1,7 @@
 package com.cleannote.ui
 
 import android.view.View
+import androidx.navigation.NavController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
@@ -25,6 +26,7 @@ import org.hamcrest.Matcher
 abstract class BaseTest {
 
     val mockUIController: UIController = mockk(relaxUnitFun = true)
+    val navController = mockk<NavController>(relaxed = true)
 
     val application: TestBaseApplication
         = ApplicationProvider.getApplicationContext() as TestBaseApplication
@@ -63,6 +65,12 @@ abstract class BaseTest {
         every {
             getComponent().provideNoteRepository().updateNote(any())
         }.returns(Completable.complete())
+    }
+
+    fun stubThrowableNoteRepositoryUpdate(throwable: Throwable){
+        every {
+            getComponent().provideNoteRepository().updateNote(any())
+        }.returns(Completable.error(throwable))
     }
 
     fun stubNoteRepositoryDelete(){

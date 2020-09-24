@@ -75,7 +75,7 @@ class NoteDetailFragment constructor(
                     }
                     is ERROR -> {
                         it.sendFirebaseThrowable()
-                        showToast(getString(R.string.deleteErrorMsg))
+                        showToast(getString(R.string.updateErrorMsg))
                         fetchNoteUi(noteUiModel)
                     }
                     else -> {}

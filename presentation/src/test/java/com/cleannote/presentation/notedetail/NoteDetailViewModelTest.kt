@@ -8,8 +8,8 @@ import com.cleannote.presentation.BaseViewModelTest
 import com.cleannote.presentation.Complete
 import com.cleannote.presentation.OnError
 import com.cleannote.presentation.OnSuccess
-import com.cleannote.presentation.data.State.LOADING
-import com.cleannote.presentation.data.State.SUCCESS
+import com.cleannote.presentation.data.State
+import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.TextMode.EditDoneMode
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.test.InstantExecutorExtension
@@ -96,6 +96,19 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     }
 
     @Test
+    fun updateNoteStateErrorReturnThrowable(){
+        noteView stubTo note
+        val throwable = RuntimeException()
+        whenUpdateNote(noteView)
+        verifyUpdateNoteExecute()
+        verifyViewModelDataState(LOADING)
+
+        onErrorUpdateNote(throwable)
+        verifyViewModelDataState(ERROR)
+        assertViewModelUpdateNoteHasThrowable(throwable)
+    }
+
+    @Test
     fun deleteNoteExecuteUseCase(){
         noteView stubTo note
         whenDeleteNote(noteView)
@@ -123,6 +136,19 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         assertViewModelDeleteNoteEqual(noteView)
     }
 
+    @Test
+    fun deleteNoteStateErrorReturnThrowable(){
+        noteView stubTo note
+        val throwable = RuntimeException()
+        whenDeleteNote(noteView)
+        verifyDeleteNoteExecute()
+        verifyViewModelDataState(LOADING)
+
+        onErrorDeleteNote(throwable)
+        verifyViewModelDataState(ERROR)
+        assertViewModelDeleteNoteHasThrowable(throwable)
+    }
+
     private fun whenUpdateNote(noteView: NoteView){
         with(viewModel) {
             setNote((noteView to EditDoneMode))
@@ -134,6 +160,12 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         onCompleteCaptor.firstValue.invoke()
         setViewModelState(viewModel.updatedNote.value?.status)
     }
+
+    private fun onErrorUpdateNote(throwable: Throwable){
+        onErrorNoteCaptor.firstValue.invoke(throwable)
+        setViewModelState(viewModel.updatedNote.value?.status)
+    }
+
 
     private fun verifyUpdateNoteExecute(){
         updateNote.verifyExecute(
@@ -154,6 +186,10 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
                 `is`(expectedData)
             )
         }
+    }
+
+    private fun assertViewModelUpdateNoteHasThrowable(throwable: Throwable){
+        assertThat(viewModel.updatedNote.value?.throwable, `is`(throwable))
     }
 
     private fun whenDeleteNote(noteView: NoteView){
@@ -182,10 +218,17 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         }
     }
 
+    private fun assertViewModelDeleteNoteHasThrowable(throwable: Throwable){
+        assertThat(viewModel.deletedNote.value?.throwable, `is`(throwable))
+    }
+
     private fun onSuccessDeleteNote(){
         onCompleteCaptor.firstValue.invoke()
         setViewModelState(viewModel.deletedNote.value?.status)
     }
 
-
+    private fun onErrorDeleteNote(throwable: Throwable){
+        onErrorNoteCaptor.firstValue.invoke(throwable)
+        setViewModelState(viewModel.deletedNote.value?.status)
+    }
 }

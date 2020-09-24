@@ -44,6 +44,7 @@
     <string name="searchErrorMsg">메모를 불러오는데 실패 했습니다.</string>
     <string name="insertErrorMsg">메모를 생성하는데 실패 했습니다.</string>
     <string name="updateSuccessMsg">업데이트 되었습니다.</string>
+    <string name="updateErrorMsg">업데이트 실패 하였습니다.</string>
     <string name="deleteSuccessMsg">삭제 되었습니다.</string>
     <string name="deleteErrorMsg">삭제를 실패 하였습니다.</string>
     <string name="deleteCancelMsg">삭제가 취소 되었습니다.</string>

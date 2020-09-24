@@ -181,7 +181,6 @@ class NotesNavigationTest: BaseTest() {
                     }
                 }
             }
-            idle(5000)
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
@@ -51,10 +52,14 @@ abstract class BaseFragment(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
         displayProgressBar(show)
     }
 
-    fun showToast(message: String) = with (uiController){
+    /*fun showToast(message: String) = with (uiController){
         showUIMessage(
             UIMessage(message, UIType.Toast)
         )
+    }*/
+
+    fun showToast(message: String) = activity?.let {
+        Toast.makeText(it, message, Toast.LENGTH_SHORT).show()
     }
 
     fun showErrorMessage(

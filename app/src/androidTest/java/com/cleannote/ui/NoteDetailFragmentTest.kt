@@ -2,10 +2,13 @@ package com.cleannote.ui
 
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.navigation.Navigation
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import com.cleannote.MainActivity
 import com.cleannote.app.R
 import com.cleannote.common.UIController
 import com.cleannote.model.NoteUiModel
@@ -15,6 +18,7 @@ import com.cleannote.test.NoteFactory
 import com.cleannote.ui.screen.DetailNoteScreen
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Test
@@ -118,7 +122,73 @@ class NoteDetailFragmentTest: BaseTest() {
                 secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
             }
             noteTitle.isFocused(false)
+            noteTitle.containText("test")
+            updateSuccessToast.isDisplayed()
         }
+    }
+
+    @Test
+    fun noteTitleEditDoneThenThrowableNotUpdatedTitle(){
+        val throwable = RuntimeException()
+        val updateText = "test"
+        stubThrowableNoteRepositoryUpdate(throwable)
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        )
+        screen {
+            noteTitle.typeText(updateText)
+            toolbar {
+                secondMenu.click()
+                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
+            }
+            noteTitle{
+                isFocused(false)
+                notContainText(updateText)
+            }
+            updateErrorToast.isDisplayed()
+            idle(3500)
+        }
+    }
+
+    @Test
+    fun noteDeleteSuccessThenNavNoteList(){
+        stubNoteRepositoryDelete()
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        ).onFragment { fragment ->
+            Navigation.setViewNavController(fragment.requireView(), navController)
+        }
+        screen {
+            toolbar {
+                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
+                secondMenu.click()
+                deleteDialog.positiveBtn.click()
+            }
+            deleteSuccessToast.isDisplayed()
+        }
+        verify { navController.popBackStack() }
+    }
+
+    @Test
+    fun noteDeleteErrorThenNotNavNoteList(){
+        stubThrowableNoteRepositoryDelete(RuntimeException())
+        launchFragmentInContainer<NoteDetailFragment>(
+            factory = fragmentFactory,
+            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
+        ).onFragment { fragment ->
+            Navigation.setViewNavController(fragment.requireView(), navController)
+        }
+        screen {
+            toolbar {
+                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
+                secondMenu.click()
+                deleteDialog.positiveBtn.click()
+            }
+            deleteErrorToast.isDisplayed()
+        }
+        verify(exactly = 0){ navController.popBackStack() }
     }
 
     @Test

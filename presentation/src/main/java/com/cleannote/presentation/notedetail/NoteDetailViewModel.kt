@@ -19,7 +19,7 @@ constructor(
     private val updateNote: UpdateNote,
     private val deleteNote: DeleteNote,
     private val noteMapper: NoteMapper
-): BaseViewModel(updateNote) {
+): BaseViewModel(updateNote, deleteNote) {
 
     private lateinit var note: NoteView
     private lateinit var tempNote: NoteView
@@ -66,7 +66,7 @@ constructor(
             updateNote.execute(
                 onSuccess = {},
                 onError = {
-                    _updatedNote.postValue(DataState.error(it, note))
+                    _updatedNote.postValue(DataState.error(it))
                 },
                 onComplete = {
                     note = tempNote
