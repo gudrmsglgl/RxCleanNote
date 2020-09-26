@@ -14,4 +14,5 @@ interface NoteRepository {
     fun searchNotes(query: Query): Flowable<List<Note>>
     fun updateNote(note: Note): Completable
     fun deleteNote(note: Note): Completable
+    fun deleteMultipleNotes(notes: List<Note>): Completable
 }

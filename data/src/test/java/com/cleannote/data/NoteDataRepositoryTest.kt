@@ -408,4 +408,23 @@ class NoteDataRepositoryTest: BaseDataTest() {
 
         noteCacheDataStore.verifyDeleteNote(deleteNoteEntity)
     }
+
+    @Test
+    fun whenDeleteMultipleNotesThenCallOnlyCache(){
+        val deleteNote = NoteFactory.createNoteList(0,3)
+        val deleteNoteEntities = NoteFactory.createNoteEntityList(0,3)
+
+        deleteNoteEntities.forEachIndexed { index, noteEntity ->
+            deleteNote[index] stubTo noteEntity
+        }
+        noteCacheDataStore stubDeleteMultiNotes (deleteNoteEntities to Completable.complete())
+
+        whenDataRepositoryDeleteMultiNotes(deleteNote)
+            .test()
+            .assertComplete()
+            .assertNoValues()
+
+        noteRemoteDataStore.verifyDeleteMultiNotes(deleteNoteEntities, never())
+        noteCacheDataStore.verifyDeleteMultiNotes(deleteNoteEntities, times(1))
+    }
 }

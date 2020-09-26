@@ -14,4 +14,5 @@ interface NoteCache {
     fun setLastCacheTime(lastCache: Long, page: Int = 1)
     fun updateNote(noteEntity: NoteEntity): Completable
     fun deleteNote(noteEntity: NoteEntity): Completable
+    fun deleteMultipleNotes(notes: List<NoteEntity>): Completable
 }

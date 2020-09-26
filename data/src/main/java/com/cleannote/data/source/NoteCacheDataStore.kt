@@ -42,4 +42,7 @@ constructor(
     override fun updateNote(noteEntity: NoteEntity): Completable = noteCache.updateNote(noteEntity)
 
     override fun deleteNote(noteEntity: NoteEntity): Completable = noteCache.deleteNote(noteEntity)
+
+    override fun deleteMultipleNotes(notes: List<NoteEntity>): Completable = noteCache.deleteMultipleNotes(notes)
+
 }

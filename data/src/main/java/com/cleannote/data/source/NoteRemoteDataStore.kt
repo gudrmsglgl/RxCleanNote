@@ -43,4 +43,8 @@ constructor(
     override fun deleteNote(noteEntity: NoteEntity): Completable {
         throw UnsupportedOperationException()
     }
+
+    override fun deleteMultipleNotes(notes: List<NoteEntity>): Completable {
+        throw UnsupportedOperationException()
+    }
 }

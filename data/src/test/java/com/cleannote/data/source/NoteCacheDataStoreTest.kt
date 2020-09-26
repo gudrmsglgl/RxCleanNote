@@ -35,6 +35,7 @@ class NoteCacheDataStoreTest {
             on { isCached(any()) } doReturn Single.just(true)
             on { updateNote(noteEntity) } doReturn Completable.complete()
             on { deleteNote(noteEntity)} doReturn Completable.complete()
+            on { deleteMultipleNotes(noteEntities)} doReturn Completable.complete()
         }
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
@@ -105,6 +106,23 @@ class NoteCacheDataStoreTest {
             .test()
             .assertComplete()
             .assertNoValues()
+    }
+
+    @Test
+    fun deleteMultipleNotesCallNoteCache(){
+        whenCacheDataStoreDeleteMultipleNotes(noteEntities)
+            .test()
+            .assertComplete()
+            .assertNoValues()
+
+        verifyCacheCallDeleteMultipleNotes(noteEntities)
+    }
+
+    private fun whenCacheDataStoreDeleteMultipleNotes(param: List<NoteEntity>) =
+        noteCacheDataStore.deleteMultipleNotes(param)
+
+    private fun verifyCacheCallDeleteMultipleNotes(param: List<NoteEntity>) {
+        verify(noteCache).deleteMultipleNotes(param)
     }
 
     private fun whenCacheDataStoreDeleteNote(param: NoteEntity) =

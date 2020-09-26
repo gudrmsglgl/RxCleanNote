@@ -16,4 +16,5 @@ interface NoteDataStore {
     fun isCached(page: Int): Single<Boolean>
     fun updateNote(noteEntity: NoteEntity): Completable
     fun deleteNote(noteEntity: NoteEntity): Completable
+    fun deleteMultipleNotes(notes: List<NoteEntity>): Completable
 }
