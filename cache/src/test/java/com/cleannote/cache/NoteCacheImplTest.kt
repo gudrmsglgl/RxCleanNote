@@ -122,7 +122,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun updateNote(){
+    fun updateNoteThenSortingTop(){
         val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
         val selectIndex = 2
         val updateTitle = "updated"
@@ -158,6 +158,26 @@ class NoteCacheImplTest {
         val allNotes = noteCacheImpl.searchNotes(query).test().values()[0]
 
         assertThat(allNotes, not(hasItem(deleteNote)))
+    }
+
+    @Test
+    fun deleteMultipleNotes(){
+        val query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
+
+        val notes = NoteFactory.createNoteEntityList(end = 5)
+        noteCacheImpl.saveNotes(notes).test()
+
+        val deleteIndex = 1
+        val deleteIndex2 = 3
+
+        val deleteNotes = listOf(notes[deleteIndex], notes[deleteIndex2])
+        noteCacheImpl.deleteMultipleNotes(deleteNotes)
+            .test()
+            .assertComplete()
+            .assertNoValues()
+
+        val allNotes = noteCacheImpl.searchNotes(query).test().values()[0]
+        assertThat(allNotes, not(hasItems(deleteNotes[0], deleteNotes[1])))
     }
 
     private fun checkNoteTableRows(expectedRow: Int){

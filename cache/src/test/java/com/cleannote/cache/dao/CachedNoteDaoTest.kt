@@ -132,6 +132,24 @@ open class CachedNoteDaoTest{
         assertThat(loadAllNotes().size, `is`(cacheNotes.size - 1))
     }
 
+    @Test
+    fun deleteMultipleNotes(){
+        val cachedNotes = NoteFactory.createCachedNoteList(end = 5)
+        whenSaveNotes(cachedNotes)
+        assertThat(loadAllNotes().size, `is`(cachedNotes.size))
+
+        val deleteIndex1 = 1
+        val deleteIndex2 = 3
+
+        val deleteNotes = listOf(cachedNotes[deleteIndex1], cachedNotes[deleteIndex2])
+        whenDeleteMultipleNotes(deleteNotes)
+        assertThat(loadAllNotes(), not(hasItems(cachedNotes[deleteIndex1], cachedNotes[deleteIndex2])))
+    }
+
+    private fun whenDeleteMultipleNotes(notes: List<CachedNote>){
+        noteDao.deleteMultipleNotes(notes)
+    }
+
     private fun whenDeleteNote(note: CachedNote){
         noteDao.deleteNote(note)
     }

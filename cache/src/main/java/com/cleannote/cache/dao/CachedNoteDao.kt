@@ -45,4 +45,7 @@ abstract class CachedNoteDao {
 
     @Delete
     abstract fun deleteNote(note: CachedNote)
+
+    @Delete
+    abstract fun deleteMultipleNotes(notes: List<CachedNote>)
 }

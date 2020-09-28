@@ -76,7 +76,7 @@ constructor(
         subscribeDeleteResult()
         noteClick()
         noteLongClick()
-        setFragmentResultListener(REQUEST_KEY_ON_BACK){ key, bundle ->
+        setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
             requestUpdate(bundle)
             requestDelete(bundle)
         }
