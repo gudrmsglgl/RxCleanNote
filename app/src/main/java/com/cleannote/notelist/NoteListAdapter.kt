@@ -4,9 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.recyclerview.widget.*
 import com.cleannote.app.R
+import com.cleannote.model.NoteMode
+import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.longClicks
@@ -17,13 +18,21 @@ import timber.log.Timber
 class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object{
-        private const val MENU_ITEM = 1
-        private const val DEFAULT_ITEM = 2
+        private const val DEFAULT_ITEM = 1
+        private const val SINGLE_DELETE_ITEM = 2
+        private const val MULTI_DELETE_DEFAULT_ITEM = 3
+        private const val MULTI_DELETE_SELECT_ITEM = 4
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return if (differ.currentList[position].isShowMenu) MENU_ITEM else DEFAULT_ITEM
-    }
+    override fun getItemViewType(position: Int): Int =
+        //return if (differ.currentList[position].isSingleDeleteMode) SINGLE_DELETE_ITEM else DEFAULT_ITEM
+        when(differ.currentList[position].mode){
+            Default -> DEFAULT_ITEM
+            SingleDelete -> SINGLE_DELETE_ITEM
+            MultiDefault -> MULTI_DELETE_DEFAULT_ITEM
+            else -> MULTI_DELETE_SELECT_ITEM
+        }
+
 
     private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
     val clickNoteSubject: PublishSubject<NoteUiModel>
@@ -58,7 +67,7 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             else -> NoteMenuHolder(
                 LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_menu_note,
+                    R.layout.item_single_delete_note,
                     parent,
                     false
                 )
@@ -84,9 +93,9 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val transNotes = differ.currentList.apply {
             forEachIndexed { index, _ ->
                 if (index == position)
-                    get(index).apply { isShowMenu = true }
+                    get(index).apply { isSingleDeleteMode = true }
                 else
-                    get(index).apply { isShowMenu = false }
+                    get(index).apply { isSingleDeleteMode = false }
             }
         }
         differ.submitList(transNotes)
@@ -94,12 +103,12 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun isShowMenu(): Boolean  = differ.currentList.any {
-        it.isShowMenu
+        it.isSingleDeleteMode
     }
 
     fun hideMenu() = differ.currentList.apply {
         forEachIndexed { index, _ ->
-            get(index).apply { isShowMenu = false }
+            get(index).apply { isSingleDeleteMode = false }
         }
     }.run {
         differ.submitList(this)

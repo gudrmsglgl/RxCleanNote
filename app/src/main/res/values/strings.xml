@@ -9,6 +9,8 @@
 
     <string name="text_search">노트 검색</string>
 
+    <string name="tb_multi_delete_title">선택 삭제</string>
+
     <!-- Item Menu Note-->
     <string name="item_menu_delete">delete</string>
 

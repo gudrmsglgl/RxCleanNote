@@ -11,6 +11,7 @@
     <!-- note list -->
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="recyclerview_start_end_margins">5dp</dimen>
+    <dimen name="menu_width">30dp</dimen>
 
     <!-- note item -->
     <dimen name="item_height">70dp</dimen>

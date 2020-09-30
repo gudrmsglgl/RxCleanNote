@@ -8,6 +8,7 @@ import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
 import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
 import com.cleannote.domain.Constants.SORT_UPDATED_AT
 import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
+import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Query
@@ -27,9 +28,10 @@ constructor(
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
     private val deleteNote: DeleteNote,
+    private val deleteMultipleNotes: DeleteMultipleNotes,
     private val noteMapper: NoteMapper,
     private val sharedPreferences: SharedPreferences
-): BaseViewModel(searchNotes, insertNewNote, deleteNote) {
+): BaseViewModel(searchNotes, insertNewNote, deleteNote, deleteMultipleNotes) {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
         order = loadOrderingOnSharedPreference()
@@ -116,13 +118,11 @@ constructor(
     }
 
     fun deleteNote(deletedNoteView: NoteView){
-        //_mediatorNoteList.postValue(DataState.loading())
         _deleteResult.postValue(DataState.loading())
         deleteNote.execute(
             onSuccess = {},
             onError = {
                 _deleteResult.postValue(DataState.error(it))
-                //_mediatorNoteList.postValue(DataState.error(it))
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(deletedNoteView))
@@ -130,6 +130,24 @@ constructor(
                 _mediatorNoteList.postValue(DataState.success(loadedNotes))
             },
             params = noteMapper.mapFromView(deletedNoteView)
+        )
+    }
+
+    fun deleteMultiNotes(notes: List<NoteView>){
+        _deleteResult.postValue(DataState.loading())
+        deleteMultipleNotes.execute(
+            onSuccess = {},
+            onError = {
+                _deleteResult.postValue(DataState.error(it))
+            },
+            onComplete = {
+                _deleteResult.postValue(DataState.success(null))
+                notes.forEach {
+                    loadedNotes.remove(it)
+                }
+                _mediatorNoteList.postValue(DataState.success(loadedNotes))
+            },
+            params = notes.map { noteMapper.mapFromView(it) }
         )
     }
 
@@ -158,7 +176,6 @@ constructor(
 
     fun isExistNextPage(): Boolean = loadedNotes.size / (getQuery().limit) == getQuery().page
 
-
     fun clearQuery() {
         loadedNotes.clear()
         _query.value = getQuery().apply {
@@ -168,6 +185,10 @@ constructor(
             order = loadOrderingOnSharedPreference()
             like  = null
         }
+    }
+
+    fun setToolbarState(toolbarState: ListToolbarState){
+        _toolbarState.value = toolbarState
     }
 
     private fun getQuery() = _query.value ?: Query(

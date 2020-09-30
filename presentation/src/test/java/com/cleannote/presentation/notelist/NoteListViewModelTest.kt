@@ -6,6 +6,7 @@ import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
+import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
@@ -33,6 +34,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
     lateinit var searchNotes: SearchNotes
     lateinit var insertNewNote: InsertNewNote
     lateinit var deleteNote: DeleteNote
+    lateinit var deleteMultipleNotes: DeleteMultipleNotes
 
     lateinit var sharedPreferences: SharedPreferences
 
@@ -43,6 +45,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     private lateinit var insertNoteOnSuccessCaptor: KArgumentCaptor<OnSuccess<Long>>
     private lateinit var noteParam: KArgumentCaptor<Note>
+    private lateinit var deleteNotesParam: KArgumentCaptor<List<Note>>
 
     private lateinit var onErrorCaptor: KArgumentCaptor<OnError>
     private lateinit var afterFinishedCaptor: KArgumentCaptor<Complete>
@@ -58,7 +61,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
         initMock()
         initNoteListCaptor()
-        deleteSuccessCaptor = argumentCaptor()
+        initDeleteNoteCaptor()
         initInsertNoteCaptor()
         initCommonCaptor()
 
@@ -67,7 +70,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         }
 
         noteListViewModel = NoteListViewModel(
-            searchNotes, insertNewNote, deleteNote, noteMapper, sharedPreferences)
+            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, noteMapper, sharedPreferences)
     }
 
     @AfterEach
@@ -320,6 +323,61 @@ class NoteListViewModelTest: BaseViewModelTest() {
         assertViewModelDeleteResultEqual(null)
     }
 
+    @Test
+    fun deleteMultipleNotesExecuteUseCase(){
+        val deleteIndex = 0
+        val deleteIndex2 = 2
+
+        val noteViews = NoteFactory.createNoteViewList(0,5)
+        val notes = NoteFactory.createNoteList(0,5)
+
+        val deleteNote = listOf(notes[deleteIndex], notes[deleteIndex2])
+        val deleteNoteViews = listOf(noteViews[deleteIndex], noteViews[deleteIndex2])
+        deleteNoteViews.forEachIndexed { index, noteView ->
+            noteView stubTo deleteNote[index]
+        }
+
+        whenDeleteMultipleNotes(deleteNoteViews)
+        verifyDeleteMultipleNoteExecute()
+    }
+
+    @Test
+    fun deleteMultipleNotesSuccessThenRemoveDeletedNotes(){
+        val noteList = NoteFactory.createNoteList(0, 10)
+        val noteViewList = NoteFactory.createNoteViewList(0, 10).toMutableList()
+        noteViewList.forEachIndexed { index, noteView ->
+            noteList[index] stubTo noteView
+        }
+
+        whenSearchNoteSaveState()
+        verifySearchNoteExecute()
+        whenSuccessOnNextNoteList(noteList)
+
+        val deleteIndex = 0
+        val deleteIndex2 = 2
+
+        val deleteNote = listOf(noteList[deleteIndex], noteList[deleteIndex2])
+        val deleteNoteViews = listOf(noteViewList[deleteIndex], noteViewList[deleteIndex2])
+
+        deleteNoteViews.forEachIndexed { index, noteView ->
+            noteView stubTo deleteNote[index]
+        }
+
+        whenDeleteMultipleNotes(deleteNoteViews)
+        verifyDeleteMultipleNoteExecute()
+        whenSuccessOnDeleteMultiNotes()
+
+        assertViewModelNotesSize(noteViewList.size.minus(deleteNoteViews.size))
+        assertViewModelNotesEqual(noteViewList.apply {
+            deleteNoteViews.forEach { remove(it) }
+        })
+    }
+
+    private fun whenDeleteMultipleNotes(notes: List<NoteView>){
+        noteListViewModel.deleteMultiNotes(notes)
+        setViewModelState(noteListViewModel.deleteResult.value?.status)
+    }
+
     private fun whenDeleteNote(deleteNoteView: NoteView){
         noteListViewModel.deleteNote(deleteNoteView)
         setViewModelState(noteListViewModel.deleteResult.value?.status)
@@ -363,6 +421,11 @@ class NoteListViewModelTest: BaseViewModelTest() {
     private fun whenErrorOnNextNoteList(throwable: Throwable) {
         onErrorCaptor.firstValue.invoke(throwable)
         setViewModelState(noteListViewModel.noteList.value?.status)
+    }
+
+    private fun whenSuccessOnDeleteMultiNotes(){
+        onCompleteCaptor.secondValue.invoke()
+        setViewModelState(noteListViewModel.deleteResult.value?.status)
     }
 
     private fun verifyInsertNoteExecute(){
@@ -457,6 +520,10 @@ class NoteListViewModelTest: BaseViewModelTest() {
         deleteNote.verifyExecute(deleteSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, noteParam)
     }
 
+    private fun verifyDeleteMultipleNoteExecute(){
+        deleteMultipleNotes.verifyExecute(deleteSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, deleteNotesParam)
+    }
+
     private fun initNoteListCaptor(){
         noteListOnSuccessCaptor = argumentCaptor()
         queryCaptor = argumentCaptor()
@@ -465,6 +532,11 @@ class NoteListViewModelTest: BaseViewModelTest() {
     private fun initInsertNoteCaptor(){
         insertNoteOnSuccessCaptor = argumentCaptor()
         noteParam = argumentCaptor()
+    }
+
+    private fun initDeleteNoteCaptor(){
+        deleteSuccessCaptor = argumentCaptor()
+        deleteNotesParam = argumentCaptor()
     }
 
     private fun initCommonCaptor(){
@@ -477,6 +549,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         searchNotes = mock()
         insertNewNote = mock()
         deleteNote = mock()
+        deleteMultipleNotes = mock()
         noteMapper = mock()
     }
 }

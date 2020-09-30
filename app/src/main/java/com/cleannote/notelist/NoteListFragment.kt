@@ -90,7 +90,8 @@ constructor(
                     setupSearchViewToolbar()
                 }
                 is MultiSelectState -> {
-
+                    addMultiDeleteToolbarContainer()
+                    setupMultiDeleteToolbar()
                 }
             }
         }
@@ -99,7 +100,7 @@ constructor(
     private fun noteClick() = noteAdapter.clickNoteSubject
         .doOnNext { timber("d", "$it") }
         .subscribe {
-            if (!it.isShowMenu){
+            if (!it.isSingleDeleteMode){
                 navDetailNote(it)
             }
             else{
@@ -111,7 +112,8 @@ constructor(
     private fun noteLongClick() = noteAdapter.longClickNoteSubject
         .doOnNext { timber("d", "$it") }
         .subscribe {
-            noteAdapter.transItemMenu(it)
+            //noteAdapter.transItemMenu(it)
+            viewModel.setToolbarState(MultiSelectState)
         }
         .addCompositeDisposable()
 
@@ -240,8 +242,9 @@ constructor(
     }
 
     private fun addSearchViewToolbarContainer() = view?.let {
-        toolbar_content_container
-            .addView(
+        toolbar_content_container.apply {
+            removeAllViews()
+            addView(
                 View.inflate(it.context, R.layout.layout_searchview_toolbar, null)
                     .apply {
                         layoutParams = LinearLayout.LayoutParams(
@@ -250,6 +253,7 @@ constructor(
                         )
                     }
             )
+        }
     }
 
     private fun setupSearchViewToolbar() = toolbar_content_container
@@ -274,6 +278,31 @@ constructor(
             showFilterDialog()
         }
         .addCompositeDisposable()
+
+    private fun addMultiDeleteToolbarContainer() = view?.let {
+        toolbar_content_container.apply {
+            removeAllViews()
+            addView(
+                View.inflate(it.context, R.layout.layout_multidelete_toolbar, null)
+                    .apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.MATCH_PARENT
+                        )
+                    }
+            )
+        }
+    }
+
+    private fun setupMultiDeleteToolbar() = toolbar_content_container
+        .findViewById<Toolbar>(R.id.toolbar_multi_delete)
+        .apply{
+            findViewById<ImageView>(R.id.btn_multi_delete_cancel).apply {
+                singleClick()
+                    .subscribe { viewModel.setToolbarState(SearchState) }
+                    .addCompositeDisposable()
+            }
+        }
 
     private fun showFilterDialog() = activity?.let {
         MaterialDialog(it).show {
