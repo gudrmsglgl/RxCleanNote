@@ -1,11 +1,15 @@
 package com.cleannote.notelist
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.*
 import com.cleannote.app.R
+import com.cleannote.extension.gone
+import com.cleannote.extension.visible
 import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
@@ -15,13 +19,13 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.android.synthetic.main.item_note_list.view.*
 import timber.log.Timber
 
-class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class NoteListAdapter(
+    val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object{
         private const val DEFAULT_ITEM = 1
         private const val SINGLE_DELETE_ITEM = 2
-        private const val MULTI_DELETE_DEFAULT_ITEM = 3
-        private const val MULTI_DELETE_SELECT_ITEM = 4
+        private const val MULTI_DELETE_SELECT_ITEM = 3
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -29,7 +33,6 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         when(differ.currentList[position].mode){
             Default -> DEFAULT_ITEM
             SingleDelete -> SINGLE_DELETE_ITEM
-            MultiDefault -> MULTI_DELETE_DEFAULT_ITEM
             else -> MULTI_DELETE_SELECT_ITEM
         }
 
@@ -38,8 +41,8 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val clickNoteSubject: PublishSubject<NoteUiModel>
         get() = _clickNoteSubject
 
-    private val _longClickNoteSubject: PublishSubject<Int> = PublishSubject.create()
-    val longClickNoteSubject: PublishSubject<Int>
+    private val _longClickNoteSubject: PublishSubject<Unit> = PublishSubject.create()
+    val longClickNoteSubject: PublishSubject<Unit>
         get() = _longClickNoteSubject
 
     val DIFF_CALLBACK = object : DiffUtil.ItemCallback<NoteUiModel>(){
@@ -57,17 +60,17 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (viewType){
 
-            DEFAULT_ITEM ->  NoteViewHolder(
+            SINGLE_DELETE_ITEM -> NoteMenuHolder(
                 LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_note_list,
+                    R.layout.item_single_delete_note,
                     parent,
                     false
                 )
             )
 
-            else -> NoteMenuHolder(
+            else -> NoteViewHolder(
                 LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_single_delete_note,
+                    R.layout.item_note_list,
                     parent,
                     false
                 )
@@ -89,47 +92,103 @@ class NoteListAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         differ.submitList(list)
     }
 
-    fun transItemMenu(position: Int){
-        val transNotes = differ.currentList.apply {
-            forEachIndexed { index, _ ->
-                if (index == position)
-                    get(index).apply { isSingleDeleteMode = true }
-                else
-                    get(index).apply { isSingleDeleteMode = false }
+    fun transNoteSingleDelete(position: Int){
+        with (differ) {
+            currentList.apply {
+                forEachIndexed { index, note->
+                    if (index == position)
+                        note.apply { mode = SingleDelete }
+                    else
+                        note.apply { mode = Default}
+                }
             }
+            submitList(currentList)
         }
-        differ.submitList(transNotes)
         notifyDataSetChanged()
     }
 
-    fun isShowMenu(): Boolean  = differ.currentList.any {
-        it.isSingleDeleteMode
+    fun isNotDefaultNote() = differ.currentList.any {
+        it.mode != Default
     }
 
-    fun hideMenu() = differ.currentList.apply {
-        forEachIndexed { index, _ ->
-            get(index).apply { isSingleDeleteMode = false }
+    fun transAllDefaultNote(){
+        with(differ){
+            currentList.apply {
+                forEach { it.apply { mode = Default } }
+            }
+            submitList(currentList)
         }
-    }.run {
-        differ.submitList(this)
         notifyDataSetChanged()
     }
+
+    fun transAllMultiSelectDefaultNote(){
+        with(differ){
+            currentList.apply {
+                forEach { it.apply { mode = MultiDefault } }
+            }
+            submitList(currentList)
+        }
+        notifyDataSetChanged()
+    }
+
+    fun getMultiSelectedNotes(): List<NoteUiModel> =  differ.currentList.filter { it.mode == MultiSelected }
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
-        fun bind(item: NoteUiModel, position: Int) = with(itemView) {
+        fun bind(item: NoteUiModel, position: Int) = when(item.mode) {
+            Default -> uiHolderDefault(item)
+            else -> uiHolderMultiDeleteSelect(item, position)
+        }
 
-            clicks()
-                .map { item }
-                .subscribe(_clickNoteSubject)
+        private fun uiHolderDefault(item: NoteUiModel){
+            itemView.apply {
+                margin_view.visible()
+                select_delete.gone()
 
-            longClicks { true }
-                .map { position }
-                .subscribe(_longClickNoteSubject)
+                note_title.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.note_title_color))
+                    text = item.title
+                }
+                note_timestamp.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.default_grey))
+                    text = item.updated_at
+                }
 
-            note_title.text = item.title
-            note_timestamp.text = item.updated_at
+                clicks()
+                    .map { item }
+                    .subscribe(_clickNoteSubject)
 
+                longClicks { true }
+                    .subscribe(_longClickNoteSubject)
+            }
+        }
+
+        private fun uiHolderMultiDeleteSelect(item: NoteUiModel, position: Int){
+            itemView.apply {
+                margin_view.gone()
+                select_delete.visible()
+                select_delete.isChecked = item.mode == MultiSelected
+                note_title.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.multi_delete_default_color))
+                    text = item.title
+                }
+                note_timestamp.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.multi_delete_default_color))
+                    text = item.updated_at
+                }
+
+                clicks()
+                    .subscribe {
+                        if (select_delete.isChecked){
+                            select_delete.isChecked = false
+                            differ.currentList[position].apply { mode = MultiDefault }
+                        }
+                        else {
+                            select_delete.isChecked = true
+                            differ.currentList[position].apply { mode = MultiSelected }
+                        }
+                    }
+            }
         }
     }
 

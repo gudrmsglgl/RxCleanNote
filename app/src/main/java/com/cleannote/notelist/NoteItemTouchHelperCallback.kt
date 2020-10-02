@@ -28,7 +28,7 @@ class NoteItemTouchHelperCallback constructor(
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {
-        return !touchAdapter.isSwiped()
+        return touchAdapter.isSwipeEnable()
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -67,5 +67,5 @@ class NoteItemTouchHelperCallback constructor(
 
 interface TouchAdapter{
     fun onSwiped(position: Int)
-    fun isSwiped(): Boolean
+    fun isSwipeEnable(): Boolean
 }

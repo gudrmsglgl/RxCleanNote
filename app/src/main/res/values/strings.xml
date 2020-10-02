@@ -24,6 +24,7 @@
     <!-- Delete Confirm Dialog -->
     <string name="delete_title">삭제</string>
     <string name="delete_message">메모를 삭제 하시겠습니까?</string>
+    <string name="delete_multi_select_message">선택하신 메모를 모두 삭제하시겠습니까?</string>
     <string name="delete_ok">네</string>
     <string name="delete_cancel">아니오</string>
 

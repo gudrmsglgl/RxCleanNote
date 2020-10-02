@@ -37,6 +37,7 @@ import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
@@ -100,27 +101,26 @@ constructor(
     private fun noteClick() = noteAdapter.clickNoteSubject
         .doOnNext { timber("d", "$it") }
         .subscribe {
-            if (!it.isSingleDeleteMode){
+            if (it.mode == NoteMode.Default){
                 navDetailNote(it)
             }
-            else{
-                showDeleteDialog(it)
+            else if (it.mode == NoteMode.SingleDelete){
+                showDeleteDialog(listOf(it))
             }
         }
         .addCompositeDisposable()
 
     private fun noteLongClick() = noteAdapter.longClickNoteSubject
-        .doOnNext { timber("d", "$it") }
         .subscribe {
-            //noteAdapter.transItemMenu(it)
             viewModel.setToolbarState(MultiSelectState)
+            noteAdapter.transAllMultiSelectDefaultNote()
         }
         .addCompositeDisposable()
 
     private fun initRecyclerView(){
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
-            noteAdapter = NoteListAdapter()
+            noteAdapter = NoteListAdapter(context)
             itemTouchHelper = ItemTouchHelper(
                 NoteItemTouchHelperCallback(
                     this@NoteListFragment,
@@ -187,7 +187,12 @@ constructor(
     private fun fetchNotesToAdapter(notes: List<NoteView>) {
         timber("d", "notes size: ${notes.size}")
         showEmptyData(notes.isEmpty())
-        val noteUiModels = notes.map { noteMapper.mapToUiModel(it) }
+        val noteUiModels = notes.map {
+            if (viewModel.toolbarState.value == MultiSelectState)
+                noteMapper.mapToUiModel(it).apply { mode = NoteMode.MultiDefault }
+            else
+                noteMapper.mapToUiModel(it)
+        }
         noteAdapter.submitList(noteUiModels)
     }
 
@@ -226,10 +231,14 @@ constructor(
                     SUCCESS -> {
                         showLoadingProgressBar(false)
                         showToast(getString(R.string.deleteSuccessMsg))
+                        if (viewModel.toolbarState.value == MultiSelectState)
+                            viewModel.setToolbarState(SearchState)
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)
                         showErrorMessage(getString(R.string.deleteErrorMsg))
+                        if (viewModel.toolbarState.value == MultiSelectState)
+                            viewModel.setToolbarState(SearchState)
                         it.sendFirebaseThrowable()
                     }
                 }
@@ -299,8 +308,17 @@ constructor(
         .apply{
             findViewById<ImageView>(R.id.btn_multi_delete_cancel).apply {
                 singleClick()
-                    .subscribe { viewModel.setToolbarState(SearchState) }
+                    .subscribe {
+                        viewModel.setToolbarState(SearchState)
+                        noteAdapter.transAllDefaultNote()
+                    }
                     .addCompositeDisposable()
+            }
+            findViewById<ImageView>(R.id.btn_multi_delete_ok).apply {
+                singleClick()
+                    .subscribe {
+                        showDeleteDialog(noteAdapter.getMultiSelectedNotes())
+                    }
             }
         }
 
@@ -342,24 +360,42 @@ constructor(
         }
     }
 
-    private fun showDeleteDialog(deleteMemo: NoteUiModel) = activity?.let {
+    private fun showDeleteDialog(deleteMemos: List<NoteUiModel>) = activity?.let {
         MaterialDialog(it).show {
             title(R.string.delete_title)
-            val dialogMessage = """
-                ${deleteMemo.title}
-                ${getString(R.string.delete_message)}
-            """.trimIndent()
-            message(text = dialogMessage)
+            message(text = deleteTitle(deleteMemos))
             positiveButton(R.string.delete_ok){
-                viewModel.deleteNote(noteMapper.mapToView(deleteMemo))
+                actionDelete(deleteMemos)
             }
             negativeButton(R.string.delete_cancel){
                 showToast(getString(R.string.deleteCancelMsg))
-                noteAdapter.hideMenu()
+                noteAdapter.transAllDefaultNote()
                 dismiss()
             }
             cancelable(false)
         }
+    }
+
+    private fun deleteTitle(deleteMemos: List<NoteUiModel>): String {
+        return if (deleteMemos.size == 1) {
+            """${deleteMemos[0].title}
+                ${getString(R.string.delete_message)}
+            """.trimIndent()
+        } else {
+            getString(R.string.delete_multi_select_message)
+        }
+    }
+
+    private fun actionDelete(deleteMemos: List<NoteUiModel>){
+        if (deleteMemos.size == 1)
+            viewModel.deleteNote(noteMapper.mapToView(deleteMemos[0]))
+        else
+            viewModel.deleteMultiNotes(
+                deleteMemos
+                    .map{
+                        noteMapper.mapToView(it)
+                    }
+            )
     }
 
     private fun requestUpdate(bundle: Bundle){
@@ -380,7 +416,7 @@ constructor(
     }
 
     override fun onSwiped(position: Int) {
-        noteAdapter.transItemMenu(position)
+        noteAdapter.transNoteSingleDelete(position)
     }
 
     private fun onRefresh() = swipe_refresh.setOnRefreshListener {
@@ -389,12 +425,14 @@ constructor(
     }
 
     override fun shouldBackPress(): Boolean {
-        if (noteAdapter.isShowMenu()){
-            noteAdapter.hideMenu()
+        if (noteAdapter.isNotDefaultNote()){
+            if (viewModel.toolbarState.value == MultiSelectState)
+                viewModel.setToolbarState(SearchState)
+            noteAdapter.transAllDefaultNote()
             return false
         } else
             return true
     }
 
-    override fun isSwiped(): Boolean = noteAdapter.isShowMenu()
+    override fun isSwipeEnable(): Boolean = !noteAdapter.isNotDefaultNote()
 }
