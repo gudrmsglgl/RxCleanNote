@@ -1,5 +1,6 @@
 package com.cleannote.HEspresso.recycler
 
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions
 import com.cleannote.HEspresso.assertion.AdapterAssertion
@@ -15,5 +16,4 @@ interface RecyclerAdapterAssertion: AdapterAssertion {
             )
         )
     }
-
 }

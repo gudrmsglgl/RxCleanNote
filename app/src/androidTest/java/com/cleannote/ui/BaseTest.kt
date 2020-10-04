@@ -1,30 +1,23 @@
 package com.cleannote.ui
 
-import android.view.View
 import androidx.navigation.NavController
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import com.cleannote.HEspresso.recycler.NRecyclerItem
 import com.cleannote.TestBaseApplication
 import com.cleannote.common.UIController
 import com.cleannote.domain.Constants
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.injection.TestApplicationComponent
+import com.cleannote.notelist.NoteListAdapter
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import org.hamcrest.Matcher
 
 abstract class BaseTest {
-
     val mockUIController: UIController = mockk(relaxUnitFun = true)
     val navController = mockk<NavController>(relaxed = true)
 
@@ -85,6 +78,20 @@ abstract class BaseTest {
         }.returns(Completable.error(throwable))
     }
 
+    fun stubNoteRepositoryDeleteMultiNotes(){
+        every {
+            getComponent().provideNoteRepository().deleteMultipleNotes(any())
+        }.returns(Completable.complete())
+    }
+
+    fun stubThrowableNoteRepositoryDeleteMultiNotes(throwable: Throwable){
+        every {
+            getComponent().provideNoteRepository().deleteMultipleNotes(any())
+        }.returns(Completable.error(throwable))
+    }
+
     abstract fun setupUIController()
     abstract fun injectTest()
 }
+
+typealias RecyclerItem = NRecyclerItem<NoteListAdapter.NoteViewHolder>

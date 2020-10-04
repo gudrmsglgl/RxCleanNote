@@ -8,21 +8,15 @@ import com.cleannote.ui.screen.NoteListScreen
 import com.cleannote.HEspresso.recycler.NRecyclerItem
 import com.cleannote.MainActivity
 import com.cleannote.app.R
-import com.cleannote.common.UIController
-import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.model.Note
-import com.cleannote.domain.model.Query
 import com.cleannote.notelist.NoteListAdapter.NoteViewHolder
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
 import io.reactivex.Flowable
 import org.junit.*
 import org.junit.runner.RunWith
@@ -127,7 +121,7 @@ class NoteListFragmentTest: BaseTest() {
 
         screen {
 
-            toolbar {
+            searchToolbar {
 
                 filterMenu {
                     isDisplayed()
@@ -180,7 +174,7 @@ class NoteListFragmentTest: BaseTest() {
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         screen {
-            toolbar{
+            searchToolbar{
                 filterMenu {
                     click()
                 }
@@ -221,7 +215,7 @@ class NoteListFragmentTest: BaseTest() {
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         screen {
-            toolbar {
+            searchToolbar {
                 searchView {
                     searchBtn.click()
                     searchEditView {
@@ -255,7 +249,7 @@ class NoteListFragmentTest: BaseTest() {
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         screen {
-            toolbar {
+            searchToolbar {
                 searchView {
                     searchBtn.click()
                     searchEditView {
@@ -361,7 +355,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun noteLongClickDeleteSuccessThenNotesDelete(){
+    fun noteSwipeSingleDeleteSuccessThenNotesDelete(){
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
@@ -373,7 +367,7 @@ class NoteListFragmentTest: BaseTest() {
         screen {
             recyclerView{
                 firstItem<NRecyclerItem<NoteViewHolder>> {
-                    longClick()
+                    swipeLeft()
                     swipeDeleteMode {
                         deleteImg.click()
                     }
@@ -389,7 +383,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun noteLongClickDeleteErrorThenDontDeleteNotes(){
+    fun noteSwipeSingleDeleteErrorThenDontDeleteNotes(){
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
@@ -402,7 +396,7 @@ class NoteListFragmentTest: BaseTest() {
             noteListScreen {
                 recyclerView{
                     firstItem<NRecyclerItem<NoteViewHolder>> {
-                        longClick()
+                        swipeRight()
                         swipeDeleteMode {
                             deleteImg.click()
                         }
@@ -422,6 +416,147 @@ class NoteListFragmentTest: BaseTest() {
             noteListScreen.recyclerView.hasSize(notes.size)
         }
     }
+
+    @Test
+    fun noteLongClickThenMultiSelectStateToolbar(){
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            recyclerView {
+                firstItem<RecyclerItem> {
+                    longClick()
+                }
+            }
+            multiDeleteToolbar {
+                isDisplayed()
+                btnCancel {
+                    isDisplayed()
+                    hasDrawable(R.drawable.ic_cancel_24dp)
+                }
+                title.hasText(R.string.tb_multi_delete_title)
+                btnConfirm {
+                    isDisplayed()
+                    hasDrawable(R.drawable.ic_done_24dp)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun multiDeleteThrowableThenSearchStateDefaultNotes(){
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubThrowableNoteRepositoryDeleteMultiNotes(RuntimeException())
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            recyclerView {
+                firstItem<RecyclerItem> {
+                    longClick()
+                }
+                firstItem<RecyclerItem> {
+                    click()
+                    checkBox{
+                        isDisplayed()
+                        isChecked()
+                    }
+                }
+                visibleLastItem<RecyclerItem> {
+                    click()
+                    checkBox{
+                        isDisplayed()
+                        isChecked()
+                    }
+                }
+            }
+            multiDeleteToolbar {
+                isDisplayed()
+                btnCancel {
+                    isDisplayed()
+                    hasDrawable(R.drawable.ic_cancel_24dp)
+                }
+                title.hasText(R.string.tb_multi_delete_title)
+                btnConfirm {
+                    isDisplayed()
+                    hasDrawable(R.drawable.ic_done_24dp)
+                    click()
+                }
+            }
+            deleteDialog {
+                positiveBtn.click()
+            }
+            searchToolbar {
+                isDisplayed()
+            }
+            recyclerView {
+                firstItem<RecyclerItem> {
+                    checkBox.isNotDisplayed()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun multiDeleteSuccessThenSearchStateDefaultNotesOfCheckDeleted(){
+        var checkSize = 0
+        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val notes = NoteFactory.makeNotes(0, 10)
+        stubInitOrdering(query.order)
+        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositoryDeleteMultiNotes()
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screen {
+            recyclerView {
+                firstItem<RecyclerItem> {
+                    longClick()
+                }
+                firstItem<RecyclerItem> {
+                    click()
+                    checkBox{
+                        isDisplayed()
+                        isChecked()
+                    }
+                }
+                visibleLastItem<RecyclerItem> {
+                    click()
+                    checkBox{
+                        isDisplayed()
+                        isChecked()
+                    }
+                }
+                checkSize = getCheckedSize()
+            }
+            multiDeleteToolbar {
+                isDisplayed()
+                btnConfirm {
+                    isDisplayed()
+                    hasDrawable(R.drawable.ic_done_24dp)
+                    click()
+                }
+            }
+            deleteDialog {
+                positiveBtn.click()
+            }
+            searchToolbar {
+                isDisplayed()
+            }
+            recyclerView {
+                firstItem<RecyclerItem> {
+                    checkBox.isNotDisplayed()
+                }
+                hasSize(notes.size - checkSize)
+            }
+        }
+    }
+
 
     override fun setupUIController(){
         every { mockUIController.isDisplayProgressBar() }.returns(false)

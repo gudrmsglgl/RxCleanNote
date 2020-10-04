@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.cleannote.HEspresso.util.getResourceColor
@@ -28,7 +29,7 @@ class DrawableMatcher(
     }
 
     override fun matchesSafely(view: View?): Boolean {
-        if (view !is ImageView && drawable == null) {
+        if (view !is ImageView && drawable == null && view !is AppCompatImageView) {
             return false
         }
 

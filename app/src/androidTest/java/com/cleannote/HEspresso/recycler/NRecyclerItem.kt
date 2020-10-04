@@ -7,6 +7,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.cleannote.HEspresso.actions.SwipeableActions
 import com.cleannote.HEspresso.assertion.BaseAssertion
+import com.cleannote.HEspresso.check.NCheckBox
 import com.cleannote.HEspresso.image.NImageView
 import com.cleannote.HEspresso.text.NTextView
 import com.cleannote.HEspresso.view.NBaseView
@@ -18,6 +19,7 @@ class NRecyclerItem<out T>(
     @IdRes private val idRes: Int,
     private val position: Int ): SwipeableActions, NBaseView<NRecyclerItem<T>>(RecyclerViewMatcher(idRes).atPositionOnView(position,-1))
 {
+    val checkBox = NCheckBox(RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.checkbox_delete))
     val itemTitle: NTextView = NTextView(
         RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.note_title)
     )

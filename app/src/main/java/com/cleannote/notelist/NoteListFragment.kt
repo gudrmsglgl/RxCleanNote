@@ -70,7 +70,7 @@ constructor(
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         onRefresh()
-        subscribeToolbar()
+        subscribeToolbarState()
         subscribeNoteList()
         insertNoteOnFab()
         subscribeInsertResult()
@@ -83,7 +83,7 @@ constructor(
         }
     }
 
-    private fun subscribeToolbar() = viewModel.toolbarState.observe(viewLifecycleOwner,
+    private fun subscribeToolbarState() = viewModel.toolbarState.observe(viewLifecycleOwner,
         Observer { toolbarState ->
             when(toolbarState){
                 is SearchState -> {
@@ -112,8 +112,7 @@ constructor(
 
     private fun noteLongClick() = noteAdapter.longClickNoteSubject
         .subscribe {
-            viewModel.setToolbarState(MultiSelectState)
-            noteAdapter.transAllMultiSelectDefaultNote()
+            transMultiDeleteState()
         }
         .addCompositeDisposable()
 
@@ -229,16 +228,14 @@ constructor(
                 when (it.status) {
                     LOADING -> showLoadingProgressBar(true)
                     SUCCESS -> {
+                        transSearchState(isTransNotes = false)
                         showLoadingProgressBar(false)
                         showToast(getString(R.string.deleteSuccessMsg))
-                        if (viewModel.toolbarState.value == MultiSelectState)
-                            viewModel.setToolbarState(SearchState)
                     }
                     ERROR -> {
                         showLoadingProgressBar(false)
                         showErrorMessage(getString(R.string.deleteErrorMsg))
-                        if (viewModel.toolbarState.value == MultiSelectState)
-                            viewModel.setToolbarState(SearchState)
+                        transSearchState(isTransNotes = true)
                         it.sendFirebaseThrowable()
                     }
                 }
@@ -309,8 +306,7 @@ constructor(
             findViewById<ImageView>(R.id.btn_multi_delete_cancel).apply {
                 singleClick()
                     .subscribe {
-                        viewModel.setToolbarState(SearchState)
-                        noteAdapter.transAllDefaultNote()
+                        transSearchState()
                     }
                     .addCompositeDisposable()
             }
@@ -319,6 +315,7 @@ constructor(
                     .subscribe {
                         showDeleteDialog(noteAdapter.getMultiSelectedNotes())
                     }
+                    .addCompositeDisposable()
             }
         }
 
@@ -369,7 +366,7 @@ constructor(
             }
             negativeButton(R.string.delete_cancel){
                 showToast(getString(R.string.deleteCancelMsg))
-                noteAdapter.transAllDefaultNote()
+                transSearchState()
                 dismiss()
             }
             cancelable(false)
@@ -389,13 +386,11 @@ constructor(
     private fun actionDelete(deleteMemos: List<NoteUiModel>){
         if (deleteMemos.size == 1)
             viewModel.deleteNote(noteMapper.mapToView(deleteMemos[0]))
-        else
+        else if (deleteMemos.size > 1)
             viewModel.deleteMultiNotes(
-                deleteMemos
-                    .map{
-                        noteMapper.mapToView(it)
-                    }
+                deleteMemos.map{ noteMapper.mapToView(it) }
             )
+        else showToast(getString(R.string.delete_multi_select_empty))
     }
 
     private fun requestUpdate(bundle: Bundle){
@@ -426,13 +421,24 @@ constructor(
 
     override fun shouldBackPress(): Boolean {
         if (noteAdapter.isNotDefaultNote()){
-            if (viewModel.toolbarState.value == MultiSelectState)
-                viewModel.setToolbarState(SearchState)
-            noteAdapter.transAllDefaultNote()
+            transSearchState()
             return false
         } else
             return true
     }
 
     override fun isSwipeEnable(): Boolean = !noteAdapter.isNotDefaultNote()
+
+    private fun transSearchState(isTransNotes: Boolean = true){
+        if (viewModel.toolbarState.value != SearchState)
+            viewModel.setToolbarState(SearchState)
+        if (isTransNotes)
+            noteAdapter.transAllDefaultNote()
+    }
+
+    private fun transMultiDeleteState(isTransNotes: Boolean = true){
+        viewModel.setToolbarState(MultiSelectState)
+        if (isTransNotes)
+            noteAdapter.transAllMultiSelectDefaultNote()
+    }
 }

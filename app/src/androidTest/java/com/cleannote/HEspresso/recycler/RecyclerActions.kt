@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import com.cleannote.HEspresso.actions.BaseActions
 import com.cleannote.HEspresso.actions.ScrollableActions
 import com.cleannote.HEspresso.actions.SwipeableActions
+import com.cleannote.notelist.NoteListAdapter
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 
@@ -76,5 +77,24 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
             }
         })
         return lastVisiblePosition
+    }
+
+    fun getCheckedSize(): Int {
+        var size = 0
+
+        viewInteraction.perform(object : ViewAction{
+            override fun getConstraints(): Matcher<View> =
+                Matchers.allOf(ViewMatchers.isAssignableFrom(RecyclerView::class.java), ViewMatchers.isDisplayed())
+
+            override fun getDescription(): String = "Get RecyclerView adapter size"
+
+            override fun perform(uiController: UiController?, view: View?) {
+                if (view is RecyclerView) {
+                    size = (view.adapter as NoteListAdapter).getMultiSelectedNotes().size
+                }
+            }
+        })
+        println("checkedSize: ${size}")
+        return size
     }
 }

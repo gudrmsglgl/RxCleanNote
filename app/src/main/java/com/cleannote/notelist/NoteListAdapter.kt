@@ -143,7 +143,7 @@ class NoteListAdapter(
         private fun uiHolderDefault(item: NoteUiModel){
             itemView.apply {
                 margin_view.visible()
-                select_delete.gone()
+                checkbox_delete.gone()
 
                 note_title.apply {
                     setTextColor(ContextCompat.getColor(context, R.color.note_title_color))
@@ -166,8 +166,8 @@ class NoteListAdapter(
         private fun uiHolderMultiDeleteSelect(item: NoteUiModel, position: Int){
             itemView.apply {
                 margin_view.gone()
-                select_delete.visible()
-                select_delete.isChecked = item.mode == MultiSelected
+                checkbox_delete.visible()
+                checkbox_delete.isChecked = item.mode == MultiSelected
                 note_title.apply {
                     setTextColor(ContextCompat.getColor(context, R.color.multi_delete_default_color))
                     text = item.title
@@ -179,12 +179,12 @@ class NoteListAdapter(
 
                 clicks()
                     .subscribe {
-                        if (select_delete.isChecked){
-                            select_delete.isChecked = false
+                        if (checkbox_delete.isChecked){
+                            checkbox_delete.isChecked = false
                             differ.currentList[position].apply { mode = MultiDefault }
                         }
                         else {
-                            select_delete.isChecked = true
+                            checkbox_delete.isChecked = true
                             differ.currentList[position].apply { mode = MultiSelected }
                         }
                     }
