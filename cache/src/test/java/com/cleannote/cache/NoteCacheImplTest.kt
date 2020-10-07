@@ -1,11 +1,10 @@
+/*
 package com.cleannote.cache
 
 import android.os.Build
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.cleannote.cache.dao.NoteQueryUtil
-import com.cleannote.cache.dao.NoteQueryUtil.Companion.NOTE_SORT_ASC
-import com.cleannote.cache.dao.NoteQueryUtil.Companion.NOTE_SORT_DESC
 import com.cleannote.cache.database.NoteDatabase
 import com.cleannote.cache.mapper.NoteEntityMapper
 import com.cleannote.cache.test.factory.NoteFactory
@@ -187,4 +186,4 @@ class NoteCacheImplTest {
 
     private fun getCurTime() =
         SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 package com.cleannote.cache.mapper
 
 import com.cleannote.cache.model.CachedNote
@@ -38,4 +39,4 @@ class NoteEntityMapperTest {
         assertThat(entity.body, `is`(cache.body))
         assertThat(entity.id, `is`(cache.id))
     }
-}
+}*/

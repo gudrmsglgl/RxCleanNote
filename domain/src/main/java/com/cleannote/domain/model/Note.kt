@@ -5,5 +5,6 @@ data class Note(
     val title: String,
     val body: String,
     val updated_at: String,
-    val created_at: String
+    val created_at: String,
+    val images: List<NoteImage>? = null
 )

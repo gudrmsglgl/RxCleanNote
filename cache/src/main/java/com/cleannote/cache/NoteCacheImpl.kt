@@ -1,7 +1,10 @@
 package com.cleannote.cache
 
 import com.cleannote.cache.dao.CachedNoteDao
-import com.cleannote.cache.dao.searchNoteBySorted
+import com.cleannote.cache.extensions.divideCacheNote
+import com.cleannote.cache.extensions.divideCacheNoteImages
+import com.cleannote.cache.extensions.searchNoteBySorted
+import com.cleannote.cache.extensions.transEntity
 import com.cleannote.cache.mapper.NoteEntityMapper
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
@@ -31,13 +34,15 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
             queryEntity.order,
             queryEntity.like)
         ).map { cachedNotes ->
-            cachedNotes.map { entityMapper.mapFromCached(it) }
+            cachedNotes.map { it.transEntity() }
         }
     }
 
     override fun saveNotes(notes: List<NoteEntity>): Completable = Completable.defer {
-        noteDao.saveNotes(notes.map { entityMapper.mapToCached(it) })
+        noteDao.saveNoteAndImages(notes)
         Completable.complete()
+        /*noteDao.saveNotes(notes.map { entityMapper.mapToCached(it) })
+        Completable.complete()*/
     }
 
     override fun isCached(page: Int): Single<Boolean> = Single.defer {

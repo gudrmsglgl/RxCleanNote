@@ -1,6 +1,6 @@
 package com.cleannote.cache.test.factory
 
-import com.cleannote.cache.dao.NoteQueryUtil.Companion.NOTE_SORT_DESC
+import com.cleannote.cache.dao.NoteQueryUtil.NOTE_SORT_DESC
 import com.cleannote.data.model.QueryEntity
 
 object QueryFactory {
