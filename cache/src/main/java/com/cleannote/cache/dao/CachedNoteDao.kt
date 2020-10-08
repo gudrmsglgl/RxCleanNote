@@ -74,7 +74,7 @@ abstract class CachedNoteDao {
     abstract fun updateNote(note: CachedNote)
 
     @Transaction
-    open fun updateNoteImages(noteEntity: NoteEntity){
+    open fun updateNoteAndImages(noteEntity: NoteEntity){
         updateNote(noteEntity.divideCacheNote())
         deleteNoteImagesByNotePk(noteEntity.id)
         if (noteEntity.divideCacheNoteImages().isNotEmpty()){

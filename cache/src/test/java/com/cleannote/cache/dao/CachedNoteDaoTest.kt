@@ -182,7 +182,7 @@ open class CachedNoteDaoTest{
 
 
     private fun whenUpdateNoteImages(updateNoteEntity: NoteEntity) {
-        noteDao.updateNoteImages(updateNoteEntity)
+        noteDao.updateNoteAndImages(updateNoteEntity)
     }
 
     private fun loadAllCachedNotes() = noteDao.getNumNotes()
