@@ -16,6 +16,7 @@ import com.cleannote.presentation.Complete
 import com.cleannote.presentation.OnError
 import com.cleannote.presentation.OnSuccess
 import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.extensions.transNoteViews
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
@@ -70,7 +71,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         }
 
         noteListViewModel = NoteListViewModel(
-            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, noteMapper, sharedPreferences)
+            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, sharedPreferences)
     }
 
     @AfterEach
@@ -96,17 +97,14 @@ class NoteListViewModelTest: BaseViewModelTest() {
     @Test
     fun searchNotesStateLoadingToSuccessReturnData(){
         val noteList = NoteFactory.createNoteList(0, 10)
-        val noteViewList = NoteFactory.createNoteViewList(0,10)
-        noteViewList.forEachIndexed { index, noteView ->
-            noteList[index] stubTo noteView
-        }
+
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         verifyViewModelDataState(LOADING)
 
         whenSuccessOnNextNoteList(noteList)
         verifyViewModelDataState(SUCCESS)
-        assertViewModelNotesEqual(noteViewList)
+        assertViewModelNotesEqual(noteList.transNoteViews())
     }
 
     @Test
@@ -127,13 +125,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
     fun searchNoteNextPageReturnDataTotalSize_20(){
         val p1NoteList = NoteFactory.createNoteList(0, 10)
         val p2NoteList = NoteFactory.createNoteList(10, 20)
-        val noteViewList = NoteFactory.createNoteViewList(0,20)
-        noteViewList.forEachIndexed { index, noteView ->
-            if (index < 10)
-                p1NoteList[index] stubTo noteView
-            else
-                p2NoteList[index-10] stubTo noteView
-        }
 
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
@@ -191,14 +182,14 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     @Test
     fun insertNotesExecuteUseCase(){
-        val insertedNoteView = givenStubInsertNote()
+        val insertedNoteView = NoteFactory.createNoteView(title="insertTitle", date = "1")
         whenInsertNoteSaveState(insertedNoteView)
         verifyInsertNoteExecute()
     }
 
     @Test
     fun insertNotesLoadingNoData(){
-        val insertedNoteView = givenStubInsertNote()
+        val insertedNoteView = NoteFactory.createNoteView(title="insertTitle", date = "1")
         whenInsertNoteSaveState(insertedNoteView)
         verifyInsertNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -207,7 +198,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     @Test
     fun insertNotesSuccessReturnNoteView(){
-        val insertedNoteView = givenStubInsertNote()
+        val insertedNoteView = NoteFactory.createNoteView(title="insertTitle", date = "1")
         whenInsertNoteSaveState(insertedNoteView)
         verifyInsertNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -219,7 +210,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
     @Test
     fun insertNoteErrorReturnErrorMessageNoData(){
         val throwable = RuntimeException()
-        val insertedNoteView = givenStubInsertNote()
+        val insertedNoteView = NoteFactory.createNoteView(title="insertTitle", date = "1")
         whenInsertNoteSaveState(insertedNoteView)
         verifyInsertNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -233,21 +224,18 @@ class NoteListViewModelTest: BaseViewModelTest() {
     @Test
     fun notifyUpdateNoteSuccessThenSortingTop(){
         val noteList = NoteFactory.createNoteList(0, 10)
-        val noteViewList = NoteFactory.createNoteViewList(0,10)
-        noteViewList.forEachIndexed { index, noteView ->
-            noteList[index] stubTo noteView
-        }
+        val noteViews = noteList.transNoteViews()
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         verifyViewModelDataState(LOADING)
 
         whenSuccessOnNextNoteList(noteList)
         verifyViewModelDataState(SUCCESS)
-        assertViewModelNotesEqual(noteViewList)
+        assertViewModelNotesEqual(noteViews)
 
         val updateIndex = 2
         val updateTitle = "updateTitle"
-        val updateNoteView = NoteFactory.oneOfNotesUpdate(noteViewList, updateIndex, updateTitle, null)
+        val updateNoteView = NoteFactory.oneOfNotesUpdate(noteViews, updateIndex, updateTitle, null)
         whenUpdateNote(updateNoteView)
 
         checkViewModelNotesUpdate(index = 0, updateNoteView = updateNoteView)
@@ -256,52 +244,46 @@ class NoteListViewModelTest: BaseViewModelTest() {
     @Test
     fun equalNoteNotUpdate(){
         val noteList = NoteFactory.createNoteList(0, 10)
-        val noteViewList = NoteFactory.createNoteViewList(0,10)
-        noteViewList.forEachIndexed { index, noteView ->
-            noteList[index] stubTo noteView
-        }
+        val noteViews = noteList.transNoteViews()
+
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         verifyViewModelDataState(LOADING)
 
         whenSuccessOnNextNoteList(noteList)
         verifyViewModelDataState(SUCCESS)
-        assertViewModelNotesEqual(noteViewList)
+        assertViewModelNotesEqual(noteViews)
 
         val updateIndex = 2
-        val updateNoteView = noteViewList[updateIndex]
-        whenUpdateNote(updateNoteView)
+        val dontUpdateNoteView = noteViews[updateIndex]
+        whenUpdateNote(dontUpdateNoteView)
 
-        assertViewModelNotesEqual(noteViewList) // when update then not sorting b/c equal note don't execute update
+        assertViewModelNotesEqual(noteViews) // when update then not sorting b/c equal note don't execute update
     }
 
     @Test
     fun notifyDeleteNoteStateSuccess(){
         val noteList = NoteFactory.createNoteList(0, 10)
-        val noteViewList = NoteFactory.createNoteViewList(0, 10).toMutableList()
-        noteViewList.forEachIndexed { index, noteView ->
-            noteList[index] stubTo noteView
-        }
+        val noteViews = noteList.transNoteViews().toMutableList()
+
 
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
         whenSuccessOnNextNoteList(noteList)
 
         val deleteIndex = 2
-        val deleteNoteView = noteViewList[deleteIndex]
-        noteViewList.remove(deleteNoteView)
+        val deleteNoteView = noteViews[deleteIndex]
+        noteViews.remove(deleteNoteView)
 
         whenNotifyDeleteNote(deleteNoteView)
         verifyViewModelDataState(SUCCESS, times(2))
-        assertViewModelNotesSize(noteViewList.size)
-        assertViewModelNotesEqual(noteViewList)
+        assertViewModelNotesSize(noteViews.size)
+        assertViewModelNotesEqual(noteViews)
     }
 
     @Test
     fun deleteNoteExecuteStateSuccess(){
         val deleteNoteView = NoteFactory.createNoteView(title = "deleted", date = "1")
-        val deleteNote = NoteFactory.createNote(title = "deleted", date = "1")
-        deleteNoteView stubTo deleteNote
 
         whenDeleteNote(deleteNoteView)
         verifyDeleteNoteExecute()
@@ -313,8 +295,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
     fun deleteNoteStateError(){
         val throwable = RuntimeException()
         val deleteNoteView = NoteFactory.createNoteView(title = "deleted", date = "1")
-        val deleteNote = NoteFactory.createNote(title = "deleted", date = "1")
-        deleteNoteView stubTo deleteNote
 
         whenDeleteNote(deleteNoteView)
         verifyDeleteNoteExecute()
@@ -329,13 +309,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         val deleteIndex2 = 2
 
         val noteViews = NoteFactory.createNoteViewList(0,5)
-        val notes = NoteFactory.createNoteList(0,5)
-
-        val deleteNote = listOf(notes[deleteIndex], notes[deleteIndex2])
         val deleteNoteViews = listOf(noteViews[deleteIndex], noteViews[deleteIndex2])
-        deleteNoteViews.forEachIndexed { index, noteView ->
-            noteView stubTo deleteNote[index]
-        }
 
         whenDeleteMultipleNotes(deleteNoteViews)
         verifyDeleteMultipleNoteExecute()
@@ -344,10 +318,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
     @Test
     fun deleteMultipleNotesSuccessThenRemoveDeletedNotes(){
         val noteList = NoteFactory.createNoteList(0, 10)
-        val noteViewList = NoteFactory.createNoteViewList(0, 10).toMutableList()
-        noteViewList.forEachIndexed { index, noteView ->
-            noteList[index] stubTo noteView
-        }
+        val noteViewList = noteList.transNoteViews().toMutableList()
 
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
@@ -355,19 +326,13 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
         val deleteIndex = 0
         val deleteIndex2 = 2
-
-        val deleteNote = listOf(noteList[deleteIndex], noteList[deleteIndex2])
         val deleteNoteViews = listOf(noteViewList[deleteIndex], noteViewList[deleteIndex2])
-
-        deleteNoteViews.forEachIndexed { index, noteView ->
-            noteView stubTo deleteNote[index]
-        }
 
         whenDeleteMultipleNotes(deleteNoteViews)
         verifyDeleteMultipleNoteExecute()
         whenSuccessOnDeleteMultiNotes()
 
-        assertViewModelNotesSize(noteViewList.size.minus(deleteNoteViews.size))
+        assertViewModelNotesSize(noteViewList.size - deleteNoteViews.size)
         assertViewModelNotesEqual(noteViewList.apply {
             deleteNoteViews.forEach { remove(it) }
         })
@@ -430,12 +395,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     private fun verifyInsertNoteExecute(){
         insertNewNote.verifyExecute(insertNoteOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, noteParam)
-    }
-
-    private fun givenStubInsertNote(): NoteView{
-        val insertedNoteView = NoteFactory.createNoteView(title="insertTitle", date = "1")
-        whenever(noteMapper.mapFromView(insertedNoteView)).thenReturn(NoteFactory.createNote(title="insertTitle", date = "1"))
-        return insertedNoteView
     }
 
     private fun whenInsertNoteSaveState(insertNoteView: NoteView){

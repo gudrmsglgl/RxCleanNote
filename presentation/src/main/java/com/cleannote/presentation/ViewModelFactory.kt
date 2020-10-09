@@ -9,8 +9,6 @@ import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.interactor.usecases.splash.Login
-import com.cleannote.presentation.mapper.NoteMapper
-import com.cleannote.presentation.mapper.UserMapper
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.presentation.splash.SplashViewModel
@@ -21,25 +19,23 @@ import javax.inject.Singleton
 class ViewModelFactory
 @Inject constructor(
     private val login: Login,
-    private val userMapper: UserMapper,
     private val searchNotes: SearchNotes,
     private val insertNewNote: InsertNewNote,
     private val updateNote: UpdateNote,
     private val deleteNote: DeleteNote,
     private val deleteMultipleNotes: DeleteMultipleNotes,
-    private val noteMapper: NoteMapper,
     private val sharedPreferences: SharedPreferences
 ): ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when(modelClass){
 
-        SplashViewModel::class.java -> SplashViewModel(login, userMapper) as T
+        SplashViewModel::class.java -> SplashViewModel(login) as T
 
         NoteListViewModel::class.java -> NoteListViewModel(
-            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, noteMapper, sharedPreferences) as T
+            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, sharedPreferences) as T
 
-        NoteDetailViewModel::class.java -> NoteDetailViewModel(updateNote, deleteNote, noteMapper) as T
+        NoteDetailViewModel::class.java -> NoteDetailViewModel(updateNote, deleteNote) as T
 
         else -> {
             throw IllegalArgumentException("unknown model class $modelClass")

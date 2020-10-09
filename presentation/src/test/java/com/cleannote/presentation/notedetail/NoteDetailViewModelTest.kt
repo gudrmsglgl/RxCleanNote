@@ -27,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(InstantExecutorExtension::class)
 class NoteDetailViewModelTest: BaseViewModelTest() {
 
-
     private lateinit var viewModel: NoteDetailViewModel
 
     private lateinit var updateNote: UpdateNote
@@ -40,13 +39,11 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     private lateinit var noteParamCaptor: KArgumentCaptor<Note>
 
-    private val note = NoteFactory.createNote(title = "testNote", date = "1")
     private val noteView = NoteFactory.createNoteView(title = "testNote", date = "1")
 
     @BeforeEach
     fun setUp(){
         updateNote = mock()
-        noteMapper = mock()
         deleteNote = mock()
 
         onSuccessNoteCaptor = argumentCaptor()
@@ -59,7 +56,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         viewModelState = MutableLiveData()
         viewModelState.observeForever(stateObserver)
 
-        viewModel = NoteDetailViewModel(updateNote, deleteNote, noteMapper)
+        viewModel = NoteDetailViewModel(updateNote, deleteNote)
     }
 
     @AfterEach
@@ -69,14 +66,12 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun updateNoteExecuteUseCase(){
-        noteView stubTo note
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
     }
 
     @Test
     fun updateNoteStateLoadingReturnNoData(){
-        noteView stubTo note
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -85,7 +80,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun updateNoteStateSuccessReturnNote(){
-        noteView stubTo note
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -97,7 +91,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun updateNoteStateErrorReturnThrowable(){
-        noteView stubTo note
         val throwable = RuntimeException()
         whenUpdateNote(noteView)
         verifyUpdateNoteExecute()
@@ -110,14 +103,12 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun deleteNoteExecuteUseCase(){
-        noteView stubTo note
         whenDeleteNote(noteView)
         verifyDeleteNoteExecute()
     }
 
     @Test
     fun deleteNoteStateLoadingNoData(){
-        noteView stubTo note
         whenDeleteNote(noteView)
         verifyDeleteNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -126,7 +117,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun deleteNoteStateSuccessReturnNote(){
-        noteView stubTo note
         whenDeleteNote(noteView)
         verifyDeleteNoteExecute()
         verifyViewModelDataState(LOADING)
@@ -138,7 +128,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun deleteNoteStateErrorReturnThrowable(){
-        noteView stubTo note
         val throwable = RuntimeException()
         whenDeleteNote(noteView)
         verifyDeleteNoteExecute()

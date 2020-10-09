@@ -11,14 +11,13 @@ import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
-import com.cleannote.presentation.mapper.NoteMapper
+import com.cleannote.presentation.extensions.transNote
 import com.cleannote.presentation.model.NoteView
 
 class NoteDetailViewModel
 constructor(
     private val updateNote: UpdateNote,
-    private val deleteNote: DeleteNote,
-    private val noteMapper: NoteMapper
+    private val deleteNote: DeleteNote
 ): BaseViewModel(updateNote, deleteNote) {
 
     private lateinit var note: NoteView
@@ -72,7 +71,7 @@ constructor(
                     note = tempNote
                     _updatedNote.postValue(DataState.success(note))
                 },
-                params = noteMapper.mapFromView(tempNote)
+                params = tempNote.transNote()
             )
         }
     }
@@ -88,7 +87,7 @@ constructor(
             onComplete = {
                 _deletedNote.postValue(DataState.success(noteView))
             },
-            params = noteMapper.mapFromView(noteView)
+            params = noteView.transNote()
         )
     }
 

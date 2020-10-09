@@ -13,14 +13,14 @@ import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Query
 import com.cleannote.presentation.common.BaseViewModel
-import com.cleannote.presentation.common.Constants.FAIL_DELETE_MSG
-import com.cleannote.presentation.common.Constants.SUCCESS_DELETE_MSG
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notelist.ListToolbarState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
-import com.cleannote.presentation.mapper.NoteMapper
+import com.cleannote.presentation.extensions.transNote
+import com.cleannote.presentation.extensions.transNoteViews
+import com.cleannote.presentation.extensions.transNotes
 import com.cleannote.presentation.model.NoteView
 
 class NoteListViewModel
@@ -29,7 +29,6 @@ constructor(
     private val insertNewNote: InsertNewNote,
     private val deleteNote: DeleteNote,
     private val deleteMultipleNotes: DeleteMultipleNotes,
-    private val noteMapper: NoteMapper,
     private val sharedPreferences: SharedPreferences
 ): BaseViewModel(searchNotes, insertNewNote, deleteNote, deleteMultipleNotes) {
 
@@ -74,8 +73,8 @@ constructor(
     fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
         searchNotes.execute(
-                onSuccess = { list ->
-                    loadedNotes.addAll(list.map { noteMapper.mapToView(it) })
+                onSuccess = { notes ->
+                    loadedNotes.addAll( notes.transNoteViews() )
                     _mediatorNoteList.postValue(DataState.success(loadedNotes))
                 },
                 onError = {
@@ -93,7 +92,7 @@ constructor(
             onError = {
                 _insertNote.postValue(DataState.error(it))
             },
-            params = noteMapper.mapFromView(noteView))
+            params = noteView.transNote())
     }
 
     fun notifyUpdatedNote(updateNoteView: NoteView){
@@ -129,7 +128,7 @@ constructor(
                 loadedNotes.remove(deletedNoteView)
                 _mediatorNoteList.postValue(DataState.success(loadedNotes))
             },
-            params = noteMapper.mapFromView(deletedNoteView)
+            params = deletedNoteView.transNote()
         )
     }
 
@@ -147,7 +146,7 @@ constructor(
                 }
                 _mediatorNoteList.postValue(DataState.success(loadedNotes))
             },
-            params = notes.map { noteMapper.mapFromView(it) }
+            params = notes.transNotes()
         )
     }
 
