@@ -1,8 +1,6 @@
 package com.cleannote.data
 
-import com.cleannote.data.mapper.NoteMapper
-import com.cleannote.data.mapper.QueryMapper
-import com.cleannote.data.mapper.UserMapper
+import com.cleannote.data.extensions.*
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.source.NoteDataStoreFactory
@@ -20,17 +18,14 @@ import javax.inject.Inject
 class NoteDataRepository
 @Inject
 constructor(
-    private val factory: NoteDataStoreFactory,
-    private val noteMapper: NoteMapper,
-    private val userMapper: UserMapper,
-    private val queryMapper: QueryMapper
+    private val factory: NoteDataStoreFactory
 ): NoteRepository{
 
     override fun insertNewNote(note: Note): Single<Long> = factory.retrieveCacheDataStore()
-        .insertCacheNewNote(noteMapper.mapToEntity(note))
+        .insertCacheNewNote(note.transNoteEntity())
         .map {
             if (it > 0) {
-                factory.retrieveRemoteDataStore().insertRemoteNewNote(noteMapper.mapToEntity(note))
+                factory.retrieveRemoteDataStore().insertRemoteNewNote(note.transNoteEntity())
                 it
             } else {
                 throw Exception()
@@ -38,23 +33,23 @@ constructor(
         }
         .onErrorReturn { -1L }
 
-    override fun login(userId: String): Flowable<List<User>> = factory.retrieveRemoteDataStore()
+    override fun login(userId: String): Flowable<List<User>> = factory
+        .retrieveRemoteDataStore()
         .login(userId)
-        .map { users ->
-            users.map {
-                userMapper.mapFromEntity(it)
-            }
+        .map {
+            it.transUserList()
         }
 
     override fun searchNotes(query: Query): Flowable<List<Note>> =
         if (query.like == null || query.like == "")
-            defaultSearchNote(queryMapper.mapToEntity(query))
+            defaultSearchNote(query.transQueryEntity())
         else
-            keywordSearchNote(queryMapper.mapToEntity(query))
+            keywordSearchNote(query.transQueryEntity())
 
     private fun defaultSearchNote(
         queryEntity: QueryEntity
-    ) = factory.retrieveCacheDataStore()
+    ) = factory
+        .retrieveCacheDataStore()
         .isCached(queryEntity.page)
         .flatMapPublisher {
             factory.retrieveDataStore(it).searchNotes(queryEntity)
@@ -64,21 +59,25 @@ constructor(
             val isCached: Boolean = it.second
             val loadedNoteEntities: List<NoteEntity> = it.first
             if (!isCached && loadedNoteEntities.isNotEmpty())
-                saveNotes(loadedNoteEntities, queryEntity).toSingle { it }
+                saveNotes(
+                    remoteEntities = loadedNoteEntities,
+                    queryEntity = queryEntity
+                ).toSingle { it }
             else Single.just(it)
         }
         .flatMap {
             val isCached: Boolean = it.second
             val loadedNoteEntities: List<NoteEntity> = it.first
             if (isCached)
-                transCacheNoteEntityToDomain(loadedNoteEntities)
+                returnCacheNoteEntities(loadedNoteEntities)
             else
-                loadCacheNoteEntitiesToDomain(queryEntity)
+                loadUpdatedCacheNoteEntities(queryEntity)
         }
 
     private fun keywordSearchNote(
         queryEntity: QueryEntity
-    ) = factory.retrieveRemoteDataStore()
+    ) = factory
+        .retrieveRemoteDataStore()
         .searchNotes(queryEntity)
         .flatMapSingle {
             if (it.isNotEmpty())
@@ -86,20 +85,20 @@ constructor(
             else Single.just(it)
         }
         .flatMap {
-            loadCacheNoteEntitiesToDomain(queryEntity)
+            loadUpdatedCacheNoteEntities(queryEntity)
         }
 
     override fun updateNote(note: Note): Completable = factory
         .retrieveCacheDataStore()
-        .updateNote(noteMapper.mapToEntity(note))
+        .updateNote(note.transNoteEntity())
 
     override fun deleteNote(note: Note): Completable = factory
         .retrieveCacheDataStore()
-        .deleteNote(noteMapper.mapToEntity(note))
+        .deleteNote(note.transNoteEntity())
 
     override fun deleteMultipleNotes(notes: List<Note>): Completable  = factory
         .retrieveCacheDataStore()
-        .deleteMultipleNotes(notes.map { noteMapper.mapToEntity(it) })
+        .deleteMultipleNotes(notes.transNoteEntityList())
 
     /*override fun searchNotes(query: Query): Flowable<List<Note>> {
         val queryEntity = queryMapper.mapToEntity(query)
@@ -114,19 +113,22 @@ constructor(
 
     }*/
 
-    private fun loadCacheNoteEntitiesToDomain(queryEntity: QueryEntity): Flowable<List<Note>> {
-        return factory.retrieveCacheDataStore().searchNotes(queryEntity)
-            .map { cachedNoteEntities ->
-                cachedNoteEntities.map { noteMapper.mapFromEntity(it) }
-            }
+    private fun loadUpdatedCacheNoteEntities(
+        queryEntity: QueryEntity
+    ): Flowable<List<Note>> = factory
+        .retrieveCacheDataStore()
+        .searchNotes(queryEntity)
+        .map {
+            it.transNoteList()
+        }
+
+
+    private fun returnCacheNoteEntities(cacheEntities: List<NoteEntity>): Flowable<List<Note>>{
+        return Flowable.just(cacheEntities.transNoteList())
     }
 
-    private fun transCacheNoteEntityToDomain(cacheEntities: List<NoteEntity>): Flowable<List<Note>>{
-        return Flowable.just(cacheEntities.map { noteMapper.mapFromEntity(it) })
-    }
-
-    private fun saveNotes(noteEntities: List<NoteEntity>, queryEntity: QueryEntity): Completable {
-        return factory.retrieveCacheDataStore().saveNotes(noteEntities, queryEntity)
+    private fun saveNotes(remoteEntities: List<NoteEntity>, queryEntity: QueryEntity): Completable {
+        return factory.retrieveCacheDataStore().saveNotes(remoteEntities, queryEntity)
     }
 
 }

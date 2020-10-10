@@ -1,5 +1,6 @@
 package com.cleannote.data
 
+import com.cleannote.data.extensions.*
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
@@ -10,11 +11,6 @@ import com.cleannote.data.test.factory.UserFactory
 import com.cleannote.domain.model.Note
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.instanceOf
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -27,9 +23,6 @@ class NoteDataRepositoryTest: BaseDataTest() {
 
     @BeforeEach
     fun setUp(){
-        queryMapper = mock()
-        noteMapper = mock()
-        userMapper = mock ()
         noteCacheDataStore = mock()
         noteRemoteDataStore = mock()
         noteDataStoreFactory = mock{
@@ -38,16 +31,15 @@ class NoteDataRepositoryTest: BaseDataTest() {
             on { retrieveDataStore(true) } doReturn noteCacheDataStore
             on { retrieveDataStore(false) } doReturn noteRemoteDataStore
         }
-        noteDataRepository = NoteDataRepository(noteDataStoreFactory, noteMapper, userMapper, queryMapper)
+        noteDataRepository = NoteDataRepository(noteDataStoreFactory)
     }
 
     @Test
     fun whenInsertNewNoteThenCallCacheRemoteDataStore(){
         val insertNote: Note = NoteFactory.createNote(title = "title#1")
-        val insertNoteEntity = NoteFactory.createNoteEntity(title = "title#1")
+        val insertNoteEntity = insertNote.transNoteEntity()
         val insertSuccess = 1L
 
-        insertNote stubTo insertNoteEntity
         noteCacheDataStore stubInsertNote (insertNoteEntity to insertSuccess)
         noteRemoteDataStore stubInsertNote (insertNoteEntity to Completable.complete())
 
@@ -62,10 +54,9 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun insertNewNoteReturnLongValue(){
         val insertNote: Note = NoteFactory.createNote(title = "title#1")
-        val insertNoteEntity = NoteFactory.createNoteEntity(title = "title#1")
+        val insertNoteEntity = insertNote.transNoteEntity()
         val insertSuccess = 1L
 
-        insertNote stubTo insertNoteEntity
         noteCacheDataStore stubInsertNote (insertNoteEntity to insertSuccess)
         noteRemoteDataStore stubInsertNote (insertNoteEntity to Completable.complete())
 
@@ -78,10 +69,9 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenInsertNewNoteReturnFail(){
         val failNote = NoteFactory.createNote(title = "failNote")
-        val failNoteEntity = NoteFactory.createNoteEntity(title = "failNote")
+        val failNoteEntity = failNote.transNoteEntity()
         val insertFail = -1L
 
-        failNote stubTo failNoteEntity
         noteCacheDataStore stubInsertNote (failNoteEntity to insertFail)
 
         whenDataRepositoryInsertNote(failNote)
@@ -92,10 +82,9 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenInsertNewNoteFailThenNotCallRemote(){
         val failNote = NoteFactory.createNote(title = "failNote")
-        val failNoteEntity = NoteFactory.createNoteEntity(title = "failNote")
+        val failNoteEntity = failNote.transNoteEntity()
         val insertFail = -1L
 
-        failNote stubTo failNoteEntity
         noteCacheDataStore stubInsertNote (failNoteEntity to insertFail)
 
         whenDataRepositoryInsertNote(failNote)
@@ -118,13 +107,9 @@ class NoteDataRepositoryTest: BaseDataTest() {
     fun whenLoginReturnUsers(){
         val userID = UserFactory.USER_ID
         val userList = UserFactory.users()
-        val userEntities = UserFactory.userEntities()
+        val userEntities = userList.transUserEntityList()
 
         noteRemoteDataStore stubLogin (userID to userEntities)
-
-        userList.forEachIndexed { index, user ->
-            whenever(userMapper.mapFromEntity(userEntities[index])).thenReturn(user)
-        }
 
         whenDataRepositoryLogin(userID)
             .test()
@@ -134,14 +119,10 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenSearchNotesThenComplete(){
         val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
-        val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
-        resultNote.forEachIndexed { index, note ->
-            cacheNoteEntities[index] stubTo note
-        }
+        val resultNote: List<Note> = cacheNoteEntities.transNoteList()
 
         val defaultQuery = QueryFactory.makeQuery()
-        val defaultQueryEntity = QueryFactory.makeQueryEntity()
-        defaultQuery stubTo defaultQueryEntity
+        val defaultQueryEntity = defaultQuery.transQueryEntity()
 
         noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
         noteRemoteDataStore stubSearchNotes (defaultQueryEntity to cacheNoteEntities)
@@ -156,14 +137,10 @@ class NoteDataRepositoryTest: BaseDataTest() {
     fun whenSearchNotesThenReturnNotes(){
         val remoteNoteEntities = NoteFactory.createNoteEntityList(0, 10)
         val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
-        val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
-        resultNote.forEachIndexed { index, note ->
-            cacheNoteEntities[index] stubTo note
-        }
+        val resultNote: List<Note> = cacheNoteEntities.transNoteList()
 
         val defaultQuery = QueryFactory.makeQuery()
-        val defaultQueryEntity = QueryFactory.makeQueryEntity()
-        defaultQuery stubTo defaultQueryEntity
+        val defaultQueryEntity = defaultQuery.transQueryEntity()
 
         noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
         noteRemoteDataStore stubSearchNotes (defaultQueryEntity to remoteNoteEntities)
@@ -176,17 +153,12 @@ class NoteDataRepositoryTest: BaseDataTest() {
     }
 
     @Test
-    fun whenSearchNotesSaveCacheFromRemoteData(){
+    fun whenRemoteDataIsNotEmptyThenSearchNotesSaveCacheRemoteData(){
         val defaultQuery = QueryFactory.makeQuery()
-        val defaultQueryEntity = QueryFactory.makeQueryEntity()
-        defaultQuery stubTo defaultQueryEntity
+        val defaultQueryEntity = defaultQuery.transQueryEntity()
 
         val remoteNoteEntities = NoteFactory.createNoteEntityList(0, 10)
         val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
-        val resultNote: List<Note> = NoteFactory.createNoteList(0,10)
-        resultNote.forEachIndexed { index, note ->
-            cacheNoteEntities[index] stubTo note
-        }
 
         noteCacheDataStore stubPageIsCache (defaultQueryEntity.page to false)
         noteRemoteDataStore stubSearchNotes (defaultQueryEntity to remoteNoteEntities)
@@ -210,21 +182,15 @@ class NoteDataRepositoryTest: BaseDataTest() {
                 verifySaveNote(remoteNoteEntities, defaultQueryEntity)
                 verifySearchNote(defaultQueryEntity)
             }
-
         }
     }
 
     @Test
-    fun whenSearchNotesThenNotCallRemoteOnlyCacheData(){
+    fun whenNextSearchNotesIsCacheThenNotCallRemoteOnlyCacheData(){
         val nextPageQuery = QueryFactory.makeQuery(page = 2)
-        val nextPageQueryEntity = QueryFactory.makeQueryEntity(page = 2)
-        nextPageQuery stubTo nextPageQueryEntity
+        val nextPageQueryEntity = nextPageQuery.transQueryEntity()
 
         val nextCachedNoteEntities = NoteFactory.createNoteEntityList(10,20)
-        val resultNote: List<Note> = NoteFactory.createNoteList(10,20)
-        resultNote.forEachIndexed { index, note ->
-            nextCachedNoteEntities[index] stubTo note
-        }
 
         noteCacheDataStore stubPageIsCache (nextPageQueryEntity.page to true)
         noteCacheDataStore stubSearchNotes (nextPageQueryEntity to nextCachedNoteEntities)
@@ -250,18 +216,12 @@ class NoteDataRepositoryTest: BaseDataTest() {
     }
 
     @Test
-    fun whenSearchNotesNextPageThenNoData(){
+    fun whenSearchNotesNextPageEmptyDataThenDontSaveCache(){
         val nextPageQuery = QueryFactory.makeQuery(page = 3)
-        val nextPageQueryEntity = QueryFactory.makeQueryEntity(page = 3)
-        nextPageQuery stubTo nextPageQueryEntity
+        val nextPageQueryEntity = nextPageQuery.transQueryEntity()
 
         val nextRemoteNoteEntities = emptyList<NoteEntity>()
         val nextCachedNoteEntities = emptyList<NoteEntity>()
-
-        val resultNote: List<Note> = emptyList()
-        resultNote.forEachIndexed { index, note ->
-            nextCachedNoteEntities[index] stubTo note
-        }
 
         noteCacheDataStore stubPageIsCache (nextPageQueryEntity.page to false)
         noteRemoteDataStore stubSearchNotes (nextPageQueryEntity to nextRemoteNoteEntities)
@@ -290,15 +250,12 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenSearchKeywordNoteThenComplete(){
         val searchQuery = QueryFactory.makeQuery("#1")
-        val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
-        searchQuery stubTo searchQueryEntity
+        val searchQueryEntity = searchQuery.transQueryEntity()
 
-        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
         val searchedRemoteNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
         val searchedCacheNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
-        searchedNote.forEachIndexed { index, note ->
-            searchedCacheNotes[index] stubTo note
-        }
+        val searchedNote = searchedCacheNotes.transNoteList()
+
 
         noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedRemoteNotes)
         noteCacheDataStore stubSaveNotes (Triple(searchedRemoteNotes, searchQueryEntity, Completable.complete()))
@@ -313,17 +270,13 @@ class NoteDataRepositoryTest: BaseDataTest() {
     }
 
     @Test
-    fun whenSearchKeywordNoteThenSaveCacheLoadCache(){
+    fun whenSearchKeywordNoteRemoteNotEmptyThenSaveCache(){
         val searchQuery = QueryFactory.makeQuery("#1")
-        val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
-        searchQuery stubTo searchQueryEntity
+        val searchQueryEntity = searchQuery.transQueryEntity()
 
-        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
         val searchedRemoteNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
         val searchedCacheNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
-        searchedNote.forEachIndexed { index, note ->
-            searchedCacheNotes[index] stubTo note
-        }
+
 
         noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedRemoteNotes)
         noteCacheDataStore stubSaveNotes (Triple(searchedRemoteNotes, searchQueryEntity, Completable.complete()))
@@ -341,15 +294,10 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenSearchKeywordNoteRemoteNoDataCacheExistData_ThenNotSaveCacheReturnCacheData(){
         val searchQuery = QueryFactory.makeQuery("#1")
-        val searchQueryEntity = QueryFactory.makeQueryEntity("#1")
-        searchQuery stubTo searchQueryEntity
+        val searchQueryEntity = searchQuery.transQueryEntity()
 
-        val searchedNote = listOf(NoteFactory.createNote(title = "testTitle#1"))
         val searchedRemoteNotes = emptyList<NoteEntity>()
         val searchedCacheNotes = listOf(NoteFactory.createNoteEntity(title = "testTitle#1"))
-        searchedNote.forEachIndexed { index, note ->
-            searchedCacheNotes[index] stubTo note
-        }
 
         noteRemoteDataStore stubSearchNotes (searchQueryEntity to searchedRemoteNotes)
         noteCacheDataStore stubSearchNotes (searchQueryEntity to searchedCacheNotes)
@@ -366,9 +314,7 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenUpdateNoteThenComplete(){
         val updateNote = NoteFactory.createNote(title = "updateNote")
-        val updateNoteEntity = NoteFactory.createNoteEntity(title = "updateNote")
-
-        updateNote stubTo updateNoteEntity
+        val updateNoteEntity = updateNote.transNoteEntity()
         noteCacheDataStore stubUpdateNote (updateNoteEntity to Completable.complete())
 
         whenUpdateNote(updateNote)
@@ -379,9 +325,7 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenUpdateNoteThenNoValue(){
         val updateNote = NoteFactory.createNote(title = "updateNote")
-        val updateNoteEntity = NoteFactory.createNoteEntity(title = "updateNote")
-
-        updateNote stubTo updateNoteEntity
+        val updateNoteEntity = updateNote.transNoteEntity()
         noteCacheDataStore stubUpdateNote (updateNoteEntity to Completable.complete())
 
         whenUpdateNote(updateNote)
@@ -396,9 +340,7 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenDeleteNoteThenComplete(){
         val deleteNote = NoteFactory.createNote(title = "deleteNote")
-        val deleteNoteEntity = NoteFactory.createNoteEntity(title = "deleteNote")
-
-        deleteNote stubTo deleteNoteEntity
+        val deleteNoteEntity = deleteNote.transNoteEntity()
         noteCacheDataStore stubDeleteNote (deleteNoteEntity to Completable.complete())
 
         whenDataRepositoryDeleteNote(deleteNote)
@@ -411,15 +353,12 @@ class NoteDataRepositoryTest: BaseDataTest() {
 
     @Test
     fun whenDeleteMultipleNotesThenCallOnlyCache(){
-        val deleteNote = NoteFactory.createNoteList(0,3)
-        val deleteNoteEntities = NoteFactory.createNoteEntityList(0,3)
+        val deleteNotes = NoteFactory.createNoteList(0,3)
+        val deleteNoteEntities = deleteNotes.transNoteEntityList()
 
-        deleteNoteEntities.forEachIndexed { index, noteEntity ->
-            deleteNote[index] stubTo noteEntity
-        }
         noteCacheDataStore stubDeleteMultiNotes (deleteNoteEntities to Completable.complete())
 
-        whenDataRepositoryDeleteMultiNotes(deleteNote)
+        whenDataRepositoryDeleteMultiNotes(deleteNotes)
             .test()
             .assertComplete()
             .assertNoValues()

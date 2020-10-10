@@ -1,8 +1,5 @@
 package com.cleannote.data
 
-import com.cleannote.data.mapper.NoteMapper
-import com.cleannote.data.mapper.QueryMapper
-import com.cleannote.data.mapper.UserMapper
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.model.UserEntity
@@ -18,32 +15,13 @@ import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.mockito.verification.VerificationMode
 
 abstract class BaseDataTest {
 
     lateinit var noteDataRepository: NoteDataRepository
-
-    lateinit var noteMapper: NoteMapper
-    lateinit var userMapper: UserMapper
-    lateinit var queryMapper: QueryMapper
-
-
-    infix fun Query.stubTo(queryEntity: QueryEntity){
-        whenever(queryMapper.mapToEntity(this)).thenReturn(queryEntity)
-    }
-
-    infix fun NoteEntity.stubTo(note: Note){
-        whenever(noteMapper.mapFromEntity(this)).thenReturn(note)
-    }
-
-    infix fun Note.stubTo(noteEntity: NoteEntity){
-        whenever(noteMapper.mapToEntity(this)).thenReturn(noteEntity)
-    }
 
     infix fun NoteCacheDataStore.stubInsertNote(stub: Pair<NoteEntity, Long>){
         whenever(this.insertCacheNewNote(stub.first)).thenReturn(Single.just(stub.second))
@@ -86,6 +64,7 @@ abstract class BaseDataTest {
     }
 
     fun whenDataRepositoryInsertNote(note: Note) = noteDataRepository.insertNewNote(note)
+
     fun NoteDataStore.verifyInsertNote(noteEntity: NoteEntity, verifyMode: VerificationMode? = null){
         if (this is NoteCacheDataStore)
             verify(this, verifyMode ?: times(1)).insertCacheNewNote(noteEntity)
