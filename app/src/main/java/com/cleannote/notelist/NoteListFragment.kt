@@ -37,7 +37,13 @@ import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.extension.transNoteUiModel
+import com.cleannote.extension.transNoteUiModels
+import com.cleannote.extension.transNoteView
+import com.cleannote.extension.transNoteViews
 import com.cleannote.model.NoteMode
+import com.cleannote.model.NoteMode.Default
+import com.cleannote.model.NoteMode.MultiDefault
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
@@ -55,7 +61,6 @@ import java.util.concurrent.TimeUnit
 class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val noteMapper: NoteMapper,
     private val sharedPreferences: SharedPreferences
 ): BaseFragment(R.layout.fragment_note_list),
     OnBackPressListener, TouchAdapter {
@@ -159,8 +164,7 @@ constructor(
             InputType.NewNote,
             object : InputCaptureCallback{
                 override fun onTextCaptured(text: String) {
-                    val noteView = noteMapper.mapFromTitle(text)
-                    viewModel.insertNotes(noteView)
+                    viewModel.insertNotes(text.transNoteView())
                 }
             })}
         .addCompositeDisposable()
@@ -178,20 +182,20 @@ constructor(
                         showLoadingProgressBar(false)
                         showErrorMessage(getString(R.string.searchErrorMsg))
                         dataState.sendFirebaseThrowable()
+                        timber("d","${dataState.throwable}")
                     }
                 }
             }
         })
 
     private fun fetchNotesToAdapter(notes: List<NoteView>) {
-        timber("d", "notes size: ${notes.size}")
+        timber("d", "fetchNotesToAdapter: NotesInfo: ${notes}")
         showEmptyData(notes.isEmpty())
-        val noteUiModels = notes.map {
-            if (viewModel.toolbarState.value == MultiSelectState)
-                noteMapper.mapToUiModel(it).apply { mode = NoteMode.MultiDefault }
-            else
-                noteMapper.mapToUiModel(it)
-        }
+
+        val noteUiModels =
+            if (viewModel.toolbarState.value == MultiSelectState) notes.transNoteUiModels(MultiDefault)
+            else notes.transNoteUiModels(Default)
+
         noteAdapter.submitList(noteUiModels)
     }
 
@@ -210,7 +214,7 @@ constructor(
                     LOADING -> showLoadingProgressBar(true)
                     SUCCESS -> {
                         showLoadingProgressBar(false)
-                        val noteUiModel = noteMapper.mapToUiModel(dataState.data!!)
+                        val noteUiModel = dataState.data!!.transNoteUiModel()
                         navDetailNote(noteUiModel)
                     }
                     ERROR -> {
@@ -384,24 +388,24 @@ constructor(
     }
 
     private fun actionDelete(deleteMemos: List<NoteUiModel>){
-        if (deleteMemos.size == 1)
-            viewModel.deleteNote(noteMapper.mapToView(deleteMemos[0]))
-        else if (deleteMemos.size > 1)
-            viewModel.deleteMultiNotes(
-                deleteMemos.map{ noteMapper.mapToView(it) }
+        when {
+            deleteMemos.size == 1 -> viewModel.deleteNote(deleteMemos[0].transNoteView())
+            deleteMemos.size > 1 -> viewModel.deleteMultiNotes(
+                deleteMemos.transNoteViews()
             )
-        else showToast(getString(R.string.delete_multi_select_empty))
+            else -> showToast(getString(R.string.delete_multi_select_empty))
+        }
     }
 
     private fun requestUpdate(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
-            viewModel.notifyUpdatedNote(noteMapper.mapToView(it))
+            viewModel.notifyUpdatedNote(it.transNoteView())
         }
     }
 
     private fun requestDelete(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_DELETE_KEY)?.let {
-            viewModel.notifyDeletedNote(noteMapper.mapToView(it))
+            viewModel.notifyDeletedNote(it.transNoteView())
         }
     }
 

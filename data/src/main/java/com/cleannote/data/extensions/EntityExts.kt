@@ -1,18 +1,27 @@
 package com.cleannote.data.extensions
 
 import com.cleannote.data.model.NoteEntity
+import com.cleannote.data.model.NoteImageEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.model.UserEntity
 import com.cleannote.domain.model.Note
+import com.cleannote.domain.model.NoteImage
 import com.cleannote.domain.model.Query
 import com.cleannote.domain.model.User
+
+fun NoteImageEntity.transNoteImage() = NoteImage(this.img_pk, this.note_pk, this.img_path)
+fun List<NoteImageEntity>.transNoteImages() = map { it.transNoteImage() }
+
+fun NoteImage.transNoteImageEntity() = NoteImageEntity(this.img_pk, this.note_pk, this.img_path)
+fun List<NoteImage>.transNoteImageEntities() = map { it.transNoteImageEntity() }
 
 fun NoteEntity.transNote() = Note(
     this.id,
     this.title,
     this.body,
     this.updated_at,
-    this.created_at
+    this.created_at,
+    this.images?.transNoteImages()
 )
 
 fun Note.transNoteEntity() = NoteEntity(
@@ -20,7 +29,8 @@ fun Note.transNoteEntity() = NoteEntity(
     this.title,
     this.body,
     this.updated_at,
-    this.created_at
+    this.created_at,
+    this.images?.transNoteImageEntities()
 )
 
 fun List<Note>.transNoteEntityList() = map { it.transNoteEntity() }

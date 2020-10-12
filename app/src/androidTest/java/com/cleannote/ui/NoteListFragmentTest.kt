@@ -80,7 +80,7 @@ class NoteListFragmentTest: BaseTest() {
                 isDisplayed()
                 hasSize(notes.size)
 
-                firstItem<NRecyclerItem<NoteViewHolder>> {
+                firstItem<RecyclerItem> {
                     itemTitle {
                         hasText(notes[0].title)
                     }
@@ -185,12 +185,12 @@ class NoteListFragmentTest: BaseTest() {
             }
             recyclerView {
                 hasSize(orderedNotes.size)
-                firstItem<NRecyclerItem<NoteViewHolder>> {
+                firstItem<RecyclerItem> {
                     itemTitle {
                         hasText(orderedNotes[0].title)
                     }
                 }
-                visibleLastItem<NRecyclerItem<NoteViewHolder>> {
+                visibleLastItem<RecyclerItem> {
                     itemTitle {
                         hasText(orderedNotes[getLastVisiblePosition()].title)
                     }
@@ -225,7 +225,7 @@ class NoteListFragmentTest: BaseTest() {
                 idle(1500) // for RxDebounce(1000)
             }
             recyclerView {
-                firstItem<NRecyclerItem<NoteViewHolder>> {
+                firstItem<RecyclerItem> {
                     itemTitle {
                         hasText(searchedNotes[0].title)
                     }
@@ -279,7 +279,7 @@ class NoteListFragmentTest: BaseTest() {
 
         screen {
             recyclerView {
-                firstItem<NRecyclerItem<NoteViewHolder>> {
+                firstItem<RecyclerItem> {
                     swipeLeft()
                     swipeDeleteMode {
                         deleteImg.hasDrawable(R.drawable.ic_delete_24dp)
@@ -317,7 +317,7 @@ class NoteListFragmentTest: BaseTest() {
                 swipeUp()
                 hasSize(notes.size + nextNotes.size)
                 scrollToEnd()
-                visibleLastItem<NRecyclerItem<NoteViewHolder>> {
+                visibleLastItem<RecyclerItem> {
                     itemTitle {
                         hasText(nextNotes[getLastVisiblePosition()-notes.size].title) // nextNote[0~9], so minus notes.size: 19 - 10
                     }
@@ -366,7 +366,7 @@ class NoteListFragmentTest: BaseTest() {
 
         screen {
             recyclerView{
-                firstItem<NRecyclerItem<NoteViewHolder>> {
+                firstItem<RecyclerItem> {
                     swipeLeft()
                     swipeDeleteMode {
                         deleteImg.click()
@@ -395,7 +395,7 @@ class NoteListFragmentTest: BaseTest() {
         activity {
             noteListScreen {
                 recyclerView{
-                    firstItem<NRecyclerItem<NoteViewHolder>> {
+                    firstItem<RecyclerItem> {
                         swipeRight()
                         swipeDeleteMode {
                             deleteImg.click()

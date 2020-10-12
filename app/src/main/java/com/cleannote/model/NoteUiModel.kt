@@ -9,7 +9,8 @@ data class NoteUiModel(val id: String,
                        var body: String,
                        var updated_at: String,
                        val created_at: String,
-                       var mode: NoteMode = NoteMode.Default): Parcelable
+                       var mode: NoteMode = NoteMode.Default,
+                       val images: List<NoteImageUiModel>? = null): Parcelable
 
 enum class NoteMode{
     Default,

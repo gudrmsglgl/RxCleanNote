@@ -22,5 +22,9 @@ data class NoteModel(
 
     @SerializedName("created_at")
     @Expose
-    val created_at: String
+    val created_at: String,
+
+    @SerializedName("img_paths")
+    @Expose
+    val images: List<String>?
 )

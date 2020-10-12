@@ -36,7 +36,6 @@ const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
 class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val noteMapper: NoteMapper,
     private val dateUtil: DateUtil
 ) : BaseFragment(R.layout.fragment_note_detail) {
 
@@ -69,14 +68,14 @@ class NoteDetailFragment constructor(
             if (it != null){
                 when (it.status) {
                     is SUCCESS -> {
-                        noteUiModel = noteMapper.mapToUiModel(it.data!!)
+                        noteUiModel = it.data!!.transNoteUiModel()
                         showToast(getString(R.string.updateSuccessMsg))
                         fetchNoteUi(noteUiModel)
                     }
                     is ERROR -> {
-                        it.sendFirebaseThrowable()
-                        showToast(getString(R.string.updateErrorMsg))
                         fetchNoteUi(noteUiModel)
+                        showToast(getString(R.string.updateErrorMsg))
+                        it.sendFirebaseThrowable()
                     }
                     else -> {}
                 }
@@ -152,7 +151,7 @@ class NoteDetailFragment constructor(
             title(R.string.delete_title)
             message(R.string.delete_message)
             positiveButton(R.string.delete_ok){
-                viewModel.deleteNote(noteMapper.mapToView(deleteMemo))
+                viewModel.deleteNote(deleteMemo.transNoteView())
             }
             negativeButton(R.string.delete_cancel){
                 showToast(getString(R.string.deleteCancelMsg))
@@ -251,14 +250,14 @@ class NoteDetailFragment constructor(
         viewModel.setNote(editDoneNoteParam())
     }
 
-    private fun editDoneNoteParam() = noteMapper.mapToView(
+    private fun editDoneNoteParam() =
         noteUiModel
             .copy()
             .apply {
                 title = note_title.text.toString()
                 body = note_body.text.toString()
                 updated_at = dateUtil.getCurrentTimestamp()}
-    ) to EditDoneMode
+            .transNoteView() to EditDoneMode
 
     private fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable
         .equalDrawable(R.drawable.ic_cancel_24dp)

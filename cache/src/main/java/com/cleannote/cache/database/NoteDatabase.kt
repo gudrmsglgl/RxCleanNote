@@ -10,7 +10,7 @@ import com.cleannote.cache.model.CacheNoteImage
 import com.cleannote.cache.model.CachedNote
 import javax.inject.Inject
 
-@Database(entities = [CachedNote::class, CacheNoteImage::class], version = 1, exportSchema = false)
+@Database(entities = [CachedNote::class, CacheNoteImage::class], version = 2, exportSchema = false)
 abstract class NoteDatabase: RoomDatabase() {
 
     abstract fun noteDao(): CachedNoteDao
