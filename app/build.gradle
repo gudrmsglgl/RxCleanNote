@@ -83,6 +83,7 @@ dependencies {
     implementation Dependencies.material_dialogs_input
     implementation Dependencies.firebaseAnalyticsKTX
     implementation Dependencies.firebaseCrashticsKTX
+    implementation Dependencies.glide
     implementation AndroidTestDependencies.idling_resource
 
     implementation SupportDependencies.appcompat
@@ -94,6 +95,7 @@ dependencies {
     kapt AnnotationProcessing.dagger_android_processor
     kapt AnnotationProcessing.room_compiler
     kapt AnnotationProcessing.lifecycle_compiler
+    kapt AnnotationProcessing.glide_compiler
     kaptAndroidTest AnnotationProcessing.dagger_compiler
 
     implementation SupportDependencies.appcompat

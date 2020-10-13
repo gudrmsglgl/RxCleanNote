@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.*
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.cleannote.app.R
 import com.cleannote.extension.gone
 import com.cleannote.extension.visible
-import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.jakewharton.rxbinding4.view.clicks
@@ -20,7 +22,9 @@ import kotlinx.android.synthetic.main.item_note_list.view.*
 import timber.log.Timber
 
 class NoteListAdapter(
-    val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    val context: Context,
+    val glideReqManager: RequestManager
+): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object{
         private const val DEFAULT_ITEM = 1
@@ -142,7 +146,18 @@ class NoteListAdapter(
 
         private fun uiHolderDefault(item: NoteUiModel){
             itemView.apply {
-                margin_view.visible()
+
+                val image =
+                    if (item.images.isNullOrEmpty()) R.drawable.empty_holder
+                    else item.images.get(0).img_path
+                glideReqManager
+                    .applyDefaultRequestOptions(
+                        RequestOptions.bitmapTransform(RoundedCorners(10))
+                    )
+                    .load(image)
+                    .thumbnail(0.1f)
+                    .into(note_thumbnail)
+
                 checkbox_delete.gone()
 
                 note_title.apply {
@@ -165,7 +180,6 @@ class NoteListAdapter(
 
         private fun uiHolderMultiDeleteSelect(item: NoteUiModel, position: Int){
             itemView.apply {
-                margin_view.gone()
                 checkbox_delete.visible()
                 checkbox_delete.isChecked = item.mode == MultiSelected
                 note_title.apply {
@@ -190,6 +204,8 @@ class NoteListAdapter(
                     }
             }
         }
+
+
     }
 
     inner class NoteMenuHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

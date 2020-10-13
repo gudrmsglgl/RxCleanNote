@@ -44,4 +44,5 @@ object Dependencies {
     val firebaseCrashtics =  "com.google.firebase:firebase-crashlytics:${Versions.firebase_crashlytics}"
     val firebaseCrashticsKTX = "com.google.firebase:firebase-crashlytics-ktx:${Versions.firebase_crashlytics}"
     val timber = "com.jakewharton.timber:timber:${Versions.timber_version}"
+    val glide = "com.github.bumptech.glide:glide:${Versions.glide_version}"
 }

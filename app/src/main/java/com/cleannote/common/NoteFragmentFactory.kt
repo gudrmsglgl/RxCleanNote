@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
-import com.cleannote.mapper.NoteMapper
+import com.bumptech.glide.RequestManager
 import com.cleannote.mapper.UserMapper
 import com.cleannote.notedetail.NoteDetailFragment
 import com.cleannote.notelist.NoteListFragment
@@ -15,14 +15,14 @@ class NoteFragmentFactory @Inject constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
     private val userMapper: UserMapper,
-    private val noteMapper: NoteMapper,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val glideReqManager: RequestManager
 ): FragmentFactory(){
 
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(viewModelFactory, sharedPreferences)
+            val fragment = NoteListFragment(viewModelFactory, glideReqManager, sharedPreferences)
             fragment
         }
 

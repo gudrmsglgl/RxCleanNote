@@ -25,6 +25,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.bumptech.glide.RequestManager
 
 import com.cleannote.app.R
 import com.cleannote.common.BaseFragment
@@ -61,6 +62,7 @@ import java.util.concurrent.TimeUnit
 class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
+    private val glideReqManager: RequestManager,
     private val sharedPreferences: SharedPreferences
 ): BaseFragment(R.layout.fragment_note_list),
     OnBackPressListener, TouchAdapter {
@@ -124,7 +126,7 @@ constructor(
     private fun initRecyclerView(){
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
-            noteAdapter = NoteListAdapter(context)
+            noteAdapter = NoteListAdapter(context, glideReqManager)
             itemTouchHelper = ItemTouchHelper(
                 NoteItemTouchHelperCallback(
                     this@NoteListFragment,

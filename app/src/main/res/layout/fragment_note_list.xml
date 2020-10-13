@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.cleannote.notelist.NoteListFragment"
     style="@style/Theme.AppCompat.Light"
+    android:background="@color/note_list_bg"
     android:theme="@style/Theme.AppCompat.Light"
     android:id="@+id/note_list_fragment">
 

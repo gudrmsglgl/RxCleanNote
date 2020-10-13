@@ -5,4 +5,5 @@ object AnnotationProcessing {
     val dagger_compiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
     val lifecycle_compiler = "androidx.lifecycle:lifecycle-compiler:${Versions.lifecycle_version}"
     val dagger_android_processor = "com.google.dagger:dagger-android-processor:${Versions.dagger}"
+    val glide_compiler = "com.github.bumptech.glide:compiler:${Versions.glide_version}"
 }

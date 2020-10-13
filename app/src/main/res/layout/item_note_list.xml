@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_height"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="@dimen/item_margin_top"
+    android:layout_marginStart="@dimen/item_margin_start_end"
+    android:layout_marginEnd="@dimen/item_margin_start_end"
+    app:cardElevation="@dimen/item_elevation"
+    app:cardCornerRadius="@dimen/item_corner_radius">
+
+
+<LinearLayout
     android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/item_height"
     android:weightSum="100"
     android:gravity="center_vertical"
-    android:layout_marginEnd="@dimen/recyclerview_start_end_margins"
-    android:layout_marginStart="@dimen/recyclerview_start_end_margins"
     android:background="@color/white">
 
-    <View
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/note_thumbnail"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="30"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"/>
+   <!-- <View
         android:id="@+id/margin_view"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@color/colorAccent"/>
+        android:background="@color/colorAccent"/>-->
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/checkbox_delete"
@@ -29,7 +45,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/note_title"
         android:textSize="@dimen/title_list_item_text_size"
-        android:layout_weight="77"
+        android:textStyle="bold"
+        android:layout_weight="45"
         android:text="Some Note Title"
         android:textColor="@color/note_title_color"
         android:lines="1"
@@ -46,8 +63,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/note_timestamp"
         android:textSize="@dimen/date_list_item_text_size"
-        android:layout_weight="20"
-        android:text="Dec 1 2017"
+        android:layout_weight="25"
+        android:text="2020-10-11 00:00:00"
+        android:lines="2"
         android:layout_marginTop="@dimen/default_view_margin"
         android:layout_marginBottom="@dimen/default_view_margin"
         android:layout_marginEnd="@dimen/default_view_margin"
@@ -57,3 +75,4 @@
 
 
 </LinearLayout>
+</androidx.cardview.widget.CardView>
