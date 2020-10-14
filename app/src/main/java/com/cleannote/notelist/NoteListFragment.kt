@@ -28,6 +28,7 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.bumptech.glide.RequestManager
 
 import com.cleannote.app.R
+import com.cleannote.app.databinding.FragmentNoteListBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.InputCaptureCallback
 import com.cleannote.data.ui.InputType
@@ -64,7 +65,7 @@ constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val glideReqManager: RequestManager,
     private val sharedPreferences: SharedPreferences
-): BaseFragment(R.layout.fragment_note_list),
+): BaseFragment<FragmentNoteListBinding>(R.layout.fragment_note_list),
     OnBackPressListener, TouchAdapter {
 
     private val bundle: Bundle = Bundle()
@@ -75,6 +76,7 @@ constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.vm = viewModel
         initRecyclerView()
         onRefresh()
         subscribeToolbarState()
@@ -83,7 +85,6 @@ constructor(
         subscribeInsertResult()
         subscribeDeleteResult()
         noteClick()
-        noteLongClick()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
             requestUpdate(bundle)
             requestDelete(bundle)
@@ -117,16 +118,10 @@ constructor(
         }
         .addCompositeDisposable()
 
-    private fun noteLongClick() = noteAdapter.longClickNoteSubject
-        .subscribe {
-            transMultiDeleteState()
-        }
-        .addCompositeDisposable()
-
     private fun initRecyclerView(){
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
-            noteAdapter = NoteListAdapter(context, glideReqManager)
+            noteAdapter = NoteListAdapter(context, glideReqManager, viewModel)
             itemTouchHelper = ItemTouchHelper(
                 NoteItemTouchHelperCallback(
                     this@NoteListFragment,
@@ -137,9 +132,6 @@ constructor(
             itemTouchHelper.attachToRecyclerView(this)
 
             scrollEvents()
-                /*.filter {
-                    timber("d", "${it.dy}")
-                    it.dy >= 0}*/
                 .filter {
                     timber("d", "findLastCompletelyVisibleItemPosition: ${(it.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()}")
                     (it.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition() ==
@@ -148,10 +140,6 @@ constructor(
                 .filter {
                     viewModel.isExistNextPage()
                 }
-                /*.filter { isLastPosition ->
-                    timber("d","isLastPosition: $isLastPosition")
-                    isLastPosition && viewModel.isExistNextPage()
-                }*/
                 .subscribe {
                     timber("d", "doOnSubscribe2")
                     viewModel.nextPage()
@@ -192,21 +180,11 @@ constructor(
 
     private fun fetchNotesToAdapter(notes: List<NoteView>) {
         timber("d", "fetchNotesToAdapter: NotesInfo: ${notes}")
-        showEmptyData(notes.isEmpty())
-
         val noteUiModels =
             if (viewModel.toolbarState.value == MultiSelectState) notes.transNoteUiModels(MultiDefault)
             else notes.transNoteUiModels(Default)
 
         noteAdapter.submitList(noteUiModels)
-    }
-
-    private fun showEmptyData(isEmptyData: Boolean) = if (isEmptyData) {
-        recycler_view.visibility = GONE
-        tv_no_data.visibility = VISIBLE
-    } else {
-        recycler_view.visibility = VISIBLE
-        tv_no_data.visibility = GONE
     }
 
     private fun subscribeInsertResult() = viewModel.insertResult
@@ -442,9 +420,4 @@ constructor(
             noteAdapter.transAllDefaultNote()
     }
 
-    private fun transMultiDeleteState(isTransNotes: Boolean = true){
-        viewModel.setToolbarState(MultiSelectState)
-        if (isTransNotes)
-            noteAdapter.transAllMultiSelectDefaultNote()
-    }
 }

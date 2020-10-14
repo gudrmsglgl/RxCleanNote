@@ -5,6 +5,7 @@ object Dependencies {
     val kotlin_reflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     val ktx = "androidx.core:core-ktx:${Versions.ktx}"
     val fragment_ktx =  "androidx.fragment:fragment-ktx:${Versions.fragment_version}"
+    val databinding_ktx = "com.github.wada811:DataBinding-ktx:${Versions.databinding_ktx}"
     val kotlin_coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines_version}"
     val kotlin_coroutines_android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines_version}"
     val kotlin_coroutines_play_services = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.coroutines_play_services}"

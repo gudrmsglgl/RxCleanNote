@@ -55,7 +55,7 @@ class NoteListFragmentTest: BaseTest() {
 
         screen {
             recyclerView {
-                isNotDisplayed()
+                isGone()
             }
 
             noDataTextView {

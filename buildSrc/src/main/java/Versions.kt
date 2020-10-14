@@ -7,6 +7,7 @@ object Versions {
     const val targetsdk = 29
     const val kotlin = "1.3.61"
     const val ktx = "1.2.0"
+    const val databinding_ktx = "5.0.0"
     const val dagger = "2.25.4"
     const val nav_components = "2.3.0-alpha06"
     const val material_dialogs = "3.2.1"

@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.RequestManager
 import com.cleannote.common.DateUtil
 import com.cleannote.common.UIController
 import com.cleannote.mapper.NoteMapper
@@ -20,8 +21,8 @@ class TestNoteFragmentFactory
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
     private val userMapper: UserMapper,
-    private val noteMapper: NoteMapper,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val glideReqManager: RequestManager
 ): FragmentFactory() {
 
     lateinit var uiController: UIController
@@ -29,7 +30,7 @@ class TestNoteFragmentFactory
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(viewModelFactory, noteMapper, sharedPreferences)
+            val fragment = NoteListFragment(viewModelFactory, glideReqManager, sharedPreferences)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }
@@ -37,7 +38,7 @@ class TestNoteFragmentFactory
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory, noteMapper, dateUtil)
+            val fragment = NoteDetailFragment(viewModelFactory, dateUtil)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }

@@ -12,14 +12,16 @@ object NoteFactory {
         return dateFormat.format(Date())
     }
 
-    fun createNoteModel(id: String? = null,
+    fun createNoteModel( id: String? = null,
                          title: String,
-                         body: String? = null) = NoteModel(
+                         body: String? = null,
+                         images: List<String>? = null) = NoteModel(
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
         created_at = getCurrentTimestamp(),
-        updated_at = getCurrentTimestamp()
+        updated_at = getCurrentTimestamp(),
+        images = images
     )
 
     fun createNoteEntity(id: String? = null,
@@ -32,7 +34,7 @@ object NoteFactory {
         updated_at = getCurrentTimestamp()
     )
 
-    fun createNoteMoelList(count: Int): List<NoteModel> = (0 until count).map {
+    fun createNoteModelList(count: Int): List<NoteModel> = (0 until count).map {
         createNoteModel("#$it", "title #it", "body #it") }.toList()
 
     fun createNoteEntityList(count: Int): List<NoteEntity> = (0 until count).map {

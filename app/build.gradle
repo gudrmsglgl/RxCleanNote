@@ -44,6 +44,10 @@ android {
         correctErrorTypes = true
     }
 
+    dataBinding{
+        enabled = true
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -67,6 +71,7 @@ dependencies {
     implementation Dependencies.ktx
     implementation Dependencies.fragment_ktx
     implementation Dependencies.dagger
+    implementation Dependencies.databinding_ktx
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
     implementation Dependencies.rxbinding

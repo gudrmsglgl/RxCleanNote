@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 
 import com.cleannote.app.R
+import com.cleannote.app.databinding.FragmentNoteDetailBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
@@ -37,7 +38,7 @@ const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil
-) : BaseFragment(R.layout.fragment_note_detail) {
+) : BaseFragment<FragmentNoteDetailBinding>(R.layout.fragment_note_detail) {
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -75
 

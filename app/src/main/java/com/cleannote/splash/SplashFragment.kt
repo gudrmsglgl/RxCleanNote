@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 
 import com.cleannote.app.R
+import com.cleannote.app.databinding.FragmentSplashBinding
 import com.cleannote.common.*
 import com.cleannote.data.ui.InputType
 import com.cleannote.mapper.UserMapper
@@ -24,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_splash.*
 class SplashFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val userMapper: UserMapper
-): BaseFragment(R.layout.fragment_splash) {
+): BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash) {
 
     private val viewModel: SplashViewModel by viewModels { viewModelFactory }
 

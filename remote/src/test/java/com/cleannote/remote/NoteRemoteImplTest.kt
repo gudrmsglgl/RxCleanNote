@@ -61,7 +61,7 @@ class NoteRemoteImplTest: BaseRemote() {
 
     @Test
     fun searchNotesComplete(){
-        val noteModels = NoteFactory.createNoteMoelList(defaultQuery.limit)
+        val noteModels = NoteFactory.createNoteModelList(defaultQuery.limit)
 
         noteService stubSearchNotes (defaultQuery to noteModels)
 
