@@ -121,7 +121,7 @@ constructor(
     private fun initRecyclerView(){
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
-            noteAdapter = NoteListAdapter(context, glideReqManager, viewModel)
+            noteAdapter = NoteListAdapter(context, glideReqManager, viewModel).apply { setHasStableIds(true) }
             itemTouchHelper = ItemTouchHelper(
                 NoteItemTouchHelperCallback(
                     this@NoteListFragment,

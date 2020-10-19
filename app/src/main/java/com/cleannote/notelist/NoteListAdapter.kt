@@ -39,6 +39,9 @@ class NoteListAdapter(
             else -> MULTI_DELETE_SELECT_ITEM
         }
 
+    override fun getItemId(position: Int): Long {
+        return differ.currentList[position].hashCode().toLong()
+    }
     private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
     val clickNoteSubject: PublishSubject<NoteUiModel>
         get() = _clickNoteSubject

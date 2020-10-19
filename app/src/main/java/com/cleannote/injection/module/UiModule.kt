@@ -29,7 +29,7 @@ abstract class UiModule {
             .placeholderOf(R.drawable.ic_placeholder)
             .error(R.drawable.error)
             .fallback(R.drawable.empty_holder)
-            .skipMemoryCache(true)
+            .skipMemoryCache(false)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
 
 
