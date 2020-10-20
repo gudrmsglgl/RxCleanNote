@@ -18,6 +18,7 @@ import com.cleannote.notelist.holder.SingleDeleteHolder
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.longClicks
+import com.jakewharton.rxbinding4.widget.checkedChanges
 
 object BindingAdapter {
 
@@ -70,7 +71,7 @@ object BindingAdapter {
                             longClicks { true }
                                 .subscribe {
                                     viewModel.setToolbarState(MultiSelectState)
-                                    (holder.bindingAdapter as NoteListAdapter).transAllMultiSelectDefaultNote()
+                                    (holder.bindingAdapter as NoteListAdapter).changeNoteMode(NoteMode.MultiDefault)
                                 }
                         }
                         else -> {

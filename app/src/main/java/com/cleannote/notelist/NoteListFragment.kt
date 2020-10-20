@@ -4,8 +4,6 @@ import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -32,7 +30,6 @@ import com.cleannote.app.databinding.FragmentNoteListBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.InputCaptureCallback
 import com.cleannote.data.ui.InputType
-import com.cleannote.mapper.NoteMapper
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.common.OnBackPressListener
@@ -44,8 +41,7 @@ import com.cleannote.extension.transNoteUiModels
 import com.cleannote.extension.transNoteView
 import com.cleannote.extension.transNoteViews
 import com.cleannote.model.NoteMode
-import com.cleannote.model.NoteMode.Default
-import com.cleannote.model.NoteMode.MultiDefault
+import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
@@ -121,7 +117,10 @@ constructor(
     private fun initRecyclerView(){
         recycler_view.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
-            noteAdapter = NoteListAdapter(context, glideReqManager, viewModel).apply { setHasStableIds(true) }
+            setHasFixedSize(true)
+            noteAdapter = NoteListAdapter(context, glideReqManager, viewModel).apply {
+                setHasStableIds(true)
+            }
             itemTouchHelper = ItemTouchHelper(
                 NoteItemTouchHelperCallback(
                     this@NoteListFragment,
@@ -130,7 +129,6 @@ constructor(
             )
             adapter = noteAdapter
             itemTouchHelper.attachToRecyclerView(this)
-
             scrollEvents()
                 .filter {
                     timber("d", "findLastCompletelyVisibleItemPosition: ${(it.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()}")
@@ -395,7 +393,7 @@ constructor(
     }
 
     override fun onSwiped(position: Int) {
-        noteAdapter.transNoteSingleDelete(position)
+        noteAdapter.changeNoteMode(SingleDelete, position)
     }
 
     private fun onRefresh() = swipe_refresh.setOnRefreshListener {
@@ -404,20 +402,20 @@ constructor(
     }
 
     override fun shouldBackPress(): Boolean {
-        if (noteAdapter.isNotDefaultNote()){
-            transSearchState()
+        if (noteAdapter.isDefaultNote()){
+            transSearchState(true)
             return false
         } else
             return true
     }
 
-    override fun isSwipeEnable(): Boolean = !noteAdapter.isNotDefaultNote()
+    override fun isSwipeEnable(): Boolean = noteAdapter.isDefaultNote()
 
     private fun transSearchState(isTransNotes: Boolean = true){
         if (viewModel.toolbarState.value != SearchState)
             viewModel.setToolbarState(SearchState)
         if (isTransNotes)
-            noteAdapter.transAllDefaultNote()
+            noteAdapter.changeNoteMode(Default)
     }
 
 }

@@ -10,13 +10,16 @@ import androidx.recyclerview.widget.*
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.R
 import com.cleannote.app.databinding.ItemNoteListBinding
+import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.holder.BaseHolder
 import com.cleannote.notelist.holder.NoteViewHolder
 import com.cleannote.notelist.holder.SingleDeleteHolder
 import com.cleannote.presentation.notelist.NoteListViewModel
+import com.jakewharton.rxbinding4.recyclerview.dataChanges
 import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.widget.checkedChanges
 import io.reactivex.rxjava3.subjects.PublishSubject
 import timber.log.Timber
 
@@ -24,7 +27,7 @@ class NoteListAdapter(
     val context: Context,
     val glideReqManager: RequestManager,
     val noteListViewModel: NoteListViewModel
-): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+): ListAdapter<NoteUiModel, BaseHolder<NoteUiModel>>(NoteDiffCallback) {
 
     companion object{
         private const val DEFAULT_ITEM = 1
@@ -33,22 +36,22 @@ class NoteListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int =
-        when(differ.currentList[position].mode){
+        when(currentList[position].mode){
             Default -> DEFAULT_ITEM
             SingleDelete -> SINGLE_DELETE_ITEM
             else -> MULTI_DELETE_SELECT_ITEM
         }
 
     override fun getItemId(position: Int): Long {
-        return differ.currentList[position].hashCode().toLong()
+        return currentList[position].hashCode().toLong()
     }
     private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
     val clickNoteSubject: PublishSubject<NoteUiModel>
         get() = _clickNoteSubject
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<NoteUiModel>(){
+    object NoteDiffCallback: DiffUtil.ItemCallback<NoteUiModel>(){
         override fun areItemsTheSame(oldItem: NoteUiModel, newItem: NoteUiModel): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: NoteUiModel, newItem: NoteUiModel): Boolean {
@@ -56,9 +59,7 @@ class NoteListAdapter(
         }
     }
 
-    private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder<NoteUiModel> =
         when (viewType){
 
             SINGLE_DELETE_ITEM -> SingleDeleteHolder(binding = DataBindingUtil.inflate(
@@ -80,58 +81,31 @@ class NoteListAdapter(
             )
     }
 
-    override fun getItemCount(): Int = differ.currentList.size
+    override fun getItemCount(): Int = currentList.size
 
-    @Suppress("UNCHECKED_CAST")
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as BaseHolder<NoteUiModel>).bind(differ.currentList[position], position, _clickNoteSubject)
+    override fun onBindViewHolder(holder: BaseHolder<NoteUiModel>, position: Int) {
+        holder.bind(currentList[position], position, _clickNoteSubject)
     }
 
-    fun submitList(list: List<NoteUiModel>) {
-        Timber.tag("RxCleanNote").d("Adapter_submitList size:${list.size}")
-        differ.submitList(list)
-    }
-
-    fun transNoteSingleDelete(position: Int){
-        with (differ) {
+    fun changeNoteMode(noteMode: NoteMode, position: Int? = null){
+        val changedNote = if (noteMode == SingleDelete){
             currentList.apply {
-                forEachIndexed { index, note->
-                    if (index == position)
-                        note.apply { mode = SingleDelete }
-                    else
-                        note.apply { mode = Default}
-                }
+                find { it.mode == SingleDelete }?.let { it.mode = Default }
+                get(position!!).mode = SingleDelete
             }
-            submitList(currentList)
         }
-        notifyItemChanged(position)
-    }
-
-    fun isNotDefaultNote() = differ.currentList.any {
-        it.mode != Default
-    }
-
-    fun transAllDefaultNote(){
-        with(differ){
-            currentList.apply {
-                forEach { it.apply { mode = Default } }
-            }
-            submitList(currentList)
+        else {
+            currentList.map { it.apply { mode = noteMode } }
         }
+        submitList(changedNote)
         notifyDataSetChanged()
     }
 
-    fun transAllMultiSelectDefaultNote(){
-        with(differ){
-            currentList.apply {
-                forEach { it.apply { mode = MultiDefault } }
-            }
-            submitList(currentList)
-        }
-        notifyDataSetChanged()
+    fun isDefaultNote() = currentList.any {
+        it.mode != MultiDefault
     }
 
-    fun getMultiSelectedNotes(): List<NoteUiModel> =  differ.currentList.filter { it.mode == MultiSelected }
+    fun getMultiSelectedNotes(): List<NoteUiModel> =  currentList.filter { it.mode == MultiSelected }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
@@ -141,11 +115,11 @@ class NoteListAdapter(
     fun setMultiSelectCheck(position: Int, binding: ItemNoteListBinding) {
         if (binding.checkboxDelete.isChecked){
             binding.checkboxDelete.isChecked = false
-            differ.currentList[position].apply { mode = MultiDefault }
+            currentList[position].apply { mode = MultiDefault }
         }
         else {
             binding.checkboxDelete.isChecked = true
-            differ.currentList[position].apply { mode = MultiSelected }
+            currentList[position].apply { mode = MultiSelected }
         }
     }
 

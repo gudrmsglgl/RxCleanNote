@@ -1,7 +1,10 @@
 package com.cleannote.notelist.holder
 
+import androidx.core.view.isGone
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.databinding.ItemNoteListBinding
+import com.cleannote.extension.visible
+import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteUiModel
 import com.cleannote.presentation.notelist.NoteListViewModel
 import io.reactivex.rxjava3.subjects.PublishSubject
