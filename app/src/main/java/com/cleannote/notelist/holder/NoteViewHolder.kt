@@ -6,7 +6,11 @@ import com.cleannote.app.databinding.ItemNoteListBinding
 import com.cleannote.extension.visible
 import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notelist.NoteListAdapter
+import com.cleannote.presentation.data.notelist.ListToolbarState
 import com.cleannote.presentation.notelist.NoteListViewModel
+import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.view.longClicks
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 class NoteViewHolder(
@@ -16,11 +20,29 @@ class NoteViewHolder(
 ): BaseHolder<NoteUiModel>(binding){
     override fun bind(item: NoteUiModel, position: Int, clickSubject: PublishSubject<NoteUiModel>) {
         binding.apply {
-            holder = this@NoteViewHolder
-            selectPosition = position
             glideReqManager = requestManager
             noteUiModel = item
-            setClickSubject(clickSubject)
+            with(itemNote){
+                when (item.mode){
+                    NoteMode.Default -> {
+                        clicks()
+                            .map { item }
+                            .subscribe( clickSubject )
+
+                        longClicks { true }
+                            .subscribe {
+                                viewModel.setToolbarState(ListToolbarState.MultiSelectState)
+                                (bindingAdapter as NoteListAdapter).changeNoteMode(NoteMode.MultiDefault)
+                            }
+                    }
+                    else -> {
+                        clicks()
+                            .subscribe {
+                                (bindingAdapter as NoteListAdapter).setMultiSelectCheck(position, binding)
+                            }
+                    }
+                }
+            }
         }
     }
 }
