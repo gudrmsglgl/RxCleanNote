@@ -20,7 +20,7 @@ constructor(
     private val deleteNote: DeleteNote
 ): BaseViewModel(updateNote, deleteNote) {
 
-    private lateinit var note: NoteView
+    val finalNote = MutableLiveData<NoteView>()
     private lateinit var tempNote: NoteView
 
     private val _updatedNote = MutableLiveData<DataState<NoteView>>()
@@ -35,12 +35,6 @@ constructor(
     val detailToolbarState: LiveData<DetailToolbarState>
         get() = _detailToolbarState
 
-    val noteTitleState: LiveData<NoteTitleState>
-        get() = Transformations.map(_detailToolbarState){
-            if (it is TbExpanded) NtExpanded
-            else NtCollapse
-        }
-
     private val _noteMode: MutableLiveData<TextMode> = MutableLiveData()
     val noteMode: LiveData<TextMode>
         get() = _noteMode
@@ -49,33 +43,27 @@ constructor(
         _detailToolbarState.value = state
     }
 
-    fun setNoteMode(mode: TextMode){
+    fun setNoteMode(mode: TextMode, noteParam: NoteView?){
         _noteMode.value = mode
-    }
+        if (mode == DefaultMode) finalNote.value = noteParam!!
+        else if (mode == EditDoneMode){
+            tempNote = finalNote.value!!
 
-    fun setNote(noteParam: Pair<NoteView, TextMode>){
-        val curNoteView = noteParam.first
-        val curMode = noteParam.second
-        setNoteMode(curMode)
-
-        tempNote = curNoteView
-
-        if (curMode is EditDoneMode){
             _updatedNote.postValue(DataState.loading())
             updateNote.execute(
                 onSuccess = {},
                 onError = {
+                    finalNote.postValue(tempNote)
                     _updatedNote.postValue(DataState.error(it))
                 },
                 onComplete = {
-                    note = tempNote
-                    _updatedNote.postValue(DataState.success(note))
+                    finalNote.postValue(noteParam)
+                    _updatedNote.postValue(DataState.success(noteParam))
                 },
-                params = tempNote.transNote()
+                params = noteParam?.transNote()
             )
         }
     }
-
 
     fun deleteNote(noteView: NoteView) {
         _deletedNote.postValue(DataState.loading())
@@ -89,10 +77,6 @@ constructor(
             },
             params = noteView.transNote()
         )
-    }
-
-    fun isEditMode(): Boolean{
-        return _noteMode.value is EditMode
     }
 
 }

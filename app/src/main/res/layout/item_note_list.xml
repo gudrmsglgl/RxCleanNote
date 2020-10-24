@@ -9,15 +9,6 @@
         <variable
             name="glideReqManager"
             type="com.bumptech.glide.RequestManager" />
-        <variable
-            name="clickSubject"
-            type="io.reactivex.rxjava3.subjects.PublishSubject&lt;NoteUiModel>" />
-        <variable
-            name="holder"
-            type="com.cleannote.notelist.holder.NoteViewHolder" />
-        <variable
-            name="selectPosition"
-            type="Integer" />
     </data>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,9 +20,7 @@
     android:layout_marginStart="@dimen/item_margin_start_end"
     android:layout_marginEnd="@dimen/item_margin_start_end"
     app:cardElevation="@dimen/item_elevation"
-    app:cardCornerRadius="@dimen/item_corner_radius"
-    app:viewHolder="@{holder}"
-    app:selectedPos="@{selectPosition}">
+    app:cardCornerRadius="@dimen/item_corner_radius">
 
 
 <LinearLayout

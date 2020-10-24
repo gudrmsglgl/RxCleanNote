@@ -11,7 +11,6 @@ import com.cleannote.app.R
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.model.Note
-import com.cleannote.notelist.NoteListAdapter.NoteViewHolder
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory

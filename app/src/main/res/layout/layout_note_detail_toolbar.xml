@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable
+            name="vm"
+            type="com.cleannote.presentation.notedetail.NoteDetailViewModel" />
+    </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -26,6 +32,7 @@
         app:layout_constraintRight_toLeftOf="@id/toolbar_secondary_icon"
         app:layout_constraintHorizontal_bias="0"
         android:id="@+id/tool_bar_title"
+        android:text='@{vm.finalNote.title}'
         android:textColor="@color/white"
         android:layout_marginStart="@dimen/toolbar_title_margin"
         android:layout_marginEnd="@dimen/default_view_margin"
@@ -47,3 +54,4 @@
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -22,6 +22,7 @@ import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.cleannote.extension.isVisible
+import com.cleannote.extension.transNoteUiModel
 import com.cleannote.extension.visible
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.NoteDetailFragment
@@ -173,7 +174,7 @@ class MainActivity : AppCompatActivity(), UIController {
                 when (fragment){
                     is OnBackPressListener -> if (fragment.shouldBackPress()) super.onBackPressed()
                     is NoteDetailFragment -> with(fragment){
-                        setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_BUNDLE_KEY to  noteUiModel))
+                        setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_BUNDLE_KEY to  viewModel.finalNote.value?.transNoteUiModel()))
                         findNavController().popBackStack()
                     }
                     else -> super.onBackPressed()

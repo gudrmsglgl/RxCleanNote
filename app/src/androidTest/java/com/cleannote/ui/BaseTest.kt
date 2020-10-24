@@ -9,7 +9,9 @@ import com.cleannote.domain.Constants
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.injection.TestApplicationComponent
+import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.NoteListAdapter
+import com.cleannote.notelist.holder.BaseHolder
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -94,4 +96,4 @@ abstract class BaseTest {
     abstract fun injectTest()
 }
 
-typealias RecyclerItem = NRecyclerItem<NoteListAdapter.NoteViewHolder>
+typealias RecyclerItem = NRecyclerItem<BaseHolder<NoteUiModel>>

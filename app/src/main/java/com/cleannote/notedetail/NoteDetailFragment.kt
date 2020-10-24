@@ -40,13 +40,14 @@ class NoteDetailFragment constructor(
     private val dateUtil: DateUtil
 ) : BaseFragment<FragmentNoteDetailBinding>(R.layout.fragment_note_detail) {
 
-    private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -75
+    private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -85
 
     lateinit var noteUiModel: NoteUiModel
-    private val viewModel: NoteDetailViewModel by viewModels { viewModelFactory }
+    val viewModel: NoteDetailViewModel by viewModels { viewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.vm = viewModel
         getPreviousFragmentNote()
 
         appBarOffSetChangeSource()
@@ -57,7 +58,6 @@ class NoteDetailFragment constructor(
         menuSecondarySource()
 
         toolbarCollapseExpandedAnimation()
-        setTitleOfCollapseExpanded()
         noteModeChangeToolbarUi()
 
         subscribeUpdateNote()
@@ -69,12 +69,14 @@ class NoteDetailFragment constructor(
             if (it != null){
                 when (it.status) {
                     is SUCCESS -> {
-                        noteUiModel = it.data!!.transNoteUiModel()
+                        noteUiModel.apply {
+                            title = it.data!!.title
+                            body = it.data!!.body
+                            updated_at = it.data!!.updated_at
+                        }
                         showToast(getString(R.string.updateSuccessMsg))
-                        fetchNoteUi(noteUiModel)
                     }
                     is ERROR -> {
-                        fetchNoteUi(noteUiModel)
                         showToast(getString(R.string.updateErrorMsg))
                         it.sendFirebaseThrowable()
                     }
@@ -132,7 +134,7 @@ class NoteDetailFragment constructor(
         .subscribe { cancelMenu ->
             if (cancelMenu) defaultMode()
             else {
-                setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to noteUiModel))
+                setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel()))
                 findNavController().popBackStack()
             }
             releaseFocus()
@@ -160,34 +162,6 @@ class NoteDetailFragment constructor(
             }
             cancelable(false)
         }
-    }
-
-    private fun fetchNoteUi(noteUiModel: NoteUiModel){
-        setNoteTitle(noteUiModel.title)
-        setNoteBody(noteUiModel.body)
-    }
-
-    private fun setTitleOfCollapseExpanded() = viewModel.noteTitleState.observe( viewLifecycleOwner,
-        Observer { titleState ->
-            when (titleState) {
-                is NtExpanded -> setNoteTitle(noteUiModel.title)
-                is NtCollapse -> setToolbarTitle()
-            }
-        })
-
-    private fun setNoteTitle(title: String) = with(note_title){
-        setText(title)
-        setSelection(title.length)
-    }
-
-    private fun setNoteBody(body: String) = with(note_body){
-        setText(body)
-        setSelection(body.length)
-    }
-
-    private fun setToolbarTitle(){
-        viewModel.takeIf { it.isEditMode() }?.setNoteMode(DefaultMode)
-        tool_bar_title.text = noteUiModel.title
     }
 
     private fun getPreviousFragmentNote(){
@@ -239,26 +213,23 @@ class NoteDetailFragment constructor(
     }
 
     private fun defaultMode(){
-        viewModel.setNoteMode(DefaultMode)
-        fetchNoteUi(noteUiModel)
+        viewModel.setNoteMode(DefaultMode, noteUiModel.transNoteView())
     }
 
     private fun editMode(){
-        viewModel.setNoteMode(EditMode)
+        viewModel.setNoteMode(EditMode, null)
     }
 
     private fun editDoneMode(){
-        viewModel.setNote(editDoneNoteParam())
+        viewModel.setNoteMode(
+            EditDoneMode,
+            noteUiModel.copy(
+                title = note_title.text.toString(),
+                body = note_body.text.toString(),
+                updated_at = dateUtil.getCurrentTimestamp()
+            ).transNoteView()
+        )
     }
-
-    private fun editDoneNoteParam() =
-        noteUiModel
-            .copy()
-            .apply {
-                title = note_title.text.toString()
-                body = note_body.text.toString()
-                updated_at = dateUtil.getCurrentTimestamp()}
-            .transNoteView() to EditDoneMode
 
     private fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable
         .equalDrawable(R.drawable.ic_cancel_24dp)

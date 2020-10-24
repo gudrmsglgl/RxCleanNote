@@ -3,7 +3,7 @@
     <dimen name="splash_logo_width">180dp</dimen>
 
     <dimen name="toolbar_height">55dp</dimen>
-    <dimen name="toolbar_title_offset_height">65dp</dimen>
+    <dimen name="toolbar_title_offset_height">55dp</dimen>
     <dimen name="toolbar_item_margin">24dp</dimen>
     <dimen name="toolbar_title_margin">32dp</dimen>
     <dimen name="page_title_size">20sp</dimen>
