@@ -9,7 +9,10 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cleannote.app.R
+import com.cleannote.extension.hideKeyboard
 import com.cleannote.model.NoteUiModel
+import com.cleannote.presentation.data.notedetail.TextMode
+import kotlinx.android.synthetic.main.fragment_note_detail.*
 
 
 object BindingAdapter {
@@ -37,6 +40,18 @@ object BindingAdapter {
             .load(image)
             .thumbnail(0.1f)
             .into(imageView)
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["releaseFocus"])
+    fun releaseFocus(
+        view: View,
+        textMode: TextMode
+    ){
+        if (textMode != TextMode.EditMode){
+            view.takeIf { it.isFocused }?.clearFocus()
+            view.hideKeyboard()
+        }
     }
 
 }

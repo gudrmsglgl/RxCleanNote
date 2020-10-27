@@ -15,19 +15,17 @@ import com.cleannote.app.databinding.FragmentNoteDetailBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
-import com.cleannote.mapper.NoteMapper
 import com.cleannote.model.NoteUiModel
 import com.cleannote.presentation.data.State.ERROR
 import com.cleannote.presentation.data.State.SUCCESS
-import com.cleannote.presentation.data.notedetail.NoteTitleState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges
+import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
@@ -51,14 +49,12 @@ class NoteDetailFragment constructor(
         getPreviousFragmentNote()
 
         appBarOffSetChangeSource()
-        noteTitleChangeSource()
-        noteBodyChangeSource()
+        titleBodyChangeSource()
 
         menuPrimarySource()
         menuSecondarySource()
 
         toolbarCollapseExpandedAnimation()
-        noteModeChangeToolbarUi()
 
         subscribeUpdateNote()
         subscribeDeleteNote()
@@ -103,31 +99,11 @@ class NoteDetailFragment constructor(
             }
         })
 
-    private fun noteTitleChangeSource() = note_title
-        .textChanges()
-        .filter { note_title.isFocused }
+    private fun titleBodyChangeSource() = Observable.merge(
+        note_title.textChanges().filter { note_title.isFocused  && noteUiModel.title != note_title.text.toString()},
+        note_body.textChanges().filter { note_body.isFocused && noteUiModel.body != note_body.text.toString()})
         .subscribe { editMode() }
         .addCompositeDisposable()
-
-    private fun noteBodyChangeSource() = note_body
-        .textChanges()
-        .filter { note_body.isFocused }
-        .subscribe { editMode() }
-        .addCompositeDisposable()
-
-    private fun noteModeChangeToolbarUi() = viewModel.noteMode
-        .observe( viewLifecycleOwner, Observer {  mode ->
-            when (mode) {
-                is EditMode -> {
-                    toolbarEditMenu()
-                }
-                else -> {
-                    releaseFocus()
-                    toolbarDefaultMenu()
-                    view?.hideKeyboard()
-                }
-            }
-        })
 
     private fun menuPrimarySource() = toolbar_primary_icon.clicks()
         .map { isEditCancelMenu() }
@@ -137,7 +113,6 @@ class NoteDetailFragment constructor(
                 setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel()))
                 findNavController().popBackStack()
             }
-            releaseFocus()
         }
         .addCompositeDisposable()
 
@@ -193,25 +168,6 @@ class NoteDetailFragment constructor(
             }
         })
 
-    private fun toolbarEditMenu(){
-        activity?.let {
-            toolbar_primary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_cancel_24dp,null))
-            toolbar_secondary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_done_24dp,null))
-        }
-    }
-
-    private fun toolbarDefaultMenu(){
-        activity?.let {
-            toolbar_primary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_back_24dp,null))
-
-            toolbar_secondary_icon
-                .setImageDrawable(resources.getDrawable(R.drawable.ic_delete_24dp,null))
-        }
-    }
-
     private fun defaultMode(){
         viewModel.setNoteMode(DefaultMode, noteUiModel.transNoteView())
     }
@@ -237,8 +193,4 @@ class NoteDetailFragment constructor(
     private fun isEditDoneMenu(): Boolean = toolbar_secondary_icon.drawable
         .equalDrawable(R.drawable.ic_done_24dp)
 
-    private fun releaseFocus(){
-        note_title.takeIf { it.isFocused }?.clearFocus()
-        note_body.takeIf { it.isFocused }?.clearFocus()
-    }
 }

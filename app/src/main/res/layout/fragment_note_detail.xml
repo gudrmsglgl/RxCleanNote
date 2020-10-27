@@ -48,7 +48,8 @@
                    android:textColor="#000"
                    android:textSize="22sp"
                    android:importantForAutofill="no"
-                   android:inputType="text" />
+                   android:inputType="text"
+                   app:releaseFocus="@{vm.noteMode}"/>
 
            </LinearLayout>
 
@@ -107,7 +108,7 @@
                 android:paddingEnd="@dimen/default_view_margin"
                 android:hint="@string/detail_note_hint"
                 android:layout_marginTop="@dimen/default_view_margin"
-                />
+                app:releaseFocus="@{vm.noteMode}" />
 
             <View
                 android:layout_width="match_parent"
