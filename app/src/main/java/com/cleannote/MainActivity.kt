@@ -173,10 +173,7 @@ class MainActivity : AppCompatActivity(), UIController {
             ?.forEach { fragment ->
                 when (fragment){
                     is OnBackPressListener -> if (fragment.shouldBackPress()) super.onBackPressed()
-                    is NoteDetailFragment -> with(fragment){
-                        setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_BUNDLE_KEY to  viewModel.finalNote.value?.transNoteUiModel()))
-                        findNavController().popBackStack()
-                    }
+                    is NoteDetailFragment -> fragment.navNoteListFragment()
                     else -> super.onBackPressed()
                 }
             }

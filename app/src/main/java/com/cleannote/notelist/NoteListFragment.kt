@@ -402,14 +402,14 @@ constructor(
     }
 
     override fun shouldBackPress(): Boolean {
-        if (noteAdapter.isDefaultNote()){
+        if (noteAdapter.isNotDefaultNote()){
             transSearchState(true)
             return false
         } else
             return true
     }
 
-    override fun isSwipeEnable(): Boolean = noteAdapter.isDefaultNote()
+    override fun isSwipeEnable(): Boolean = noteAdapter.isSwipeMode()
 
     private fun transSearchState(isTransNotes: Boolean = true){
         if (viewModel.toolbarState.value != SearchState)

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse"/>
         <import type="com.cleannote.presentation.data.notedetail.TextMode.EditMode"/>
         <variable
             name="vm"
             type="com.cleannote.presentation.notedetail.NoteDetailViewModel" />
+        <variable
+            name="fragment"
+            type="com.cleannote.notedetail.NoteDetailFragment" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,7 +27,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/toolbar_primary_icon"
         android:src="@{vm.noteMode instanceof EditMode ? @drawable/ic_cancel_24dp : @drawable/ic_arrow_back_24dp}"
-        />
+        android:onClick="@{() -> fragment.editCancelMenu ? fragment.defaultMode() : fragment.navNoteListFragment()}"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:layout_width="0dp"
@@ -34,15 +39,14 @@
         app:layout_constraintRight_toLeftOf="@id/toolbar_secondary_icon"
         app:layout_constraintHorizontal_bias="0"
         android:id="@+id/tool_bar_title"
-        android:text='@{vm.finalNote.title}'
+        android:text='@{vm.detailToolbarState instanceof TbCollapse ? vm.finalNote.title : ""}'
         android:textColor="@color/white"
         android:layout_marginStart="@dimen/toolbar_title_margin"
         android:layout_marginEnd="@dimen/default_view_margin"
         android:gravity="center_vertical"
         android:textSize="@dimen/page_title_size"
         android:maxLines="1"
-        android:ellipsize="end"
-        />
+        android:ellipsize="end" />
 
 
     <ImageView
@@ -54,7 +58,8 @@
         android:id="@+id/toolbar_secondary_icon"
         android:layout_marginEnd="@dimen/default_view_margin"
         android:src="@{vm.noteMode instanceof EditMode ? @drawable/ic_done_24dp : @drawable/ic_delete_24dp}"
-        />
+        android:onClick="@{() -> fragment.editDoneMenu ? fragment.editDoneMode() : fragment.showDeleteDialog()}"
+        tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

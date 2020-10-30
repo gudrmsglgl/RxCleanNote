@@ -3,12 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.cleannote.notedetail.NoteDetailFragment">
     <data>
+        <import type="com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded"/>
         <variable
             name="vm"
             type="com.cleannote.presentation.notedetail.NoteDetailViewModel" />
         <variable
             name="note"
             type="com.cleannote.model.NoteUiModel" />
+        <variable
+            name="fragment"
+            type="com.cleannote.notedetail.NoteDetailFragment" />
     </data>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
@@ -44,12 +48,13 @@
                    android:layout_height="wrap_content"
                    android:minHeight="@dimen/toolbar_height"
                    android:id="@+id/note_title"
-                   android:text="@{vm.finalNote.title}"
+                   android:text='@{vm.detailToolbarState instanceof TbExpanded ? vm.finalNote.title : ""}'
                    android:textColor="#000"
                    android:textSize="22sp"
                    android:importantForAutofill="no"
                    android:inputType="text"
-                   app:releaseFocus="@{vm.noteMode}"/>
+                   app:releaseFocus="@{vm.noteMode}"
+                   />
 
            </LinearLayout>
 
@@ -62,7 +67,8 @@
 
                <include
                    layout="@layout/layout_note_detail_toolbar"
-                   app:vm = "@{vm}"/>
+                   app:vm = "@{vm}"
+                   app:fragment = "@{fragment}"/>
 
            </androidx.appcompat.widget.Toolbar>
 

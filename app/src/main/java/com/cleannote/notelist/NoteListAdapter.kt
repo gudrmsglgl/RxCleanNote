@@ -101,8 +101,12 @@ class NoteListAdapter(
         notifyDataSetChanged()
     }
 
-    fun isDefaultNote() = currentList.any {
-        it.mode != MultiDefault
+    fun isNotDefaultNote() = currentList.any {
+        it.mode == MultiDefault || it.mode == SingleDelete
+    }
+
+    fun isSwipeMode() = currentList.any {
+        it.mode == Default || it.mode == SingleDelete
     }
 
     fun getMultiSelectedNotes(): List<NoteUiModel> =  currentList.filter { it.mode == MultiSelected }

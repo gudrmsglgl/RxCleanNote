@@ -45,19 +45,19 @@ class NoteDetailFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.vm = viewModel
+        initDataBinding()
         getPreviousFragmentNote()
 
         appBarOffSetChangeSource()
         titleBodyChangeSource()
 
-        menuPrimarySource()
-        menuSecondarySource()
-
-        toolbarCollapseExpandedAnimation()
-
         subscribeUpdateNote()
         subscribeDeleteNote()
+    }
+
+    private fun initDataBinding() = with(binding){
+        vm = viewModel
+        fragment = this@NoteDetailFragment
     }
 
     private fun subscribeUpdateNote() = viewModel.updatedNote
@@ -65,11 +65,6 @@ class NoteDetailFragment constructor(
             if (it != null){
                 when (it.status) {
                     is SUCCESS -> {
-                        noteUiModel.apply {
-                            title = it.data!!.title
-                            body = it.data!!.body
-                            updated_at = it.data!!.updated_at
-                        }
                         showToast(getString(R.string.updateSuccessMsg))
                     }
                     is ERROR -> {
@@ -87,8 +82,7 @@ class NoteDetailFragment constructor(
                 when (it.status) {
                     is SUCCESS -> {
                         showToast(getString(R.string.deleteSuccessMsg))
-                        setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(NOTE_DETAIL_DELETE_KEY to noteUiModel))
-                        findNavController().popBackStack()
+                        navNoteListFragment()
                     }
                     is ERROR -> {
                         it.sendFirebaseThrowable()
@@ -105,37 +99,20 @@ class NoteDetailFragment constructor(
         .subscribe { editMode() }
         .addCompositeDisposable()
 
-    private fun menuPrimarySource() = toolbar_primary_icon.clicks()
-        .map { isEditCancelMenu() }
-        .subscribe { cancelMenu ->
-            if (cancelMenu) defaultMode()
-            else {
-                setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel()))
-                findNavController().popBackStack()
+    fun showDeleteDialog() {
+        activity?.let {
+            MaterialDialog(it).show {
+                title(R.string.delete_title)
+                message(R.string.delete_message)
+                positiveButton(R.string.delete_ok){
+                    viewModel.deleteNote(noteUiModel.transNoteView())
+                }
+                negativeButton(R.string.delete_cancel){
+                    showToast(getString(R.string.deleteCancelMsg))
+                    dismiss()
+                }
+                cancelable(false)
             }
-        }
-        .addCompositeDisposable()
-
-    private fun menuSecondarySource() = toolbar_secondary_icon.clicks()
-        .map { isEditDoneMenu() }
-        .subscribe { doneMenu ->
-            if (doneMenu) editDoneMode()
-            else showDeleteDialog(noteUiModel)
-        }
-        .addCompositeDisposable()
-
-    private fun showDeleteDialog(deleteMemo: NoteUiModel) = activity?.let {
-        MaterialDialog(it).show {
-            title(R.string.delete_title)
-            message(R.string.delete_message)
-            positiveButton(R.string.delete_ok){
-                viewModel.deleteNote(deleteMemo.transNoteView())
-            }
-            negativeButton(R.string.delete_cancel){
-                showToast(getString(R.string.deleteCancelMsg))
-                dismiss()
-            }
-            cancelable(false)
         }
     }
 
@@ -154,29 +131,15 @@ class NoteDetailFragment constructor(
         .subscribe { viewModel.setToolbarState(it) }
         .addCompositeDisposable()
 
-    private fun toolbarCollapseExpandedAnimation() = viewModel.detailToolbarState
-        .observe( viewLifecycleOwner, Observer { toolbarState ->
-            when (toolbarState){
-                is TbCollapse -> {
-                    tool_bar_title.fadeIn()
-                    note_title.fadeOut()
-                }
-                is TbExpanded -> {
-                    tool_bar_title.fadeOut()
-                    note_title.fadeIn()
-                }
-            }
-        })
-
-    private fun defaultMode(){
-        viewModel.setNoteMode(DefaultMode, noteUiModel.transNoteView())
+    fun defaultMode(){
+        viewModel.setNoteMode(DefaultMode, viewModel.finalNote.value ?: noteUiModel.transNoteView())
     }
 
     private fun editMode(){
         viewModel.setNoteMode(EditMode, null)
     }
 
-    private fun editDoneMode(){
+    fun editDoneMode(){
         viewModel.setNoteMode(
             EditDoneMode,
             noteUiModel.copy(
@@ -187,10 +150,16 @@ class NoteDetailFragment constructor(
         )
     }
 
-    private fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable
+    fun navNoteListFragment(){
+        view?.clearFocus()
+        setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel()))
+        findNavController().popBackStack()
+    }
+
+    fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable
         .equalDrawable(R.drawable.ic_cancel_24dp)
 
-    private fun isEditDoneMenu(): Boolean = toolbar_secondary_icon.drawable
+    fun isEditDoneMenu(): Boolean = toolbar_secondary_icon.drawable
         .equalDrawable(R.drawable.ic_done_24dp)
 
 }
