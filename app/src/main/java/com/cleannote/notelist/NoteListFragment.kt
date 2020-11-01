@@ -3,6 +3,7 @@ package com.cleannote.notelist
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -12,6 +13,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -27,6 +29,8 @@ import com.bumptech.glide.RequestManager
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
+import com.cleannote.app.databinding.LayoutMultideleteToolbarBinding
+import com.cleannote.app.databinding.LayoutSearchviewToolbarBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.InputCaptureCallback
 import com.cleannote.data.ui.InputType
@@ -92,11 +96,9 @@ constructor(
             when(toolbarState){
                 is SearchState -> {
                     addSearchViewToolbarContainer()
-                    setupSearchViewToolbar()
                 }
                 is MultiSelectState -> {
                     addMultiDeleteToolbarContainer()
-                    setupMultiDeleteToolbar()
                 }
             }
         }
@@ -232,126 +234,94 @@ constructor(
     private fun addSearchViewToolbarContainer() = view?.let {
         toolbar_content_container.apply {
             removeAllViews()
+            val searchToolbarBinding: LayoutSearchviewToolbarBinding =
+                DataBindingUtil.inflate(LayoutInflater.from(it.context), R.layout.layout_searchview_toolbar, this, false)
+
             addView(
-                View.inflate(it.context, R.layout.layout_searchview_toolbar, null)
-                    .apply {
-                        layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.MATCH_PARENT
-                        )
+                searchToolbarBinding.apply {
+                    fragment = this@NoteListFragment
+                    searchView.apply {
+                        queryTextChangeEvents()
+                            .skipInitialValue()
+                            .debounce(1000, TimeUnit.MILLISECONDS)
+                            .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
+                            .addCompositeDisposable()
                     }
+                }.root
             )
         }
     }
-
-    private fun setupSearchViewToolbar() = toolbar_content_container
-        .findViewById<Toolbar>(R.id.searchview_toolbar)
-        .apply {
-            subscribeSearchView()
-            subscribeFilterView()
-        }
-
-    private fun Toolbar.subscribeSearchView() = findViewById<SearchView>(R.id.search_view)
-        .apply {
-            queryTextChangeEvents()
-                .skipInitialValue()
-                .debounce(1000, TimeUnit.MILLISECONDS)
-                .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
-                .addCompositeDisposable()
-        }
-
-    private fun Toolbar.subscribeFilterView() = findViewById<ImageView>(R.id.action_filter)
-        .singleClick()
-        .subscribe {
-            showFilterDialog()
-        }
-        .addCompositeDisposable()
 
     private fun addMultiDeleteToolbarContainer() = view?.let {
         toolbar_content_container.apply {
             removeAllViews()
+            val multiDeleteToolbar: LayoutMultideleteToolbarBinding =
+                DataBindingUtil.inflate(LayoutInflater.from(it.context), R.layout.layout_multidelete_toolbar, this, false)
+
             addView(
-                View.inflate(it.context, R.layout.layout_multidelete_toolbar, null)
-                    .apply {
-                        layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.MATCH_PARENT
-                        )
-                    }
+                multiDeleteToolbar.apply {
+                    fragment = this@NoteListFragment
+                    adapter = noteAdapter
+                }.root
             )
         }
     }
 
-    private fun setupMultiDeleteToolbar() = toolbar_content_container
-        .findViewById<Toolbar>(R.id.toolbar_multi_delete)
-        .apply{
-            findViewById<ImageView>(R.id.btn_multi_delete_cancel).apply {
-                singleClick()
-                    .subscribe {
-                        transSearchState()
-                    }
-                    .addCompositeDisposable()
-            }
-            findViewById<ImageView>(R.id.btn_multi_delete_ok).apply {
-                singleClick()
-                    .subscribe {
-                        showDeleteDialog(noteAdapter.getMultiSelectedNotes())
-                    }
-                    .addCompositeDisposable()
-            }
-        }
+    fun showFilterDialog() {
+        activity?.let {
+            MaterialDialog(it).show {
+                customView(R.layout.layout_filter)
+                cancelable(true)
 
-    private fun showFilterDialog() = activity?.let {
-        MaterialDialog(it).show {
-            customView(R.layout.layout_filter)
-            cancelable(true)
-
-            @IdRes val cacheRadioBtn =
-                if (ORDER_DESC == sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC))
-                    R.id.radio_btn_desc
-                else
-                    R.id.radio_btn_asc
-
-            val view = getCustomView()
-            val radioGroup = view.findViewById<RadioGroup>(R.id.radio_group)
-            radioGroup.check(cacheRadioBtn)
-            val filterOk = view.findViewById<Button>(R.id.filter_btn_ok)
-
-            val source = Observable.combineLatest(
-                radioGroup.checkedChanges(),
-                filterOk.singleClick(),
-                BiFunction { resRadioBtn: Int, _: Unit ->
-                    resRadioBtn
-                })
-                .map {
-                    if (it == R.id.radio_btn_desc)
-                        ORDER_DESC
+                @IdRes val cacheRadioBtn =
+                    if (ORDER_DESC == sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC))
+                        R.id.radio_btn_desc
                     else
-                        ORDER_ASC
-                }
-                .subscribe { order ->
-                    sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
-                    viewModel.setOrdering(order)
-                    dismiss()
-                }
+                        R.id.radio_btn_asc
 
-            onDismiss { source.dispose() }
+                val view = getCustomView()
+                val radioGroup = view.findViewById<RadioGroup>(R.id.radio_group)
+                radioGroup.check(cacheRadioBtn)
+                val filterOk = view.findViewById<Button>(R.id.filter_btn_ok)
+
+                val source = Observable.combineLatest(
+                    radioGroup.checkedChanges(),
+                    filterOk.singleClick(),
+                    BiFunction { resRadioBtn: Int, _: Unit ->
+                        resRadioBtn
+                    })
+                    .map {
+                        if (it == R.id.radio_btn_desc)
+                            ORDER_DESC
+                        else
+                            ORDER_ASC
+                    }
+                    .subscribe { order ->
+                        sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
+                        viewModel.setOrdering(order)
+                        dismiss()
+                    }
+
+                onDismiss { source.dispose() }
+            }
         }
     }
 
-    private fun showDeleteDialog(deleteMemos: List<NoteUiModel>) = activity?.let {
-        MaterialDialog(it).show {
-            title(R.string.delete_title)
-            message(text = deleteTitle(deleteMemos))
-            positiveButton(R.string.delete_ok){
-                actionDelete(deleteMemos)
+    fun showDeleteDialog(deleteMemos: List<NoteUiModel>) {
+        activity?.let {
+            MaterialDialog(it).show {
+                title(R.string.delete_title)
+                message(text = deleteTitle(deleteMemos))
+                positiveButton(R.string.delete_ok){
+                    actionDelete(deleteMemos)
+                }
+                negativeButton(R.string.delete_cancel){
+                    showToast(getString(R.string.deleteCancelMsg))
+                    transSearchState()
+                    dismiss()
+                }
+                cancelable(false)
             }
-            negativeButton(R.string.delete_cancel){
-                showToast(getString(R.string.deleteCancelMsg))
-                transSearchState()
-                dismiss()
-            }
-            cancelable(false)
         }
     }
 
@@ -411,7 +381,7 @@ constructor(
 
     override fun isSwipeEnable(): Boolean = noteAdapter.isSwipeMode()
 
-    private fun transSearchState(isTransNotes: Boolean = true){
+    fun transSearchState(isTransNotes: Boolean = true){
         if (viewModel.toolbarState.value != SearchState)
             viewModel.setToolbarState(SearchState)
         if (isTransNotes)

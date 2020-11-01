@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+<data>
+    <variable
+        name="fragment"
+        type="com.cleannote.notelist.NoteListFragment" />
+    <variable
+        name="adapter"
+        type="com.cleannote.notelist.NoteListAdapter" />
+</data>
+
 <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:src="@drawable/ic_cancel_24dp"
+            android:onClick="@{()-> fragment.transSearchState(true)}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -36,10 +47,12 @@
             android:layout_height="0dp"
             android:src="@drawable/ic_done_24dp"
             android:layout_marginRight="@dimen/default_view_margin"
+            android:onClick="@{()-> fragment.showDeleteDialog(adapter.multiSelectedNotes)}"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.appcompat.widget.Toolbar>
+</layout>
