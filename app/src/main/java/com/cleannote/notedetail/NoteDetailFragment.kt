@@ -1,5 +1,6 @@
 package com.cleannote.notedetail
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -8,7 +9,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.afollestad.materialdialogs.MaterialDialog
+import com.bumptech.glide.RequestManager
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailBinding
@@ -26,6 +30,7 @@ import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
+import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
@@ -35,7 +40,8 @@ const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
 class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val dateUtil: DateUtil
+    private val dateUtil: DateUtil,
+    private val glideRequestManager: RequestManager
 ) : BaseFragment<FragmentNoteDetailBinding>(R.layout.fragment_note_detail) {
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -85
@@ -47,6 +53,7 @@ class NoteDetailFragment constructor(
         super.onViewCreated(view, savedInstanceState)
         initDataBinding()
         getPreviousFragmentNote()
+        initRecyclerImages()
 
         appBarOffSetChangeSource()
         titleBodyChangeSource()
@@ -58,6 +65,13 @@ class NoteDetailFragment constructor(
     private fun initDataBinding() = with(binding){
         vm = viewModel
         fragment = this@NoteDetailFragment
+    }
+
+    private fun initRecyclerImages(){
+        binding.noteBodyContainer.rcy_images.apply {
+            adapter = AttachImagesAdapter(glideRequestManager)
+            addItemDecoration(HorizontalItemDecoration(15))
+        }
     }
 
     private fun subscribeUpdateNote() = viewModel.updatedNote
@@ -122,6 +136,8 @@ class NoteDetailFragment constructor(
             defaultMode()
         }
     }
+
+
 
     private fun appBarOffSetChangeSource() = app_bar.offsetChanges()
         .map { offset ->

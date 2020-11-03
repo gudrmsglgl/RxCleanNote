@@ -17,7 +17,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background_color"
+    android:background="@color/white"
     style="@style/Theme.AppCompat.Light"
     android:theme="@style/Theme.AppCompat.Light">
 
@@ -80,8 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/note_scroll_view"
-        >
+        android:id="@+id/note_scroll_view">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -90,12 +89,6 @@
             android:background="@color/colorPrimaryDark"
             android:id="@+id/note_body_container">
 
-            <!--<View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/view_between_spacing"
-                android:background="@color/app_background_color"
-                android:layout_gravity="bottom"
-                />-->
 
             <EditText
                 android:layout_width="match_parent"
@@ -116,27 +109,13 @@
                 android:layout_marginTop="@dimen/default_view_margin"
                 app:releaseFocus="@{vm.noteMode}" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/view_between_spacing"
-                android:background="@color/app_background_color"
-                android:layout_gravity="bottom"
-                >
-
-            </View>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/scrollview_bottom_margin"
-                android:background="@color/app_background_color"
-                >
-
-            </View>
+            <include
+                layout="@layout/footer_note_detail"
+                app:vm="@{vm}"
+                />
 
 
         </LinearLayout>
-
-
 
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

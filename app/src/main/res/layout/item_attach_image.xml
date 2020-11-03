@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="reqManager"
+            type="com.bumptech.glide.RequestManager" />
+        <variable
+            name="imageModel"
+            type="com.cleannote.model.NoteImageUiModel" />
+    </data>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/attach_image"
+        android:layout_width="@dimen/attach_image"
+        android:layout_height="@dimen/attach_image"
+        app:glideManager="@{reqManager}"
+        app:imageModel="@{imageModel}"
+        android:scaleType="fitXY"
+        />
+</layout>

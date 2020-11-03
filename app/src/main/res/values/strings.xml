@@ -52,4 +52,8 @@
     <string name="deleteSuccessMsg">삭제 되었습니다.</string>
     <string name="deleteErrorMsg">삭제를 실패 하였습니다.</string>
     <string name="deleteCancelMsg">삭제가 취소 되었습니다.</string>
+
+    <!-- Detail Footer -->
+    <string name="tv_footer_add">사진 추가하기</string>
+    <string name="tv_footer_no_images">첨부된 사진이 존재하지 않습니다.</string>
 </resources>

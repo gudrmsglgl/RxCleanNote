@@ -27,7 +27,7 @@ class NoteFragmentFactory @Inject constructor(
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory, dateUtil)
+            val fragment = NoteDetailFragment(viewModelFactory, dateUtil, glideReqManager)
             fragment
         }
 

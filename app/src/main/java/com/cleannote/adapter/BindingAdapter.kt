@@ -5,17 +5,17 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cleannote.app.R
-import com.cleannote.extension.fadeIn
-import com.cleannote.extension.fadeOut
 import com.cleannote.extension.hideKeyboard
+import com.cleannote.model.NoteImageUiModel
 import com.cleannote.model.NoteUiModel
-import com.cleannote.presentation.data.notedetail.DetailToolbarState
+import com.cleannote.notedetail.AttachImagesAdapter
 import com.cleannote.presentation.data.notedetail.TextMode
-import kotlinx.android.synthetic.main.fragment_note_detail.*
 
 
 object BindingAdapter {
@@ -41,6 +41,33 @@ object BindingAdapter {
                 RequestOptions.bitmapTransform(RoundedCorners(10))
             )
             .load(image)
+            .thumbnail(0.1f)
+            .into(imageView)
+    }
+
+
+    @JvmStatic
+    @BindingAdapter(value = ["attachImages"])
+    fun attachDataToAdapter(
+        recyclerView: RecyclerView,
+        images: List<NoteImageUiModel>?
+    ){
+        (recyclerView.adapter as AttachImagesAdapter).submitList(images)
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["glideManager", "imageModel"])
+    fun loadDetailImage(
+        imageView: ImageView,
+        glideManager: RequestManager,
+        imageModel: NoteImageUiModel
+    ){
+        glideManager
+            .applyDefaultRequestOptions(
+                RequestOptions
+                    .bitmapTransform(RoundedCorners(10))
+            )
+            .load(imageModel.img_path)
             .thumbnail(0.1f)
             .into(imageView)
     }
