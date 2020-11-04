@@ -112,7 +112,7 @@
             <include
                 layout="@layout/footer_note_detail"
                 app:vm="@{vm}"
-                />
+                app:fragment="@{fragment}" />
 
 
         </LinearLayout>

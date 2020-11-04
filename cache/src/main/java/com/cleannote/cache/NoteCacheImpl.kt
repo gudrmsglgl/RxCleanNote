@@ -2,6 +2,7 @@ package com.cleannote.cache
 
 import com.cleannote.cache.dao.CachedNoteDao
 import com.cleannote.cache.extensions.divideCacheNote
+import com.cleannote.cache.extensions.divideCacheNoteImages
 import com.cleannote.cache.extensions.searchNoteBySorted
 import com.cleannote.cache.extensions.transEntity
 import com.cleannote.data.model.NoteEntity

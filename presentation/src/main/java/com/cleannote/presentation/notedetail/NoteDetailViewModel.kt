@@ -11,7 +11,9 @@ import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.*
 import com.cleannote.presentation.data.notedetail.TextMode.*
+import com.cleannote.presentation.extensions.createNoteImageView
 import com.cleannote.presentation.extensions.transNote
+import com.cleannote.presentation.model.NoteImageView
 import com.cleannote.presentation.model.NoteView
 
 class NoteDetailViewModel
@@ -79,4 +81,32 @@ constructor(
         )
     }
 
+    fun uploadImage(path: String, updateTime: String){
+        tempNote = finalNote.value!!.copy(
+            updated_at = updateTime,
+            noteImages = copyNoteImages(path)
+        )
+
+        _updatedNote.postValue(DataState.loading())
+        updateNote.execute(
+            onSuccess = {},
+            onError = {
+                finalNote.postValue(finalNote.value)
+                _updatedNote.postValue(DataState.error(it))
+            },
+            onComplete = {
+                finalNote.postValue(tempNote)
+                _updatedNote.postValue(DataState.success(tempNote))
+            },
+            params = tempNote.transNote()
+        )
+
+    }
+
+    private fun copyNoteImages(path: String): List<NoteImageView> {
+        val list =
+            finalNote.value!!.noteImages?.toMutableList() ?: mutableListOf()
+        list.add(0, path.createNoteImageView(notePk = finalNote.value!!.id))
+        return list
+    }
 }

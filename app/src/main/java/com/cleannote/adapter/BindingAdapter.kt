@@ -5,6 +5,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.RequestManager
@@ -53,6 +55,13 @@ object BindingAdapter {
         images: List<NoteImageUiModel>?
     ){
         (recyclerView.adapter as AttachImagesAdapter).submitList(images)
+        val scroller = object : LinearSmoothScroller(recyclerView.context){
+            override fun getHorizontalSnapPreference(): Int {
+                return LinearSmoothScroller.SNAP_TO_START
+            }
+        }
+        scroller.targetPosition = 0
+        recyclerView.layoutManager?.startSmoothScroll(scroller)
     }
 
     @JvmStatic

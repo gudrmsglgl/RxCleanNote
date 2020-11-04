@@ -56,4 +56,8 @@
     <!-- Detail Footer -->
     <string name="tv_footer_add">사진 추가하기</string>
     <string name="tv_footer_no_images">첨부된 사진이 존재하지 않습니다.</string>
+
+    <string name="menu_album">앨범</string>
+    <string name="menu_camera">카메라</string>
+    <string name="menu_link">링크</string>
 </resources>

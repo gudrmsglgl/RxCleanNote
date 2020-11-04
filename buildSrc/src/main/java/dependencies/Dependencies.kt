@@ -35,6 +35,7 @@ object Dependencies {
     val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJavaVersion}"
     val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlinVersion}"
     val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroidVersion}"
+    val rxRoom =  "android.arch.persistence.room:rxjava2:1.1.1"
     val rxbinding = "com.jakewharton.rxbinding4:rxbinding:${Versions.rxbindingVersion}"
     val rxbindingCore = "com.jakewharton.rxbinding4:rxbinding-core:${Versions.rxbindingVersion}"
     val rxbindingMaterial = "com.jakewharton.rxbinding4:rxbinding-material:${Versions.rxbindingVersion}"
@@ -46,4 +47,6 @@ object Dependencies {
     val firebaseCrashticsKTX = "com.google.firebase:firebase-crashlytics-ktx:${Versions.firebase_crashlytics}"
     val timber = "com.jakewharton.timber:timber:${Versions.timber_version}"
     val glide = "com.github.bumptech.glide:glide:${Versions.glide_version}"
+    val imagePicker = "com.github.dhaval2404:imagepicker:${Versions.imgPicker_version}"
+    val imagePickerInline = "com.github.florent37:inline-activity-result-kotlin:1.0.4"
 }

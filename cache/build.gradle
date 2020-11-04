@@ -49,6 +49,7 @@ dependencies {
     implementation Dependencies.rxJava
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
+    implementation Dependencies.rxRoom
     implementation Dependencies.dagger
     implementation Dependencies.room_runtime
     implementation Dependencies.livedata_ktx

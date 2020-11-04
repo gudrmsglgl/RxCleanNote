@@ -1,8 +1,10 @@
 package com.cleannote.notedetail
 
+import android.app.Activity
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
+import android.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -26,8 +28,10 @@ import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
+import com.github.dhaval2404.imagepicker.ImagePicker
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.widget.itemClicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
@@ -138,7 +142,6 @@ class NoteDetailFragment constructor(
     }
 
 
-
     private fun appBarOffSetChangeSource() = app_bar.offsetChanges()
         .map { offset ->
             if (offset < COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD) TbCollapse
@@ -178,4 +181,51 @@ class NoteDetailFragment constructor(
     fun isEditDoneMenu(): Boolean = toolbar_secondary_icon.drawable
         .equalDrawable(R.drawable.ic_done_24dp)
 
+    fun showAddImagePopupMenu(view: View){
+        activity?.let {
+            PopupMenu(it, view).apply {
+                val inflater = menuInflater
+                inflater.inflate(R.menu.menu_image_add, menu)
+                visibleIcon(it)
+                itemClicks()
+                    .subscribe {
+                        when (it.itemId){
+                            R.id.album -> {
+                                loadImagePicker(PickerType.GALLERY)
+                            }
+                            R.id.camera -> {
+                                loadImagePicker(PickerType.CAMERA)
+                            }
+                            R.id.link -> {}
+                        }
+                    }
+                    .addCompositeDisposable()
+                show()
+            }
+        }
+    }
+
+    private fun loadImagePicker(type: PickerType){
+        val builder = ImagePicker.with(this)
+        if (type == PickerType.CAMERA)
+            builder.cameraOnly()
+        else
+            builder.galleryOnly()
+        builder.compress(1024)
+            .start { resultCode, data ->
+                if (resultCode == Activity.RESULT_OK) {
+                    //You can also get File Path from intent
+                    val filePath:String = ImagePicker.getFilePath(data)!!
+                    viewModel.uploadImage(filePath,dateUtil.getCurrentTimestamp())
+                } else if (resultCode == ImagePicker.RESULT_ERROR) {
+                    showToast(ImagePicker.getError(data))
+                } else {
+                    showToast("취소 되었습니다.")
+                }
+            }
+    }
+
+    enum class PickerType{
+        CAMERA, GALLERY
+    }
 }

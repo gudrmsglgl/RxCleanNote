@@ -89,6 +89,8 @@ dependencies {
     implementation Dependencies.firebaseAnalyticsKTX
     implementation Dependencies.firebaseCrashticsKTX
     implementation Dependencies.glide
+    implementation Dependencies.imagePicker
+    implementation Dependencies.imagePickerInline
     implementation AndroidTestDependencies.idling_resource
 
     implementation SupportDependencies.appcompat
