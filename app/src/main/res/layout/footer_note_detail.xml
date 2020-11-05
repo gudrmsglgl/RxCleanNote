@@ -68,7 +68,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:attachImages="@{UiModelExtsKt.transNoteImageUiModels(vm.finalNote.noteImages)}"/>
+        app:attachImages="@{UiModelExtsKt.transNoteImageUiModels(vm.finalNote.noteImages)}"
+        app:visible="@{!vm.finalNote.noteImages.empty &amp;&amp; vm.finalNote.noteImages != null}"/>
 
     <TextView
         android:id="@+id/tv_footer_no_images"
@@ -80,7 +81,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:visible="@{vm.finalNote.noteImages.empty}"/>
+        app:visible="@{vm.finalNote.noteImages.empty || vm.finalNote.noteImages == null}"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

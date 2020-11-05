@@ -39,7 +39,8 @@ import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 
 const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
-const val NOTE_DETAIL_DELETE_KEY = "com.cleannote.notedetail.request_onback_delete"
+const val REQ_DELETE_KEY = "com.cleannote.notedetail.request_onback_delete"
+const val REQ_UPDATE_KEY = "com.cleannote.notedetail.request_onback_request"
 const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
 class NoteDetailFragment constructor(
@@ -52,6 +53,8 @@ class NoteDetailFragment constructor(
 
     lateinit var noteUiModel: NoteUiModel
     val viewModel: NoteDetailViewModel by viewModels { viewModelFactory }
+
+    var onBackPressThenKey: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -84,6 +87,7 @@ class NoteDetailFragment constructor(
                 when (it.status) {
                     is SUCCESS -> {
                         showToast(getString(R.string.updateSuccessMsg))
+                        onBackPressThenKey = REQ_UPDATE_KEY
                     }
                     is ERROR -> {
                         showToast(getString(R.string.updateErrorMsg))
@@ -100,6 +104,7 @@ class NoteDetailFragment constructor(
                 when (it.status) {
                     is SUCCESS -> {
                         showToast(getString(R.string.deleteSuccessMsg))
+                        onBackPressThenKey = REQ_DELETE_KEY
                         navNoteListFragment()
                     }
                     is ERROR -> {
@@ -171,7 +176,9 @@ class NoteDetailFragment constructor(
 
     fun navNoteListFragment(){
         view?.clearFocus()
-        setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel()))
+        onBackPressThenKey?.let { reqKey ->
+            setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(reqKey to viewModel.finalNote.value?.transNoteUiModel()))
+        }
         findNavController().popBackStack()
     }
 

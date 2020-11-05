@@ -9,6 +9,8 @@ import javax.inject.Singleton
 class DateUtil @Inject constructor() {
 
     fun getCurrentTimestamp(): String =
-        SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(
+            Calendar.getInstance().time
+        )
 
 }

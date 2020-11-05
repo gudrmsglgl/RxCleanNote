@@ -3,6 +3,7 @@ package com.cleannote.presentation.notelist
 import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
 import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
@@ -96,19 +97,20 @@ constructor(
     }
 
     fun notifyUpdatedNote(updateNoteView: NoteView){
-        with(loadedNotes){
-            val updateIndex = indexOfFirst { it.id == updateNoteView.id }
-            if (this[updateIndex] == updateNoteView)
-                return
-            else {
-                removeAt(updateIndex)
-                if (loadOrderingOnSharedPreference() == ORDER_DESC)
-                    add(0, updateNoteView)
-                else
-                    add(loadedNotes.size, updateNoteView)
-            }
+        // step1) find UpdateNoteView
+        val findNoteView = loadedNotes.find { it.id == updateNoteView.id }
+
+        // step2) replace updateNoteView
+        // DESC -> replace pos 0 NoteView
+        // ASC -> remove pos 0 Add last Note -> very complicated b/c NextPage Notes -> LoadDB
+        if (loadOrderingOnSharedPreference() == ORDER_DESC){
+            loadedNotes.remove(findNoteView)
+            loadedNotes.add(0, updateNoteView)
+            _mediatorNoteList.value = DataState.success(loadedNotes)
         }
-        _mediatorNoteList.value = DataState.success(loadedNotes)
+        else if (loadOrderingOnSharedPreference() == ORDER_ASC){
+            clearQuery()
+        }
     }
 
     fun notifyDeletedNote(deletedNoteView: NoteView){
@@ -173,6 +175,8 @@ constructor(
         _query.value = getQuery().apply { page += 1 }
     }
 
+    // DB every 10 load Note
+    // so load Note less than 10 Then Don't exist next page
     fun isExistNextPage(): Boolean = loadedNotes.size / (getQuery().limit) == getQuery().page
 
     fun clearQuery() {

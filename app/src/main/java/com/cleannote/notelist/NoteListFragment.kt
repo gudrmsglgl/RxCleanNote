@@ -6,12 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.setFragmentResultListener
@@ -48,8 +44,9 @@ import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
-import com.cleannote.notedetail.NOTE_DETAIL_DELETE_KEY
+import com.cleannote.notedetail.REQ_DELETE_KEY
 import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
+import com.cleannote.notedetail.REQ_UPDATE_KEY
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.model.NoteView
@@ -299,6 +296,7 @@ constructor(
                     .subscribe { order ->
                         sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
                         viewModel.setOrdering(order)
+                        scrollTop()
                         dismiss()
                     }
 
@@ -346,13 +344,13 @@ constructor(
     }
 
     private fun requestUpdate(bundle: Bundle){
-        bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_BUNDLE_KEY)?.let {
+        bundle.getParcelable<NoteUiModel>(REQ_UPDATE_KEY)?.let {
             viewModel.notifyUpdatedNote(it.transNoteView())
         }
     }
 
     private fun requestDelete(bundle: Bundle){
-        bundle.getParcelable<NoteUiModel>(NOTE_DETAIL_DELETE_KEY)?.let {
+        bundle.getParcelable<NoteUiModel>(REQ_DELETE_KEY)?.let {
             viewModel.notifyDeletedNote(it.transNoteView())
         }
     }
@@ -386,6 +384,19 @@ constructor(
             viewModel.setToolbarState(SearchState)
         if (isTransNotes)
             noteAdapter.changeNoteMode(Default)
+    }
+
+    private fun scrollTop(){
+        binding.recyclerView.verticalScrollbarPosition = 0
+        //(binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
+        //binding.recyclerView.scrollToPosition(0)
+        /*val scroller = object : LinearSmoothScroller(context){
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }
+        scroller.targetPosition = 0
+        binding.recyclerView.layoutManager?.startSmoothScroll(scroller)*/
     }
 
 }

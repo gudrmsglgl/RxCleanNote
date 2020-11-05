@@ -1,5 +1,6 @@
 package com.cleannote.adapter
 
+import android.content.SharedPreferences
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
