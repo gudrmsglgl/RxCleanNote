@@ -38,7 +38,7 @@ class TestNoteFragmentFactory
         }
 
         NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory, dateUtil)
+            val fragment = NoteDetailFragment(viewModelFactory, dateUtil, glideReqManager)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }

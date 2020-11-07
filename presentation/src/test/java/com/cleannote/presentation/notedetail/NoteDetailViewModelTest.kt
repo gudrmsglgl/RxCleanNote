@@ -8,8 +8,9 @@ import com.cleannote.presentation.BaseViewModelTest
 import com.cleannote.presentation.Complete
 import com.cleannote.presentation.OnError
 import com.cleannote.presentation.OnSuccess
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.data.notedetail.TextMode
+import com.cleannote.presentation.data.notedetail.TextMode.DefaultMode
 import com.cleannote.presentation.data.notedetail.TextMode.EditDoneMode
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.test.InstantExecutorExtension
@@ -66,13 +67,15 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun updateNoteExecuteUseCase(){
-        whenUpdateNote(noteView)
+        setNoteWithMode(DefaultMode, noteView)
+        setNoteWithMode(EditDoneMode, noteView)
         verifyUpdateNoteExecute()
     }
 
     @Test
     fun updateNoteStateLoadingReturnNoData(){
-        whenUpdateNote(noteView)
+        setNoteWithMode(DefaultMode, noteView)
+        setNoteWithMode(EditDoneMode, noteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
         assertViewModelUpdateNoteEqual(null)
@@ -80,25 +83,41 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
 
     @Test
     fun updateNoteStateSuccessReturnNote(){
-        whenUpdateNote(noteView)
+        setNoteWithMode(DefaultMode, noteView)
+        val updatedNoteView = noteView.copy(title = "updatedTitle")
+        setNoteWithMode(EditDoneMode, updatedNoteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
 
         onSuccessUpdateNote()
         verifyViewModelDataState(SUCCESS)
-        assertViewModelUpdateNoteEqual(noteView)
+        assertViewModelUpdateNoteEqual(updatedNoteView)
     }
 
     @Test
     fun updateNoteStateErrorReturnThrowable(){
         val throwable = RuntimeException()
-        whenUpdateNote(noteView)
+        setNoteWithMode(DefaultMode, noteView)
+        val updatedNoteView = noteView.copy(title = "updatedTitle")
+        setNoteWithMode(EditDoneMode, updatedNoteView)
         verifyUpdateNoteExecute()
         verifyViewModelDataState(LOADING)
 
         onErrorUpdateNote(throwable)
         verifyViewModelDataState(ERROR)
         assertViewModelUpdateNoteHasThrowable(throwable)
+    }
+
+    @Test
+    fun uploadImageThenUpdate(){
+        setNoteWithMode(DefaultMode, noteView)
+        val updateImagePath = "updateImagePath"
+        whenUploadImage(updateImagePath,"2020-06-01 11:11:11")
+        verifyUpdateNoteExecute()
+        verifyViewModelDataState(LOADING)
+        onSuccessUpdateNote()
+        verifyViewModelDataState(SUCCESS)
+        assertNoteImagesOfFirstImagePath(updateImagePath)
     }
 
     @Test
@@ -138,13 +157,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         assertViewModelDeleteNoteHasThrowable(throwable)
     }
 
-    private fun whenUpdateNote(noteView: NoteView){
-        with(viewModel) {
-            setNote((noteView to EditDoneMode))
-        }
-        setViewModelState(viewModel.updatedNote.value?.status)
-    }
-
     private fun onSuccessUpdateNote(){
         onCompleteCaptor.firstValue.invoke()
         setViewModelState(viewModel.updatedNote.value?.status)
@@ -154,7 +166,6 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         onErrorNoteCaptor.firstValue.invoke(throwable)
         setViewModelState(viewModel.updatedNote.value?.status)
     }
-
 
     private fun verifyUpdateNoteExecute(){
         updateNote.verifyExecute(
@@ -207,6 +218,10 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         }
     }
 
+    private fun assertNoteImagesOfFirstImagePath(expectedPath: String){
+        assertThat(viewModel.finalNote.value?.noteImages?.get(0)?.img_path, `is`(expectedPath))
+    }
+
     private fun assertViewModelDeleteNoteHasThrowable(throwable: Throwable){
         assertThat(viewModel.deletedNote.value?.throwable, `is`(throwable))
     }
@@ -220,4 +235,15 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         onErrorNoteCaptor.firstValue.invoke(throwable)
         setViewModelState(viewModel.deletedNote.value?.status)
     }
+
+    private fun setNoteWithMode(mode: TextMode, noteView: NoteView){
+        viewModel.setNoteMode(mode, noteView)
+        if (mode == EditDoneMode) setViewModelState(viewModel.updatedNote.value?.status)
+    }
+
+    private fun whenUploadImage(path: String, updateTime: String){
+        viewModel.uploadImage(path, updateTime)
+        setViewModelState(viewModel.updatedNote.value?.status)
+    }
+
 }

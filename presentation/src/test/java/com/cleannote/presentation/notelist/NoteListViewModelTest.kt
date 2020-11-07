@@ -236,29 +236,9 @@ class NoteListViewModelTest: BaseViewModelTest() {
         val updateIndex = 2
         val updateTitle = "updateTitle"
         val updateNoteView = NoteFactory.oneOfNotesUpdate(noteViews, updateIndex, updateTitle, null)
-        whenUpdateNote(updateNoteView)
+        whenNotifyUpdateNote(updateNoteView)
 
         checkViewModelNotesUpdate(index = 0, updateNoteView = updateNoteView)
-    }
-
-    @Test
-    fun equalNoteNotUpdate(){
-        val noteList = NoteFactory.createNoteList(0, 10)
-        val noteViews = noteList.transNoteViews()
-
-        whenSearchNoteSaveState()
-        verifySearchNoteExecute()
-        verifyViewModelDataState(LOADING)
-
-        whenSuccessOnNextNoteList(noteList)
-        verifyViewModelDataState(SUCCESS)
-        assertViewModelNotesEqual(noteViews)
-
-        val updateIndex = 2
-        val dontUpdateNoteView = noteViews[updateIndex]
-        whenUpdateNote(dontUpdateNoteView)
-
-        assertViewModelNotesEqual(noteViews) // when update then not sorting b/c equal note don't execute update
     }
 
     @Test
@@ -353,7 +333,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
-    private fun whenUpdateNote(updateNote: NoteView){
+    private fun whenNotifyUpdateNote(updateNote: NoteView){
         noteListViewModel.notifyUpdatedNote(updateNote)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
@@ -509,6 +489,5 @@ class NoteListViewModelTest: BaseViewModelTest() {
         insertNewNote = mock()
         deleteNote = mock()
         deleteMultipleNotes = mock()
-        noteMapper = mock()
     }
 }

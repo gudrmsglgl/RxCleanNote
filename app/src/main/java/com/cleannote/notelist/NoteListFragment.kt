@@ -3,6 +3,7 @@ package com.cleannote.notelist
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -387,16 +388,9 @@ constructor(
     }
 
     private fun scrollTop(){
-        binding.recyclerView.verticalScrollbarPosition = 0
-        //(binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
-        //binding.recyclerView.scrollToPosition(0)
-        /*val scroller = object : LinearSmoothScroller(context){
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_START
-            }
-        }
-        scroller.targetPosition = 0
-        binding.recyclerView.layoutManager?.startSmoothScroll(scroller)*/
+        Handler().postDelayed({
+            binding.recyclerView.scrollToPosition(0)
+        }, 100L)
     }
 
 }
