@@ -26,10 +26,18 @@
             app:destination="@id/noteDetailFragment"
             app:popUpTo="@id/noteListFragment"
             app:popUpToInclusive="false"/>
+        <action
+            android:id="@+id/action_noteListFragment_to_noteDetailViewFragment"
+            app:destination="@id/noteDetailViewFragment" />
     </fragment>
     <fragment
         android:id="@+id/noteDetailFragment"
         android:name="com.cleannote.notedetail.NoteDetailFragment"
         android:label="fragment_note_detail"
         tools:layout="@layout/fragment_note_detail" />
+    <fragment
+        android:id="@+id/noteDetailViewFragment"
+        android:name="com.cleannote.notedetail.NoteDetailViewFragment"
+        android:label="fragment_note_detail_view"
+        tools:layout="@layout/fragment_note_detail_view" />
 </navigation>

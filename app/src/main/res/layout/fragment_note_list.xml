@@ -76,5 +76,21 @@
         app:fabSize="normal"
         app:borderWidth="0dp"
         />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_add_white_24dp"
+        app:rippleColor="@color/tealLight"
+        android:backgroundTint="@color/cardview_dark_background"
+        android:background="@color/tealDark"
+        android:id="@+id/test"
+        android:layout_margin="@dimen/fab_margin"
+        app:fabSize="normal"
+        app:borderWidth="0dp"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

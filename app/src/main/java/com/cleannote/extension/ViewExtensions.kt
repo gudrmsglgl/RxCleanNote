@@ -15,6 +15,9 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupMenu
+import androidx.annotation.DrawableRes
+import androidx.annotation.MenuRes
+import androidx.appcompat.widget.Toolbar
 import com.cleannote.app.R
 
 
@@ -72,6 +75,18 @@ fun EditText.disableEdit(){
     isFocusableInTouchMode = false
     isCursorVisible = false
     clearFocus()
+}
+
+fun Toolbar.setToolbar(
+    @DrawableRes homeIcon: Int,
+    @MenuRes menuRes: Int,
+    onHomeClickListener:View.OnClickListener,
+    onMenuItemClickListener: Toolbar.OnMenuItemClickListener
+){
+    setNavigationIcon(homeIcon)
+    inflateMenu(menuRes)
+    setNavigationOnClickListener(onHomeClickListener)
+    setOnMenuItemClickListener(onMenuItemClickListener)
 }
 
 /**

@@ -97,6 +97,7 @@ dependencies {
     implementation SupportDependencies.constraintlayout
     implementation SupportDependencies.recyclerview
     implementation SupportDependencies.material_design
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     kapt AnnotationProcessing.dagger_compiler
     kapt AnnotationProcessing.dagger_android_processor

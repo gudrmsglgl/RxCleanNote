@@ -203,7 +203,9 @@ class NoteDetailFragment constructor(
                             R.id.camera -> {
                                 loadImagePicker(PickerType.CAMERA)
                             }
-                            R.id.link -> {}
+                            R.id.link -> {
+
+                            }
                         }
                     }
                     .addCompositeDisposable()

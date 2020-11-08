@@ -53,6 +53,7 @@ import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.model.NoteView
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
+import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.checkedChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
@@ -87,6 +88,11 @@ constructor(
             requestUpdate(bundle)
             requestDelete(bundle)
         }
+        binding.test.clicks()
+            .subscribe {
+                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailViewFragment)
+            }
+            .addCompositeDisposable()
     }
 
     private fun subscribeToolbarState() = viewModel.toolbarState.observe(viewLifecycleOwner,
