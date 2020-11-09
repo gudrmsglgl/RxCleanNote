@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
@@ -15,9 +17,12 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupMenu
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.forEach
+import com.afollestad.materialdialogs.utils.MDUtil
 import com.cleannote.app.R
 
 
@@ -88,6 +93,17 @@ fun Toolbar.setToolbar(
     setNavigationOnClickListener(onHomeClickListener)
     setOnMenuItemClickListener(onMenuItemClickListener)
 }
+
+fun Toolbar.setMenuIconColor(
+    @ColorRes res: Int
+) = apply {
+    navigationIcon?.colorFilter =
+        PorterDuffColorFilter(MDUtil.resolveColor(context, res), PorterDuff.Mode.MULTIPLY)
+    menu.forEach {
+        it.icon.colorFilter = PorterDuffColorFilter(MDUtil.resolveColor(context, res), PorterDuff.Mode.MULTIPLY)
+    }
+}
+
 
 /**
  * Use everywhere except from Activity (Custom View, Fragment, Dialogs, DialogFragments).

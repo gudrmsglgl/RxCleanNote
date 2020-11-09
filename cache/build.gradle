@@ -64,6 +64,8 @@ dependencies {
     testImplementation TestDependencies.archTesting
     testImplementation TestDependencies.testCore
 
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
+
     kapt AnnotationProcessing.dagger_compiler
     kapt AnnotationProcessing.room_compiler
 }

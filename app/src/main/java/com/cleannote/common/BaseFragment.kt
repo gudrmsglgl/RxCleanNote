@@ -3,8 +3,10 @@ package com.cleannote.common
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
@@ -56,11 +58,18 @@ abstract class BaseFragment<DataBinding: ViewDataBinding>(@LayoutRes layoutRes: 
         displayProgressBar(show)
     }
 
-    /*fun showToast(message: String) = with (uiController){
-        showUIMessage(
-            UIMessage(message, UIType.Toast)
-        )
-    }*/
+    fun getWindowHeight(): Int {
+        val displayMetrics = DisplayMetrics()
+        activity?.let {
+            it.windowManager.defaultDisplay.getMetrics(displayMetrics)
+            return displayMetrics.heightPixels
+        }
+        return 0
+    }
+
+    fun dimenPx(@DimenRes res: Int): Int{
+        return context?.resources?.getDimensionPixelSize(res) ?: 0
+    }
 
     fun showToast(message: String) = activity?.let {
         Toast.makeText(it, message, Toast.LENGTH_SHORT).show()

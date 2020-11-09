@@ -3,7 +3,7 @@ import dependencies.Dependencies
 import dependencies.Java
 import dependencies.TestDependencies
 
-apply plugin: 'java-library'
+//apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 
@@ -32,6 +32,8 @@ dependencies {
     testImplementation TestDependencies.jupiter_api
     testImplementation TestDependencies.jupiter_params
     testRuntimeOnly    TestDependencies.jupiter_engine
+
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
 
     kapt AnnotationProcessing.dagger_compiler
 }

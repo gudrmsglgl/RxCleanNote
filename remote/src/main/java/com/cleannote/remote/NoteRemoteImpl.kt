@@ -6,9 +6,6 @@ import com.cleannote.data.model.UserEntity
 import com.cleannote.data.repository.NoteRemote
 import com.cleannote.remote.extensions.transNoteEntities
 import com.cleannote.remote.extensions.transUserEntities
-import com.cleannote.remote.mapper.NoteEntityMapper
-import com.cleannote.remote.mapper.UserEntityMapper
-import com.cleannote.remote.model.NoteModel
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import javax.inject.Inject

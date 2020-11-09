@@ -66,6 +66,11 @@ dependencies {
     implementation(project(':cache'))
     implementation(project(':remote'))
 
+    implementation "javax.xml.bind:jaxb-api:2.2.11"
+    implementation "com.sun.xml.bind:jaxb-core:2.2.11"
+    implementation "com.sun.xml.bind:jaxb-impl:2.2.11"
+    implementation "javax.activation:activation:1.1.1"
+
     implementation Dependencies.kotlin_standard_library
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.ktx
@@ -123,6 +128,8 @@ dependencies {
     def androidx_test_runner = "1.2.0"
     androidTestImplementation "androidx.test:runner:$androidx_test_runner"
     androidTestUtil 'androidx.test:orchestrator:1.2.0'
+
+
 
     debugImplementation AndroidTestDependencies.fragment_testing
 }

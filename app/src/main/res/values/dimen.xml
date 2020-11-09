@@ -13,6 +13,9 @@
     <dimen name="recyclerview_start_end_margins">5dp</dimen>
     <dimen name="menu_width">30dp</dimen>
 
+    <!-- detail view -->
+    <dimen name="detail_view_appbar_size">200dp</dimen>
+
     <!-- note item -->
     <dimen name="item_margin_start_end">12dp</dimen>
     <dimen name="item_margin_top">2dp</dimen>
