@@ -1,7 +1,6 @@
-package com.cleannote.notedetail
+package com.cleannote.notedetail.edit
 
 import android.app.Activity
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
@@ -11,8 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.afollestad.materialdialogs.MaterialDialog
 import com.bumptech.glide.RequestManager
 
@@ -22,6 +19,10 @@ import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
+import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
+import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
 import com.cleannote.presentation.data.State.ERROR
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.TextMode.*
@@ -30,18 +31,12 @@ import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.jakewharton.rxbinding4.material.offsetChanges
-import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.itemClicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
-
-const val NOTE_DETAIL_BUNDLE_KEY = "com.cleannote.notedetail.select_note"
-const val REQ_DELETE_KEY = "com.cleannote.notedetail.request_onback_delete"
-const val REQ_UPDATE_KEY = "com.cleannote.notedetail.request_onback_request"
-const val REQUEST_KEY_ON_BACK = "com.cleannote.notedetail.request_onback"
 
 class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
@@ -76,7 +71,7 @@ class NoteDetailFragment constructor(
 
     private fun initRecyclerImages(){
         binding.noteBodyContainer.rcy_images.apply {
-            adapter = AttachImagesAdapter(glideRequestManager)
+            adapter = EditImagesAdapter(glideRequestManager)
             addItemDecoration(HorizontalItemDecoration(15))
         }
     }

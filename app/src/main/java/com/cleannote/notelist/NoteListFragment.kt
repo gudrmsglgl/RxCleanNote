@@ -44,10 +44,10 @@ import com.cleannote.extension.transNoteViews
 import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
-import com.cleannote.notedetail.REQ_DELETE_KEY
-import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
-import com.cleannote.notedetail.REQ_UPDATE_KEY
+import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
+import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
+import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.model.NoteView
@@ -232,7 +232,7 @@ constructor(
 
     private fun navDetailNote(noteUiModel: NoteUiModel){
         bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-        findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, bundle)
+        findNavController().navigate(R.id.action_noteListFragment_to_noteDetailViewFragment, bundle)
     }
 
     private fun addSearchViewToolbarContainer() = view?.let {

@@ -1,4 +1,4 @@
-package com.cleannote.notedetail
+package com.cleannote.notedetail.edit
 
 import android.graphics.Rect
 import android.view.View

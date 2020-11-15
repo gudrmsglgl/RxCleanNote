@@ -6,8 +6,8 @@ import androidx.navigation.Navigation
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.app.R
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
-import com.cleannote.notedetail.NoteDetailFragment
+import com.cleannote.notedetail.edit.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.edit.NoteDetailFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.ui.screen.DetailNoteScreen
 import io.mockk.every

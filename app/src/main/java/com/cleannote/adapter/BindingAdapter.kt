@@ -1,12 +1,10 @@
 package com.cleannote.adapter
 
-import android.content.SharedPreferences
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -17,7 +15,8 @@ import com.cleannote.app.R
 import com.cleannote.extension.hideKeyboard
 import com.cleannote.model.NoteImageUiModel
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notedetail.AttachImagesAdapter
+import com.cleannote.notedetail.edit.EditImagesAdapter
+import com.cleannote.notedetail.view.ImageViewAdapter
 import com.cleannote.presentation.data.notedetail.TextMode
 
 
@@ -48,14 +47,23 @@ object BindingAdapter {
             .into(imageView)
     }
 
+    @JvmStatic
+    @BindingAdapter(value = ["imageViews"])
+    fun attachDataToViewImageAdapter(
+        pager: ViewPager2,
+        images: List<NoteImageUiModel>?
+    ){
+        (pager.adapter as ImageViewAdapter).submitList(images)
+    }
+
 
     @JvmStatic
     @BindingAdapter(value = ["attachImages"])
-    fun attachDataToAdapter(
+    fun attachDataToEditImageAdapter(
         recyclerView: RecyclerView,
         images: List<NoteImageUiModel>?
     ){
-        (recyclerView.adapter as AttachImagesAdapter).submitList(images)
+        (recyclerView.adapter as EditImagesAdapter).submitList(images)
         val scroller = object : LinearSmoothScroller(recyclerView.context){
             override fun getHorizontalSnapPreference(): Int {
                 return LinearSmoothScroller.SNAP_TO_START
@@ -67,16 +75,16 @@ object BindingAdapter {
 
     @JvmStatic
     @BindingAdapter(value = ["glideManager", "imageModel"])
-    fun loadDetailImage(
+    fun loadEditImage(
         imageView: ImageView,
         glideManager: RequestManager,
         imageModel: NoteImageUiModel
     ){
         glideManager
-            .applyDefaultRequestOptions(
+           /* .applyDefaultRequestOptions(
                 RequestOptions
                     .bitmapTransform(RoundedCorners(10))
-            )
+            )*/
             .load(imageModel.img_path)
             .thumbnail(0.1f)
             .into(imageView)

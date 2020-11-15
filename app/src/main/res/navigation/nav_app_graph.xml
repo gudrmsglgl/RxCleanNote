@@ -32,12 +32,12 @@
     </fragment>
     <fragment
         android:id="@+id/noteDetailFragment"
-        android:name="com.cleannote.notedetail.NoteDetailFragment"
+        android:name="com.cleannote.notedetail.edit.NoteDetailFragment"
         android:label="fragment_note_detail"
         tools:layout="@layout/fragment_note_detail" />
     <fragment
         android:id="@+id/noteDetailViewFragment"
-        android:name="com.cleannote.notedetail.NoteDetailViewFragment"
+        android:name="com.cleannote.notedetail.view.NoteDetailViewFragment"
         android:label="fragment_note_detail_view"
         tools:layout="@layout/fragment_note_detail_view" />
 </navigation>

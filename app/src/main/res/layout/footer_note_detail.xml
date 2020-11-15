@@ -9,7 +9,7 @@
             type="com.cleannote.presentation.notedetail.NoteDetailViewModel" />
         <variable
             name="fragment"
-            type="com.cleannote.notedetail.NoteDetailFragment" />
+            type="com.cleannote.notedetail.edit.NoteDetailFragment" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"

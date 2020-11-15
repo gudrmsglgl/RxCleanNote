@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.afollestad.materialdialogs.MaterialDialog
@@ -22,16 +19,11 @@ import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.cleannote.extension.isVisible
-import com.cleannote.extension.transNoteUiModel
-import com.cleannote.extension.visible
-import com.cleannote.notedetail.NOTE_DETAIL_BUNDLE_KEY
-import com.cleannote.notedetail.NoteDetailFragment
-import com.cleannote.notedetail.REQUEST_KEY_ON_BACK
+import com.cleannote.notedetail.edit.NoteDetailFragment
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), UIController {

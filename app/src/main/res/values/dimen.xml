@@ -14,7 +14,7 @@
     <dimen name="menu_width">30dp</dimen>
 
     <!-- detail view -->
-    <dimen name="detail_view_appbar_size">200dp</dimen>
+    <dimen name="detail_view_appbar_size">300dp</dimen>
 
     <!-- note item -->
     <dimen name="item_margin_start_end">12dp</dimen>

@@ -8,7 +8,7 @@
             type="com.cleannote.presentation.notedetail.NoteDetailViewModel" />
         <variable
             name="fragment"
-            type="com.cleannote.notedetail.NoteDetailFragment" />
+            type="com.cleannote.notedetail.edit.NoteDetailFragment" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
