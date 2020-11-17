@@ -2,10 +2,12 @@ package com.cleannote.common
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
@@ -26,7 +28,9 @@ import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-abstract class BaseFragment<DataBinding: ViewDataBinding>(@LayoutRes layoutRes: Int): Fragment(layoutRes) {
+abstract class BaseFragment<DataBinding : ViewDataBinding>(@LayoutRes layoutRes: Int): Fragment(
+    layoutRes
+) {
 
     lateinit var uiController: UIController
 
@@ -113,7 +117,7 @@ abstract class BaseFragment<DataBinding: ViewDataBinding>(@LayoutRes layoutRes: 
             try{
                 uiController = context as UIController
             }catch (e: ClassCastException) {
-                timber("d","$context must implement com.cleannote.common.UIController")
+                timber("d", "$context must implement com.cleannote.common.UIController")
             }
     }
 
@@ -145,5 +149,25 @@ abstract class BaseFragment<DataBinding: ViewDataBinding>(@LayoutRes layoutRes: 
 
     fun <T> DataState<T>.sendFirebaseThrowable(){
         this.throwable?.let { FirebaseCrashlytics.getInstance().recordException(it) }
+    }
+
+    fun setStatusBarColor(@ColorRes color: Int){
+        activity?.window?.statusBarColor = getColor(color)
+    }
+
+    fun getColor(@ColorRes color: Int): Int = ContextCompat.getColor(requireContext(), color)
+
+    fun setStatusBarTextBlack(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
+
+    fun setStatusBarTextTrans(){
+        val decorView: View = activity?.window?.decorView!! //set status background black
+
+        decorView.systemUiVisibility =
+            decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() //set status text  light
+
     }
 }

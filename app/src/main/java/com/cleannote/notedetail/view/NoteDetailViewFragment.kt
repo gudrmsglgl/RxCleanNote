@@ -9,8 +9,10 @@ import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.ViewModelProvider
@@ -50,19 +52,7 @@ class NoteDetailViewFragment(
         getPreviousFragmentNote()
         initViewPager()
         initToolbar()
-
-        app_bar_detail_view
-            .offsetChanges()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { offset ->
-                // offset -559(collapse) ~ 0(expand)
-                //expand
-                changeViewPagerAlpha()
-                changeMenu()
-            }
-            .addCompositeDisposable()
-
-        //initBottomSheet()
+        appbarChangeSource()
     }
 
     private fun initBinding() = binding.apply {
@@ -84,7 +74,6 @@ class NoteDetailViewFragment(
     }
 
     private fun initToolbar() {
-        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         binding.detailViewToolbar.setToolbar(
             R.drawable.arrow_back,
             R.menu.menu_detail_view,
@@ -106,97 +95,46 @@ class NoteDetailViewFragment(
         )
     }
 
-    private fun changeViewPagerAlpha() = with(binding){
-        val offsetAlpha = appBarDetailView.y / appBarDetailView.totalScrollRange
-        imagePager.alpha = 1 - (offsetAlpha*-1)
-    }
-
-    private fun changeMenu() = with(binding) {
-        val offset = (appBarDetailView.y / appBarDetailView.totalScrollRange).absoluteValue
-        timber("d", "offset: ${offset}")
-        if (offset == 1.0f){
-            detailViewToolbar.apply {
-                title = "expanded"
-                setMenuIconColor(R.color.black)
-                setBackgroundColor(Color.WHITE)
+    private fun appbarChangeSource() = binding.appBarDetailView
+        .offsetChanges()
+        .map {
+            (binding.appBarDetailView.y / binding.appBarDetailView.totalScrollRange).absoluteValue
+        }
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe { offset ->
+            changeViewPagerAlpha(offset)
+            if (offset == 1.0f){
+                appbarCollapseUI()
+                setStatusBarColor(R.color.white)
+                setStatusBarTextBlack()
+            } else if (offset >= 0.0f && offset < 1.0f){
+                appbarExpandedUI()
+                setStatusBarColor(R.color.transparent)
+                setStatusBarTextTrans()
             }
-            bottomSheet.setBackgroundResource(R.drawable.expand_bottom_sheet_background)
-        } else if (offset >= 0.0f && offset < 1.0f){
-            detailViewToolbar.apply{
-                title = ""
-                setMenuIconColor(R.color.white)
-                setBackgroundColor(Color.TRANSPARENT)
-            }
-            bottomSheet.setBackgroundResource(R.drawable.collapse_bottom_sheet_background)
         }
+        .addCompositeDisposable()
+
+    private fun changeViewPagerAlpha(offset: Float) = with(binding){
+        imagePager.alpha = 1 - (offset)
     }
 
-    private fun initBottomSheet(){
-        initBottomSheetHeight()
-        bottomBehaviorSetup()
-    }
-    private fun initBottomSheetHeight(){
-        binding.bottomSheet.apply {
-            val setHeight = getWindowHeight() - dimenPx(R.dimen.toolbar_height)
-            layoutParams.height = setHeight
+    private fun appbarCollapseUI() = with(binding){
+        detailViewToolbar.apply {
+            title = viewModel.finalNote.value?.title ?: ""
+            setMenuIconColor(R.color.black)
+            setBackgroundColor(Color.WHITE)
         }
+        bottomSheet.setBackgroundResource(R.drawable.expand_bottom_sheet_background)
     }
 
-    private fun bottomBehaviorSetup(){
-        BottomSheetBehavior.from(binding.bottomSheet).apply {
-            peekHeight = getWindowHeight() + dimenPx(R.dimen.toolbar_height) - dimenPx(R.dimen.detail_view_appbar_size)
-
-            addBottomSheetCallback(object :
-                BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    when (newState){
-                        STATE_EXPANDED -> {
-
-                            /*binding.floatBtn
-                                .animate()
-                                .translationY(-dimenPx(R.dimen.detail_view_appbar_size).toFloat())
-                                .alpha(0.1.toFloat())
-                                .start()*/
-
-                            //binding.appBarDetailView.setExpanded(false)
-                            binding.detailViewToolbar.apply {
-                                title = "expanded"
-                                setMenuIconColor(R.color.black)
-                                setBackgroundColor(Color.WHITE)
-                            }
-                            binding.bottomSheet.setBackgroundResource(R.drawable.expand_bottom_sheet_background)
-                        }
-                        STATE_COLLAPSED -> {
-
-                            /*binding.floatBtn
-                                .animate()
-                                .translationY(0.toFloat())
-                                .alpha(1.toFloat())
-                                .start()*/
-
-                            //binding.appBarDetailView.setExpanded(true)
-                            binding.detailViewToolbar.apply{
-                                title = ""
-                                setMenuIconColor(R.color.white)
-                                setBackgroundColor(Color.TRANSPARENT)
-                            }
-                            binding.bottomSheet.setBackgroundResource(R.drawable.collapse_bottom_sheet_background)
-                        }
-                        else -> {}
-                    }
-                }
-
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    //timber("d", "bottomSheetSlideOffset: $slideOffset")
-                    binding.floatBtn.alpha = 1 - slideOffset
-
-                    /*val ani = binding.imagePager
-                        .animate()
-                        .setInterpolator(AccelerateInterpolator())
-                        .alpha(1.toFloat()-slideOffset)
-                        .start()*/
-                }
-            })
+    private fun appbarExpandedUI() = with(binding){
+        detailViewToolbar.apply{
+            title = ""
+            setMenuIconColor(R.color.white)
+            setBackgroundColor(Color.TRANSPARENT)
         }
+        bottomSheet.setBackgroundResource(R.drawable.collapse_bottom_sheet_background)
     }
+
 }

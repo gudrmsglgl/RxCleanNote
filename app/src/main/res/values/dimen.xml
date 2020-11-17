@@ -15,6 +15,7 @@
 
     <!-- detail view -->
     <dimen name="detail_view_appbar_size">300dp</dimen>
+    <dimen name="dv_margin_start">5dp</dimen>
 
     <!-- note item -->
     <dimen name="item_margin_start_end">12dp</dimen>
