@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.ViewModelProvider
@@ -103,20 +104,18 @@ class NoteDetailViewFragment(
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { offset ->
             changeViewPagerAlpha(offset)
+            setStatusBar(offset)
             if (offset == 1.0f){
                 appbarCollapseUI()
-                setStatusBarColor(R.color.white)
-                setStatusBarTextBlack()
             } else if (offset >= 0.0f && offset < 1.0f){
                 appbarExpandedUI()
-                setStatusBarColor(R.color.transparent)
-                setStatusBarTextTrans()
             }
         }
         .addCompositeDisposable()
 
     private fun changeViewPagerAlpha(offset: Float) = with(binding){
-        imagePager.alpha = 1 - (offset)
+        if (imagePager.isVisible) imagePager.alpha = 1 - (offset)
+        else ivDvNoImages.alpha = 1 - (offset)
     }
 
     private fun appbarCollapseUI() = with(binding){
@@ -131,10 +130,25 @@ class NoteDetailViewFragment(
     private fun appbarExpandedUI() = with(binding){
         detailViewToolbar.apply{
             title = ""
-            setMenuIconColor(R.color.white)
+            if (imagePager.isVisible) setMenuIconColor(R.color.white) else setMenuIconColor(R.color.black)
             setBackgroundColor(Color.TRANSPARENT)
         }
         bottomSheet.setBackgroundResource(R.drawable.collapse_bottom_sheet_background)
+    }
+
+    private fun setStatusBar(offset: Float){
+        if (binding.ivDvNoImages.isVisible) {
+            setStatusBarColor(R.color.transparent)
+            setStatusBarTextBlack()
+            return
+        }
+        if (offset == 1.0f){
+            setStatusBarColor(R.color.white)
+            setStatusBarTextBlack()
+        } else if (offset >= 0.0f && offset < 1.0f){
+            setStatusBarColor(R.color.transparent)
+            setStatusBarTextTrans()
+        }
     }
 
 }

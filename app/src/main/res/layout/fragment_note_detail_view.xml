@@ -39,7 +39,17 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:imageViews="@{UiModelExtsKt.transNoteImageUiModels(vm.finalNote.noteImages)}"
+                app:visible="@{!vm.finalNote.noteImages.empty &amp;&amp; vm.finalNote.noteImages != null }"
                 />
+
+            <ImageView
+                android:id="@+id/iv_dv_no_images"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                android:src="@drawable/empty_holder"
+                android:scaleType="fitXY"
+                app:visible="@{vm.finalNote.noteImages.empty || vm.finalNote.noteImages == null}"/>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/detail_view_toolbar"
@@ -77,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="20dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/dv_margin_top"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"/>
 
@@ -86,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/updated_time_24"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/dv_margin_top"
                 app:layout_constraintTop_toBottomOf="@+id/tv_dv_title"
                 app:layout_constraintLeft_toLeftOf="parent"
                 />
@@ -111,6 +121,30 @@
                 app:layout_constraintTop_toTopOf="@+id/iv_dv_update"
                 app:layout_constraintLeft_toRightOf="@+id/tv_dv_update_time_desc"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_dv_update"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/content_24"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/iv_dv_update"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="250dp"
+                android:padding="20dp"
+                android:background="@drawable/bg_detail_view_content"
+                android:layout_marginTop="@dimen/dv_margin_top"
+                app:layout_constraintTop_toBottomOf="@+id/iv_dv_update">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{vm.finalNote.body}"/>
+
+            </LinearLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
