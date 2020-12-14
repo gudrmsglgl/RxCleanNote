@@ -4,7 +4,9 @@ import android.animation.Animator
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
@@ -13,10 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.utils.MDUtil.dimenPx
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.R
@@ -45,19 +49,27 @@ class NoteDetailViewFragment(
     val requestManager: RequestManager) : BaseFragment<FragmentNoteDetailViewBinding>(R.layout.fragment_note_detail_view)
 {
 
-    private val viewModel:NoteDetailViewModel by viewModels { viewModelFactory }
-    
+    private val viewModel:NoteDetailViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getPreviousFragmentNote()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        timber("d","viewModelFactory: ${viewModelFactory}")
+        timber("d", "viewModel: $viewModel")
         initBinding()
-        getPreviousFragmentNote()
         initViewPager()
         initToolbar()
         appbarChangeSource()
     }
 
-    private fun initBinding() = binding.apply {
-        vm = viewModel
+    override fun initBinding() {
+        binding.vm = viewModel
     }
 
     private fun getPreviousFragmentNote(){
@@ -84,7 +96,10 @@ class NoteDetailViewFragment(
             Toolbar.OnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.menu_edit -> {
-                        showToast("edit")
+                        findNavController().navigate(
+                            R.id.action_noteDetailViewFragment_to_noteDetailFragment,
+                            bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel())
+                        )
                         true
                     }
                     else -> {

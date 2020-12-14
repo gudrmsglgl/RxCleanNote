@@ -37,6 +37,8 @@ class SplashFragment constructor(
         //subscribeLoginResult()
     }
 
+    override fun initBinding() {}
+
     private fun logoClickListener(){
         splash_logo.singleClick()
             .subscribe {

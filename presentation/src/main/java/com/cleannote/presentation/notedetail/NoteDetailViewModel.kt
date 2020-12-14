@@ -1,5 +1,6 @@
 package com.cleannote.presentation.notedetail
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
@@ -15,8 +16,11 @@ import com.cleannote.presentation.extensions.createNoteImageView
 import com.cleannote.presentation.extensions.transNote
 import com.cleannote.presentation.model.NoteImageView
 import com.cleannote.presentation.model.NoteView
+import javax.inject.Inject
+import javax.inject.Singleton
 
 class NoteDetailViewModel
+@Singleton
 constructor(
     private val updateNote: UpdateNote,
     private val deleteNote: DeleteNote
@@ -108,5 +112,10 @@ constructor(
             finalNote.value!!.noteImages?.toMutableList() ?: mutableListOf()
         list.add(0, path.createNoteImageView(notePk = finalNote.value!!.id))
         return list
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("RxCleanNote", "NoteDetailViewModel onCleared()")
     }
 }

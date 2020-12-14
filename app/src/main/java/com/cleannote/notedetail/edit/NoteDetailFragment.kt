@@ -53,7 +53,9 @@ class NoteDetailFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initDataBinding()
+        timber("d","NoteDetailFragment viewModelFactory: ${viewModelFactory}")
+        timber("d", "NoteDetailFragment viewModel: $viewModel")
+        initBinding()
         getPreviousFragmentNote()
         initRecyclerImages()
 
@@ -64,9 +66,11 @@ class NoteDetailFragment constructor(
         subscribeDeleteNote()
     }
 
-    private fun initDataBinding() = with(binding){
-        vm = viewModel
-        fragment = this@NoteDetailFragment
+    override fun initBinding() {
+        binding.apply {
+            vm = viewModel
+            fragment = this@NoteDetailFragment
+        }
     }
 
     private fun initRecyclerImages(){

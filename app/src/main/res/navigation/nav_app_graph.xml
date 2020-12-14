@@ -39,5 +39,11 @@
         android:id="@+id/noteDetailViewFragment"
         android:name="com.cleannote.notedetail.view.NoteDetailViewFragment"
         android:label="fragment_note_detail_view"
-        tools:layout="@layout/fragment_note_detail_view" />
+        tools:layout="@layout/fragment_note_detail_view" >
+        <action
+            android:id="@+id/action_noteDetailViewFragment_to_noteDetailFragment"
+            app:destination="@id/noteDetailFragment"
+            app:popUpTo="@id/noteDetailViewFragment"
+            app:popUpToInclusive="false"/>
+    </fragment>
 </navigation>
