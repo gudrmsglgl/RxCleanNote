@@ -1,12 +1,22 @@
 package com.cleannote.presentation
 
+import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.cleannote.domain.Constants
+import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.interactor.UseCase
 import com.cleannote.presentation.data.State
+import com.cleannote.presentation.notelist.NoteListViewModel
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.mockito.verification.VerificationMode
 
 typealias OnSuccess<T> = (T) -> Unit
@@ -22,24 +32,22 @@ abstract class BaseViewModelTest {
         viewModelState.value = state
     }
 
+    @BeforeEach
+    open fun setup(){
+        viewModelState = MutableLiveData()
+        viewModelState.observeForever(stateObserver)
+    }
+
+    @AfterEach
+    open fun release(){
+        viewModelState.removeObserver(stateObserver)
+    }
+
+
     fun verifyViewModelDataState(state: State?, verificationMode: VerificationMode? = null){
         if (verificationMode == null)
             verify(stateObserver).onChanged(state)
         else verify(stateObserver, verificationMode).onChanged(state)
     }
-
-
-    fun <T, Param> UseCase<T, Param>.verifyExecute(
-        onSuccessCaptor: KArgumentCaptor<OnSuccess<T>>,
-        onErrorCaptor: KArgumentCaptor<OnError>,
-        afterFinishedCaptor: KArgumentCaptor<Complete>,
-        onCompleteCaptor: KArgumentCaptor<Complete>,
-        paramCaptor: KArgumentCaptor<Param>
-    ) = verify(this).execute(onSuccess = onSuccessCaptor.capture(),
-                                            onError = onErrorCaptor.capture(),
-                                            afterFinished = afterFinishedCaptor.capture(),
-                                            onComplete = onCompleteCaptor.capture(),
-                                            params = paramCaptor.capture()
-    )
 
 }

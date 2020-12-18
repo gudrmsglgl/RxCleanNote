@@ -1,7 +1,7 @@
 package com.cleannote.domain.usecase
 
 import com.cleannote.domain.BaseDomainTest
-import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
+import com.cleannote.domain.interactor.usecases.common.DeleteNote
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.test.factory.NoteFactory
 import com.cleannote.domain.usecase.common.CompletableUseCaseBuilder

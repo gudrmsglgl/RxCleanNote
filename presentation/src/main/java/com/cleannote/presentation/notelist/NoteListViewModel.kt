@@ -8,12 +8,14 @@ import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
 import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
 import com.cleannote.domain.Constants.SORT_UPDATED_AT
-import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
+import com.cleannote.domain.interactor.usecases.common.DeleteNote
 import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
+import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Query
 import com.cleannote.presentation.common.BaseViewModel
+import com.cleannote.presentation.common.NewBaseViewModel
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.State.SUCCESS
@@ -26,12 +28,9 @@ import com.cleannote.presentation.model.NoteView
 
 class NoteListViewModel
 constructor(
-    private val searchNotes: SearchNotes,
-    private val insertNewNote: InsertNewNote,
-    private val deleteNote: DeleteNote,
-    private val deleteMultipleNotes: DeleteMultipleNotes,
+    private val useCases: NoteListUseCases,
     private val sharedPreferences: SharedPreferences
-): BaseViewModel(searchNotes, insertNewNote, deleteNote, deleteMultipleNotes) {
+): NewBaseViewModel(useCases) {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
         order = loadOrderingOnSharedPreference()
@@ -73,7 +72,7 @@ constructor(
 
     fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
-        searchNotes.execute(
+        useCases.searchNotes.execute(
                 onSuccess = { notes ->
                     loadedNotes.addAll( notes.transNoteViews() )
                     _mediatorNoteList.postValue(DataState.success(loadedNotes))
@@ -86,7 +85,7 @@ constructor(
 
     fun insertNotes(noteView: NoteView){
         _insertNote.postValue(DataState.loading())
-        insertNewNote.execute(
+        useCases.insertNewNote.execute(
             onSuccess = {
                 _insertNote.postValue(DataState.success(noteView))
             },
@@ -120,7 +119,7 @@ constructor(
 
     fun deleteNote(deletedNoteView: NoteView){
         _deleteResult.postValue(DataState.loading())
-        deleteNote.execute(
+        useCases.deleteNote.execute(
             onSuccess = {},
             onError = {
                 _deleteResult.postValue(DataState.error(it))
@@ -136,7 +135,7 @@ constructor(
 
     fun deleteMultiNotes(notes: List<NoteView>){
         _deleteResult.postValue(DataState.loading())
-        deleteMultipleNotes.execute(
+        useCases.deleteMultipleNotes.execute(
             onSuccess = {},
             onError = {
                 _deleteResult.postValue(DataState.error(it))

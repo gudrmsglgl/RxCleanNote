@@ -1,4 +1,4 @@
-package com.cleannote.domain.interactor.usecases.notedetail
+package com.cleannote.domain.interactor.usecases.common
 
 import com.cleannote.domain.interactor.CompletableUseCase
 import com.cleannote.domain.interactor.executor.PostExecutionThread

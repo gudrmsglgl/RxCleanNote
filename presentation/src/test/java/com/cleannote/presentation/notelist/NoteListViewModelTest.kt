@@ -5,19 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
-import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
+import com.cleannote.domain.interactor.usecases.common.DeleteNote
 import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
+import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
-import com.cleannote.domain.model.Query
-import com.cleannote.presentation.BaseViewModelTest
-import com.cleannote.presentation.Complete
-import com.cleannote.presentation.OnError
-import com.cleannote.presentation.OnSuccess
+import com.cleannote.presentation.*
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.extensions.transNoteViews
+import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
+import com.cleannote.presentation.notelist.search.SearchUseCaseCaptors
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.*
@@ -32,6 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(InstantExecutorExtension::class)
 class NoteListViewModelTest: BaseViewModelTest() {
 
+    lateinit var useCases: NoteListUseCases
+
     lateinit var searchNotes: SearchNotes
     lateinit var insertNewNote: InsertNewNote
     lateinit var deleteNote: DeleteNote
@@ -39,8 +40,10 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     lateinit var sharedPreferences: SharedPreferences
 
-    private lateinit var noteListOnSuccessCaptor: KArgumentCaptor<OnSuccess<List<Note>>>
-    private lateinit var queryCaptor: KArgumentCaptor<Query>
+    lateinit var listCaptors: SearchUseCaseCaptors
+
+   // private lateinit var noteListOnSuccessCaptor: KArgumentCaptor<OnSuccess<List<Note>>>
+    //private lateinit var queryCaptor: KArgumentCaptor<Query>
 
     private lateinit var deleteSuccessCaptor: KArgumentCaptor<OnSuccess<Nothing>>
 
@@ -56,7 +59,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
 
     @BeforeEach
     fun setUp(){
-
         viewModelState = MutableLiveData()
         viewModelState.observeForever(stateObserver)
 
@@ -70,12 +72,12 @@ class NoteListViewModelTest: BaseViewModelTest() {
             on { getString(FILTER_ORDERING_KEY, ORDER_DESC) } doReturn ORDER_DESC
         }
 
-        noteListViewModel = NoteListViewModel(
-            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, sharedPreferences)
+        noteListViewModel = NoteListViewModel(useCases, sharedPreferences)
+            //searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, sharedPreferences)
     }
 
     @AfterEach
-    fun release(){
+    fun releases(){
         viewModelState.removeObserver(stateObserver)
     }
 
@@ -132,7 +134,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         assertViewModelNotesSize(p1NoteList.size)
 
         whenNextSearchNotesSaveState()
-        assertThat(queryCaptor.firstValue.page, `is`(2))
+        assertThat(listCaptors.capturedQuery().page/*queryCaptor.firstValue.page*/, `is`(2))
         whenSuccessOnNextNoteList(p2NoteList)
         verifyViewModelDataState(LOADING, times(2))
         verifyViewModelDataState(SUCCESS, times(2))
@@ -144,7 +146,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         noteListViewModel.setOrdering(ORDER_DESC)
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
-        assertThat(queryCaptor.firstValue.order, `is`(ORDER_DESC))
+        assertThat(listCaptors.capturedQuery().order/*queryCaptor.firstValue.order*/, `is`(ORDER_DESC))
     }
 
     @Test
@@ -152,7 +154,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
         noteListViewModel.setOrdering(ORDER_ASC)
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
-        assertThat(queryCaptor.firstValue.order, `is`(ORDER_ASC))
+        assertThat(listCaptors.capturedQuery().order/*queryCaptor.firstValue.order*/, `is`(ORDER_ASC))
     }
 
     @Test
@@ -161,7 +163,8 @@ class NoteListViewModelTest: BaseViewModelTest() {
         noteListViewModel.searchKeyword(keyword)
         whenSearchNoteSaveState()
         verifySearchNoteExecute()
-        assertThat(queryCaptor.firstValue.like, `is`(keyword))
+        assertThat(listCaptors.capturedQuery().like, `is`(keyword))
+
     }
 
     @Test
@@ -359,7 +362,8 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     private fun whenSuccessOnNextNoteList(noteList: List<Note>){
-        noteListOnSuccessCaptor.firstValue.invoke(noteList)
+        listCaptors.fetchSuccessData(noteList)
+        //noteListOnSuccessCaptor.firstValue.invoke(noteList)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }
 
@@ -371,10 +375,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
     private fun whenSuccessOnDeleteMultiNotes(){
         onCompleteCaptor.secondValue.invoke()
         setViewModelState(noteListViewModel.deleteResult.value?.status)
-    }
-
-    private fun verifyInsertNoteExecute(){
-        insertNewNote.verifyExecute(insertNoteOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, noteParam)
     }
 
     private fun whenInsertNoteSaveState(insertNoteView: NoteView){
@@ -451,8 +451,13 @@ class NoteListViewModelTest: BaseViewModelTest() {
         assertThat(noteListViewModel.deleteResult.value?.throwable, `is`(throwable))
     }
 
+    private fun verifyInsertNoteExecute(){
+        insertNewNote.verifyExecute(insertNoteOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, noteParam)
+    }
+
     private fun verifySearchNoteExecute(){
-        searchNotes.verifyExecute(noteListOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, queryCaptor)
+        //searchNotes.verifyExecute(noteListOnSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, queryCaptor)
+        searchNotes.verifyExecute(listCaptors.onSuccessCaptor, onErrorCaptor, afterFinishedCaptor, onCompleteCaptor, listCaptors.queryCaptor)
     }
 
     private fun verifyDeleteNoteExecute(){
@@ -464,8 +469,9 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     private fun initNoteListCaptor(){
-        noteListOnSuccessCaptor = argumentCaptor()
-        queryCaptor = argumentCaptor()
+        listCaptors = SearchUseCaseCaptors()
+        /*noteListOnSuccessCaptor = argumentCaptor()
+        queryCaptor = argumentCaptor()*/
     }
 
     private fun initInsertNoteCaptor(){
@@ -489,5 +495,6 @@ class NoteListViewModelTest: BaseViewModelTest() {
         insertNewNote = mock()
         deleteNote = mock()
         deleteMultipleNotes = mock()
+        useCases = NoteListUseCases(searchNotes, insertNewNote, deleteNote, deleteMultipleNotes)
     }
 }

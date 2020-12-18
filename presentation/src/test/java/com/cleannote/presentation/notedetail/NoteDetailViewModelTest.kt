@@ -1,7 +1,7 @@
 package com.cleannote.presentation.notedetail
 
 import androidx.lifecycle.MutableLiveData
-import com.cleannote.domain.interactor.usecases.notedetail.DeleteNote
+import com.cleannote.domain.interactor.usecases.common.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.BaseViewModelTest
@@ -12,6 +12,7 @@ import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.TextMode.DefaultMode
 import com.cleannote.presentation.data.notedetail.TextMode.EditDoneMode
+import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
@@ -60,10 +61,10 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         viewModel = NoteDetailViewModel(updateNote, deleteNote)
     }
 
-    @AfterEach
+   /* @AfterEach
     fun release(){
         viewModelState.removeObserver(stateObserver)
-    }
+    }*/
 
     @Test
     fun updateNoteExecuteUseCase(){
