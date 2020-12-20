@@ -2,12 +2,21 @@ package com.cleannote.presentation
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.cleannote.domain.interactor.UseCase
+import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
+import com.cleannote.presentation.extensions.verifyExecute
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.mockito.verification.VerificationMode
 
-abstract class ViewModelFeatureTester<D, P>
+// C: Child ClassType, D: UseCase Domain Model, Param: UseCase Param, R: UseCase Return In ViewModel
+@Suppress("UNCHECKED_CAST")
+abstract class ViewModelFeatureTester<C, D, Param, R>(val captors: ArgumentCaptors<D>)
 {
     val state: MutableLiveData<State>  = MutableLiveData()
     private val stateObserver: Observer<State> = mock()
@@ -17,30 +26,53 @@ abstract class ViewModelFeatureTester<D, P>
         state.observeForever(stateObserver)
     }
 
-    fun verifyChangeState(state: State?, verificationMode: VerificationMode? = null): ViewModelFeatureTester<D, P> {
+    fun verifyChangeState(state: State?, verificationMode: VerificationMode? = null): C{
         if (verificationMode == null) verify(stateObserver).onChanged(state)
         else verify(stateObserver, verificationMode).onChanged(state)
-        return this
+        return this as C
     }
 
     fun setState(state: State?){
         this.state.value = state
     }
 
+    fun expectData(data: R?): C{
+        if (data == null)
+            assertThat(vmCurrentData()?.data, `is`(nullValue()))
+        else
+            assertThat(vmCurrentData()?.data, `is`(data))
+        return this as C
+    }
+
+    fun expectError(data: Throwable?): C{
+        assertThat(vmCurrentData()?.throwable, `is`(data))
+        return this as C
+    }
+
+    fun expectState(state: State): C{
+        assertThat(vmCurrentData()?.status, `is`(state))
+        return this as C
+    }
+
+    fun stubUseCaseOnSuccess(stub: D): C{
+       captors.onSuccessInvoke(stub)
+       setState(currentState())
+       return this as C
+    }
+
+    fun stubUseCaseOnError(stub: Throwable): C{
+        captors.onErrorInvoke(stub)
+        setState(currentState())
+        return this as C
+    }
+
+    fun stubUseCaseOnComplete(): C{
+        captors.onCompleteInvoke()
+        setState(currentState())
+        return this as C
+    }
+
+    abstract fun verifyUseCaseExecute(): C
+    abstract fun vmCurrentData(): DataState<R>?
     abstract fun currentState(): State?
-
-    abstract fun verifyUseCaseExecute(): ViewModelFeatureTester<D, P>
-
-    abstract fun expectData(data: P?): ViewModelFeatureTester<D, P>
-
-    abstract fun expectError(data: Throwable?): ViewModelFeatureTester<D, P>
-
-    abstract fun expectState(state: State): ViewModelFeatureTester<D, P>
-
-    abstract fun stubUseCaseOnSuccess(stub: D): ViewModelFeatureTester<D, P>
-
-    abstract fun stubUseCaseOnError(stub: Throwable): ViewModelFeatureTester<D, P>
-
-    abstract fun stubUseCaseOnComplete(): ViewModelFeatureTester<D, P>
-
 }

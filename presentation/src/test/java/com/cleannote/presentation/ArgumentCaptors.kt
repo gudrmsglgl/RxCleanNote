@@ -1,33 +1,34 @@
 package com.cleannote.presentation
 
-import com.cleannote.domain.model.Query
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import org.mockito.ArgumentCaptor
 
-open class ArgumentCaptors<R> {
+abstract class ArgumentCaptors<D> {
 
-    val onSuccessCaptor: KArgumentCaptor<OnSuccess<R>>  = argumentCaptor()
-    val onErrorCaptor: KArgumentCaptor<OnError> = argumentCaptor()
-    val afterFinishedCaptor: KArgumentCaptor<Complete> = argumentCaptor()
-    val onCompleteCaptor: KArgumentCaptor<Complete> = argumentCaptor()
+    private val onSuccessCaptor: KArgumentCaptor<OnSuccess<D>>  = argumentCaptor()
+    private val onErrorCaptor: KArgumentCaptor<OnError> = argumentCaptor()
+    private val afterFinishedCaptor: KArgumentCaptor<Complete> = argumentCaptor()
+    private val onCompleteCaptor: KArgumentCaptor<Complete> = argumentCaptor()
 
-
-    fun onSuccessCapturing(data: R){
+    fun onSuccessInvoke(data: D){
         onSuccessCaptor.firstValue.invoke(data)
     }
 
-    fun onErrorCapturing(data: Throwable){
+    fun onErrorInvoke(data: Throwable){
         onErrorCaptor.firstValue.invoke(data)
     }
 
-    fun onAfterFinishCapturing(){
+    fun onAfterFinishValueCapturing(){
         afterFinishedCaptor.firstValue.invoke()
     }
 
-    fun onCompleteCapturing(){
+    fun onCompleteInvoke(){
         onCompleteCaptor.firstValue.invoke()
     }
 
+    fun onSuccessCapture() = onSuccessCaptor.capture()
+    fun onErrorCapture() = onErrorCaptor.capture()
+    fun onAfterFinishedCapture() = afterFinishedCaptor.capture()
+    fun onCompleteCapture() = onCompleteCaptor.capture()
 
 }

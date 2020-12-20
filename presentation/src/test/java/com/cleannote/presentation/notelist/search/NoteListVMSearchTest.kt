@@ -4,18 +4,15 @@ import com.cleannote.domain.Constants
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.extensions.transNoteViews
 import com.cleannote.presentation.extensions.transNotes
 import com.cleannote.presentation.notelist.NewNoteListViewModelTest
-import com.cleannote.presentation.notelist.search.Tester.SearchFeatureTester
-import com.cleannote.presentation.notelist.search.Tester.SearchUseCaseCaptors
-import com.cleannote.presentation.test.InstantExecutorExtension
+import com.cleannote.presentation.notelist.search.tester.SearchFeatureTester
+import com.cleannote.presentation.notelist.search.tester.SearchUseCaseCaptors
 import com.cleannote.presentation.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
 class NoteListVMSearchTest: NewNoteListViewModelTest() {
 
@@ -84,7 +81,7 @@ class NoteListVMSearchTest: NewNoteListViewModelTest() {
     }
     @Test
     fun searchNoteNextPageReturnDataTotalSize_20(){
-        val noteList = NoteFactory.createNoteViewList(0, 20)
+        val noteList = NoteFactory.createNoteViewList(0, 20).asReversed()
         with(searchFeatureTester) {
 
             search()

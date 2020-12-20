@@ -2,8 +2,8 @@ package com.cleannote.presentation.notelist.delete
 
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.notelist.NewNoteListViewModelTest
-import com.cleannote.presentation.notelist.delete.Tester.DeleteFeatureTester
-import com.cleannote.presentation.notelist.delete.Tester.DeleteUseCaseCaptors
+import com.cleannote.presentation.notelist.delete.tester.DeleteFeatureTester
+import com.cleannote.presentation.notelist.delete.tester.DeleteUseCaseCaptors
 import com.cleannote.presentation.test.factory.NoteFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,6 +55,7 @@ class NoteListVMDeleteTest: NewNoteListViewModelTest() {
             stubUseCaseOnComplete()
                 .verifyChangeState(SUCCESS)
                 .expectData(deleteNoteView)
+
         }
 
     }
