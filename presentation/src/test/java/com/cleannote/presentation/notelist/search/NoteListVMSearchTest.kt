@@ -4,7 +4,11 @@ import com.cleannote.domain.Constants
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.extensions.transNoteViews
+import com.cleannote.presentation.extensions.transNotes
 import com.cleannote.presentation.notelist.NewNoteListViewModelTest
+import com.cleannote.presentation.notelist.search.Tester.SearchFeatureTester
+import com.cleannote.presentation.notelist.search.Tester.SearchUseCaseCaptors
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.times
@@ -13,11 +17,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(InstantExecutorExtension::class)
-class ViewModelSearchTest: NewNoteListViewModelTest() {
+class NoteListVMSearchTest: NewNoteListViewModelTest() {
 
     private lateinit var captors: SearchUseCaseCaptors
-
     private lateinit var searchFeatureTester: SearchFeatureTester
 
     @BeforeEach
@@ -50,23 +52,23 @@ class ViewModelSearchTest: NewNoteListViewModelTest() {
 
     @Test
     fun searchNotesStateLoadingToSuccessReturnData(){
-        val noteList = NoteFactory.createNoteList(0, 10)
-
+        val notes = NoteFactory.createNoteViewList(0, 10)
         with(searchFeatureTester) {
 
             search()
                 .verifyUseCaseExecute()
                 .verifyChangeState(LOADING)
 
-            stubUseCaseOnSuccess(noteList)
+            stubUseCaseOnSuccess(notes.transNotes())
                 .verifyChangeState(SUCCESS)
-                .expectData(noteList)
+                .expectData(notes)
         }
     }
 
     @Test
-    fun searchNotesStateErrorReturnErrorMessageNoData(){
-        val throwable = RuntimeException()
+    fun searchNotesStateErrorReturnThrowableNoData(){
+        val errorMessage = "RunTimeException Test"
+        val throwable = RuntimeException(errorMessage)
         with(searchFeatureTester){
 
             search()
@@ -82,18 +84,18 @@ class ViewModelSearchTest: NewNoteListViewModelTest() {
     }
     @Test
     fun searchNoteNextPageReturnDataTotalSize_20(){
-        val noteList = NoteFactory.createNoteList(0, 20)
+        val noteList = NoteFactory.createNoteViewList(0, 20)
         with(searchFeatureTester) {
 
             search()
                 .verifyUseCaseExecute()
-                .stubUseCaseOnSuccess(noteList.subList(0, 10))
+                .stubUseCaseOnSuccess(noteList.subList(0, 10).transNotes())
                 .expectQuery(page = 1)
                 .expectData(noteList.subList(0, 10))
 
 
             search(isNextPage = true)
-                .stubUseCaseOnSuccess(noteList.subList(10, 20))
+                .stubUseCaseOnSuccess(noteList.subList(10, 20).transNotes())
                 .expectQuery(page = 2)
                 .expectData(noteList)
 
@@ -136,19 +138,19 @@ class ViewModelSearchTest: NewNoteListViewModelTest() {
     @Test
     fun searchNoteAfterKeyWordQuery_ReturnOnlyKeywordData(){
         val keyword = "TestQuery"
-        val nonKeyWordNoteList = NoteFactory.createNoteList(0,10)
-        val keyWordNoteList = NoteFactory.createNoteList(0,5)
+        val defaultNoteList = NoteFactory.createNoteViewList(0,10)
+        val keyWordNoteList = NoteFactory.createNoteViewList(0,5)
 
         with(searchFeatureTester){
 
             search()
                 .verifyUseCaseExecute()
-                .stubUseCaseOnSuccess(nonKeyWordNoteList)
-                .expectData(nonKeyWordNoteList)
+                .stubUseCaseOnSuccess(defaultNoteList.transNotes())
+                .expectData(defaultNoteList)
 
             searchKeyword(keyword)
                 .search()
-                .stubUseCaseOnSuccess(keyWordNoteList)
+                .stubUseCaseOnSuccess(keyWordNoteList.transNotes())
                 .expectQuery(like = keyword)
                 .expectData(keyWordNoteList)
 

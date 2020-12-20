@@ -16,7 +16,7 @@ import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.extensions.transNoteViews
 import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
-import com.cleannote.presentation.notelist.search.SearchUseCaseCaptors
+import com.cleannote.presentation.notelist.search.Tester.SearchUseCaseCaptors
 import com.cleannote.presentation.test.InstantExecutorExtension
 import com.cleannote.presentation.test.factory.NoteFactory
 import com.nhaarman.mockitokotlin2.*
@@ -362,7 +362,7 @@ class NoteListViewModelTest: BaseViewModelTest() {
     }
 
     private fun whenSuccessOnNextNoteList(noteList: List<Note>){
-        listCaptors.fetchSuccessData(noteList)
+        //listCaptors.fetchSuccessData(noteList)
         //noteListOnSuccessCaptor.firstValue.invoke(noteList)
         setViewModelState(noteListViewModel.noteList.value?.status)
     }

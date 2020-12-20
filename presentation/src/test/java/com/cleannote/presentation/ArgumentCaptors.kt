@@ -13,19 +13,19 @@ open class ArgumentCaptors<R> {
     val onCompleteCaptor: KArgumentCaptor<Complete> = argumentCaptor()
 
 
-    fun fetchSuccessData(data: R){
+    fun onSuccessCapturing(data: R){
         onSuccessCaptor.firstValue.invoke(data)
     }
 
-    fun fetchErrorData(data: Throwable){
+    fun onErrorCapturing(data: Throwable){
         onErrorCaptor.firstValue.invoke(data)
     }
 
-    fun fetchAfterFinished(){
+    fun onAfterFinishCapturing(){
         afterFinishedCaptor.firstValue.invoke()
     }
 
-    fun fetchComplete(){
+    fun onCompleteCapturing(){
         onCompleteCaptor.firstValue.invoke()
     }
 

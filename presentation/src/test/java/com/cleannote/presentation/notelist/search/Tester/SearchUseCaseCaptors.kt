@@ -1,4 +1,4 @@
-package com.cleannote.presentation.notelist.search
+package com.cleannote.presentation.notelist.search.Tester
 
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query

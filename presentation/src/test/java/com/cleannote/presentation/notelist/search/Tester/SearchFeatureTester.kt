@@ -1,7 +1,8 @@
-package com.cleannote.presentation.notelist.search
+package com.cleannote.presentation.notelist.search.Tester
 
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Note
+import com.cleannote.presentation.ViewModelFeatureTester
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.extensions.transNoteViews
 import com.cleannote.presentation.extensions.verifyExecute
@@ -12,10 +13,10 @@ import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 
 class SearchFeatureTester(
-    val viewModel: NoteListViewModel,
-    val usecase: SearchNotes,
-    val captors: SearchUseCaseCaptors
-): ViewModelFeatureTester<List<Note>>()
+    private val viewModel: NoteListViewModel,
+    private val usecase: SearchNotes,
+    private val captors: SearchUseCaseCaptors
+): ViewModelFeatureTester<List<Note>, List<NoteView>>()
 {
 
     override fun verifyUseCaseExecute(): SearchFeatureTester {
@@ -23,16 +24,16 @@ class SearchFeatureTester(
         return this
     }
 
-    override fun expectData(data: List<Note>?): SearchFeatureTester {
+    override fun expectData(data: List<NoteView>?): SearchFeatureTester {
         if (data == null)
             assertThat(viewModel.noteList.value?.data, `is`(nullValue()))
         else
-            assertThat(viewModel.noteList.value?.data, `is`(data.transNoteViews()))
+            assertThat(viewModel.noteList.value?.data, `is`(data))
         return this
     }
 
     override fun expectState(state: State): SearchFeatureTester {
-        assertThat(viewModel.noteList.value?.status, `is`(state))
+        assertThat(currentState(), `is`(state))
         return this
     }
 
@@ -42,30 +43,36 @@ class SearchFeatureTester(
     }
 
     override fun stubUseCaseOnSuccess(stub: List<Note>): SearchFeatureTester {
-        captors.onSuccessCaptor.firstValue.invoke(stub)
-        setState(viewModel.noteList.value?.status)
+        captors.onSuccessCapturing(stub)
+        setState(currentState())
         return this
     }
 
     override fun stubUseCaseOnError(stub: Throwable): SearchFeatureTester {
-        captors.onErrorCaptor.firstValue.invoke(stub)
-        setState(viewModel.noteList.value?.status)
+        captors.onErrorCapturing(stub)
+        setState(currentState())
         return this
     }
 
-    fun search(isNextPage: Boolean = false): SearchFeatureTester{
+    override fun stubUseCaseOnComplete(): SearchFeatureTester {
+        captors.onCompleteCapturing()
+        setState(currentState())
+        return this
+    }
+
+    fun search(isNextPage: Boolean = false): SearchFeatureTester {
         if (isNextPage) viewModel.nextPage()
         viewModel.searchNotes()
-        setState(viewModel.noteList.value?.status)
+        setState(currentState())
         return this
     }
 
-    fun setOrdering(order: String): SearchFeatureTester{
+    fun setOrdering(order: String): SearchFeatureTester {
         viewModel.setOrdering(order)
         return this
     }
 
-    fun searchKeyword(keyword: String): SearchFeatureTester{
+    fun searchKeyword(keyword: String): SearchFeatureTester {
         viewModel.searchKeyword(keyword)
         return this
     }
@@ -77,15 +84,17 @@ class SearchFeatureTester(
         sort: String? = null
     ): SearchFeatureTester {
         if (order != null)
-            assertThat(captors.queryCaptor.firstValue.order, `is`(order))
+            assertThat(captors.capturedQuery().order, `is`(order))
         else if (page != null)
-            assertThat(captors.queryCaptor.firstValue.page, `is`(page))
+            assertThat(captors.capturedQuery().page, `is`(page))
         else if (like != null)
-            assertThat(captors.queryCaptor.firstValue.like, `is`(like))
+            assertThat(captors.capturedQuery().like, `is`(like))
         else if (sort != null)
-            assertThat(captors.queryCaptor.firstValue.sort, `is`(sort))
+            assertThat(captors.capturedQuery().sort, `is`(sort))
         return this
     }
 
-
+    override fun currentState(): State? {
+        return viewModel.noteList.value?.status
+    }
 }

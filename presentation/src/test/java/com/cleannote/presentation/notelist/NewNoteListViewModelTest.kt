@@ -8,12 +8,15 @@ import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
 import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.presentation.BaseViewModelTest
+import com.cleannote.presentation.test.InstantExecutorExtension
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.ExtendWith
 
-open class NewNoteListViewModelTest: BaseViewModelTest() {
+@ExtendWith(InstantExecutorExtension::class)
+open class NewNoteListViewModelTest {
 
     protected lateinit var noteListViewModel: NoteListViewModel
     lateinit var useCases: NoteListUseCases

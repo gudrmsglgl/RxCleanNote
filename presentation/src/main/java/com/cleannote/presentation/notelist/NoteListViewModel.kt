@@ -199,4 +199,6 @@ constructor(
 
     private fun loadOrderingOnSharedPreference() = sharedPreferences
         .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+
+    //TODO:: fun() 노트 목록을 갱신하는 읽기 쉬운 메소드 만들기
 }
