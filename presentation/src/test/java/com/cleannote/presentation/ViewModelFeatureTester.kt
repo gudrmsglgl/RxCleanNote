@@ -36,7 +36,7 @@ abstract class ViewModelFeatureTester<C, D, Param, R>(val captors: ArgumentCapto
         this.state.value = state
     }
 
-    fun expectData(data: R?): C{
+    open fun expectData(data: R?): C{
         if (data == null)
             assertThat(vmCurrentData()?.data, `is`(nullValue()))
         else
