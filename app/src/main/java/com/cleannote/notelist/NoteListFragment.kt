@@ -351,13 +351,13 @@ constructor(
 
     private fun requestUpdate(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(REQ_UPDATE_KEY)?.let {
-            viewModel.notifyUpdatedNote(it.transNoteView())
+            viewModel.reqUpdateFromDetailFragment(it.transNoteView())
         }
     }
 
     private fun requestDelete(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(REQ_DELETE_KEY)?.let {
-            viewModel.notifyDeletedNote(it.transNoteView())
+            viewModel.reqDeleteFromDetailFragment(it.transNoteView())
         }
     }
 

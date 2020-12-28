@@ -12,7 +12,7 @@ import com.cleannote.presentation.notelist.NoteListViewModel
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 
-class SearchFeatureTester(
+open class SearchFeatureTester(
     private val viewModel: NoteListViewModel,
     private val usecase: SearchNotes,
     private val searchCaptors: SearchUseCaseCaptors

@@ -1,22 +1,17 @@
 package com.cleannote.presentation.notelist.multidelete
 
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.extensions.transNoteViews
 import com.cleannote.presentation.extensions.transNotes
-import com.cleannote.presentation.model.NoteView
-import com.cleannote.presentation.notelist.NewNoteListViewModelTest
+import com.cleannote.presentation.notelist.NoteListViewModelTest
 import com.cleannote.presentation.notelist.multidelete.tester.DeleteMultiUseCaseCaptors
 import com.cleannote.presentation.notelist.multidelete.tester.DeleteMultipleFeatureTester
 import com.cleannote.presentation.notelist.search.tester.SearchFeatureTester
 import com.cleannote.presentation.notelist.search.tester.SearchUseCaseCaptors
 import com.cleannote.presentation.test.factory.NoteFactory
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteListVMDeleteMultiTest: NewNoteListViewModelTest() {
+class NoteListVMDeleteMultiTest: NoteListViewModelTest() {
 
     private lateinit var deleteMultiUseCaseCaptors: DeleteMultiUseCaseCaptors
     private lateinit var deleteMultipleFeatureTester: DeleteMultipleFeatureTester

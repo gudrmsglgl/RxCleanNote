@@ -8,14 +8,8 @@ import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
 import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
 import com.cleannote.domain.Constants.SORT_UPDATED_AT
-import com.cleannote.domain.interactor.usecases.common.DeleteNote
-import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
-import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
 import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
-import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.model.Query
-import com.cleannote.presentation.common.BaseViewModel
-import com.cleannote.presentation.common.NewBaseViewModel
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.State.SUCCESS
@@ -30,7 +24,7 @@ class NoteListViewModel
 constructor(
     private val useCases: NoteListUseCases,
     private val sharedPreferences: SharedPreferences
-): NewBaseViewModel(useCases) {
+): ViewModel() {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
         order = loadOrderingOnSharedPreference()
@@ -40,7 +34,7 @@ constructor(
     val toolbarState: LiveData<ListToolbarState>
         get() = _toolbarState
 
-    private val loadedNotes = mutableListOf<NoteView>()
+    private val noteViews = mutableListOf<NoteView>()
     private val _mediatorNoteList: MediatorLiveData<DataState<List<NoteView>>> = MediatorLiveData()
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _mediatorNoteList
@@ -67,15 +61,16 @@ constructor(
     override fun onCleared() {
         _mediatorNoteList.removeSource(_insertNote)
         _mediatorNoteList.removeSource(_query)
-        super.onCleared()
+        useCases.disposeUseCases()
     }
 
     fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
         useCases.searchNotes.execute(
-                onSuccess = { notes ->
-                    loadedNotes.addAll( notes.transNoteViews() )
-                    _mediatorNoteList.postValue(DataState.success(loadedNotes))
+                onSuccess = { searchedNotes ->
+                    updateSuccessStateNoteList(updateData = modifyNoteViews {
+                        addAll(searchedNotes.transNoteViews())
+                    })
                 },
                 onError = {
                     _mediatorNoteList.postValue(DataState.error(it))
@@ -83,41 +78,41 @@ constructor(
                 params = getQuery())
     }
 
-    fun insertNotes(noteView: NoteView){
+    fun insertNotes(param: NoteView){
         _insertNote.postValue(DataState.loading())
         useCases.insertNewNote.execute(
             onSuccess = {
-                _insertNote.postValue(DataState.success(noteView))
+                _insertNote.postValue(DataState.success(param))
             },
             onError = {
                 _insertNote.postValue(DataState.error(it))
             },
-            params = noteView.transNote())
+            params = param.transNote())
     }
 
-    fun notifyUpdatedNote(updateNoteView: NoteView){
-        // step1) find UpdateNoteView
-        val findNoteView = loadedNotes.find { it.id == updateNoteView.id }
-
-        // step2) replace updateNoteView
-        // DESC -> replace pos 0 NoteView
-        // ASC -> remove pos 0 Add last Note -> very complicated b/c NextPage Notes -> LoadDB
+    fun reqUpdateFromDetailFragment(param: NoteView){
         if (loadOrderingOnSharedPreference() == ORDER_DESC){
-            loadedNotes.remove(findNoteView)
-            loadedNotes.add(0, updateNoteView)
-            _mediatorNoteList.value = DataState.success(loadedNotes)
+            updateSuccessStateNoteList(isProcessBackground = false,
+                updateData = modifyNoteViews {
+                    val findNoteView = find { it.id == param.id }
+                    remove(findNoteView)
+                    add(0, param)
+            })
         }
         else if (loadOrderingOnSharedPreference() == ORDER_ASC){
             clearQuery()
         }
     }
 
-    fun notifyDeletedNote(deletedNoteView: NoteView){
-        loadedNotes.remove(deletedNoteView)
-        _mediatorNoteList.value = DataState.success(loadedNotes)
+    fun reqDeleteFromDetailFragment(param: NoteView){
+        updateSuccessStateNoteList(isProcessBackground = false,
+            updateData = modifyNoteViews {
+                remove(param)
+            }
+        )
     }
 
-    fun deleteNote(deletedNoteView: NoteView){
+    fun deleteNote(param: NoteView){
         _deleteResult.postValue(DataState.loading())
         useCases.deleteNote.execute(
             onSuccess = {},
@@ -125,15 +120,16 @@ constructor(
                 _deleteResult.postValue(DataState.error(it))
             },
             onComplete = {
-                _deleteResult.postValue(DataState.success(deletedNoteView))
-                loadedNotes.remove(deletedNoteView)
-                _mediatorNoteList.postValue(DataState.success(loadedNotes))
+                _deleteResult.postValue(DataState.success(param))
+                updateSuccessStateNoteList(updateData = modifyNoteViews {
+                    remove(param)
+                })
             },
-            params = deletedNoteView.transNote()
+            params = param.transNote()
         )
     }
 
-    fun deleteMultiNotes(notes: List<NoteView>){
+    fun deleteMultiNotes(paramNotes: List<NoteView>){
         _deleteResult.postValue(DataState.loading())
         useCases.deleteMultipleNotes.execute(
             onSuccess = {},
@@ -142,17 +138,16 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(null))
-                notes.forEach {
-                    loadedNotes.remove(it)
-                }
-                _mediatorNoteList.postValue(DataState.success(loadedNotes))
+                updateSuccessStateNoteList(updateData = modifyNoteViews {
+                    paramNotes.forEach { remove(it) }
+                })
             },
-            params = notes.transNotes()
+            params = paramNotes.transNotes()
         )
     }
 
     fun setOrdering(ordering: String){
-        loadedNotes.clear()
+        modifyNoteViews { clear() }
         _query.value = getQuery().apply {
             page = 1
             order = ordering
@@ -160,7 +155,7 @@ constructor(
     }
 
     fun searchKeyword(search: String) {
-        loadedNotes.clear()
+        modifyNoteViews { clear() }
         _query.postValue(getQuery().apply {
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
@@ -176,10 +171,10 @@ constructor(
 
     // DB every 10 load Note
     // so load Note less than 10 Then Don't exist next page
-    fun isExistNextPage(): Boolean = loadedNotes.size / (getQuery().limit) == getQuery().page
+    fun isExistNextPage(): Boolean = noteViews.size / (getQuery().limit) == getQuery().page
 
     fun clearQuery() {
-        loadedNotes.clear()
+        modifyNoteViews { clear() }
         _query.value = getQuery().apply {
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
@@ -200,5 +195,16 @@ constructor(
     private fun loadOrderingOnSharedPreference() = sharedPreferences
         .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
 
-    //TODO:: fun() 노트 목록을 갱신하는 읽기 쉬운 메소드 만들기
+    private inline fun modifyNoteViews(func: MutableList<NoteView>.() -> Unit): List<NoteView>{
+        func.invoke(noteViews)
+        return noteViews
+    }
+
+    private fun updateSuccessStateNoteList(isProcessBackground: Boolean = true, updateData: List<NoteView>){
+        if (isProcessBackground)
+            _mediatorNoteList.postValue(DataState.success(updateData))
+        else
+            _mediatorNoteList.value = DataState.success(updateData)
+    }
+
 }

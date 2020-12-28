@@ -5,7 +5,7 @@ import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.extensions.transNotes
-import com.cleannote.presentation.notelist.NewNoteListViewModelTest
+import com.cleannote.presentation.notelist.NoteListViewModelTest
 import com.cleannote.presentation.notelist.search.tester.SearchFeatureTester
 import com.cleannote.presentation.notelist.search.tester.SearchUseCaseCaptors
 import com.cleannote.presentation.test.factory.NoteFactory
@@ -14,7 +14,7 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteListVMSearchTest: NewNoteListViewModelTest() {
+class NoteListVMSearchTest: NoteListViewModelTest() {
 
     private lateinit var captors: SearchUseCaseCaptors
     private lateinit var searchFeatureTester: SearchFeatureTester

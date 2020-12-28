@@ -1,14 +1,14 @@
 package com.cleannote.presentation.notelist.insert
 
 import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.notelist.NewNoteListViewModelTest
+import com.cleannote.presentation.notelist.NoteListViewModelTest
 import com.cleannote.presentation.notelist.insert.tester.InsertFeatureTester
 import com.cleannote.presentation.notelist.insert.tester.InsertUseCaseCaptors
 import com.cleannote.presentation.test.factory.NoteFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteListVMInsertTest: NewNoteListViewModelTest() {
+class NoteListVMInsertTest: NoteListViewModelTest() {
 
     lateinit var captors: InsertUseCaseCaptors
     lateinit var insertFeatureTester: InsertFeatureTester
