@@ -27,7 +27,7 @@ constructor(
 ): ViewModel() {
 
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
-        order = loadOrderingOnSharedPreference()
+        order = loadOrderingOnSharedPref()
     ))
 
     private val _toolbarState: MutableLiveData<ListToolbarState> = MutableLiveData(SearchState)
@@ -68,9 +68,12 @@ constructor(
         _mediatorNoteList.postValue(DataState.loading())
         useCases.searchNotes.execute(
                 onSuccess = { searchedNotes ->
-                    updateSuccessStateNoteList(updateData = modifyNoteViews {
+
+                    updateNoteViews {
                         addAll(searchedNotes.transNoteViews())
-                    })
+                    }
+                    .setNoteListSuccessState(isbBackground = true)
+
                 },
                 onError = {
                     _mediatorNoteList.postValue(DataState.error(it))
@@ -91,25 +94,24 @@ constructor(
     }
 
     fun reqUpdateFromDetailFragment(param: NoteView){
-        if (loadOrderingOnSharedPreference() == ORDER_DESC){
-            updateSuccessStateNoteList(isProcessBackground = false,
-                updateData = modifyNoteViews {
-                    val findNoteView = find { it.id == param.id }
-                    remove(findNoteView)
-                    add(0, param)
-            })
-        }
-        else if (loadOrderingOnSharedPreference() == ORDER_ASC){
+        if (loadOrderingOnSharedPref() == ORDER_DESC)
+
+            updateNoteViews {
+                val findNoteView = find { it.id == param.id }
+                remove(findNoteView)
+                add(0, param)
+            }
+            .setNoteListSuccessState(isbBackground = false)
+
+        else if (loadOrderingOnSharedPref() == ORDER_ASC)
             clearQuery()
-        }
     }
 
     fun reqDeleteFromDetailFragment(param: NoteView){
-        updateSuccessStateNoteList(isProcessBackground = false,
-            updateData = modifyNoteViews {
-                remove(param)
-            }
-        )
+        updateNoteViews {
+            remove(param)
+        }
+        .setNoteListSuccessState(isbBackground = false)
     }
 
     fun deleteNote(param: NoteView){
@@ -121,9 +123,10 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(param))
-                updateSuccessStateNoteList(updateData = modifyNoteViews {
+                updateNoteViews {
                     remove(param)
-                })
+                }
+                .setNoteListSuccessState(isbBackground = true)
             },
             params = param.transNote()
         )
@@ -138,16 +141,17 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(null))
-                updateSuccessStateNoteList(updateData = modifyNoteViews {
+                updateNoteViews {
                     paramNotes.forEach { remove(it) }
-                })
+                }
+                .setNoteListSuccessState(isbBackground = true)
             },
             params = paramNotes.transNotes()
         )
     }
 
     fun setOrdering(ordering: String){
-        modifyNoteViews { clear() }
+        updateNoteViews { clear() }
         _query.value = getQuery().apply {
             page = 1
             order = ordering
@@ -155,12 +159,12 @@ constructor(
     }
 
     fun searchKeyword(search: String) {
-        modifyNoteViews { clear() }
+        updateNoteViews { clear() }
         _query.postValue(getQuery().apply {
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
             sort = SORT_UPDATED_AT
-            order = loadOrderingOnSharedPreference()
+            order = loadOrderingOnSharedPref()
             like = search
         })
     }
@@ -174,12 +178,12 @@ constructor(
     fun isExistNextPage(): Boolean = noteViews.size / (getQuery().limit) == getQuery().page
 
     fun clearQuery() {
-        modifyNoteViews { clear() }
+        updateNoteViews { clear() }
         _query.value = getQuery().apply {
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
             sort = SORT_UPDATED_AT
-            order = loadOrderingOnSharedPreference()
+            order = loadOrderingOnSharedPref()
             like  = null
         }
     }
@@ -189,22 +193,25 @@ constructor(
     }
 
     private fun getQuery() = _query.value ?: Query(
-        order = loadOrderingOnSharedPreference()
+        order = loadOrderingOnSharedPref()
     )
 
-    private fun loadOrderingOnSharedPreference() = sharedPreferences
+    private fun loadOrderingOnSharedPref() = sharedPreferences
         .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
 
-    private inline fun modifyNoteViews(func: MutableList<NoteView>.() -> Unit): List<NoteView>{
-        func.invoke(noteViews)
-        return noteViews
+
+    private inline fun updateNoteViews(
+        updateData: MutableList<NoteView>.() -> Unit
+    ): List<NoteView>{
+        return noteViews.apply {
+            updateData.invoke(this)
+        }
     }
 
-    private fun updateSuccessStateNoteList(isProcessBackground: Boolean = true, updateData: List<NoteView>){
-        if (isProcessBackground)
-            _mediatorNoteList.postValue(DataState.success(updateData))
+    private fun List<NoteView>.setNoteListSuccessState(isbBackground: Boolean){
+        if (isbBackground)
+            _mediatorNoteList.postValue(DataState.success(this))
         else
-            _mediatorNoteList.value = DataState.success(updateData)
+            _mediatorNoteList.value = DataState.success(this)
     }
-
 }

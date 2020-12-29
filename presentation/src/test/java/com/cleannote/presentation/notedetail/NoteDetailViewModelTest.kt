@@ -2,6 +2,7 @@ package com.cleannote.presentation.notedetail
 
 import androidx.lifecycle.MutableLiveData
 import com.cleannote.domain.interactor.usecases.common.DeleteNote
+import com.cleannote.domain.interactor.usecases.notedetail.NoteDetailUseCases
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.BaseViewModelTest
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class NoteDetailViewModelTest: BaseViewModelTest() {
 
     private lateinit var viewModel: NoteDetailViewModel
+    private lateinit var detailUseCases: NoteDetailUseCases
 
     private lateinit var updateNote: UpdateNote
     private lateinit var deleteNote: DeleteNote
@@ -47,6 +49,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     fun setUp(){
         updateNote = mock()
         deleteNote = mock()
+        detailUseCases = NoteDetailUseCases(updateNote, deleteNote)
 
         onSuccessNoteCaptor = argumentCaptor()
         onErrorNoteCaptor = argumentCaptor()
@@ -58,7 +61,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         viewModelState = MutableLiveData()
         viewModelState.observeForever(stateObserver)
 
-        viewModel = NoteDetailViewModel(updateNote, deleteNote)
+        viewModel = NoteDetailViewModel(detailUseCases)
     }
 
    /* @AfterEach

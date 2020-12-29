@@ -3,6 +3,7 @@ package com.cleannote.presentation.notedetail
 import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.domain.interactor.usecases.common.DeleteNote
+import com.cleannote.domain.interactor.usecases.notedetail.NoteDetailUseCases
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.presentation.common.BaseViewModel
 import com.cleannote.presentation.data.DataState
@@ -16,11 +17,9 @@ import com.cleannote.presentation.model.NoteView
 import javax.inject.Singleton
 
 class NoteDetailViewModel
-@Singleton
 constructor(
-    private val updateNote: UpdateNote,
-    private val deleteNote: DeleteNote
-): BaseViewModel(updateNote, deleteNote) {
+    private val detailUseCases: NoteDetailUseCases
+): ViewModel() {
 
     val finalNote = MutableLiveData<NoteView>()
     private lateinit var tempNote: NoteView
@@ -52,7 +51,7 @@ constructor(
             tempNote = finalNote.value!!
 
             _updatedNote.postValue(DataState.loading())
-            updateNote.execute(
+            detailUseCases.updateNote.execute(
                 onSuccess = {},
                 onError = {
                     finalNote.postValue(tempNote)
@@ -69,7 +68,7 @@ constructor(
 
     fun deleteNote(noteView: NoteView) {
         _deletedNote.postValue(DataState.loading())
-        deleteNote.execute(
+        detailUseCases.deleteNote.execute(
             onSuccess = {},
             onError = {
                 _deletedNote.postValue(DataState.error(it))
@@ -88,7 +87,7 @@ constructor(
         )
 
         _updatedNote.postValue(DataState.loading())
-        updateNote.execute(
+        detailUseCases.updateNote.execute(
             onSuccess = {},
             onError = {
                 finalNote.postValue(finalNote.value)

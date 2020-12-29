@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cleannote.domain.interactor.usecases.common.DeleteNote
+import com.cleannote.domain.interactor.usecases.notedetail.NoteDetailUseCases
 import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
 import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.interactor.usecases.notelist.InsertNewNote
@@ -20,12 +21,8 @@ import javax.inject.Singleton
 class ViewModelFactory
 @Inject constructor(
     private val login: Login,
-    //private val searchNotes: SearchNotes,
-    //private val insertNewNote: InsertNewNote,
     private val noteListUseCases: NoteListUseCases,
-    private val updateNote: UpdateNote,
-    private val deleteNote: DeleteNote,
-    //private val deleteMultipleNotes: DeleteMultipleNotes,
+    private val noteDetailUseCases: NoteDetailUseCases,
     private val sharedPreferences: SharedPreferences
 ): ViewModelProvider.Factory {
 
@@ -35,10 +32,8 @@ class ViewModelFactory
         SplashViewModel::class.java -> SplashViewModel(login) as T
 
         NoteListViewModel::class.java -> NoteListViewModel(noteListUseCases, sharedPreferences) as T
-            /*NoteListViewModel(
-            searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, sharedPreferences) as T*/
 
-        NoteDetailViewModel::class.java -> NoteDetailViewModel(updateNote, deleteNote) as T
+        NoteDetailViewModel::class.java -> NoteDetailViewModel(noteDetailUseCases) as T
 
         else -> {
             throw IllegalArgumentException("unknown model class $modelClass")
