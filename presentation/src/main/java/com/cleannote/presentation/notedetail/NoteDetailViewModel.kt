@@ -2,11 +2,9 @@ package com.cleannote.presentation.notedetail
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.cleannote.domain.interactor.usecases.common.DeleteNote
 import com.cleannote.domain.interactor.usecases.notedetail.NoteDetailUseCases
-import com.cleannote.domain.interactor.usecases.notedetail.UpdateNote
-import com.cleannote.presentation.common.BaseViewModel
 import com.cleannote.presentation.data.DataState
+import com.cleannote.presentation.data.notedetail.BeforeAfterNoteView
 import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.TextMode.*
@@ -14,15 +12,15 @@ import com.cleannote.presentation.extensions.createNoteImageView
 import com.cleannote.presentation.extensions.transNote
 import com.cleannote.presentation.model.NoteImageView
 import com.cleannote.presentation.model.NoteView
-import javax.inject.Singleton
 
 class NoteDetailViewModel
 constructor(
     private val detailUseCases: NoteDetailUseCases
 ): ViewModel() {
 
-    val finalNote = MutableLiveData<NoteView>()
-    private lateinit var tempNote: NoteView
+    private val _finalNote = MutableLiveData<NoteView>()
+    val finalNote: LiveData<NoteView>
+        get() = _finalNote
 
     private val _updatedNote = MutableLiveData<DataState<NoteView>>()
     val updatedNote: LiveData<DataState<NoteView>>
@@ -44,26 +42,69 @@ constructor(
         _detailToolbarState.value = state
     }
 
-    fun setNoteMode(mode: TextMode, noteParam: NoteView?){
-        _noteMode.value = mode
-        if (mode == DefaultMode) finalNote.value = noteParam!!
-        else if (mode == EditDoneMode){
-            tempNote = finalNote.value!!
+    fun defaultMode(param: NoteView?){
+        noteMode(DefaultMode)
+        setFinalNote(param, isAsync = false)
+    }
 
-            _updatedNote.postValue(DataState.loading())
-            detailUseCases.updateNote.execute(
-                onSuccess = {},
-                onError = {
-                    finalNote.postValue(tempNote)
-                    _updatedNote.postValue(DataState.error(it))
-                },
-                onComplete = {
-                    finalNote.postValue(noteParam)
-                    _updatedNote.postValue(DataState.success(noteParam))
-                },
-                params = noteParam?.transNote()
-            )
-        }
+    fun editMode(){
+        noteMode(EditMode)
+    }
+
+    fun editCancel(){
+        noteMode(DefaultMode)
+        setFinalNote(finalNote(), isAsync = false)
+    }
+
+    fun editDoneMode(param: NoteView){
+        noteMode(EditDoneMode)
+        val beforeAfterNoteView = BeforeAfterNoteView(before = finalNote()!!, after = param)
+        executeUpdate(beforeAfterNoteView)
+    }
+
+    fun uploadImage(
+        path: String,
+        updateTime: String
+    ){
+        val beforeAfterNoteView = BeforeAfterNoteView(
+            before = finalNote()!!,
+            after = imageUpdatedNoteView(path, updateTime)
+        )
+        executeUpdate(beforeAfterNoteView)
+    }
+
+    private fun imageUpdatedNoteView(
+        path: String,
+        updateTime: String
+    ) = finalNote()!!
+        .copy(
+            updated_at = updateTime,
+            noteImages = finalNoteAddImage(path)
+        )
+
+    private fun executeUpdate(param: BeforeAfterNoteView){
+        _updatedNote.postValue(DataState.loading())
+        detailUseCases.updateNote.execute(
+            onSuccess = {},
+            onError = {
+                setFinalNote(param.before, isAsync = true)
+                _updatedNote.postValue(DataState.error(it))
+            },
+            onComplete = {
+                setFinalNote(param.after, isAsync = true)
+                _updatedNote.postValue(DataState.success(param.after))
+            },
+            params = param.after.transNote()
+        )
+    }
+
+    private fun noteMode(mode: TextMode){
+        _noteMode.value = mode
+    }
+
+    private fun setFinalNote(param: NoteView?, isAsync: Boolean){
+        if (isAsync) _finalNote.postValue(param)
+        else _finalNote.value = param
     }
 
     fun deleteNote(noteView: NoteView) {
@@ -80,34 +121,20 @@ constructor(
         )
     }
 
-    fun uploadImage(path: String, updateTime: String){
-        tempNote = finalNote.value!!.copy(
-            updated_at = updateTime,
-            noteImages = copyNoteImages(path)
-        )
+    fun finalNote() = _finalNote.value
 
-        _updatedNote.postValue(DataState.loading())
-        detailUseCases.updateNote.execute(
-            onSuccess = {},
-            onError = {
-                finalNote.postValue(finalNote.value)
-                _updatedNote.postValue(DataState.error(it))
-            },
-            onComplete = {
-                finalNote.postValue(tempNote)
-                _updatedNote.postValue(DataState.success(tempNote))
-            },
-            params = tempNote.transNote()
-        )
+    private fun finalNoteAddImage(
+        path: String
+    ): List<NoteImageView> =
+        finalNoteImages()
+            .apply {
+                add(0, path.createNoteImageView(notePk = finalNote()!!.id))
+            }
 
-    }
-
-    private fun copyNoteImages(path: String): List<NoteImageView> {
-        val list =
-            finalNote.value!!.noteImages?.toMutableList() ?: mutableListOf()
-        list.add(0, path.createNoteImageView(notePk = finalNote.value!!.id))
-        return list
-    }
+    private fun finalNoteImages() = finalNote()!!
+        .noteImages
+        ?.toMutableList()
+        ?: mutableListOf()
 
     override fun onCleared() {
         super.onCleared()

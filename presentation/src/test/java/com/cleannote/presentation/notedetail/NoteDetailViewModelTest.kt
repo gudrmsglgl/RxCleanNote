@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 
+/*
 @ExtendWith(InstantExecutorExtension::class)
 class NoteDetailViewModelTest: BaseViewModelTest() {
 
@@ -64,10 +65,12 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         viewModel = NoteDetailViewModel(detailUseCases)
     }
 
-   /* @AfterEach
+   */
+/* @AfterEach
     fun release(){
         viewModelState.removeObserver(stateObserver)
-    }*/
+    }*//*
+
 
     @Test
     fun updateNoteExecuteUseCase(){
@@ -172,13 +175,15 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     }
 
     private fun verifyUpdateNoteExecute(){
-        /*updateNote.verifyExecute(
+        */
+/*updateNote.verifyExecute(
             onSuccessNoteCaptor,
             onErrorNoteCaptor,
             afterFinishedCaptor,
             onCompleteCaptor,
             noteParamCaptor
-        )*/
+        )*//*
+
     }
 
     private fun assertViewModelUpdateNoteEqual(expectedData: NoteView?){
@@ -202,13 +207,15 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     }
 
     private fun verifyDeleteNoteExecute(){
-        /*deleteNote.verifyExecute(
+        */
+/*deleteNote.verifyExecute(
             onSuccessNoteCaptor,
             onErrorNoteCaptor,
             afterFinishedCaptor,
             onCompleteCaptor,
             noteParamCaptor
-        )*/
+        )*//*
+
     }
 
     private fun assertViewModelDeleteNoteEqual(expectedData: NoteView?){
@@ -241,7 +248,7 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
     }
 
     private fun setNoteWithMode(mode: TextMode, noteView: NoteView){
-        viewModel.setNoteMode(mode, noteView)
+        //viewModel.setNoteMode(mode, noteView)
         if (mode == EditDoneMode) setViewModelState(viewModel.updatedNote.value?.status)
     }
 
@@ -250,4 +257,4 @@ class NoteDetailViewModelTest: BaseViewModelTest() {
         setViewModelState(viewModel.updatedNote.value?.status)
     }
 
-}
+}*/

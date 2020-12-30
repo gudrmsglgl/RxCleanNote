@@ -154,29 +154,28 @@ class NoteDetailFragment constructor(
         .subscribe { viewModel.setToolbarState(it) }
         .addCompositeDisposable()
 
-    fun defaultMode(){
-        viewModel.setNoteMode(DefaultMode, viewModel.finalNote.value ?: noteUiModel.transNoteView())
-    }
 
-    private fun editMode(){
-        viewModel.setNoteMode(EditMode, null)
-    }
+    private fun defaultMode() = viewModel.defaultMode(
+        viewModel.finalNote() ?: noteUiModel.transNoteView()
+    )
 
-    fun editDoneMode(){
-        viewModel.setNoteMode(
-            EditDoneMode,
-            noteUiModel.copy(
-                title = note_title.text.toString(),
-                body = note_body.text.toString(),
-                updated_at = dateUtil.getCurrentTimestamp()
-            ).transNoteView()
-        )
-    }
+    fun editCancel() = viewModel.editCancel()
+
+    private fun editMode() = viewModel.editMode()
+
+    fun editDoneMode() = viewModel.editDoneMode(
+        noteUiModel.copy(
+            title = note_title.text.toString(),
+            body = note_body.text.toString(),
+            updated_at = dateUtil.getCurrentTimestamp()
+        ).transNoteView()
+    )
+
 
     fun navNoteListFragment(){
         view?.clearFocus()
         onBackPressThenKey?.let { reqKey ->
-            setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(reqKey to viewModel.finalNote.value?.transNoteUiModel()))
+            setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(reqKey to viewModel.finalNote()?.transNoteUiModel()))
         }
         findNavController().popBackStack()
     }
