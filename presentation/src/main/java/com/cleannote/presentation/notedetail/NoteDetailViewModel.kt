@@ -58,29 +58,27 @@ constructor(
 
     fun editDoneMode(param: NoteView){
         noteMode(EditDoneMode)
-        val beforeAfterNoteView = BeforeAfterNoteView(before = finalNote()!!, after = param)
-        executeUpdate(beforeAfterNoteView)
+        executeUpdate(
+            BeforeAfterNoteView(before = finalNote()!!, after = param)
+        )
     }
 
-    fun uploadImage(
-        path: String,
-        updateTime: String
-    ){
-        val beforeAfterNoteView = BeforeAfterNoteView(
-            before = finalNote()!!,
-            after = imageUpdatedNoteView(path, updateTime)
+    fun uploadImage(path: String, updateTime: String){
+        executeUpdate(
+            BeforeAfterNoteView(
+                before = finalNote()!!,
+                after = updatedFinalNoteOfImage(path, updateTime)
+            )
         )
-        executeUpdate(beforeAfterNoteView)
     }
 
-    private fun imageUpdatedNoteView(
+    private fun updatedFinalNoteOfImage(
         path: String,
         updateTime: String
-    ) = finalNote()!!
-        .copy(
-            updated_at = updateTime,
-            noteImages = finalNoteAddImage(path)
-        )
+    ) = finalNote()!!.copy(
+        updated_at = updateTime,
+        noteImages = finalNoteAddImage(path)
+    )
 
     private fun executeUpdate(param: BeforeAfterNoteView){
         _updatedNote.postValue(DataState.loading())
@@ -125,16 +123,13 @@ constructor(
 
     private fun finalNoteAddImage(
         path: String
-    ): List<NoteImageView> =
-        finalNoteImages()
-            .apply {
-                add(0, path.createNoteImageView(notePk = finalNote()!!.id))
-            }
+    ): List<NoteImageView> = finalNoteImages().apply {
+        add(0, path.createNoteImageView(notePk = finalNote()!!.id))
+    }
 
     private fun finalNoteImages() = finalNote()!!
         .noteImages
-        ?.toMutableList()
-        ?: mutableListOf()
+        ?.toMutableList() ?: mutableListOf()
 
     override fun onCleared() {
         super.onCleared()
