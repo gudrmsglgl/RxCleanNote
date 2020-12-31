@@ -1,9 +1,8 @@
 package com.cleannote.presentation.notedetail.update
 
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.TextMode
-import com.cleannote.presentation.notedetail.NewNoteDetailViewModelTest
+import com.cleannote.presentation.notedetail.NoteDetailViewModelTest
 import com.cleannote.presentation.notedetail.update.tester.UpdateFeatureTester
 import com.cleannote.presentation.notedetail.update.tester.UpdateUseCaseCaptors
 import com.cleannote.presentation.test.factory.NoteFactory
@@ -11,7 +10,7 @@ import com.nhaarman.mockitokotlin2.times
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteDetailVMUpdateTest: NewNoteDetailViewModelTest() {
+class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
     private lateinit var updateFeatureTester: UpdateFeatureTester
     private lateinit var captors: UpdateUseCaseCaptors
