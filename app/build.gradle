@@ -55,10 +55,23 @@ android {
     configurations.all {
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.0'
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "500" // or whatever number you want
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     api(project(':presentation'))
@@ -66,10 +79,14 @@ dependencies {
     implementation(project(':cache'))
     implementation(project(':remote'))
 
-    implementation "javax.xml.bind:jaxb-api:2.2.11"
-    implementation "com.sun.xml.bind:jaxb-core:2.2.11"
-    implementation "com.sun.xml.bind:jaxb-impl:2.2.11"
-    implementation "javax.activation:activation:1.1.1"
+    if (JavaVersion.current().ordinal() > JavaVersion.VERSION_1_9.ordinal()) {
+        kapt "com.sun.xml.bind:jaxb-core:2.3.0.1"
+        kapt "javax.xml.bind:jaxb-api:2.3.1"
+        kapt "com.sun.xml.bind:jaxb-impl:2.3.2"
+
+        annotationProcessor "com.sun.xml.bind:jaxb-core:2.3.0.1"
+        annotationProcessor "javax.xml.bind:jaxb-api:2.3.1"
+    }
 
     implementation Dependencies.kotlin_standard_library
     implementation Dependencies.kotlin_reflect

@@ -110,7 +110,6 @@ class NoteDetailVMUpdateTest: NewNoteDetailViewModelTest() {
 
     @Test
     fun updateNoteEditToEditCancel_ThenDefaultMode_NotExecuteUpdateNote_TriggerFinalNote(){
-        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updated_at = "2020-12-30 08:10:00")
         with(updateFeatureTester){
 
             defaultMode(defaultNoteView)

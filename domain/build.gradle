@@ -19,6 +19,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //implementation Dependencies.kotlin_standard_library
+
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
+
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.rxJava
     implementation Dependencies.rxKotlin

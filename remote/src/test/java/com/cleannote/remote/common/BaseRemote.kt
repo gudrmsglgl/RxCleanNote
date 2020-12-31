@@ -1,9 +1,7 @@
 package com.cleannote.remote.common
 
-import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.remote.NoteService
-import com.cleannote.remote.mapper.NoteEntityMapper
 import com.cleannote.remote.model.NoteModel
 import com.cleannote.remote.model.UserModel
 import com.nhaarman.mockitokotlin2.whenever
