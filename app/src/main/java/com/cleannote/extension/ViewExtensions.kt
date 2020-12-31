@@ -17,10 +17,9 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupMenu
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.MenuRes
+import androidx.annotation.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
 import com.afollestad.materialdialogs.utils.MDUtil
 import com.cleannote.app.R
@@ -98,10 +97,32 @@ fun Toolbar.setMenuIconColor(
     @ColorRes res: Int
 ) = apply {
     navigationIcon?.colorFilter =
-        PorterDuffColorFilter(MDUtil.resolveColor(context, res), PorterDuff.Mode.MULTIPLY)
+        PorterDuffColorFilter(resolveColor(context, res), PorterDuff.Mode.MULTIPLY)
     menu.forEach {
-        it.icon.colorFilter = PorterDuffColorFilter(MDUtil.resolveColor(context, res), PorterDuff.Mode.MULTIPLY)
+        it.icon.colorFilter = PorterDuffColorFilter(resolveColor(context, res), PorterDuff.Mode.MULTIPLY)
     }
+}
+
+@ColorInt
+fun resolveColor(
+    context: Context,
+    @ColorRes res: Int? = null,
+    @AttrRes attr: Int? = null,
+    fallback: (() -> Int)? = null
+): Int {
+    if (attr != null) {
+        val a = context.theme.obtainStyledAttributes(intArrayOf(attr))
+        try {
+            val result = a.getColor(0, 0)
+            if (result == 0 && fallback != null) {
+                return fallback()
+            }
+            return result
+        } finally {
+            a.recycle()
+        }
+    }
+    return ContextCompat.getColor(context, res ?: 0)
 }
 
 

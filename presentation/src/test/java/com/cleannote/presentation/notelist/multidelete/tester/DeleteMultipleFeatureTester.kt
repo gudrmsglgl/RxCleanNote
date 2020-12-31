@@ -40,7 +40,7 @@ class DeleteMultipleFeatureTester(
     }
 
     override fun expectData(data: NoteView?): DeleteMultipleFeatureTester{
-        throw UnsupportedOperationException("DeleteMultipleNotes Usecase Don't Return deleteResult, replace function expectData() to expectTotalNotes()")
+        //throw UnsupportedOperationException("DeleteMultipleNotes Usecase Don't Return deleteResult, replace function expectData() to expectTotalNotes()")
         return this
     }
 

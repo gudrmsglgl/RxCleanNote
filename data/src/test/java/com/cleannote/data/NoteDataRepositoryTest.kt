@@ -119,7 +119,6 @@ class NoteDataRepositoryTest: BaseDataTest() {
     @Test
     fun whenSearchNotesThenComplete(){
         val cacheNoteEntities = NoteFactory.createNoteEntityList(0,10)
-        val resultNote: List<Note> = cacheNoteEntities.transNoteList()
 
         val defaultQuery = QueryFactory.makeQuery()
         val defaultQueryEntity = defaultQuery.transQueryEntity()

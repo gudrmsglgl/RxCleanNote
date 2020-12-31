@@ -8,7 +8,7 @@ object Versions {
     const val kotlin = "1.3.61"
     const val ktx = "1.2.0"
     const val databinding_ktx = "5.0.0"
-    const val dagger = "2.25.4"
+    const val dagger = "2.30.1"
     const val nav_components = "2.3.0-alpha06"
     const val material_dialogs = "3.2.1"
     const val room = "2.1.0"
@@ -46,7 +46,7 @@ object Versions {
     const val mockito_kotlin_version = "2.2.0"
     const val mockitoAndroidVersion = "2.8.47"
 
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.4"
     const val recyclerview = "1.2.0-alpha03"
     const val timber_version = "4.7.1"
     const val firebase_analytics = "17.5.0"

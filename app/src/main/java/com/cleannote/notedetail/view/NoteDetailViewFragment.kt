@@ -75,7 +75,7 @@ class NoteDetailViewFragment(
     private fun getPreviousFragmentNote(){
         arguments?.let {
             val noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
-            viewModel.setNoteMode(DefaultMode, viewModel.finalNote.value ?: noteUiModel.transNoteView())
+            viewModel.defaultMode(viewModel.finalNote() ?: noteUiModel.transNoteView())
         }
     }
 
@@ -98,7 +98,7 @@ class NoteDetailViewFragment(
                     R.id.menu_edit -> {
                         findNavController().navigate(
                             R.id.action_noteDetailViewFragment_to_noteDetailFragment,
-                            bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote.value?.transNoteUiModel())
+                            bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote()?.transNoteUiModel())
                         )
                         true
                     }
@@ -135,7 +135,7 @@ class NoteDetailViewFragment(
 
     private fun appbarCollapseUI() = with(binding){
         detailViewToolbar.apply {
-            title = viewModel.finalNote.value?.title ?: ""
+            title = viewModel.finalNote()?.title ?: ""
             setMenuIconColor(R.color.black)
             setBackgroundColor(Color.WHITE)
         }
