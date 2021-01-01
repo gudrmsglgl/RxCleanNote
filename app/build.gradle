@@ -147,5 +147,9 @@ dependencies {
     androidTestUtil 'androidx.test:orchestrator:1.2.0'
 
     debugImplementation AndroidTestDependencies.fragment_testing
+    debugImplementation FlipperDependencies.flipper
+    debugImplementation FlipperDependencies.soloader
+
+    releaseImplementation FlipperDependencies.flipper_noop
 }
 apply plugin: 'com.google.gms.google-services'
