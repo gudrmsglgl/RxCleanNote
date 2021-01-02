@@ -10,6 +10,6 @@ import io.reactivex.Single
 interface NoteRemote {
     fun insertRemoteNewNote(noteEntity: NoteEntity): Completable
     fun login(userId: String): Flowable<List<UserEntity>>
-    fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>
+    fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>>
     fun updateNote(noteEntity: NoteEntity):Completable
 }

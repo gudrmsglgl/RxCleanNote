@@ -8,7 +8,7 @@ import io.reactivex.Single
 
 interface NoteCache {
     fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long>
-    fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>
+    fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>>
     fun saveNotes(notes: List<NoteEntity>): Completable
     fun isCached(page: Int): Single<Boolean>
     fun setLastCacheTime(lastCache: Long, page: Int = 1)

@@ -3,6 +3,7 @@ package com.cleannote.data
 import com.cleannote.data.extensions.*
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
+import com.cleannote.data.repository.NoteDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.model.Note
@@ -40,53 +41,11 @@ constructor(
             it.transUserList()
         }
 
-    override fun searchNotes(query: Query): Flowable<List<Note>> =
+    override fun searchNotes(query: Query): Single<List<Note>> =
         if (query.like == null || query.like == "")
             defaultSearchNote(query.transQueryEntity())
         else
             keywordSearchNote(query.transQueryEntity())
-
-    private fun defaultSearchNote(
-        queryEntity: QueryEntity
-    ) = factory
-        .retrieveCacheDataStore()
-        .isCached(queryEntity.page)
-        .flatMapPublisher {
-            factory.retrieveDataStore(it).searchNotes(queryEntity)
-                .zipWith(Flowable.just(it))
-        }
-        .flatMapSingle {
-            val isCached: Boolean = it.second
-            val loadedNoteEntities: List<NoteEntity> = it.first
-            if (!isCached && loadedNoteEntities.isNotEmpty())
-                saveNotes(
-                    remoteEntities = loadedNoteEntities,
-                    queryEntity = queryEntity
-                ).toSingle { it }
-            else Single.just(it)
-        }
-        .flatMap {
-            val isCached: Boolean = it.second
-            val loadedNoteEntities: List<NoteEntity> = it.first
-            if (isCached)
-                returnCacheNoteEntities(loadedNoteEntities)
-            else
-                loadUpdatedCacheNoteEntities(queryEntity)
-        }
-
-    private fun keywordSearchNote(
-        queryEntity: QueryEntity
-    ) = factory
-        .retrieveRemoteDataStore()
-        .searchNotes(queryEntity)
-        .flatMapSingle {
-            if (it.isNotEmpty())
-                saveNotes(it, queryEntity).toSingle { it }
-            else Single.just(it)
-        }
-        .flatMap {
-            loadUpdatedCacheNoteEntities(queryEntity)
-        }
 
     override fun updateNote(note: Note): Completable = factory
         .retrieveCacheDataStore()
@@ -100,34 +59,82 @@ constructor(
         .retrieveCacheDataStore()
         .deleteMultipleNotes(notes.transNoteEntityList())
 
-    /*override fun searchNotes(query: Query): Flowable<List<Note>> {
-        val queryEntity = queryMapper.mapToEntity(query)
-        return factory.retrieveRemoteDataStore().searchNotes(queryEntity)
-            .doOnNext { if (it.isNotEmpty()) saveNotes(it) }
-            .mergeWith(factory.retrieveCacheDataStore().searchNotes(queryEntity))
-            .flatMapIterable { it }
-            .distinct()
-            .map { noteMapper.mapFromEntity(it) }
-            .toList()
-            .toFlowable()
-
-    }*/
-
-    private fun loadUpdatedCacheNoteEntities(
+    private fun defaultSearchNote(
         queryEntity: QueryEntity
-    ): Flowable<List<Note>> = factory
+    ) = factory
+        .retrieveCacheDataStore()
+        .isCached(queryEntity.page)
+        .flatMap { isCached ->
+            searchNotesOnDataStore(
+                dataStore = factory.retrieveDataStore(isCached),
+                queryEntity = queryEntity
+            )
+            .zipWith(Single.just(isCached))
+        }
+        .flatMap {
+            when {
+                isRemoteLoadedNotes(it) -> {
+                    val remoteNotes = it.first
+                    returnRemoteNotes(queryEntity, remoteNotes)
+                }
+                isRemoteLoadedNotesEmpty(it) -> {
+                    returnSearchNoteOnCache(queryEntity)
+                }
+                else -> {
+                    val cacheNotes = it.first
+                    Single.just(cacheNotes.transNoteList())
+                }
+            }
+        }
+
+
+    private fun searchNotesOnDataStore(
+        dataStore: NoteDataStore,
+        queryEntity: QueryEntity
+    ): Single<List<NoteEntity>>{
+        return dataStore.searchNotes(queryEntity)
+    }
+
+    private fun isRemoteLoadedNotes(pendingData: Pair<List<NoteEntity>, Boolean>): Boolean{
+        return pendingData.first.isNotEmpty() && !pendingData.second
+    }
+
+    private fun isRemoteLoadedNotesEmpty(pendingData: Pair<List<NoteEntity>, Boolean>): Boolean{
+        return pendingData.first.isEmpty() && !pendingData.second
+    }
+
+    private fun keywordSearchNote(
+        queryEntity: QueryEntity
+    ) = factory
+        .retrieveRemoteDataStore()
+        .searchNotes(queryEntity)
+        .flatMap {
+            if (it.isNotEmpty())
+                returnRemoteNotes(queryEntity, it)
+            else
+                returnSearchNoteOnCache(queryEntity)
+        }
+
+
+    private fun returnRemoteNotes(
+        queryEntity: QueryEntity,
+        remoteNotes: List<NoteEntity>
+    ) = saveRemoteNotesToCache(
+            remoteNotes,
+            queryEntity
+        )
+        .toSingle {
+            remoteNotes.transNoteList()
+        }
+
+    private fun returnSearchNoteOnCache(queryEntity: QueryEntity) = factory
         .retrieveCacheDataStore()
         .searchNotes(queryEntity)
         .map {
             it.transNoteList()
         }
 
-
-    private fun returnCacheNoteEntities(cacheEntities: List<NoteEntity>): Flowable<List<Note>>{
-        return Flowable.just(cacheEntities.transNoteList())
-    }
-
-    private fun saveNotes(remoteEntities: List<NoteEntity>, queryEntity: QueryEntity): Completable {
+    private fun saveRemoteNotesToCache(remoteEntities: List<NoteEntity>, queryEntity: QueryEntity): Completable {
         return factory.retrieveCacheDataStore().saveNotes(remoteEntities, queryEntity)
     }
 

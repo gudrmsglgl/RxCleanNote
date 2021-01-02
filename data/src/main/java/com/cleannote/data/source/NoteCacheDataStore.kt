@@ -27,7 +27,7 @@ constructor(
         throw UnsupportedOperationException("Not Supported")
     }
 
-    override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> =
+    override fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>> =
         noteCache.searchNotes(queryEntity)
 
     override fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable =

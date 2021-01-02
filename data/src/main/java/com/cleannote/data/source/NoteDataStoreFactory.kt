@@ -12,9 +12,11 @@ constructor(
     private val noteCacheDataStore: NoteCacheDataStore,
     private val noteRemoteDataStore: NoteRemoteDataStore
 ){
-    open fun retrieveDataStore(
-        isCached: Boolean
-    ): NoteDataStore = if (isCached) noteCacheDataStore else noteRemoteDataStore
+    open fun retrieveDataStore(isCached: Boolean): NoteDataStore =
+        if (isCached)
+            noteCacheDataStore
+        else
+            noteRemoteDataStore
 
     open fun retrieveCacheDataStore(): NoteDataStore = noteCacheDataStore
 

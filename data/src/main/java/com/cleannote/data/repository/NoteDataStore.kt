@@ -11,7 +11,7 @@ interface NoteDataStore {
     fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long>
     fun insertRemoteNewNote(noteEntity: NoteEntity): Completable
     fun login(userId: String): Flowable<List<UserEntity>>
-    fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>>
+    fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>>
     fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable
     fun isCached(page: Int): Single<Boolean>
     fun updateNote(noteEntity: NoteEntity): Completable

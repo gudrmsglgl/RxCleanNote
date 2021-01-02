@@ -25,7 +25,7 @@ constructor(
 
     override fun login(userId: String): Flowable<List<UserEntity>> = noteRemote.login(userId)
 
-    override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> =
+    override fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>> =
         noteRemote.searchNotes(queryEntity)
 
     override fun saveNotes(notes: List<NoteEntity>, queryEntity: QueryEntity): Completable {
