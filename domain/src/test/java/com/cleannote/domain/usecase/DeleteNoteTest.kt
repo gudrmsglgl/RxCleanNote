@@ -1,46 +1,56 @@
+
 package com.cleannote.domain.usecase
 
 import com.cleannote.domain.BaseDomainTest
 import com.cleannote.domain.interactor.usecases.common.DeleteNote
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.test.factory.NoteFactory
-import com.cleannote.domain.usecase.common.CompletableUseCaseBuilder
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Completable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class DeleteNoteTest: BaseDomainTest<Note>(), CompletableUseCaseBuilder<Note> {
+class DeleteNoteTest: BaseDomainTest<Completable, Note>(){
 
     private lateinit var deleteNote: DeleteNote
     private val paramNote = NoteFactory.createSingleNote(title = "deleteNote")
+
     @BeforeEach
     fun setUp(){
-        repository = mock {
-            on { deleteNote(paramNote) } doReturn Completable.complete()
-        }
         mockRxSchedulers()
         deleteNote = DeleteNote(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun deleteNoteCallRepository(){
+    fun buildUseCaseCallRepositoryDeleteNote(){
+        stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote).test()
-        verifyRepositoryCall(paramNote)
+        verifyRepositoryCallDeleteNote(paramNote)
     }
 
     @Test
-    fun deleteNoteAssertComplete(){
+    fun buildUseCaseCompletableComplete(){
+        stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote)
             .test()
             .assertComplete()
+    }
+
+    @Test
+    fun buildUseCaseDeleteNoteReturnNoValue(){
+        stubRepositoryReturnValue(paramNote, Completable.complete())
+        whenBuildUseCase(paramNote)
+            .test()
             .assertNoValues()
     }
 
-    override fun verifyRepositoryCall(param: Note?) {
-        verify(repository).deleteNote(paramNote)
+    private fun verifyRepositoryCallDeleteNote(param: Note){
+        verify(repository).deleteNote(param)
+    }
+
+    override fun stubRepositoryReturnValue(param: Note?, stubValue: Completable) {
+        whenever(repository.deleteNote(param!!)).thenReturn(stubValue)
     }
 
     override fun whenBuildUseCase(param: Note): Completable {

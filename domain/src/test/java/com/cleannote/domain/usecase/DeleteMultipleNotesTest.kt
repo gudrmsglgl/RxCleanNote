@@ -1,3 +1,4 @@
+
 package com.cleannote.domain.usecase
 
 import com.cleannote.domain.BaseDomainTest
@@ -12,7 +13,7 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class DeleteMultipleNotesTest: BaseDomainTest<List<Note>>(), CompletableUseCaseBuilder<List<Note>> {
+class DeleteMultipleNotesTest: BaseDomainTest<Completable, List<Note>>(){
 
     lateinit var deleteMultipleNotesTest: DeleteMultipleNotes
     @BeforeEach
@@ -40,15 +41,16 @@ class DeleteMultipleNotesTest: BaseDomainTest<List<Note>>(), CompletableUseCaseB
             .assertNoValues()
     }
 
-    override fun verifyRepositoryCall(param: List<Note>?) {
-        verify(repository).deleteMultipleNotes(param!!)
+    private fun verifyRepositoryCallDeleteMultipleNotes(param: List<Note>){
+        verify(repository).deleteMultipleNotes(param)
+    }
+
+    override fun stubRepositoryReturnValue(param: List<Note>?, stubValue: Completable) {
+        whenever(repository.deleteMultipleNotes(param!!)).thenReturn(stubValue)
     }
 
     override fun whenBuildUseCase(param: List<Note>): Completable {
         return repository.deleteMultipleNotes(param)
     }
 
-    private fun stubCompleteDeleteMultiple(param: List<Note>){
-        whenever(repository.deleteMultipleNotes(param)).thenReturn(Completable.complete())
-    }
 }

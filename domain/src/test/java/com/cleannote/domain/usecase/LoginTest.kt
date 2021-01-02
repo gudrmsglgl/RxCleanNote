@@ -1,3 +1,4 @@
+/*
 package com.cleannote.domain.usecase
 
 import com.cleannote.domain.BaseDomainTest
@@ -63,4 +64,4 @@ class LoginTest: BaseDomainTest<String>(), FlowableUseCaseBuilder<List<User>, St
     override fun verifyRepositoryCall(param: String?) {
         verify(repository).login(param!!)
     }
-}
+}*/
