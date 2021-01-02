@@ -21,7 +21,6 @@ class SearchNotesTest: BaseDomainTest<Single<List<Note>>, Query>() {
 
     @BeforeEach
     fun setup(){
-        mockRxSchedulers()
         searchNotes = SearchNotes(repository, threadExecutor, postExecutionThread)
     }
 

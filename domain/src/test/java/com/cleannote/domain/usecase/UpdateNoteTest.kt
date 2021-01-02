@@ -18,7 +18,6 @@ class UpdateNoteTest: BaseDomainTest<Completable, Note>(){
 
     @BeforeEach
     fun setUp(){
-        mockRxSchedulers()
         updateNote = UpdateNote(repository, threadExecutor, postExecutionThread)
     }
 

@@ -5,8 +5,6 @@ import com.cleannote.domain.BaseDomainTest
 import com.cleannote.domain.interactor.usecases.notelist.DeleteMultipleNotes
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.test.factory.NoteFactory
-import com.cleannote.domain.usecase.common.CompletableUseCaseBuilder
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Completable
@@ -15,29 +13,34 @@ import org.junit.jupiter.api.Test
 
 class DeleteMultipleNotesTest: BaseDomainTest<Completable, List<Note>>(){
 
-    lateinit var deleteMultipleNotesTest: DeleteMultipleNotes
+    private lateinit var deleteMultipleNotes: DeleteMultipleNotes
+    private val paramNotes: List<Note> = NoteFactory.createNoteList(3)
+
     @BeforeEach
     fun setUp(){
-        repository = mock ()
-        mockRxSchedulers()
-        deleteMultipleNotesTest = DeleteMultipleNotes(repository, threadExecutor, postExecutionThread)
+        deleteMultipleNotes = DeleteMultipleNotes(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun deleteMultipleNotesCallRepository(){
-        val deleteNotes = NoteFactory.createNoteList(3)
-        stubCompleteDeleteMultiple(param = deleteNotes)
-        whenBuildUseCase(deleteNotes).test()
-        verifyRepositoryCall(deleteNotes)
+    fun buildUseCaseCallRepositoryDeleteMultipleNotes(){
+        stubRepositoryReturnValue(paramNotes, Completable.complete())
+        whenBuildUseCase(paramNotes).test()
+        verifyRepositoryCallDeleteMultipleNotes(paramNotes)
     }
 
     @Test
-    fun deleteMultipleNotesAssertComplete(){
-        val deleteNotes = NoteFactory.createNoteList(3)
-        stubCompleteDeleteMultiple(param = deleteNotes)
-        whenBuildUseCase(deleteNotes)
+    fun buildUseCaseCompletableComplete(){
+        stubRepositoryReturnValue(paramNotes, Completable.complete())
+        whenBuildUseCase(paramNotes)
             .test()
             .assertComplete()
+    }
+
+    @Test
+    fun buildUseCaseDeleteMultipleNotesReturnNoValue(){
+        stubRepositoryReturnValue(paramNotes, Completable.complete())
+        whenBuildUseCase(paramNotes)
+            .test()
             .assertNoValues()
     }
 
@@ -50,7 +53,6 @@ class DeleteMultipleNotesTest: BaseDomainTest<Completable, List<Note>>(){
     }
 
     override fun whenBuildUseCase(param: List<Note>): Completable {
-        return repository.deleteMultipleNotes(param)
+        return deleteMultipleNotes.buildUseCaseCompletable(param)
     }
-
 }

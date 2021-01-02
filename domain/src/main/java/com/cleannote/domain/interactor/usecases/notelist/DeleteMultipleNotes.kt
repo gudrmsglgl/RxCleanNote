@@ -15,7 +15,7 @@ constructor(
     threadExecutor: ThreadExecutor,
     postExecutionThread: PostExecutionThread
 ): CompletableUseCase<List<Note>>(threadExecutor, postExecutionThread){
-    override fun buildUseCaseCompletable(params: List<Note>?): Completable {
+    public override fun buildUseCaseCompletable(params: List<Note>?): Completable {
         return repository.deleteMultipleNotes(params!!)
     }
 }

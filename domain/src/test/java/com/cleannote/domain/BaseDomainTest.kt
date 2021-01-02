@@ -17,6 +17,7 @@ abstract class BaseDomainTest<D, Param> {
 
     @BeforeEach
     fun baseSetup(){
+        mockRxSchedulers()
         repository = mock()
     }
 

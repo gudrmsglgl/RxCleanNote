@@ -18,7 +18,6 @@ class DeleteNoteTest: BaseDomainTest<Completable, Note>(){
 
     @BeforeEach
     fun setUp(){
-        mockRxSchedulers()
         deleteNote = DeleteNote(repository, threadExecutor, postExecutionThread)
     }
 
