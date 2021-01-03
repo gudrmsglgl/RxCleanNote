@@ -44,11 +44,11 @@ abstract class BaseDataTest {
     }
 
     infix fun NoteRemoteDataStore.stubSearchNotes(stubEntities: Pair<QueryEntity, List<NoteEntity>>){
-        whenever(this.searchNotes(stubEntities.first)).thenReturn(Flowable.just(stubEntities.second))
+        whenever(this.searchNotes(stubEntities.first)).thenReturn(Single.just(stubEntities.second))
     }
 
     infix fun NoteCacheDataStore.stubSearchNotes(stubEntities: Pair<QueryEntity, List<NoteEntity>>){
-        whenever(this.searchNotes(stubEntities.first)).thenReturn(Flowable.just(stubEntities.second))
+        whenever(this.searchNotes(stubEntities.first)).thenReturn(Single.just(stubEntities.second))
     }
 
     infix fun NoteDataStore.stubUpdateNote(stub: Pair<NoteEntity, Completable>){

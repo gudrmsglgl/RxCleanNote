@@ -40,18 +40,24 @@ class NoteCacheDataStoreTest {
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
 
-
     @Test
-    fun insertCacheNewNoteCompletes(){
-        val testObserver = noteCacheDataStore.insertCacheNewNote(noteEntity).test()
-        testObserver.assertComplete()
+    fun insertCacheNewNoteCallCacheFunc(){
+        noteCacheDataStore.insertCacheNewNote(noteEntity).test()
+        verify(noteCache).insertCacheNewNote(noteEntity)
     }
 
     @Test
-    fun insertCacheNewNoteReturnDataLong(){
-        val testObserver = noteCacheDataStore.insertCacheNewNote(noteEntity).test()
-        verify(noteCache).insertCacheNewNote(noteEntity)
-        testObserver.assertValue(successInserted)
+    fun insertCacheNewNoteCompletes(){
+        noteCacheDataStore.insertCacheNewNote(noteEntity)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun insertCacheNewNoteReturnRow(){
+        noteCacheDataStore.insertCacheNewNote(noteEntity)
+            .test()
+            .assertValue(successInserted)
     }
 
     @Test
@@ -69,74 +75,106 @@ class NoteCacheDataStoreTest {
     }
 
     @Test
+    fun saveNotesCallCacheFunc(){
+        noteCacheDataStore.saveNotes(noteEntities, QueryFactory.makeQueryEntity()).test()
+        verify(noteCache).saveNotes(noteEntities)
+    }
+
+    @Test
     fun saveNotesCompletes(){
-        val testObserver =
-            noteCacheDataStore.saveNotes(noteEntities, QueryFactory.makeQueryEntity()).test()
-        testObserver.onComplete()
-    }
-
-    @Test
-    fun isCacheCompletes(){
-        val testObserver = noteCacheDataStore.isCached(1).test()
-        testObserver.onComplete()
-    }
-
-    @Test
-    fun updateNoteCallNoteCache(){
-        whenCacheDataStoreUpdateNote(noteEntity).test()
-        verifyCacheCallUpdateNote(noteEntity)
-    }
-
-    @Test
-    fun updateNoteAssertComplete(){
-        whenCacheDataStoreUpdateNote(noteEntity)
+        noteCacheDataStore
+            .saveNotes(noteEntities, QueryFactory.makeQueryEntity())
             .test()
-            .assertComplete()
+            .onComplete()
     }
 
     @Test
-    fun deleteNoteCallNoteCache(){
-        whenCacheDataStoreDeleteNote(noteEntity).test()
-        verifyCacheCallDeleteNote(noteEntity)
-    }
-
-    @Test
-    fun deleteNoteAssertComplete(){
-        whenCacheDataStoreDeleteNote(noteEntity)
+    fun saveNotesReturnNoValue(){
+        noteCacheDataStore
+            .saveNotes(noteEntities, QueryFactory.makeQueryEntity())
             .test()
-            .assertComplete()
             .assertNoValues()
     }
 
     @Test
-    fun deleteMultipleNotesCallNoteCache(){
-        whenCacheDataStoreDeleteMultipleNotes(noteEntities)
+    fun isCacheCallCacheFunc(){
+        noteCacheDataStore.isCached(1).test()
+        verify(noteCache).isCached(1)
+    }
+
+    @Test
+    fun isCacheComplete(){
+        noteCacheDataStore.isCached(1)
             .test()
             .assertComplete()
+    }
+
+    @Test
+    fun isCacheReturnBoolean(){
+        noteCacheDataStore.isCached(1)
+            .test()
+            .assertValue(true)
+    }
+
+
+    @Test
+    fun updateNoteCallCacheFunc(){
+        noteCacheDataStore.updateNote(noteEntity).test()
+        verify(noteCache).updateNote(noteEntity)
+    }
+
+    @Test
+    fun updateNoteComplete(){
+        noteCacheDataStore.updateNote(noteEntity)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun updateNoteReturnNoValue(){
+        noteCacheDataStore.updateNote(noteEntity)
+            .test()
             .assertNoValues()
-
-        verifyCacheCallDeleteMultipleNotes(noteEntities)
     }
 
-    private fun whenCacheDataStoreDeleteMultipleNotes(param: List<NoteEntity>) =
-        noteCacheDataStore.deleteMultipleNotes(param)
-
-    private fun verifyCacheCallDeleteMultipleNotes(param: List<NoteEntity>) {
-        verify(noteCache).deleteMultipleNotes(param)
+    @Test
+    fun deleteNoteCallCacheFunc(){
+        noteCacheDataStore.deleteNote(noteEntity).test()
+        verify(noteCache).deleteNote(noteEntity)
     }
 
-    private fun whenCacheDataStoreDeleteNote(param: NoteEntity) =
-        noteCacheDataStore.deleteNote(param)
-
-    private fun verifyCacheCallDeleteNote(param: NoteEntity) {
-        verify(noteCache).deleteNote(param)
+    @Test
+    fun deleteNoteComplete(){
+        noteCacheDataStore.deleteNote(noteEntity)
+            .test()
+            .assertComplete()
     }
 
-    private fun whenCacheDataStoreUpdateNote(param: NoteEntity) =
-        noteCacheDataStore.updateNote(param)
+    @Test
+    fun deleteNoteReturnNoValue(){
+        noteCacheDataStore.deleteNote(noteEntity)
+            .test()
+            .assertNoValues()
+    }
 
-    private fun verifyCacheCallUpdateNote(param: NoteEntity){
-        verify(noteCache).updateNote(param)
+    @Test
+    fun deleteMultipleNotesCallCacheFunc(){
+        noteCacheDataStore.deleteMultipleNotes(noteEntities).test()
+        verify(noteCache).deleteMultipleNotes(noteEntities)
+    }
+
+    @Test
+    fun deleteMultipleNotesComplete(){
+        noteCacheDataStore.deleteMultipleNotes(noteEntities)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun deleteMultipleNotesReturnNoValue(){
+        noteCacheDataStore.deleteMultipleNotes(noteEntities)
+            .test()
+            .assertNoValues()
     }
 
 }

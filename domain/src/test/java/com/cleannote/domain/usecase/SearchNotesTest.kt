@@ -46,7 +46,7 @@ class SearchNotesTest: BaseDomainTest<Single<List<Note>>, Query>() {
     }
 
     @Test
-    fun buildUseCaseSearchQueryReturnNote(){
+    fun buildUseCaseSearchQueryReturnNotes(){
         val stubNotes = NoteFactory.createNoteList(2)
         stubRepositoryReturnValue(
             param = defaultQuery,

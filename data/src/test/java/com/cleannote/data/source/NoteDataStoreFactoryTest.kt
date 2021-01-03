@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class NoteDataStoreFactoryTest {
-    private lateinit var noteDataStoreFactory: NoteDataStoreFactory
+    private lateinit var factory: NoteDataStoreFactory
 
     private lateinit var noteCache: NoteCache
     private lateinit var noteCacheDataStore: NoteCacheDataStore
@@ -22,34 +22,40 @@ class NoteDataStoreFactoryTest {
         noteCache = mock()
         noteCacheDataStore = mock()
         noteRemoteDataStore = mock()
-        noteDataStoreFactory = NoteDataStoreFactory(noteCache, noteCacheDataStore, noteRemoteDataStore)
+        factory = NoteDataStoreFactory(noteCacheDataStore, noteRemoteDataStore)
     }
 
     @Test
     fun retrieveCacheDataStoreReturnsCacheDataStore() {
-        val noteCacheDataStore = noteDataStoreFactory.retrieveCacheDataStore()
+        val noteCacheDataStore = factory.retrieveCacheDataStore()
         assertThat(noteCacheDataStore, instanceOf(NoteCacheDataStore::class.java))
     }
 
     @Test
     fun retrieveRemoteDataStoreReturnsRemoteDataStore(){
-        val remoteDataStore = noteDataStoreFactory.retrieveRemoteDataStore()
+        val remoteDataStore = factory.retrieveRemoteDataStore()
         assertThat(remoteDataStore, instanceOf(NoteRemoteDataStore::class.java))
     }
 
     @Test
     fun retrieveDataStoreReturnCacheDataStore(){
-        whenever(noteCache.isCached(0)).thenReturn(Single.just(true))
-        val dataStore: NoteDataStore =
-            noteDataStoreFactory.retrieveDataStore(noteCache.isCached(0).blockingGet())
+        stubCurrentPageIsCached(page = 0, stub = true)
+        val dataStore = factory.retrieveDataStore(isCachedOnNoteCache(page = 0))
         assertThat(dataStore, instanceOf(NoteCacheDataStore::class.java))
     }
 
     @Test
     fun retrieveDataStoreReturnRemoteDataStore(){
-        whenever(noteCache.isCached(1)).thenReturn(Single.just(false))
-        val dataStore: NoteDataStore =
-            noteDataStoreFactory.retrieveDataStore(noteCache.isCached(1).blockingGet())
+        stubCurrentPageIsCached(page = 1, stub = false)
+        val dataStore: NoteDataStore = factory.retrieveDataStore(isCachedOnNoteCache(page = 1))
         assertThat(dataStore, instanceOf(NoteRemoteDataStore::class.java))
+    }
+
+    private fun stubCurrentPageIsCached(page:Int, stub: Boolean){
+        whenever(noteCache.isCached(page)).thenReturn(Single.just(stub))
+    }
+
+    private fun isCachedOnNoteCache(page: Int): Boolean{
+        return noteCache.isCached(page).blockingGet()
     }
 }
