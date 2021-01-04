@@ -1,36 +1,32 @@
 package com.cleannote.data
 
 import com.cleannote.data.extensions.*
-import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.data.source.NoteRemoteDataStore
 import com.cleannote.data.test.factory.NoteFactory
-import com.cleannote.data.test.factory.QueryFactory
-import com.cleannote.data.test.factory.UserFactory
+import com.cleannote.data.test.stub.DataStoreStubberContainer
+import com.cleannote.data.test.verify.VerifierContainer
 import com.cleannote.domain.model.Note
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteDataRepositoryTest: BaseDataTest() {
-
-    private lateinit var noteDataStoreFactory: NoteDataStoreFactory
+class NoteDataRepositoryTest: BaseCacheDataTest() {
 
     private lateinit var noteCacheDataStore: NoteCacheDataStore
     private lateinit var noteRemoteDataStore: NoteRemoteDataStore
+    private lateinit var noteDataStoreFactory: NoteDataStoreFactory
+
+    private lateinit var stubContainer: DataStoreStubberContainer
+    private lateinit var verifyContainer: VerifierContainer
 
     @BeforeEach
     fun setUp(){
-        noteCacheDataStore = mock()
-        noteRemoteDataStore = mock()
-        noteDataStoreFactory = mock{
-            on { retrieveRemoteDataStore() } doReturn noteRemoteDataStore
-            on { retrieveCacheDataStore() } doReturn noteCacheDataStore
-            on { retrieveDataStore(true) } doReturn noteCacheDataStore
-            on { retrieveDataStore(false) } doReturn noteRemoteDataStore
-        }
+        initMockDataStore()
+        initMockStubDataStoreFactory()
+        initContainer()
         noteDataRepository = NoteDataRepository(noteDataStoreFactory)
     }
 
@@ -40,18 +36,33 @@ class NoteDataRepositoryTest: BaseDataTest() {
         val insertNoteEntity = insertNote.transNoteEntity()
         val insertSuccess = 1L
 
-        noteCacheDataStore stubInsertNote (insertNoteEntity to insertSuccess)
-        noteRemoteDataStore stubInsertNote (insertNoteEntity to Completable.complete())
+        stubContainer {
+            remoteDataStore {
+                stubInsertNote(param = insertNoteEntity, stub = Completable.complete())
+            }
+            cacheDataStore {
+                stubInsertNote(param = insertNoteEntity, stub = insertSuccess)
+            }
+        }
 
         whenDataRepositoryInsertNote(insertNote)
             .test()
             .assertComplete()
 
-        noteCacheDataStore.verifyInsertNote(insertNoteEntity)
-        noteRemoteDataStore.verifyInsertNote(insertNoteEntity)
+        verifyContainer{
+            inOrder(remoteDataStore, cacheDataStore) {
+
+                verify(cacheDataStore)
+                    .insertCacheNewNote(insertNoteEntity)
+
+                verify(remoteDataStore)
+                    .insertRemoteNewNote(insertNoteEntity)
+
+            }
+        }
     }
 
-    @Test
+    /*@Test
     fun insertNewNoteReturnLongValue(){
         val insertNote: Note = NoteFactory.createNote(title = "title#1")
         val insertNoteEntity = insertNote.transNoteEntity()
@@ -364,5 +375,24 @@ class NoteDataRepositoryTest: BaseDataTest() {
 
         noteRemoteDataStore.verifyDeleteMultiNotes(deleteNoteEntities, never())
         noteCacheDataStore.verifyDeleteMultiNotes(deleteNoteEntities, times(1))
+    }*/
+
+    private fun initMockStubDataStoreFactory(){
+        noteDataStoreFactory = mock{
+            on { retrieveRemoteDataStore() } doReturn noteRemoteDataStore
+            on { retrieveCacheDataStore() } doReturn noteCacheDataStore
+            on { retrieveDataStore(true) } doReturn noteCacheDataStore
+            on { retrieveDataStore(false) } doReturn noteRemoteDataStore
+        }
+    }
+
+    private fun initMockDataStore(){
+        noteCacheDataStore = mock()
+        noteRemoteDataStore = mock()
+    }
+
+    private fun initContainer(){
+        stubContainer = DataStoreStubberContainer(noteRemoteDataStore,noteCacheDataStore)
+        verifyContainer = VerifierContainer(noteDataStoreFactory, noteRemoteDataStore, noteCacheDataStore)
     }
 }
