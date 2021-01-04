@@ -1,15 +1,9 @@
-package com.cleannote.data.test.stub
+package com.cleannote.data.test.container.stub
 
 import com.cleannote.data.model.NoteEntity
-import com.cleannote.data.model.QueryEntity
-import com.cleannote.data.model.UserEntity
-import com.cleannote.data.repository.NoteDataStore
 import com.cleannote.data.source.NoteCacheDataStore
-import com.cleannote.data.source.NoteRemoteDataStore
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import org.mockito.verification.VerificationMode
 
@@ -19,8 +13,8 @@ class NoteCacheDataStoreStubber(private val dataStore: NoteCacheDataStore): Stub
         whenever(dataStore.insertCacheNewNote(param)).thenReturn(Single.just(stub))
     }
 
-    infix fun VerificationMode.verifyInsertNote(param: NoteEntity){
-        verify(dataStore, this).insertCacheNewNote(param)
+    fun stubInsertThrowable(param: NoteEntity, stub: Throwable){
+        whenever(dataStore.insertCacheNewNote(param)).thenReturn(Single.error(stub))
     }
 
     /*infix fun NoteCacheDataStore.stubSaveNotes(stub: Triple<List<NoteEntity>, QueryEntity, Completable>){

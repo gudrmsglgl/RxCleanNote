@@ -1,4 +1,4 @@
-package com.cleannote.data.test.stub
+package com.cleannote.data.test.container.stub
 
 @Suppress("UNCHECKED_CAST")
 open class Stubber<T> {

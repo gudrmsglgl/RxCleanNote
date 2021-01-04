@@ -1,4 +1,4 @@
-package com.cleannote.data.test.stub
+package com.cleannote.data.test.container.stub
 
 import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteRemoteDataStore

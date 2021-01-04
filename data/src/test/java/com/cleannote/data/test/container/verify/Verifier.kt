@@ -1,4 +1,4 @@
-package com.cleannote.data.test.verify
+package com.cleannote.data.test.container.verify
 
 @Suppress("UNCHECKED_CAST")
 open class Verifier<T> {

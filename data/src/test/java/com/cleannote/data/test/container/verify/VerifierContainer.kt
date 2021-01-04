@@ -1,11 +1,8 @@
-package com.cleannote.data.test.verify
+package com.cleannote.data.test.container.verify
 
 import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.data.source.NoteRemoteDataStore
-import com.nhaarman.mockitokotlin2.inOrder
-import com.nhaarman.mockitokotlin2.mock
-import org.mockito.InOrder
 import org.mockito.Mock
 
 class VerifierContainer(
