@@ -29,7 +29,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer{
+        verifyContainer {
             verify(cacheDataStore)
                 .insertCacheNewNote(noteEntity)
             verify(remoteDataStore)
@@ -50,7 +50,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer{
+        verifyContainer {
             inOrder(cacheDataStore, remoteDataStore){
                 verify(cacheDataStore)
                     .insertCacheNewNote(noteEntity)
@@ -103,7 +103,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
        whenDataRepositoryInsertNote(note)
            .test()
 
-       verifyContainer{
+       verifyContainer {
            verify(cacheDataStore)
                .insertCacheNewNote(noteEntity)
            verify(remoteDataStore, never())
@@ -175,7 +175,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer{
+        verifyContainer {
             inOrder(cacheDataStore, remoteDataStore){
                 verify(cacheDataStore)
                     .insertCacheNewNote(noteEntity)

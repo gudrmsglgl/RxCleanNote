@@ -5,4 +5,8 @@ open class Stubber<T> {
     operator fun invoke(func: T.()-> Unit){
         func(this as T)
     }
+
+    fun scenario(param: String, func: T.() -> Unit){
+        func(this as T)
+    }
 }
