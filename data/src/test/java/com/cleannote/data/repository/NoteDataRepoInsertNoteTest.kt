@@ -17,7 +17,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     private val successRow = 1L
 
     @Test
-    @DisplayName("TestCase[Remote⭕, Cache⭕]: Remote Cache DataStore 모두 호출")
+    @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
     fun remoteCacheDataStoreSuccessThenCallRemoteCacheDataStore(){
         stubContainer {
             remoteDataStore
@@ -38,7 +38,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase[Remote⭕, Cache⭕]: CacheStore 불러온 후 RemoteStore 호출")
+    @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: CacheStore InsertCacheNewNote -> RemoteStore InsertRemoteNewNote")
     fun verifyOrderingFirstCacheDataStoreNextRemoteDataStore(){
         stubContainer {
             remoteDataStore
@@ -61,7 +61,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase[Remote⭕, Cache⭕]: NoteDataRepo AssertComplete")
+    @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: AssertComplete")
     fun cacheAndRemoteStoreSuccessThenAssertComplete(){
         stubContainer {
             remoteDataStore
@@ -76,7 +76,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase[Remote⭕, Cache⭕]: NoteDataRepo AssertValue -> successRow ")
+    @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: AssertValue -> successRow ")
     fun cacheAndRemoteStoreSuccessThenAssertValueSuccessRow(){
         stubContainer {
             remoteDataStore
@@ -91,7 +91,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
 
    @Test
-   @DisplayName("TestCase[cache\uD83D\uDC1C]: Cache DataStore 호출 Remote DataStore 호출X")
+   @DisplayName("TestCase[Cache Throwable]: CacheDataStore Insert ⭕ RemoteDataStore ❌")
    fun cacheDataStoreThrowThenOnlyCallCacheDataStore(){
        stubContainer {
            remoteDataStore
@@ -112,7 +112,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    }
 
    @Test
-   @DisplayName("TestCase[cache\uD83D\uDC1C]: NoteDataRepo AssertComplete")
+   @DisplayName("TestCase[Cache Throwable]: NoteDataRepo AssertComplete")
    fun cacheStoreThrowableThenAssertComplete(){
        stubContainer {
            remoteDataStore
@@ -127,7 +127,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    }
    
    @Test
-   @DisplayName("TestCase[cache\uD83D\uDC1C]: NoteDataRepo AssertValue -> FailRow[-1L]")
+   @DisplayName("TestCase[Cache Throwable]: AssertValue -> FailRow[-1L]")
    fun cacheAndRemoteStoreSuccessThenAssertValueFailRow(){
        stubContainer {
            remoteDataStore
@@ -142,7 +142,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    }
    
     @Test
-    @DisplayName("TestCase[Remote\uD83D\uDC1C, cache⭕]: Remote Cache DataStore 호출")
+    @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
     fun cacheDataStoreSuccessRemoteStoreThrowThenCallRemoteCacheDataStore(){
         stubContainer {
             remoteDataStore
@@ -163,7 +163,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
     
     @Test
-    @DisplayName("TestCase[Remote\uD83D\uDC1C, cache⭕]: CacheStore 불러온 후 RemoteStore 호출")
+    @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: CacheStore Insert -> RemoteStore Insert")
     fun verifyOrderingFirstCacheStoreNextRemoteStore(){
         stubContainer {
             remoteDataStore
@@ -186,7 +186,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
     
     @Test
-    @DisplayName("TestCase[Remote\uD83D\uDC1C, cache⭕]: NoteDataRepo AssertComplete")
+    @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: AssertComplete")
     fun cacheStoreSuccessRemoteThrowableThenAssertComplete(){
         stubContainer {
             remoteDataStore.stubInsertThrowable(noteEntity, RuntimeException())
@@ -199,7 +199,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
     
     @Test
-    @DisplayName("TestCase[Remote\uD83D\uDC1C, cache⭕]: NoteDataRepo AssertValue -> SuccessRow")
+    @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: AssertValue -> SuccessRow")
     fun cacheStoreSuccessRemoteThrowableThenAssertValueSuccessRow(){
         stubContainer {
             remoteDataStore
