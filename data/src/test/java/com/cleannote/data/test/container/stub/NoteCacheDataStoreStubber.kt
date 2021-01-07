@@ -39,27 +39,15 @@ class NoteCacheDataStoreStubber(
         whenever(cacheDataStore.insertCacheNewNote(param)).thenReturn(Single.error(stub))
     }
 
-    /*infix fun NoteCacheDataStore.stubSaveNotes(stub: Triple<List<NoteEntity>, QueryEntity, Completable>){
-        whenever(this.saveNotes(stub.first, stub.second)).thenReturn(stub.third)
+    fun stubUpdateNote(param: NoteEntity, stub: Completable){
+        whenever(cacheDataStore.updateNote(param)).thenReturn(stub)
     }
 
-    infix fun NoteCacheDataStore.stubPageIsCache(stub: Pair<Int, Boolean>){
-        whenever(this.isCached(stub.first)).thenReturn(Single.just(stub.second))
+    fun stubDeleteNote(param: NoteEntity, stub: Completable){
+        whenever(cacheDataStore.deleteNote(param)).thenReturn(stub)
     }
 
-    infix fun NoteCacheDataStore.stubSearchNotes(stubEntities: Pair<QueryEntity, List<NoteEntity>>){
-        whenever(this.searchNotes(stubEntities.first)).thenReturn(Single.just(stubEntities.second))
+    fun stubDeleteMultipleNotes(param: List<NoteEntity>, stub: Completable){
+        whenever(cacheDataStore.deleteMultipleNotes(param)).thenReturn(stub)
     }
-
-    infix fun NoteDataStore.stubUpdateNote(stub: Pair<NoteEntity, Completable>){
-        whenever(this.updateNote(stub.first)).thenReturn(stub.second)
-    }
-
-    infix fun NoteCacheDataStore.stubDeleteNote(stub: Pair<NoteEntity, Completable>){
-        whenever(this.deleteNote(stub.first)).thenReturn(stub.second)
-    }
-
-    infix fun NoteCacheDataStore.stubDeleteMultiNotes(stub: Pair<List<NoteEntity>, Completable>) {
-        whenever(this.deleteMultipleNotes(stub.first)).thenReturn(stub.second)
-    }*/
 }

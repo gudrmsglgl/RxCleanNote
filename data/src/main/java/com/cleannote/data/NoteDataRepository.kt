@@ -70,13 +70,16 @@ constructor(
         }
         .flatMap {
             when {
-                isRemoteNotesNotEmptyEqualOrGreaterThanCacheNotes(it) -> {
+                isNotEmptyRemoteNotesGreaterThanOrEqCacheNotes(it) -> {
                     val remoteNotes = it.second
                     saveRemoteNotesThenReturnRemote(remoteNotes, queryEntity)
                 }
-                isRemoteNotesNotEmptyLessThanCachedNotes(it) -> {
+                isNotEmptyRemoteNotesLessThanCachedNotes(it) -> {
                     val remoteNotes = it.second
                     saveRemoteNotesAndThenCacheSearchNotes(remoteNotes, queryEntity)
+                }
+                isEmptyRemoteNotes(it) -> {
+                    returnSearchNoteOnCache(queryEntity)
                 }
                 else -> {
                     val cacheNotes = it.second
@@ -100,7 +103,7 @@ constructor(
         }
     )
 
-    private fun isRemoteNotesNotEmptyEqualOrGreaterThanCacheNotes(
+    private fun isNotEmptyRemoteNotesGreaterThanOrEqCacheNotes(
         pendingData: Triple<Boolean, List<NoteEntity> , Int>
     ): Boolean{
         val isCache = pendingData.first
@@ -110,7 +113,7 @@ constructor(
         return !isCache && remoteData.isNotEmpty() && isRemoteNoteEqualGreaterThanCacheNotes
     }
 
-    private fun isRemoteNotesNotEmptyLessThanCachedNotes(
+    private fun isNotEmptyRemoteNotesLessThanCachedNotes(
         pendingData: Triple<Boolean, List<NoteEntity> , Int>
     ): Boolean{
         val isCache = pendingData.first
@@ -118,6 +121,14 @@ constructor(
         val currentCacheNoteSize = pendingData.third
         val isRemoteNoteLessThanCacheNotes = remoteData.size < currentCacheNoteSize
         return !isCache && remoteData.isNotEmpty() && isRemoteNoteLessThanCacheNotes
+    }
+    
+    private fun isEmptyRemoteNotes(
+        pendingData: Triple<Boolean, List<NoteEntity> , Int>
+    ): Boolean{
+        val isCache = pendingData.first
+        val remoteData = pendingData.second
+        return !isCache && remoteData.isEmpty()
     }
 
     private fun searchNotesOnDataStore(
@@ -153,10 +164,9 @@ constructor(
         .retrieveCacheDataStore()
         .saveNotes(remoteNotes, queryEntity)
         .andThen(
-            factory
-                .retrieveCacheDataStore()
-                .searchNotes(queryEntity)
-                .map { it.transNoteList() }
+            Single.defer {
+                returnSearchNoteOnCache(queryEntity)
+            }
         )
 
     private fun returnSearchNoteOnCache(queryEntity: QueryEntity) = factory

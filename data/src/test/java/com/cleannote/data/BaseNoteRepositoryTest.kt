@@ -42,7 +42,7 @@ abstract class BaseNoteRepositoryTest {
 
     fun whenDataRepositorySearchNotes(query: Query) = noteDataRepository.searchNotes(query)
 
-    fun whenUpdateNote(note: Note) = noteDataRepository.updateNote(note)
+    fun whenDataRepositoryUpdateNote(note: Note) = noteDataRepository.updateNote(note)
 
     fun whenDataRepositoryDeleteNote(note: Note) = noteDataRepository.deleteNote(note)
 

@@ -17,7 +17,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     private val successRow = 1L
 
     @Test
-    @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
+    @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: Call RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
     fun remoteCacheDataStoreSuccessThenCallRemoteCacheDataStore(){
         stubContainer {
             remoteDataStore
@@ -91,7 +91,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     }
 
    @Test
-   @DisplayName("TestCase[Cache Throwable]: CacheDataStore Insert ⭕ RemoteDataStore ❌")
+   @DisplayName("TestCase[Cache Throwable]: Call CacheDataStore Insert ⭕ RemoteDataStore ❌")
    fun cacheDataStoreThrowThenOnlyCallCacheDataStore(){
        stubContainer {
            remoteDataStore
@@ -142,7 +142,7 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    }
    
     @Test
-    @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
+    @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: Call RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
     fun cacheDataStoreSuccessRemoteStoreThrowThenCallRemoteCacheDataStore(){
         stubContainer {
             remoteDataStore

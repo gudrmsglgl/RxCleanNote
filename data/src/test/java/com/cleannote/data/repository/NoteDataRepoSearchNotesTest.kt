@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
-    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
+    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
     fun testCase1_callRemoteStoreSearchNotCallCacheStoreSearch(){
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = NoteFactory.createNoteEntityList(0,10)
@@ -139,7 +139,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
+    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
     fun testCase2_callRemoteStoreSearchNotCallCacheStoreSearch(){
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = NoteFactory.createNoteEntityList(0,10)
@@ -264,7 +264,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
     }
     
     @Test
-    @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
+    @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
     fun testCase3_callRemoteCacheDataStore(){
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = NoteFactory.createNoteEntityList(0,5)
@@ -393,7 +393,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase4[query: defaultQuery, isCache: true]: RemoteDataStore SearchNotes ❌ CacheDataStore SearchNotes ⭕")
+    @DisplayName("TestCase4[query: defaultQuery, isCache: true]: Call RemoteDataStore SearchNotes ❌ CacheDataStore SearchNotes ⭕")
     fun testCase4_callCacheStoreSearchNotCallRemoteStoreSearch(){
         val defaultQuery = QueryFactory.makeQuery()
         val cacheNote = NoteFactory.createNoteEntityList(0,10)
@@ -514,7 +514,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase5[query: {like: 'keyword'}, remote notes not empty]: RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
+    @DisplayName("TestCase5[query: {like: 'keyword'}, remote notes not empty]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
     fun testCase5_callRemoteDataStoreSearch(){
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
         val remoteNote = NoteFactory.createNoteEntityList(0,10)
@@ -626,7 +626,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
     }
 
     @Test
-    @DisplayName("TestCase6[query: {like: 'keyword'}, remote notes empty]: RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
+    @DisplayName("TestCase6[query: {like: 'keyword'}, remote notes empty]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
     fun testCase6_callRemoteCacheDataStore(){
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
         val remoteNote: List<NoteEntity> = emptyList()
@@ -736,6 +736,131 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         }
 
         whenDataRepositorySearchNotes(searchQuery)
+            .test()
+            .assertValue(cacheNote.transNoteList())
+    }
+
+    @Test
+    @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
+    fun testCase7_callRemoteCacheDataStoreSearch(){
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = emptyList<NoteEntity>()
+        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+                remoteDataStore {
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cacheDataStore {
+                    stubPageIsCache(param = defaultQuery.page, stub = false)
+                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+
+        verifyContainer {
+            verify(remoteDataStore)
+                .searchNotes(defaultQuery.transQueryEntity())
+            verify(cacheDataStore)
+                .searchNotes(defaultQuery.transQueryEntity())
+        }
+    }
+
+    @Test
+    @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: CacheStore isCache[false] -> RemoteStore SearchNotes -> CacheStore SearchNotes")
+    fun testCase7_verifyOrderingFirstCacheStoreNextRemoteStore(){
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = emptyList<NoteEntity>()
+        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+                remoteDataStore {
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cacheDataStore {
+                    stubPageIsCache(param = defaultQuery.page, stub = false)
+                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+
+        verifyContainer {
+            inOrder(remoteDataStore, cacheDataStore){
+
+                verify(cacheDataStore)
+                    .isCached(defaultQuery.page)
+                cacheDataStore
+                    .expectPageIsCached(defaultQuery.page to false)
+
+                verify(remoteDataStore)
+                    .searchNotes(defaultQuery.transQueryEntity())
+
+                verify(cacheDataStore, never())
+                    .saveNotes(remoteNote, defaultQuery.transQueryEntity())
+
+                verify(cacheDataStore)
+                    .searchNotes(defaultQuery.transQueryEntity())
+
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: AssertComplete")
+    fun testCase7_assertComplete(){
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = emptyList<NoteEntity>()
+        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+                remoteDataStore {
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cacheDataStore {
+                    stubPageIsCache(param = defaultQuery.page, stub = false)
+                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: AssertValue -> CacheNotes")
+    fun testCase7_assertValueCacheNotes(){
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = emptyList<NoteEntity>()
+        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+                remoteDataStore {
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cacheDataStore {
+                    stubPageIsCache(param = defaultQuery.page, stub = false)
+                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
             .test()
             .assertValue(cacheNote.transNoteList())
     }
