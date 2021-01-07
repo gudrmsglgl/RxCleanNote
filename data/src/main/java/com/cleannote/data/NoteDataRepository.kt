@@ -4,6 +4,7 @@ import com.cleannote.data.extensions.*
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.repository.NoteDataStore
+import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.model.Note
@@ -12,7 +13,7 @@ import com.cleannote.domain.model.User
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.zipWith
+import io.reactivex.functions.Function3
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -65,42 +66,76 @@ constructor(
         .retrieveCacheDataStore()
         .isCached(queryEntity.page)
         .flatMap { isCached ->
-            searchNotesOnDataStore(
-                dataStore = factory.retrieveDataStore(isCached),
-                queryEntity = queryEntity
-            )
-            .zipWith(Single.just(isCached))
+            zip_IsCache_SearchNotes_CurPageCacheNoteSize(isCached, queryEntity)
         }
         .flatMap {
             when {
-                isRemoteLoadedNotes(it) -> {
-                    val remoteNotes = it.first
-                    returnRemoteNotes(queryEntity, remoteNotes)
+                isNotEmptyRemoteNotesGreaterThanOrEqCacheNotes(it) -> {
+                    val remoteNotes = it.second
+                    saveRemoteNotesThenReturnRemote(remoteNotes, queryEntity)
                 }
-                isRemoteLoadedNotesEmpty(it) -> {
+                isNotEmptyRemoteNotesLessThanCachedNotes(it) -> {
+                    val remoteNotes = it.second
+                    saveRemoteNotesAndThenCacheSearchNotes(remoteNotes, queryEntity)
+                }
+                isEmptyRemoteNotes(it) -> {
                     returnSearchNoteOnCache(queryEntity)
                 }
                 else -> {
-                    val cacheNotes = it.first
-                    Single.just(cacheNotes.transNoteList())
+                    val cacheNotes = it.second
+                    returnCachedNotes(cacheNotes.transNoteList())
                 }
             }
         }
 
+    private fun zip_IsCache_SearchNotes_CurPageCacheNoteSize(
+        isCached: Boolean,
+        queryEntity: QueryEntity
+    ) = Single.zip(
+        Single.just(isCached),
+        searchNotesOnDataStore(
+            dataStore = factory.retrieveDataStore(isCached),
+            queryEntity = queryEntity
+        ),
+        (factory.retrieveCacheDataStore() as NoteCacheDataStore).currentPageNoteSize(queryEntity.page),
+        Function3<Boolean, List<NoteEntity>, Int, Triple<Boolean, List<NoteEntity>, Int>>{ s1, s2, s3 ->
+            Triple(s1, s2, s3)
+        }
+    )
+
+    private fun isNotEmptyRemoteNotesGreaterThanOrEqCacheNotes(
+        pendingData: Triple<Boolean, List<NoteEntity> , Int>
+    ): Boolean{
+        val isCache = pendingData.first
+        val remoteData = pendingData.second
+        val currentCacheNoteSize = pendingData.third
+        val isRemoteNoteEqualGreaterThanCacheNotes = remoteData.size >= currentCacheNoteSize
+        return !isCache && remoteData.isNotEmpty() && isRemoteNoteEqualGreaterThanCacheNotes
+    }
+
+    private fun isNotEmptyRemoteNotesLessThanCachedNotes(
+        pendingData: Triple<Boolean, List<NoteEntity> , Int>
+    ): Boolean{
+        val isCache = pendingData.first
+        val remoteData = pendingData.second
+        val currentCacheNoteSize = pendingData.third
+        val isRemoteNoteLessThanCacheNotes = remoteData.size < currentCacheNoteSize
+        return !isCache && remoteData.isNotEmpty() && isRemoteNoteLessThanCacheNotes
+    }
+    
+    private fun isEmptyRemoteNotes(
+        pendingData: Triple<Boolean, List<NoteEntity> , Int>
+    ): Boolean{
+        val isCache = pendingData.first
+        val remoteData = pendingData.second
+        return !isCache && remoteData.isEmpty()
+    }
 
     private fun searchNotesOnDataStore(
         dataStore: NoteDataStore,
         queryEntity: QueryEntity
     ): Single<List<NoteEntity>>{
         return dataStore.searchNotes(queryEntity)
-    }
-
-    private fun isRemoteLoadedNotes(pendingData: Pair<List<NoteEntity>, Boolean>): Boolean{
-        return pendingData.first.isNotEmpty() && !pendingData.second
-    }
-
-    private fun isRemoteLoadedNotesEmpty(pendingData: Pair<List<NoteEntity>, Boolean>): Boolean{
-        return pendingData.first.isEmpty() && !pendingData.second
     }
 
     private fun keywordSearchNote(
@@ -110,22 +145,29 @@ constructor(
         .searchNotes(queryEntity)
         .flatMap {
             if (it.isNotEmpty())
-                returnRemoteNotes(queryEntity, it)
+                saveRemoteNotesThenReturnRemote(it, queryEntity)
             else
                 returnSearchNoteOnCache(queryEntity)
         }
 
 
-    private fun returnRemoteNotes(
-        queryEntity: QueryEntity,
-        remoteNotes: List<NoteEntity>
-    ) = saveRemoteNotesToCache(
-            remoteNotes,
-            queryEntity
-        )
+    private fun saveRemoteNotesThenReturnRemote(
+        remoteNotes: List<NoteEntity>,
+        queryEntity: QueryEntity
+    ) = saveRemoteNotesToCache(remoteNotes, queryEntity)
         .toSingle {
             remoteNotes.transNoteList()
         }
+
+    private fun saveRemoteNotesAndThenCacheSearchNotes(remoteNotes: List<NoteEntity>,
+                                                       queryEntity: QueryEntity) = factory
+        .retrieveCacheDataStore()
+        .saveNotes(remoteNotes, queryEntity)
+        .andThen(
+            Single.defer {
+                returnSearchNoteOnCache(queryEntity)
+            }
+        )
 
     private fun returnSearchNoteOnCache(queryEntity: QueryEntity) = factory
         .retrieveCacheDataStore()
@@ -133,6 +175,8 @@ constructor(
         .map {
             it.transNoteList()
         }
+
+    private fun returnCachedNotes(param: List<Note>) = Single.just(param)
 
     private fun saveRemoteNotesToCache(remoteEntities: List<NoteEntity>, queryEntity: QueryEntity): Completable {
         return factory.retrieveCacheDataStore().saveNotes(remoteEntities, queryEntity)

@@ -39,6 +39,8 @@ constructor(
 
     override fun isCached(page: Int): Single<Boolean> = noteCache.isCached(page)
 
+    public fun currentPageNoteSize(page: Int) = noteCache.currentPageNoteSize(page)
+
     override fun updateNote(noteEntity: NoteEntity): Completable = noteCache.updateNote(noteEntity)
 
     override fun deleteNote(noteEntity: NoteEntity): Completable = noteCache.deleteNote(noteEntity)
