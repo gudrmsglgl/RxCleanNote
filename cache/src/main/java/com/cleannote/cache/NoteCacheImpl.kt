@@ -1,21 +1,20 @@
 package com.cleannote.cache
 
 import com.cleannote.cache.dao.CachedNoteDao
+import com.cleannote.cache.extensions.currentNoteSize
 import com.cleannote.cache.extensions.divideCacheNote
-import com.cleannote.cache.extensions.divideCacheNoteImages
 import com.cleannote.cache.extensions.searchNoteBySorted
 import com.cleannote.cache.extensions.transEntity
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.repository.NoteCache
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import javax.inject.Inject
 
-class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
-                                        private val preferencesHelper: PreferencesHelper):
-    NoteCache {
+class NoteCacheImpl @Inject constructor(private val noteDao: CachedNoteDao,
+                                        private val preferencesHelper: PreferencesHelper): NoteCache
+{
 
     private val SHOULD_PAGE_UPDATE_TIME = (60 * 3 * 1000).toLong()
 
@@ -25,12 +24,9 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
             Single.just(noteDao.insertNote(noteEntity.divideCacheNote()))
         }
 
-    override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> = Flowable.defer {
-        Flowable.just(noteDao.searchNoteBySorted(
-            queryEntity.page,
-            queryEntity.limit,
-            queryEntity.order,
-            queryEntity.like)
+    override fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>> = Single.defer {
+        Single.just(
+            noteDao.searchNoteBySorted(queryEntity)
         ).map { cachedNotes ->
             cachedNotes.map { it.transEntity() }
         }
@@ -68,6 +64,12 @@ class NoteCacheImpl @Inject constructor(val noteDao: CachedNoteDao,
             notes.map { it.divideCacheNote() }
         )
         Completable.complete()
+    }
+
+    override fun currentPageNoteSize(queryEntity: QueryEntity): Single<Int> = Single.defer {
+        Single.just(
+            noteDao.currentNoteSize(queryEntity)
+        )
     }
 
     private fun getLastCacheTime(page: Int) = preferencesHelper.getLastCacheTime(page)

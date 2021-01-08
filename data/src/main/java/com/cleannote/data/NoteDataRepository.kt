@@ -97,7 +97,7 @@ constructor(
             dataStore = factory.retrieveDataStore(isCached),
             queryEntity = queryEntity
         ),
-        (factory.retrieveCacheDataStore() as NoteCacheDataStore).currentPageNoteSize(queryEntity.page),
+        (factory.retrieveCacheDataStore() as NoteCacheDataStore).currentPageNoteSize(queryEntity),
         Function3<Boolean, List<NoteEntity>, Int, Triple<Boolean, List<NoteEntity>, Int>>{ s1, s2, s3 ->
             Triple(s1, s2, s3)
         }

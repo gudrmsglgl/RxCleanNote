@@ -24,7 +24,7 @@ class NoteCacheDataStoreTest {
     private lateinit var noteEntity: NoteEntity
 
     private val noteEntities = NoteFactory.createNoteEntityList(0,5)
-
+    private val queryEntity = QueryFactory.makeQueryEntity()
     private val successInserted: Long = 1L
     @BeforeEach
     fun setUp() {
@@ -36,6 +36,7 @@ class NoteCacheDataStoreTest {
             on { updateNote(noteEntity) } doReturn Completable.complete()
             on { deleteNote(noteEntity)} doReturn Completable.complete()
             on { deleteMultipleNotes(noteEntities)} doReturn Completable.complete()
+            on { currentPageNoteSize(queryEntity) } doReturn Single.just(noteEntities.size)
         }
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
@@ -175,6 +176,26 @@ class NoteCacheDataStoreTest {
         noteCacheDataStore.deleteMultipleNotes(noteEntities)
             .test()
             .assertNoValues()
+    }
+
+    @Test
+    fun currentPageNoteSizeCallCacheFunc(){
+        noteCacheDataStore.currentPageNoteSize(queryEntity).test()
+        verify(noteCache).currentPageNoteSize(queryEntity)
+    }
+
+    @Test
+    fun currentPageNoteSizeComplete(){
+        noteCacheDataStore.currentPageNoteSize(queryEntity)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun currentPageNoteSizeReturnNoteSize(){
+        noteCacheDataStore.currentPageNoteSize(queryEntity)
+            .test()
+            .assertValue(noteEntities.size)
     }
 
 }

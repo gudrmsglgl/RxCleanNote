@@ -19,7 +19,7 @@ class NoteCacheDataStoreStubber(
         whenever(cacheDataStore.saveNotes(remoteNotes, queryEntity)).thenReturn(stub)
     }
 
-    fun stubCurrentPageNoteSize(param: Int, stub: Int){
+    fun stubCurrentPageNoteSize(param: QueryEntity, stub: Int){
         whenever(cacheDataStore.currentPageNoteSize(param)).thenReturn(Single.just(stub))
     }
 
