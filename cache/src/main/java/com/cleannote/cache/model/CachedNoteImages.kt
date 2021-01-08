@@ -9,5 +9,5 @@ data class CachedNoteImages(
         parentColumn = "id",
         entityColumn = "note_pk"
     )
-    var images: List<CacheNoteImage>
+    var images: List<CachedImage>
 )

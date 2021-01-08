@@ -6,32 +6,26 @@ import androidx.test.core.app.ApplicationProvider
 import com.cleannote.cache.dao.NoteQueryUtil.NOTE_SORT_ASC
 import com.cleannote.cache.dao.NoteQueryUtil.NOTE_SORT_DESC
 import com.cleannote.cache.database.NoteDatabase
-import com.cleannote.cache.extensions.divideCacheNote
-import com.cleannote.cache.extensions.divideCacheNoteImages
-import com.cleannote.cache.extensions.searchNoteBySorted
-import com.cleannote.cache.extensions.transEntity
+import com.cleannote.cache.extensions.*
 import com.cleannote.cache.model.CachedNote
 import com.cleannote.cache.test.factory.NoteFactory
 import com.cleannote.cache.test.factory.QueryFactory
 import com.cleannote.data.model.NoteEntity
-import com.cleannote.data.model.QueryEntity
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.lang.IndexOutOfBoundsException
 import java.text.SimpleDateFormat
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-open class CachedNoteDaoTest{
+open class CachedNoteDaoTest: BaseNoteDaoTest(){
 
     private lateinit var noteDatabase: NoteDatabase
-    private lateinit var noteDao: CachedNoteDao
 
     /*@get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()*/
@@ -52,140 +46,213 @@ open class CachedNoteDaoTest{
     }
 
     @Test
-    fun insertNoteHasImagesThenSaveCacheNoteHasImages(){
-        val insertNote = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
-        noteDao.insertNoteAndImages(insertNote)
+    fun insertNoteThenAssertLong(){
+        val note = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
 
-        val cachedNotes = noteDao.getNumNotes()
-        val cachedNoteImages = noteDao.getNoteImagesByPk(insertNote.id)
-
-        assertThat(cachedNotes.isNotEmpty(), `is`(true))
-        assertThat(cachedNotes[0], `is`(insertNote.divideCacheNote()))
-        assertThat(cachedNoteImages, `is`(insertNote.divideCacheNoteImages()))
+        whenInsertNote(note.divideCacheNote())
+            .assertGreaterThan(0L)
     }
 
     @Test
-    fun insertNoteEmptyImagesThenSaveCacheNoteNoImages(){
-        val insertNoteEmptyImages = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 0)
-        noteDao.insertNoteAndImages(insertNoteEmptyImages)
+    fun insertNoteAndImagesThenAssertLong(){
+        val note = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
 
-        val cachedNoteImages = noteDao.getNoteImagesByPk(insertNoteEmptyImages.id)
-
-        assertThat(cachedNoteImages, `is`(emptyList()))
+        whenInsertNoteAndImages(note)
+            .assertGreaterThan(0L)
     }
 
     @Test
-    fun saveNotesAndImagesThenCacheSaveNotesImages(){
+    fun noteOfHasImagesInsertNoteThenNotSaveImages(){
+        val note = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
+        val insertedNote = note.divideCacheNote()
+
+        whenInsertNote(note.divideCacheNote())
+
+        loadNoteAndImages(pk = note.id)
+            .hasNote(insertedNote)
+            .hasImages(emptyList())
+    }
+
+    @Test
+    fun noteOfHasImagesInsertNoteAndImagesThenSaveImages(){
+        val note = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
+        val insertedNote = note.divideCacheNote()
+        val insertedNoteImages = note.divideCacheNoteImages()
+
+        whenInsertNoteAndImages(note)
+
+        loadNoteAndImages(pk = note.id)
+            .hasNote(insertedNote)
+            .hasImages(insertedNoteImages)
+    }
+
+    @Test
+    fun noteOfEmptyImagesInsertNoteAndImagesThenNotSaveImages(){
+        val note = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 0)
+        val insertedNote = note.divideCacheNote()
+
+        whenInsertNoteAndImages(note)
+
+        loadNoteAndImages(pk = note.id)
+            .hasNote(insertedNote)
+            .hasImages(emptyList())
+    }
+
+    @Test
+    fun saveNotesAndImagesThenCacheDataReturnSavedNotes(){
         val noteEntities = NoteFactory.createNoteEntityList(end = 3)
         whenSaveNotesAndImages(noteEntities)
 
-        val cacheNotes = loadAllCachedNotes()
-        assertThat(noteEntities.size, `is`(cacheNotes.size))
+        loadAllCacheNoteAndImages()
+            .forEachIndexed { index, loadNoteAndImages ->
 
-        cacheNotes.forEachIndexed { index, cachedNote ->
-            assertThat(noteEntities[index].divideCacheNoteImages(), `is`(noteDao.getNoteImagesByPk(cachedNote.id)))
-        }
+                val savedNote = noteEntities[index].divideCacheNote()
+                val savedImages = noteEntities[index].divideCacheNoteImages()
+
+                loadNoteAndImages
+                    .hasNote(savedNote)
+                    .hasImages(savedImages)
+
+            }
     }
 
     @Test
-    fun searchNoteASC(){
-        val queryEntity = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
+    fun searchNotesBySortedOnQueryASCReturnASCValue(){
+        val queryASC = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
+        val savedNotes = NoteFactory.createNoteEntityList(end = 3)
+
+        whenSaveNotesAndImages(savedNotes)
+
+        whenSearchNotesBySorted(queryASC)
+            .assertSortedValue(savedNotes)
+    }
+
+    @Test
+    fun searchNotesBySortedOnQueryDESCReturnDescValue(){
+        val queryDESC = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
+        val savedNotes = NoteFactory.createNoteEntityList(end = 3)
+
+        whenSaveNotesAndImages(savedNotes)
+
+        whenSearchNotesBySorted(queryDESC)
+            .assertSortedValue(savedNotes.asReversed())
+    }
+
+    @Test
+    fun updateNoteAndImagesOfHasImagesThenUpdateOtherImagesNote(){
+        val existNote = loadExistingNote(index = 1, total = 3)
+        val updateNote = update(existNote, imageSize = 5)
+
+        loadNoteAndImages(pk = existNote.id)
+            .hasNote(updateNote.divideCacheNote())
+            .hasImages(updateNote.divideCacheNoteImages())
+    }
+
+    @Test
+    fun updateNoteAndImagesOfEmptyImagesThenUpdateEmptyImagesNote(){
+        val existNote = loadExistingNote(index = 0, total = 5)
+        val updateNote = update(existNote, imageSize = 0)
+
+        loadNoteAndImages(pk = existNote.id)
+            .hasNote(updateNote.divideCacheNote())
+            .hasImages(emptyList())
+    }
+
+    @Test
+    fun updateNoteAndImagesThenSearchNotesDescReturnFirstIndex(){
+        val queryDesc = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
+
+        val existNote = loadExistingNote(index = 1, total = 3)
+        val updateNote = update(existNote, imageSize = 5)
+
+        whenSearchNotesBySorted(queryDesc)
+            .assertValueAt(index = 0, expect = updateNote)
+    }
+
+    @Test
+    fun updateNoteAndImagesThenSearchNotesASCReturnLastIndex(){
+        val queryAsc = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
+
+        val existNote = loadExistingNote(index = 1, total = 3)
+        val updateNote = update(existNote, imageSize = 5)
+
+        whenSearchNotesBySorted(queryAsc)
+            .assertValueAt(index = loadAllCacheNoteAndImages().lastIndex, expect = updateNote)
+    }
+
+    @Test
+    fun deleteNoteThenExistNotesRemoved(){
         val noteEntities = NoteFactory.createNoteEntityList(end = 3)
         whenSaveNotesAndImages(noteEntities)
 
-        val cachedNotesAndImages  = searchNotes(queryEntity)
-        assertThat(cachedNotesAndImages[0].cachedNote, `is`(noteEntities[0].divideCacheNote()))
-        assertThat(cachedNotesAndImages[0].images, `is`(emptyList()))
+        val deletedNote = delete(savedNotes = noteEntities, index = 2)
+
+        loadAllCacheNoteAndImages()
+            .notHasNote(deletedNote.divideCacheNote())
+            .notHasImages(deletedNote.divideCacheNoteImages())
+
+        loadImages(deletedNote.id)
+            .expectImages(emptyList())
     }
 
     @Test
-    fun searchNoteDESC(){
-        val queryEntity = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
-        val noteEntities = NoteFactory.createNoteEntityList(end = 3)
-
-        whenSaveNotesAndImages(noteEntities)
-
-        val cachedNotesAndImages  = searchNotes(queryEntity)
-        assertThat(
-            cachedNotesAndImages[0].cachedNote,
-            `is`(noteEntities.asReversed()[0].divideCacheNote())
-        )
-    }
-
-    @Test
-    fun updateNoteAndImagesThenModifiedNoteAndImagesOnListTop(){
-        val queryEntity = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
-        val updateTitle = "updateTitle"
-        val selectedIndex = 1
-
-        val noteEntities = NoteFactory.createNoteEntityList(end = 3)
-        whenSaveNotesAndImages(noteEntities)
-
-        val updateNoteImageEntity = NoteFactory.createNoteImgEntities(noteEntities[selectedIndex].id, 1)
-        val updateNoteEntity = NoteFactory.oneOfNotesUpdate(noteEntities, selectedIndex, updateTitle, null, getCurTime(), updateNoteImageEntity)
-        whenUpdateNoteImages(updateNoteEntity)
-
-        val cachedNotesImages = searchNotes(queryEntity)
-
-        assertThat(cachedNotesImages[0].transEntity().images, `is`(updateNoteImageEntity))
-    }
-
-    @Test
-    fun deleteNote(){
-        val noteEntities = NoteFactory.createNoteEntityList(end = 3)
-        whenSaveNotesAndImages(noteEntities)
-
-        val cachedNotes = loadAllCachedNotes()
-        assertThat(cachedNotes.size, `is`(noteEntities.size))
-
-        val deleteIndex = 1
-        val deleteNote = cachedNotes[deleteIndex]
-        whenDeleteNote(deleteNote)
-
-        val cachedNotesAfterDeleted = loadAllCachedNotes()
-        val deletedNoteImages = noteDao.getNoteImagesByPk(deleteNote.id)
-
-        assertThat(cachedNotesAfterDeleted, not(hasItem(deleteNote)))
-        assertThat(deletedNoteImages, `is`(emptyList()))
-    }
-
-    @Test
-    fun deleteMultipleNotes(){
+    fun deleteMultipleNotesThenExistNotesRemoved(){
         val noteEntities = NoteFactory.createNoteEntityList(end = 5)
         whenSaveNotesAndImages(noteEntities)
 
-        val cachedNotes = loadAllCachedNotes()
-        assertThat(cachedNotes.size, `is`(noteEntities.size))
+        val deletedNotes = deleteMultiple(noteEntities, 1, 3,4)
 
-        val deleteIndex1 = 1
-        val deleteIndex2 = 3
-
-        val deleteNotes = listOf(cachedNotes[deleteIndex1], cachedNotes[deleteIndex2])
-        whenDeleteMultipleNotes(deleteNotes)
-        assertThat(loadAllCachedNotes(), not(hasItems(cachedNotes[deleteIndex1], cachedNotes[deleteIndex2])))
+        loadAllCacheNoteAndImages()
+            .notHasNotes(deletedNotes)
     }
 
-    private fun whenDeleteMultipleNotes(notes: List<CachedNote>){
-        noteDao.deleteMultipleNotes(notes)
+    @Test
+    fun currentPageNoteSizeThenReturnCacheNoteSize(){
+        val queryDesc = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC)
+        val noteEntities = NoteFactory.createNoteEntityList(end = 3)
+
+        whenSaveNotesAndImages(noteEntities)
+
+        whenCurrentPageNoteSize(queryDesc)
+            .expectNoteSize(
+                whenSearchNotesBySorted(queryDesc).size
+            )
     }
 
-    private fun whenDeleteNote(note: CachedNote){
-        noteDao.deleteNote(note)
+    private fun loadExistingNote(index: Int, total: Int): NoteEntity{
+        val savedNote = NoteFactory.createNoteEntityList(end = total)
+        whenSaveNotesAndImages(savedNote)
+        return savedNote[index]
     }
 
-    private fun whenSaveNotesAndImages(noteEntities: List<NoteEntity>){
-        noteDao.saveNoteAndImages(noteEntities)
+    private fun update(existNote: NoteEntity, imageSize: Int): NoteEntity{
+        val updateId = existNote.id
+        val updateImages = NoteFactory.createNoteImgEntities(updateId, imageSize)
+        val updatedNote = existNote.copy(title = "updateTitle", updated_at = getCurTime(), images = updateImages)
+        whenUpdateNoteImages(updatedNote)
+        return updatedNote
     }
 
-    private fun searchNotes(query: QueryEntity) =
-        noteDao.searchNoteBySorted(query.page, query.limit, query.order, query.like)
-
-
-    private fun whenUpdateNoteImages(updateNoteEntity: NoteEntity) {
-        noteDao.updateNoteAndImages(updateNoteEntity)
+    private fun delete(savedNotes: List<NoteEntity>, index: Int): NoteEntity{
+        val deletedNote = savedNotes[index].divideCacheNote()
+        whenDeleteNote(deletedNote)
+        return savedNotes[index]
     }
 
-    private fun loadAllCachedNotes() = noteDao.getNumNotes()
+    private fun deleteMultiple(savedNotes: List<NoteEntity>, vararg indexs: Int): List<CachedNote>{
+        val cachedNotes = selectedNoteEntity(savedNotes, indexs).map { it.divideCacheNote() }
+        whenDeleteMultipleNotes(cachedNotes)
+        return cachedNotes
+    }
+
+    private fun selectedNoteEntity(savedNotes: List<NoteEntity>, indexs: IntArray): List<NoteEntity>{
+        val result = mutableListOf<NoteEntity>()
+        indexs.forEach {
+            if (it > savedNotes.lastIndex) IndexOutOfBoundsException("저장된 마지막 인덱스의 범위를 초과 했습니다.")
+            result.add(savedNotes[it])
+        }
+        return result
+    }
 
     private fun getCurTime() =
         SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())

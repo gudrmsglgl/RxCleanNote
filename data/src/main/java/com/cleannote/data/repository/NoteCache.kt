@@ -11,7 +11,7 @@ interface NoteCache {
     fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>>
     fun saveNotes(notes: List<NoteEntity>): Completable
     fun isCached(page: Int): Single<Boolean>
-    fun currentPageNoteSize(page: Int): Single<Int>
+    fun currentPageNoteSize(queryEntity: QueryEntity): Single<Int>
     fun setLastCacheTime(lastCache: Long, page: Int = 1)
     fun updateNote(noteEntity: NoteEntity): Completable
     fun deleteNote(noteEntity: NoteEntity): Completable

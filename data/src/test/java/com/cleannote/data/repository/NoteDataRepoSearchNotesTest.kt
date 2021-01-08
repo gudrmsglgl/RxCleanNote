@@ -28,7 +28,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -59,7 +59,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -103,7 +103,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -128,7 +128,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -153,7 +153,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -184,7 +184,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -228,7 +228,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -253,7 +253,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -278,7 +278,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -310,7 +310,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -355,7 +355,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -381,7 +381,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
                     stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -405,7 +405,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -435,7 +435,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -478,7 +478,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -502,7 +502,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -754,7 +754,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -785,7 +785,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -829,7 +829,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
@@ -854,7 +854,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 }
                 cacheDataStore {
                     stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.page, stub = cacheNote.size)
+                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                     stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }

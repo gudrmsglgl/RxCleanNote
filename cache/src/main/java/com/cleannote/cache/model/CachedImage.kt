@@ -18,7 +18,7 @@ import com.cleannote.cache.database.constants.Constants
         )
     ]
 )
-data class CacheNoteImage(
+data class CachedImage(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "image_pk")
     var img_pk: String,

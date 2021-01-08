@@ -3,11 +3,10 @@ package com.cleannote.cache.dao
 import androidx.room.*
 import com.cleannote.cache.extensions.divideCacheNote
 import com.cleannote.cache.extensions.divideCacheNoteImages
-import com.cleannote.cache.model.CacheNoteImage
+import com.cleannote.cache.model.CachedImage
 import com.cleannote.cache.model.CachedNote
 import com.cleannote.cache.model.CachedNoteImages
 import com.cleannote.data.model.NoteEntity
-import io.reactivex.Completable
 
 @Dao
 abstract class CachedNoteDao {
@@ -15,25 +14,11 @@ abstract class CachedNoteDao {
     @Insert
     abstract fun insertNote(note: CachedNote): Long
 
-    @Transaction
-    open fun insertNoteAndImages(note: NoteEntity): Long{
-        val insertResult = insertNote(note.divideCacheNote())
-        if (note.divideCacheNoteImages().isNotEmpty())
-            saveImages(note.divideCacheNoteImages())
-        return insertResult
-    }
-
-    @Query("SELECT * FROM notes")
-    abstract fun getNumNotes(): List<CachedNote>
-
-    @Query("SELECT * FROM note_images WHERE note_pk = :pk")
-    abstract fun getNoteImagesByPk(pk: String): List<CacheNoteImage>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun saveNotes(noteList: List<CachedNote>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun saveImages(images: List<CacheNoteImage>)
+    abstract fun saveImages(images: List<CachedImage>)
 
     @Transaction
     open fun saveNoteAndImages(notes: List<NoteEntity>){
@@ -90,4 +75,33 @@ abstract class CachedNoteDao {
 
     @Query("DELETE FROM note_images WHERE note_pk = :notePk")
     abstract fun deleteNoteImagesByNotePk(notePk: String)
+
+    @Query("SELECT COUNT(*) FROM notes ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit)")
+    abstract fun currentPageNoteSizeOnASC(page: Int, limit: Int): Int
+
+    @Query("SELECT COUNT(*) FROM notes ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit)")
+    abstract fun currentPageNoteSizeOnDESC(page: Int, limit: Int): Int
+
+    @Transaction
+    open fun insertNoteAndImages(note: NoteEntity): Long{
+        val insertResult = insertNote(note.divideCacheNote())
+        if (!note.images.isNullOrEmpty())
+            saveImages(note.divideCacheNoteImages())
+        return insertResult
+    }
+    /*
+    *   For DAO Test Func
+    * */
+    @Query("SELECT * FROM notes")
+    abstract fun loadAllCacheNoteAndImages(): List<CachedNoteImages>
+
+    @Query("SELECT * FROM note_images WHERE note_pk = :pk")
+    abstract fun loadImagesByPk(pk: String): List<CachedImage>
+
+    @Query("SELECT * FROM notes WHERE id = :pk")
+    abstract fun loadNoteByPk(pk: String): CachedNote
+
+    @Query("SELECT * FROM notes WHERE id = :pk")
+    abstract fun loadNoteAndImagesByPk(pk: String): CachedNoteImages
+
 }

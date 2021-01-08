@@ -1,11 +1,9 @@
 package com.cleannote.cache.test.factory
 
-import com.cleannote.cache.model.CacheNoteImage
+import com.cleannote.cache.model.CachedImage
 import com.cleannote.cache.model.CachedNote
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.NoteImageEntity
-import java.lang.Thread.sleep
-import java.text.SimpleDateFormat
 import java.util.*
 
 object NoteFactory {
@@ -39,12 +37,6 @@ object NoteFactory {
         )
     }
 
-    fun createNoteImageEntity(notePk: String, imgPath: String?) = NoteImageEntity(
-        UUID.randomUUID().toString(),
-        notePk,
-        imgPath ?:  ""
-    )
-
     fun createNoteImgEntities(notePk: String, size: Int): List<NoteImageEntity> {
         return if (size == 0) emptyList()
         else (0 until size).map {
@@ -52,7 +44,13 @@ object NoteFactory {
         }
     }
 
-    fun createCacheNoteImage(notePk: String, imgPath: String? = null) = CacheNoteImage(
+    fun createNoteImageEntity(notePk: String, imgPath: String?) = NoteImageEntity(
+        UUID.randomUUID().toString(),
+        notePk,
+        imgPath ?:  ""
+    )
+
+    fun createCacheNoteImage(notePk: String, imgPath: String? = null) = CachedImage(
         UUID.randomUUID().toString(),
         notePk,
         imgPath ?:  ""
