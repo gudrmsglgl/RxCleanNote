@@ -159,8 +159,10 @@ constructor(
             remoteNotes.transNoteList()
         }
 
-    private fun saveRemoteNotesAndThenCacheSearchNotes(remoteNotes: List<NoteEntity>,
-                                                       queryEntity: QueryEntity) = factory
+    private fun saveRemoteNotesAndThenCacheSearchNotes(
+        remoteNotes: List<NoteEntity>,
+        queryEntity: QueryEntity
+    ) = factory
         .retrieveCacheDataStore()
         .saveNotes(remoteNotes, queryEntity)
         .andThen(
