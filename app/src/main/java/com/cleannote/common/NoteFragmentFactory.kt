@@ -15,7 +15,6 @@ import javax.inject.Inject
 class NoteFragmentFactory @Inject constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
-    private val userMapper: UserMapper,
     private val sharedPreferences: SharedPreferences,
     private val glideReqManager: RequestManager
 ): FragmentFactory(){
@@ -38,7 +37,7 @@ class NoteFragmentFactory @Inject constructor(
         }
 
         SplashFragment::class.java.name -> {
-            val fragment = SplashFragment(viewModelFactory, userMapper)
+            val fragment = SplashFragment(viewModelFactory)
             fragment
         }
 

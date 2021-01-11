@@ -228,7 +228,7 @@ open class CachedNoteDaoTest: BaseNoteDaoTest(){
     private fun update(existNote: NoteEntity, imageSize: Int): NoteEntity{
         val updateId = existNote.id
         val updateImages = NoteFactory.createNoteImgEntities(updateId, imageSize)
-        val updatedNote = existNote.copy(title = "updateTitle", updated_at = getCurTime(), images = updateImages)
+        val updatedNote = existNote.copy(title = "updateTitle", updatedAt = getCurTime(), images = updateImages)
         whenUpdateNoteImages(updatedNote)
         return updatedNote
     }

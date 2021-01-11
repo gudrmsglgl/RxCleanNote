@@ -15,8 +15,8 @@ object NoteFactory {
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
-        created_at = "2020-07-${date} 12:00:$date",
-        updated_at = "2020-07-${date} 12:00:$date"
+        createdAt = "2020-07-${date} 12:00:$date",
+        updatedAt = "2020-07-${date} 12:00:$date"
     )
 
     fun createNoteEntity(
@@ -31,8 +31,8 @@ object NoteFactory {
             id = notePk,
             title = title,
             body = body ?: "",
-            created_at = "2020-07-${date} 12:00:$date",
-            updated_at = "2020-07-${date} 12:00:$date",
+            createdAt = "2020-07-${date} 12:00:$date",
+            updatedAt = "2020-07-${date} 12:00:$date",
             images = createNoteImgEntities(notePk, imgSize)
         )
     }
@@ -66,8 +66,8 @@ object NoteFactory {
         id = notes[index].id,
         title = title ?: notes[index].title,
         body = body ?: notes[index].body,
-        created_at = notes[index].created_at,
-        updated_at = updateTime,
+        createdAt = notes[index].createdAt,
+        updatedAt = updateTime,
         images = updateImages?: notes[index].images
     )
 

@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.cleannote.cache.database.constants.Constants
-import java.util.*
 
 @Entity(tableName = Constants.TABLE_NOTE)
 data class CachedNote(
@@ -19,10 +18,10 @@ data class CachedNote(
     var body: String,
 
     @ColumnInfo(name = "updated_at")
-    var updated_at: String,
+    var updatedAt: String,
 
     @ColumnInfo(name = "created_at")
-    var created_at: String
+    var createdAt: String
 )
 {
     override fun equals(other: Any?): Boolean {
@@ -34,7 +33,7 @@ data class CachedNote(
         if (id != other.id) return false
         if (title != other.title) return false
         if (body != other.body) return false
-        if (created_at != other.created_at) return false
+        if (createdAt != other.createdAt) return false
 
         return true
     }
@@ -43,8 +42,8 @@ data class CachedNote(
         var result = id.hashCode()
         result = 31 * result + title.hashCode()
         result = 31 * result + body.hashCode()
-        result = 31 * result + updated_at.hashCode()
-        result = 31 * result + created_at.hashCode()
+        result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + createdAt.hashCode()
         return result
     }
 

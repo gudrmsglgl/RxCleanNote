@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/date_list_item_text_size"
         android:layout_weight="25"
-        android:text="@{noteUiModel.updated_at}"
+        android:text="@{noteUiModel.updatedAt}"
         android:lines="2"
         android:layout_marginTop="@dimen/default_view_margin"
         android:layout_marginBottom="@dimen/default_view_margin"

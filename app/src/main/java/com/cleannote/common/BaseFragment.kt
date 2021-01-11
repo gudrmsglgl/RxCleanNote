@@ -144,9 +144,12 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(@LayoutRes layoutRes:
     }
 
     fun Drawable?.equalDrawable(@DrawableRes drawable: Int): Boolean = activity?.let{
+        var isNullDrawable = false
         val loadDrawableBitmap  = ContextCompat.getDrawable(it, drawable)?.toBitmap()
-        if (loadDrawableBitmap == null || this == null)
-            false
+        if (loadDrawableBitmap == null || this == null){
+            isNullDrawable = true
+            return isNullDrawable
+        }
         else
             this.toBitmap().sameAs(loadDrawableBitmap)
     }?: false

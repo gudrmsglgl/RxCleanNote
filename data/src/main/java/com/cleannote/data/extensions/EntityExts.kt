@@ -9,18 +9,18 @@ import com.cleannote.domain.model.NoteImage
 import com.cleannote.domain.model.Query
 import com.cleannote.domain.model.User
 
-fun NoteImageEntity.transNoteImage() = NoteImage(this.img_pk, this.note_pk, this.img_path)
+fun NoteImageEntity.transNoteImage() = NoteImage(this.imgPk, this.notePk, this.imgPath)
 fun List<NoteImageEntity>.transNoteImages() = map { it.transNoteImage() }
 
-fun NoteImage.transNoteImageEntity() = NoteImageEntity(this.img_pk, this.note_pk, this.img_path)
+fun NoteImage.transNoteImageEntity() = NoteImageEntity(this.imgPk, this.notePk, this.imgPath)
 fun List<NoteImage>.transNoteImageEntities() = map { it.transNoteImageEntity() }
 
 fun NoteEntity.transNote() = Note(
     this.id,
     this.title,
     this.body,
-    this.updated_at,
-    this.created_at,
+    this.updatedAt,
+    this.createdAt,
     this.images?.transNoteImages()
 )
 
@@ -28,8 +28,8 @@ fun Note.transNoteEntity() = NoteEntity(
     this.id,
     this.title,
     this.body,
-    this.updated_at,
-    this.created_at,
+    this.updatedAt,
+    this.createdAt,
     this.images?.transNoteImageEntities()
 )
 

@@ -7,21 +7,21 @@ import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.NoteImageEntity
 
 fun CachedImage.transEntity(): NoteImageEntity = NoteImageEntity(
-    this.img_pk, this.note_pk, this.image_path
+    this.imgPk, this.notePk, this.imagePath
 )
 
 fun NoteImageEntity.transCache(): CachedImage = CachedImage(
-    this.img_pk, this.note_pk, this.img_path
+    this.imgPk, this.notePk, this.imgPath
 )
 
 fun NoteEntity.divideCacheNote(): CachedNote = CachedNote(
-    this.id, this.title, this.body, this.updated_at, this.created_at
+    this.id, this.title, this.body, this.updatedAt, this.createdAt
 )
 
 fun NoteEntity.divideCacheNoteImages(): List<CachedImage> = this.images?.map { it.transCache() }?: emptyList()
 
 fun CachedNoteImages.transEntity(): NoteEntity = NoteEntity(
     this.cachedNote.id, this.cachedNote.title, this.cachedNote.body,
-    this.cachedNote.updated_at, this.cachedNote.created_at ,
+    this.cachedNote.updatedAt, this.cachedNote.createdAt ,
     this.images.map { it.transEntity() }
 )

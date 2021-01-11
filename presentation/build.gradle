@@ -39,7 +39,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     api project(':domain')
-    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
 
     implementation Dependencies.kotlin_reflect
     implementation Dependencies.rxJava

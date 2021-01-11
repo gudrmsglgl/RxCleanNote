@@ -6,6 +6,7 @@ import com.cleannote.remote.model.NoteModel
 import com.cleannote.remote.model.UserModel
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 abstract class BaseRemote {
     lateinit var noteService: NoteService
@@ -18,13 +19,13 @@ abstract class BaseRemote {
         whenever(this.searchNotes(
             stub.first.page, stub.first.limit, stub.first.sort,
             stub.first.order, stub.first.like, stub.first.like
-        )).thenReturn(Flowable.just(stub.second))
+        )).thenReturn(Single.just(stub.second))
     }
 
     infix fun NoteService.stubSearchNotesThrow(stub: Pair<QueryEntity, Throwable>){
         whenever(this.searchNotes(
             stub.first.page, stub.first.limit, stub.first.sort,
             stub.first.order, stub.first.like, stub.first.like
-        )).thenReturn(Flowable.error(stub.second))
+        )).thenReturn(Single.error(stub.second))
     }
 }

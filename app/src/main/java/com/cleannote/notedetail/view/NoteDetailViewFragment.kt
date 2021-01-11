@@ -60,7 +60,7 @@ class NoteDetailViewFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timber("d","viewModelFactory: ${viewModelFactory}")
+        timber("d","viewModelFactory: $viewModelFactory")
         timber("d", "viewModel: $viewModel")
         initBinding()
         initViewPager()

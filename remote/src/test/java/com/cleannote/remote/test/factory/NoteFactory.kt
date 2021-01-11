@@ -19,8 +19,8 @@ object NoteFactory {
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
-        created_at = getCurrentTimestamp(),
-        updated_at = getCurrentTimestamp(),
+        createdAt = getCurrentTimestamp(),
+        updatedAt = getCurrentTimestamp(),
         images = images
     )
 
@@ -30,8 +30,8 @@ object NoteFactory {
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
-        created_at = getCurrentTimestamp(),
-        updated_at = getCurrentTimestamp()
+        createdAt = getCurrentTimestamp(),
+        updatedAt = getCurrentTimestamp()
     )
 
     fun createNoteModelList(count: Int): List<NoteModel> = (0 until count).map {

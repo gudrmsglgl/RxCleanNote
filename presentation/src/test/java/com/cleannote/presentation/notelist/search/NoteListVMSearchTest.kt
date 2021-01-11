@@ -33,7 +33,7 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
         }
         verify(sharedPreferences, times(1)).getString(
             Constants.FILTER_ORDERING_KEY,
-            Constants.ORDER_DESC
+            ORDER_DESC
         )
     }
 

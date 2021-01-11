@@ -20,8 +20,8 @@ object NoteFactory {
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
-        created_at = getCurrentTimestamp(),
-        updated_at = getCurrentTimestamp()
+        createdAt = getCurrentTimestamp(),
+        updatedAt = getCurrentTimestamp()
     )
 
     fun createNoteList(numNotes: Int): List<Note> = (0 until numNotes).map {
