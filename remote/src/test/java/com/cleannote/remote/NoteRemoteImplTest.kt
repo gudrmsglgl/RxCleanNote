@@ -2,14 +2,11 @@ package com.cleannote.remote
 
 import com.cleannote.remote.common.BaseRemote
 import com.cleannote.remote.extensions.transNoteEntities
-import com.cleannote.remote.extensions.transUserEntities
-import com.cleannote.remote.model.UserModel
 import com.cleannote.remote.test.factory.NoteFactory
 import com.cleannote.remote.test.factory.QueryFactory
 import com.cleannote.remote.test.factory.UserFactory
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +26,7 @@ class NoteRemoteImplTest: BaseRemote() {
     fun setUp(){
         noteService = mock{
             on { insertNote(noteEntity.id, noteEntity.title,
-                noteEntity.body, noteEntity.updated_at, noteEntity.created_at)
+                noteEntity.body, noteEntity.updatedAt, noteEntity.createdAt)
             } doReturn Completable.complete()
         }
         noteRemoteImpl = NoteRemoteImpl(noteService)

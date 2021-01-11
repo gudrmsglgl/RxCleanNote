@@ -116,7 +116,7 @@
                 android:id="@+id/tv_dv_update_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{vm.finalNote.updated_at}"
+                android:text="@{vm.finalNote.updatedAt}"
                 android:layout_marginStart="@dimen/dv_margin_start"
                 app:layout_constraintTop_toTopOf="@+id/iv_dv_update"
                 app:layout_constraintLeft_toRightOf="@+id/tv_dv_update_time_desc"

@@ -1,9 +1,7 @@
 package com.cleannote.test
 
-import androidx.core.util.rangeTo
 import com.cleannote.domain.model.Note
 import com.cleannote.model.NoteUiModel
-import java.text.SimpleDateFormat
 import java.util.*
 
 object NoteFactory {
@@ -18,8 +16,8 @@ object NoteFactory {
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
-        created_at = "2020-07-${date} 12:00:$date",
-        updated_at = "2020-07-${date} 12:00:$date"
+        createdAt = "2020-07-${date} 12:00:$date",
+        updatedAt = "2020-07-${date} 12:00:$date"
     )
 
     fun makeNoteUiModel(
@@ -31,8 +29,8 @@ object NoteFactory {
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         body = body ?: "",
-        created_at = "2020-07-${date} 12:00:$date",
-        updated_at = "2020-07-${date} 12:00:$date"
+        createdAt = "2020-07-${date} 12:00:$date",
+        updatedAt = "2020-07-${date} 12:00:$date"
     )
 
     fun makeNotes(start: Int, end: Int): List<Note> =

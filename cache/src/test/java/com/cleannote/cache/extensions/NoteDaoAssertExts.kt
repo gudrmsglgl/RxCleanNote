@@ -4,11 +4,11 @@ import com.cleannote.cache.model.CachedImage
 import com.cleannote.cache.model.CachedNote
 import com.cleannote.cache.model.CachedNoteImages
 import com.cleannote.data.model.NoteEntity
-import junit.framework.Assert.assertFalse
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.not
+import org.junit.Assert.assertFalse
 
 fun Long.assertGreaterThan(expect: Long){
     assertThat(this, greaterThan(expect))

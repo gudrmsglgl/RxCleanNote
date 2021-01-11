@@ -177,7 +177,6 @@ constructor(
                         showErrorMessage(getString(R.string.searchErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
-                    else -> {}
                 }
             }
         })
@@ -194,7 +193,6 @@ constructor(
                         showErrorMessage(getString(R.string.insertErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
-                    else -> {}
                 }
             }
         })
@@ -213,7 +211,6 @@ constructor(
                         transSearchState(shouldDefaultNoteMode = true)
                         dataState.sendFirebaseThrowable()
                     }
-                    else -> {}
                 }
             }
         })

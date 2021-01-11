@@ -76,7 +76,7 @@ constructor(
         path: String,
         updateTime: String
     ) = finalNote()!!.copy(
-        updated_at = updateTime,
+        updatedAt = updateTime,
         noteImages = finalNoteAddImage(path)
     )
 

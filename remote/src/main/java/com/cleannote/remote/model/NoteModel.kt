@@ -18,11 +18,11 @@ data class NoteModel(
 
     @SerializedName("updated_at")
     @Expose
-    val updated_at: String,
+    val updatedAt: String,
 
     @SerializedName("created_at")
     @Expose
-    val created_at: String,
+    val createdAt: String,
 
     @SerializedName("img_paths")
     @Expose

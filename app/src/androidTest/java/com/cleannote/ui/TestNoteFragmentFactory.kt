@@ -19,7 +19,6 @@ class TestNoteFragmentFactory
 @Inject constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
-    private val userMapper: UserMapper,
     private val sharedPreferences: SharedPreferences,
     private val glideReqManager: RequestManager
 ): FragmentFactory() {
@@ -45,7 +44,7 @@ class TestNoteFragmentFactory
         }
 
         SplashFragment::class.java.name -> {
-            val fragment = SplashFragment(viewModelFactory, userMapper)
+            val fragment = SplashFragment(viewModelFactory)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }

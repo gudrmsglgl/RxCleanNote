@@ -92,6 +92,7 @@ abstract class CachedNoteDao {
     /*
     *   For DAO Test Func
     * */
+    @Transaction
     @Query("SELECT * FROM notes")
     abstract fun loadAllCacheNoteAndImages(): List<CachedNoteImages>
 
@@ -101,6 +102,7 @@ abstract class CachedNoteDao {
     @Query("SELECT * FROM notes WHERE id = :pk")
     abstract fun loadNoteByPk(pk: String): CachedNote
 
+    @Transaction
     @Query("SELECT * FROM notes WHERE id = :pk")
     abstract fun loadNoteAndImagesByPk(pk: String): CachedNoteImages
 

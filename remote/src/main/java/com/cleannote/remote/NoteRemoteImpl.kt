@@ -8,6 +8,7 @@ import com.cleannote.remote.extensions.transNoteEntities
 import com.cleannote.remote.extensions.transUserEntities
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import javax.inject.Inject
 
 class NoteRemoteImpl
@@ -18,8 +19,8 @@ class NoteRemoteImpl
             noteEntity.id,
             noteEntity.title,
             noteEntity.body,
-            noteEntity.updated_at,
-            noteEntity.created_at
+            noteEntity.updatedAt,
+            noteEntity.createdAt
         )
     }
 
@@ -30,7 +31,7 @@ class NoteRemoteImpl
             }
     }
 
-    override fun searchNotes(queryEntity: QueryEntity): Flowable<List<NoteEntity>> {
+    override fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>> {
         return noteService.searchNotes(
             queryEntity.page,
             queryEntity.limit,
@@ -39,7 +40,7 @@ class NoteRemoteImpl
             queryEntity.like,
             queryEntity.like
         ).onErrorResumeNext(
-            Flowable.just(emptyList())
+            Single.just(emptyList())
         ).map {
             it.transNoteEntities()
         }

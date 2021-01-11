@@ -66,7 +66,7 @@ constructor(
         .retrieveCacheDataStore()
         .isCached(queryEntity.page)
         .flatMap { isCached ->
-            zip_IsCache_SearchNotes_CurPageCacheNoteSize(isCached, queryEntity)
+            zipIsCacheSearchNotesCurPageCacheNoteSize(isCached, queryEntity)
         }
         .flatMap {
             when {
@@ -88,7 +88,7 @@ constructor(
             }
         }
 
-    private fun zip_IsCache_SearchNotes_CurPageCacheNoteSize(
+    private fun zipIsCacheSearchNotesCurPageCacheNoteSize(
         isCached: Boolean,
         queryEntity: QueryEntity
     ) = Single.zip(

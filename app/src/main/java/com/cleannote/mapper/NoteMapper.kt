@@ -9,16 +9,16 @@ import javax.inject.Inject
 open class NoteMapper @Inject constructor(private val dateUtil: DateUtil): Mapper<NoteUiModel, NoteView> {
 
     override fun mapToUiModel(type: NoteView): NoteUiModel =
-        NoteUiModel(type.id, type.title, type.body, type.updated_at, type.created_at)
+        NoteUiModel(type.id, type.title, type.body, type.updatedAt, type.createdAt)
 
     fun mapFromTitle(title: String) =  NoteView(
         id = UUID.randomUUID().toString(),
         title = title,
         body = "",
-        created_at = dateUtil.getCurrentTimestamp(),
-        updated_at = dateUtil.getCurrentTimestamp()
+        createdAt = dateUtil.getCurrentTimestamp(),
+        updatedAt = dateUtil.getCurrentTimestamp()
     )
 
     override fun mapToView(type: NoteUiModel): NoteView =
-        NoteView(type.id, type.title, type.body, type.updated_at, type.created_at)
+        NoteView(type.id, type.title, type.body, type.updatedAt, type.createdAt)
 }
