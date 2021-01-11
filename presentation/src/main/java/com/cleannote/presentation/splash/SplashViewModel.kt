@@ -38,9 +38,4 @@ constructor(private val login: Login): BaseViewModel(login) {
     private fun setUser(users: List<User>) =
         if (users.isEmpty()) null
         else users.transUserView()
-
-    private fun setMessage(users: List<User>) =
-        if (users.isEmpty()) "Not User"
-        else null
-
 }

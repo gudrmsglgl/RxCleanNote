@@ -37,7 +37,7 @@ object BindingAdapter {
     ){
         val image: Any =
             if (noteUiModel.images.isNullOrEmpty()) R.drawable.empty_holder
-            else noteUiModel.images.get(0).img_path
+            else noteUiModel.images.get(0).imgPath
         glideRequestManager
             .applyDefaultRequestOptions(
                 RequestOptions.bitmapTransform(RoundedCorners(10))
@@ -85,7 +85,7 @@ object BindingAdapter {
                 RequestOptions
                     .bitmapTransform(RoundedCorners(10))
             )*/
-            .load(imageModel.img_path)
+            .load(imageModel.imgPath)
             .thumbnail(0.1f)
             .into(imageView)
     }

@@ -21,11 +21,11 @@ import com.cleannote.cache.database.constants.Constants
 data class CachedImage(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "image_pk")
-    var img_pk: String,
+    var imgPk: String,
 
     @ColumnInfo(name = "note_pk", index = true)
-    var note_pk: String,
+    var notePk: String,
 
     @ColumnInfo(name = "img_path")
-    var image_path: String
+    var imagePath: String
 )

@@ -5,7 +5,6 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.ui.screen.MainActivityScreen
 import com.cleannote.ui.screen.NoteListScreen
-import com.cleannote.HEspresso.recycler.NRecyclerItem
 import com.cleannote.MainActivity
 import com.cleannote.app.R
 import com.cleannote.domain.Constants.ORDER_ASC
@@ -16,7 +15,7 @@ import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
 import io.mockk.every
-import io.reactivex.Flowable
+import io.reactivex.Single
 import org.junit.*
 import org.junit.runner.RunWith
 import javax.inject.Inject
@@ -46,7 +45,7 @@ class NoteListFragmentTest: BaseTest() {
     fun searchNotesEmptyThenNoteNotDisplayed(){
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(emptyList()), query)
+        stubNoteRepositorySearchNotes(Single.just(emptyList()), query)
 
         launchFragmentInContainer<NoteListFragment>(
             factory = fragmentFactory
@@ -69,7 +68,7 @@ class NoteListFragmentTest: BaseTest() {
         val notes = NoteFactory.makeNotes(1,11)
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -115,7 +114,7 @@ class NoteListFragmentTest: BaseTest() {
         val notes = NoteFactory.makeNotes(0, 10)
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         screen {
@@ -163,12 +162,12 @@ class NoteListFragmentTest: BaseTest() {
         val defaultNotes = NoteFactory.makeNotes(0, 10)
         val defaultQuery =  QueryFactory.makeQuery().apply { order = ORDER_ASC }
         stubInitOrdering(defaultQuery.order)
-        stubNoteRepositorySearchNotes(Flowable.just(defaultNotes), defaultQuery)
+        stubNoteRepositorySearchNotes(Single.just(defaultNotes), defaultQuery)
 
         val orderedNotes = NoteFactory.makeNotes(10,0)
         val orderQuery = QueryFactory.makeQuery().apply { order = ORDER_DESC }
         stubSaveOrdering(orderQuery.order)
-        stubNoteRepositorySearchNotes(Flowable.just(orderedNotes), orderQuery)
+        stubNoteRepositorySearchNotes(Single.just(orderedNotes), orderQuery)
         
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -203,13 +202,13 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery()
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         val text = "searchNote"
         val searchQuery = QueryFactory.makeQuery().apply { like = text }
         val note = NoteFactory.makeNote(title = "searchText", date = "03")
         val searchedNotes = listOf(note)
-        stubNoteRepositorySearchNotes(Flowable.just(searchedNotes), searchQuery)
+        stubNoteRepositorySearchNotes(Single.just(searchedNotes), searchQuery)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -238,12 +237,12 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         val text = "empty"
         val searchQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC; like = text }
         val emptyNotes = emptyList<Note>()
-        stubNoteRepositorySearchNotes(Flowable.just(emptyNotes), searchQuery)
+        stubNoteRepositorySearchNotes(Single.just(emptyNotes), searchQuery)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -272,7 +271,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery()
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -294,19 +293,19 @@ class NoteListFragmentTest: BaseTest() {
         val initQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(initQuery.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), initQuery)
+        stubNoteRepositorySearchNotes(Single.just(notes), initQuery)
 
         val nextQuery = QueryFactory.makeQuery().apply {
             order = ORDER_ASC
             page = 2 }
         val nextNotes = NoteFactory.makeNotes(10,20)
-        stubNoteRepositorySearchNotes(Flowable.just(nextNotes), nextQuery)
+        stubNoteRepositorySearchNotes(Single.just(nextNotes), nextQuery)
 
         val endQuery = QueryFactory.makeQuery().apply {
             order = ORDER_ASC
             page = 3 }
         val endNotes: List<Note> = emptyList()
-        stubNoteRepositorySearchNotes(Flowable.just(endNotes), endQuery)
+        stubNoteRepositorySearchNotes(Single.just(endNotes), endQuery)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -331,7 +330,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         ActivityScenario.launch(MainActivity::class.java)
 
@@ -358,7 +357,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDelete()
 
         ActivityScenario.launch(MainActivity::class.java)
@@ -386,7 +385,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDelete(RuntimeException())
 
         ActivityScenario.launch(MainActivity::class.java)
@@ -421,7 +420,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -451,7 +450,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDeleteMultiNotes(RuntimeException())
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
@@ -508,7 +507,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
-        stubNoteRepositorySearchNotes(Flowable.just(notes), query)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDeleteMultiNotes()
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 

@@ -10,24 +10,24 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 fun List<NoteImageUiModel>?.transNoteImageViews() = this?.map { it.transNoteImageView() }
-fun NoteImageUiModel.transNoteImageView() = NoteImageView(this.img_pk, this.note_pk, this.img_path)
+fun NoteImageUiModel.transNoteImageView() = NoteImageView(this.imgPk, this.notePk, this.imgPath)
 
 fun List<NoteImageView>?.transNoteImageUiModels() = this?.map { it.transNoteImageUIModel() }
-fun NoteImageView.transNoteImageUIModel() = NoteImageUiModel(this.img_pk, this.note_pk, this.img_path)
+fun NoteImageView.transNoteImageUIModel() = NoteImageUiModel(this.imgPk, this.notePk, this.imagePath)
 
 fun List<NoteView>.transNoteUiModels(mode: NoteMode) = map { it.transNoteUiModel(mode) }
-fun NoteView.transNoteUiModel(mode: NoteMode = Default) = NoteUiModel(this.id, this.title, this.body, this.updated_at, this.created_at, mode , this.noteImages.transNoteImageUiModels())
+fun NoteView.transNoteUiModel(mode: NoteMode = Default) = NoteUiModel(this.id, this.title, this.body, this.updatedAt, this.createdAt, mode , this.noteImages.transNoteImageUiModels())
 
 fun List<NoteUiModel>.transNoteViews() = map { it.transNoteView() }
 fun NoteUiModel.transNoteView() =
-    NoteView(this.id, this.title, this.body, this.updated_at, this.created_at, this.images.transNoteImageViews())
+    NoteView(this.id, this.title, this.body, this.updatedAt, this.createdAt, this.images.transNoteImageViews())
 
 fun String.transNoteView() = NoteView(
     id = UUID.randomUUID().toString(),
     title = this,
     body = "",
-    created_at = getCurrentTimestamp(),
-    updated_at = getCurrentTimestamp()
+    createdAt = getCurrentTimestamp(),
+    updatedAt = getCurrentTimestamp()
 )
 
 private fun getCurrentTimestamp() = SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())

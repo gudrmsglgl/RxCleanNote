@@ -18,6 +18,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 abstract class BaseTest {
     val mockUIController: UIController = mockk(relaxUnitFun = true)
@@ -36,7 +37,7 @@ abstract class BaseTest {
             .getString(Constants.FILTER_ORDERING_KEY, Constants.ORDER_DESC)
     }.returns(order)
 
-    fun stubNoteRepositorySearchNotes(data: Flowable<List<Note>>, query: Query? = null) {
+    fun stubNoteRepositorySearchNotes(data: Single<List<Note>>, query: Query? = null) {
         every {
             getComponent().provideNoteRepository().searchNotes(query ?: any())
         } returns data
@@ -45,7 +46,7 @@ abstract class BaseTest {
     fun stubThrowableNoteRepositorySearchNotes(throwable: Throwable, query: Query? = null) {
         every {
             getComponent().provideNoteRepository().searchNotes(query ?: any())
-        } returns Flowable.error(throwable)
+        } returns Single.error(throwable)
     }
 
     fun stubSaveOrdering(order: String) = every {

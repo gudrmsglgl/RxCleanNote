@@ -23,21 +23,22 @@ import kotlinx.android.synthetic.main.fragment_splash.*
  * A simple [Fragment] subclass.
  */
 class SplashFragment constructor(
-    private val viewModelFactory: ViewModelProvider.Factory,
-    private val userMapper: UserMapper
+    private val viewModelFactory: ViewModelProvider.Factory
 ): BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash) {
 
     private val viewModel: SplashViewModel by viewModels { viewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //viewModel.tryLogin()
+        viewModel.tryLogin()
         findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         logoClickListener()
-        //subscribeLoginResult()
+        subscribeLoginResult()
     }
 
-    override fun initBinding() {}
+    override fun initBinding() {
+        println("TODO: dataBinding")
+    }
 
     private fun logoClickListener(){
         splash_logo.singleClick()
@@ -50,29 +51,25 @@ class SplashFragment constructor(
             .addCompositeDisposable()
     }
 
-    /*private fun subscribeLoginResult() = viewModel.loginResult
+    private fun subscribeLoginResult() = viewModel.loginResult
         .observe(viewLifecycleOwner,
             Observer {
-                if (it != null) handleLoginDS(it.status, it.data, it.message)
+                if (it != null){
+                    when (it.status) {
+                        is LOADING -> showLoadingProgressBar(true)
+                        is SUCCESS -> {
+                            showLoadingProgressBar(false)
+                            showSuccessLoginUser(it.data)
+                        }
+                        is ERROR -> {
+                            showLoadingProgressBar(false)
+                            showErrorMessage("login fail")
+                        }
+                    }
+                }
             })
 
-    private fun handleLoginDS(
-        state:State,
-        data: List<UserView>?,
-        message: String?
-    ) = when (state) {
-        is LOADING -> showLoadingProgressBar(true)
-        is SUCCESS -> {
-            showLoadingProgressBar(false)
-            showSuccessLoginUser(data, message)
-        }
-        is ERROR -> {
-            showLoadingProgressBar(false)
-            showErrorMessage(message!!)
-        }
-    }*/
-
-    private fun showSuccessLoginUser(data: List<UserView>?, message: String?){
+    private fun showSuccessLoginUser(data: List<UserView>?){
         data?.let {
             val userView = it[0]
             val loginMessage = """
@@ -81,13 +78,14 @@ class SplashFragment constructor(
             showToast(loginMessage)
             findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         }?: showErrorMessage(
-            message!!,
+            "errorMessage",
             object : DialogBtnCallback{
                 override fun confirmProceed() {
                     showRetryLoginDialog()
                 }
-                override fun cancelProceed() {}
-
+                override fun cancelProceed() {
+                    timber("d", "취소 되었습니다.")
+                }
             })
     }
 

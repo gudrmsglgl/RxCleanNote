@@ -1,3 +1,3 @@
 package com.cleannote.presentation.model
 
-data class NoteImageView(val img_pk: String, val note_pk: String, val img_path: String)
+data class NoteImageView(val imgPk: String, val notePk: String, val imagePath: String)

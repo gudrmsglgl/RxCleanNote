@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import retrofit2.http.Field
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -23,8 +24,8 @@ interface NoteService {
         @Field("id") id: String,
         @Field("title") title: String,
         @Field("body") body: String,
-        @Field("updated_at") updated_at: String,
-        @Field("created_at") created_at: String
+        @Field("updated_at") updatedAt: String,
+        @Field("created_at") createdAt: String
     ): Completable
 
     @GET("memos")
@@ -35,5 +36,5 @@ interface NoteService {
         @Query("_order") order: String,
         @Query("title_like") titleLike: String?,
         @Query("body_like") bodyLike: String?
-    ): Flowable<List<NoteModel>>
+    ): Single<List<NoteModel>>
 }

@@ -42,7 +42,6 @@ fun View.isVisible(): Boolean {
 }
 
 fun View.fadeIn() {
-    //val animationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
     apply {
         visible()
         alpha = 0f
@@ -54,7 +53,6 @@ fun View.fadeIn() {
 }
 
 fun View.fadeOut(){
-    //val animationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
     apply {
         animate()
             .alpha(0f)

@@ -7,7 +7,6 @@ import com.cleannote.presentation.ViewModelFeatureTester
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.notedetail.Mode
-import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
@@ -68,7 +67,7 @@ class UpdateFeatureTester(
     }
 
     fun expectFinalNoteFirstImgPath(expect: String): UpdateFeatureTester{
-        assertThat(finalNote()?.noteImages?.get(0)?.img_path, `is`(expect))
+        assertThat(finalNote()?.noteImages?.get(0)?.imagePath, `is`(expect))
         return this
     }
 

@@ -23,6 +23,7 @@ import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.ERROR
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.TextMode.*
@@ -92,7 +93,6 @@ class NoteDetailFragment constructor(
                         showToast(getString(R.string.updateErrorMsg))
                         it.sendFirebaseThrowable()
                     }
-                    else -> {}
                 }
             }
         })
@@ -110,7 +110,6 @@ class NoteDetailFragment constructor(
                         it.sendFirebaseThrowable()
                         showToast(getString(R.string.deleteErrorMsg))
                     }
-                    else -> {}
                 }
             }
         })
@@ -167,7 +166,7 @@ class NoteDetailFragment constructor(
         noteUiModel.copy(
             title = note_title.text.toString(),
             body = note_body.text.toString(),
-            updated_at = dateUtil.getCurrentTimestamp()
+            updatedAt = dateUtil.getCurrentTimestamp()
         ).transNoteView()
     )
 
@@ -202,7 +201,7 @@ class NoteDetailFragment constructor(
                                 loadImagePicker(PickerType.CAMERA)
                             }
                             R.id.link -> {
-
+                                println("todo: InsertImageLink Then add Image")
                             }
                         }
                     }

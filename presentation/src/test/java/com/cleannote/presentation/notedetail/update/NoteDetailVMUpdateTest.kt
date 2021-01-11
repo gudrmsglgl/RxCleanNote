@@ -26,7 +26,7 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
     @Test
     fun updateNoteExecuteUseCase(){
-        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updated_at = "2020-12-30 08:10:00")
+        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
         with(updateFeatureTester){
 
             defaultMode(defaultNoteView)
@@ -41,7 +41,7 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
     @Test
     fun updateNoteStateLoadingReturnNoData(){
-        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updated_at = "2020-12-30 08:10:00")
+        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
         with(updateFeatureTester){
 
             defaultMode(defaultNoteView)
@@ -60,7 +60,7 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
     @Test
     fun updateNoteStateLoadingToSuccessReturnData(){
-        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updated_at = "2020-12-30 08:10:00")
+        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
         with(updateFeatureTester){
 
             defaultMode(defaultNoteView)
@@ -85,7 +85,7 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
     @Test
     fun updateNoteStateErrorReturnThrowableNoData_TriggerNotUpdatedFinalNote(){
-        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updated_at = "2020-12-30 08:10:00")
+        val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
         with(updateFeatureTester){
 
             defaultMode(defaultNoteView)
