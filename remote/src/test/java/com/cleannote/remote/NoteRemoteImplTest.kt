@@ -19,9 +19,6 @@ class NoteRemoteImplTest: BaseRemote() {
     private val noteEntity = NoteFactory.createNoteEntity(
         "7","title#7","body#7")
 
-
-    private val defaultQuery = QueryFactory.makeQueryEntity()
-
     @BeforeEach
     fun setUp(){
         noteService = mock{
@@ -58,23 +55,36 @@ class NoteRemoteImplTest: BaseRemote() {
 
     @Test
     fun searchNotesComplete(){
+        val defaultQuery = QueryFactory.makeQueryEntity()
         val noteModels = NoteFactory.createNoteModelList(defaultQuery.limit)
 
         noteService stubSearchNotes (defaultQuery to noteModels)
 
-        val testObserver = noteRemoteImpl.searchNotes(defaultQuery).test()
-        testObserver.assertComplete()
-        testObserver.assertValue(noteModels.transNoteEntities())
+        noteRemoteImpl.searchNotes(defaultQuery)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun searchNotesNotEmptyThenReturnRemoteNotes(){
+        val defaultQuery = QueryFactory.makeQueryEntity()
+        val noteModels = NoteFactory.createNoteModelList(defaultQuery.limit)
+
+        noteService stubSearchNotes (defaultQuery to noteModels)
+
+        noteRemoteImpl.searchNotes(defaultQuery)
+            .test()
+            .assertValue(noteModels.transNoteEntities())
     }
 
     @Test
     fun searchNotesThrowErrorThenEmpty() {
+        val defaultQuery = QueryFactory.makeQueryEntity()
         noteService stubSearchNotesThrow (defaultQuery to RuntimeException())
 
         noteRemoteImpl.searchNotes(defaultQuery)
             .test()
             .assertValue(emptyList())
-
     }
 
     @Test

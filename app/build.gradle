@@ -58,7 +58,7 @@ android {
 
     lintOptions {
         checkReleaseBuilds false
-        abortOnError false
+        abortOnError true
     }
 
     gradle.projectsEvaluated {
