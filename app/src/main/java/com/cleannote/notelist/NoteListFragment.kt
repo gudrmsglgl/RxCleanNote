@@ -17,7 +17,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -37,11 +36,12 @@ import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
+import com.cleannote.extension.rxbinding.itemCount
+import com.cleannote.extension.rxbinding.lastVisibleItemPos
 import com.cleannote.extension.transNoteUiModel
 import com.cleannote.extension.transNoteUiModels
 import com.cleannote.extension.transNoteView
 import com.cleannote.extension.transNoteViews
-import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
@@ -61,15 +61,16 @@ class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val glideReqManager: RequestManager,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPref: SharedPreferences
 ): BaseFragment<FragmentNoteListBinding>(R.layout.fragment_note_list),
-    OnBackPressListener, TouchAdapter {
-
+    OnBackPressListener,
+    TouchAdapter
+{
     private val bundle: Bundle = Bundle()
 
     private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
-    lateinit var noteAdapter: NoteListAdapter
-    lateinit var itemTouchHelper: ItemTouchHelper
+    private lateinit var noteAdapter: NoteListAdapter
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,7 +82,7 @@ constructor(
         onRefresh()
         subscribeToolbarState()
         subscribeNoteList()
-        insertNoteOnFab()
+        createNote()
         subscribeInsertResult()
         subscribeDeleteResult()
         noteClick()
@@ -95,8 +96,9 @@ constructor(
         binding.vm = viewModel
     }
 
-    private fun subscribeToolbarState() = viewModel.toolbarState.observe(viewLifecycleOwner,
-        Observer { toolbarState ->
+    private fun subscribeToolbarState() = viewModel
+        .toolbarState
+        .observe(viewLifecycleOwner, Observer { toolbarState ->
             when(toolbarState){
                 is SearchState -> {
                     addSearchViewToolbarContainer()
@@ -104,17 +106,17 @@ constructor(
                 is MultiSelectState -> {
                     addMultiDeleteToolbarContainer()
                 }
-            }
-        }
-    )
+            }}
+        )
 
-    private fun noteClick() = noteAdapter.clickNoteSubject
+    private fun noteClick() = noteAdapter
+        .clickNoteSubject
         .doOnNext { timber("d", "$it") }
         .subscribe {
-            if (it.mode == NoteMode.Default){
+            if (it.mode == Default){
                 navDetailNote(it)
             }
-            else if (it.mode == NoteMode.SingleDelete){
+            else if (it.mode == SingleDelete){
                 showDeleteDialog(listOf(it))
             }
         }
@@ -138,12 +140,11 @@ constructor(
         }
     }
 
-    private fun scrollEventNextPageSource() = binding.recyclerView
+    private fun scrollEventNextPageSource() = binding
+        .recyclerView
         .scrollEvents()
         .map {
-            val lastVisibleItemPos = (it.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-            val itemCount = it.view.adapter?.itemCount?.minus(1)
-            mapOf(LAST_VISIBLE_ITEM_POS to lastVisibleItemPos, ITEM_COUNT to itemCount)
+            mapOf(LAST_VISIBLE_ITEM_POS to it.lastVisibleItemPos(), ITEM_COUNT to it.itemCount())
         }
         .filter {
             it[LAST_VISIBLE_ITEM_POS] == it[ITEM_COUNT] && viewModel.isExistNextPage()
@@ -153,33 +154,45 @@ constructor(
         }
         .addCompositeDisposable()
 
-    private fun insertNoteOnFab() = add_new_note_fab.singleClick().subscribe {
+    private fun createNote() = binding
+        .addNewNoteFab
+        .singleClick()
+        .subscribe {
+            showNewNoteDialog {
+                viewModel.insertNotes(it.transNoteView())
+            }
+        }
+        .addCompositeDisposable()
+
+    private inline fun showNewNoteDialog(crossinline func: (String) -> Unit){
         showInputDialog(
             getString(R.string.dialog_newnote),
             InputType.NewNote,
-            object : InputCaptureCallback{
+            object : InputCaptureCallback {
                 override fun onTextCaptured(text: String) {
-                    viewModel.insertNotes(text.transNoteView())
+                    func.invoke(text)
                 }
-            })}
-        .addCompositeDisposable()
+            }
+        )
+    }
 
-    private fun subscribeNoteList() = viewModel.noteList.observe(viewLifecycleOwner,
-        Observer { dataState ->
+    private fun subscribeNoteList() = viewModel
+        .noteList
+        .observe(viewLifecycleOwner, Observer { dataState ->
             if ( dataState != null ){
                 showLoadingProgressBar(dataState.isLoading)
                 when (dataState.status) {
                     SUCCESS -> {
-                        noteAdapter.submitList(
-                            dataState.data!!.transNoteUiModels(getNoteMode()))
+                        noteAdapter
+                            .submitList(dataState.data!!.transNoteUiModels(getNoteMode()))
                     }
                     ERROR -> {
                         showErrorMessage(getString(R.string.searchErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
                 }
-            }
-        })
+            }}
+        )
 
     private fun subscribeInsertResult() = viewModel.insertResult
         .observe(viewLifecycleOwner, Observer { dataState ->
@@ -198,7 +211,7 @@ constructor(
         })
 
     private fun subscribeDeleteResult() = viewModel.deleteResult
-        .observe( viewLifecycleOwner, Observer { dataState ->
+        .observe(viewLifecycleOwner, Observer { dataState ->
             if (dataState != null) {
                 showLoadingProgressBar(dataState.isLoading)
                 when (dataState.status) {
@@ -261,29 +274,18 @@ constructor(
     }
 
     fun showFilterDialog() {
-        activity?.let {
-            MaterialDialog(it).show {
+        activity?.let { activity ->
+            MaterialDialog(activity).show {
                 customView(R.layout.layout_filter)
                 cancelable(true)
 
                 val view = getCustomView()
                 val filterOk = view.findViewById<Button>(R.id.filter_btn_ok)
 
-                val setOrderSource = Observable.combineLatest(
-                    filterRadioGroup(view).checkedChanges(),
-                    filterOk.singleClick(),
-                    BiFunction { selectedRadioBtn: Int, _: Unit ->
-                        selectedRadioBtn
-                    })
-                    .map {
-                        if (it == R.id.radio_btn_desc)
-                            ORDER_DESC
-                        else
-                            ORDER_ASC
-                    }
+                val setOrderSource = 
+                    dialogOkClickSource(dialogView = view, okBtn = filterOk)
                     .subscribe { order ->
-                        sharedPreferences.edit().putString(FILTER_ORDERING_KEY, order).apply()
-                        viewModel.setOrdering(order)
+                        saveCacheThenOrdering(order)
                         scrollTop()
                         dismiss()
                     }
@@ -293,8 +295,27 @@ constructor(
         }
     }
 
-    private fun filterRadioGroup(view: View): RadioGroup {
-        return view.findViewById<RadioGroup>(R.id.radio_group)
+    private fun dialogOkClickSource(
+        dialogView: View,
+        okBtn: View
+    ) = Observable.combineLatest(
+        selectedRadioBtnSource(dialogView),
+        okBtn.singleClick(),
+        BiFunction { selectedRadioBtn: Int, _: Unit ->
+            selectedRadioBtn
+        })
+        .map {
+            if (it == R.id.radio_btn_desc)
+                ORDER_DESC
+            else
+                ORDER_ASC
+        }
+
+    private fun selectedRadioBtnSource(view: View) = initCheckedRadioGroup(view).checkedChanges()
+
+    private fun initCheckedRadioGroup(view: View): RadioGroup {
+        return view
+            .findViewById<RadioGroup>(R.id.radio_group)
             .apply {
                 check(getCachedRadioBtn())
             }
@@ -302,19 +323,24 @@ constructor(
 
     @IdRes
     private fun getCachedRadioBtn(): Int{
-        return if (ORDER_DESC == sharedPreferences.getString(FILTER_ORDERING_KEY, ORDER_DESC))
+        return if (ORDER_DESC == sharedPref.getString(FILTER_ORDERING_KEY, ORDER_DESC))
             R.id.radio_btn_desc
         else
             R.id.radio_btn_asc
     }
 
-    fun showDeleteDialog(deleteMemos: List<NoteUiModel>) {
+    private fun saveCacheThenOrdering(order: String){
+        sharedPref.edit().putString(FILTER_ORDERING_KEY, order).apply()
+        viewModel.setOrdering(order)
+    }
+
+    fun showDeleteDialog(param: List<NoteUiModel>) {
         activity?.let {
             MaterialDialog(it).show {
                 title(R.string.delete_title)
-                message(text = deleteTitle(deleteMemos))
+                message(text = deleteTitle(param))
                 positiveButton(R.string.delete_ok){
-                    actionDelete(deleteMemos)
+                    deleteNotes(param)
                 }
                 negativeButton(R.string.delete_cancel){
                     showToast(getString(R.string.deleteCancelMsg))
@@ -326,22 +352,25 @@ constructor(
         }
     }
 
-    private fun deleteTitle(deleteMemos: List<NoteUiModel>): String {
-        return if (deleteMemos.size == 1) {
-            """${deleteMemos[0].title}
-                ${getString(R.string.delete_message)}
-            """.trimIndent()
-        } else {
+    private fun deleteTitle(
+        deleteMemos: List<NoteUiModel>
+    ): String = when {
+        deleteMemos.size == 1 -> {
+            """
+                |${deleteMemos[0].title}
+                |메모를 삭제 하시겠습니까?
+            """.trimMargin()
+        }
+        deleteMemos.size > 1 -> {
             getString(R.string.delete_multi_select_message)
         }
+        else -> ""
     }
 
-    private fun actionDelete(deleteMemos: List<NoteUiModel>){
+    private fun deleteNotes(param: List<NoteUiModel>){
         when {
-            deleteMemos.size == 1 -> viewModel.deleteNote(deleteMemos[0].transNoteView())
-            deleteMemos.size > 1 -> viewModel.deleteMultiNotes(
-                deleteMemos.transNoteViews()
-            )
+            param.size == 1 -> viewModel.deleteNote(param[0].transNoteView())
+            param.size > 1 -> viewModel.deleteMultiNotes(param.transNoteViews())
             else -> showToast(getString(R.string.delete_multi_select_empty))
         }
     }
@@ -372,13 +401,11 @@ constructor(
         viewModel.clearQuery()
     }
 
-    override fun shouldBackPress(): Boolean {
-        if (noteAdapter.isNotDefaultNote()){
-            transSearchState(true)
-            return false
-        } else
-            return true
-    }
+    override fun shouldBackPress(): Boolean = if (noteAdapter.isNotDefaultNote()) {
+        transSearchState(true)
+        false
+    } else
+        true
 
     override fun isSwipeEnable(): Boolean = noteAdapter.isSwipeMode()
 

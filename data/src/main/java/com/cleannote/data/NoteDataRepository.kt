@@ -3,8 +3,6 @@ package com.cleannote.data
 import com.cleannote.data.extensions.*
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
-import com.cleannote.data.repository.NoteDataStore
-import com.cleannote.data.source.NoteCacheDataStore
 import com.cleannote.data.source.NoteDataStoreFactory
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.model.Note
@@ -66,7 +64,7 @@ constructor(
         .retrieveCacheDataStore()
         .isCached(queryEntity.page)
         .flatMap { isCached ->
-            zipIsCacheSearchNotesCurPageCacheNoteSize(isCached, queryEntity)
+            zipSearchNoteInfo(isCached, queryEntity)
         }
         .flatMap {
             when {
@@ -88,16 +86,17 @@ constructor(
             }
         }
 
-    private fun zipIsCacheSearchNotesCurPageCacheNoteSize(
+    private fun zipSearchNoteInfo(
         isCached: Boolean,
         queryEntity: QueryEntity
     ) = Single.zip(
         Single.just(isCached),
-        searchNotesOnDataStore(
-            dataStore = factory.retrieveDataStore(isCached),
-            queryEntity = queryEntity
-        ),
-        (factory.retrieveCacheDataStore() as NoteCacheDataStore).currentPageNoteSize(queryEntity),
+        factory
+            .retrieveDataStore(isCached)
+            .searchNotes(queryEntity),
+        factory
+            .retrieveCacheDataStore()
+            .currentPageNoteSize(queryEntity),
         Function3<Boolean, List<NoteEntity>, Int, Triple<Boolean, List<NoteEntity>, Int>>{ s1, s2, s3 ->
             Triple(s1, s2, s3)
         }
@@ -131,13 +130,6 @@ constructor(
         return !isCache && remoteData.isEmpty()
     }
 
-    private fun searchNotesOnDataStore(
-        dataStore: NoteDataStore,
-        queryEntity: QueryEntity
-    ): Single<List<NoteEntity>>{
-        return dataStore.searchNotes(queryEntity)
-    }
-
     private fun keywordSearchNote(
         queryEntity: QueryEntity
     ) = factory
@@ -149,7 +141,6 @@ constructor(
             else
                 returnSearchNoteOnCache(queryEntity)
         }
-
 
     private fun saveRemoteNotesThenReturnRemote(
         remoteNotes: List<NoteEntity>,

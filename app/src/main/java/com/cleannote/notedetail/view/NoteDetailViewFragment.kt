@@ -27,6 +27,8 @@ import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailViewBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.extension.*
+import com.cleannote.extension.toolbar.setMenuIconColor
+import com.cleannote.extension.toolbar.setToolbar
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.presentation.data.notedetail.TextMode.DefaultMode
