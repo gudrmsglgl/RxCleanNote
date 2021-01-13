@@ -162,7 +162,7 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(@LayoutRes layoutRes:
         activity?.window?.statusBarColor = getColor(color)
     }
 
-    fun getColor(@ColorRes color: Int): Int = ContextCompat.getColor(requireContext(), color)
+    private fun getColor(@ColorRes color: Int): Int = ContextCompat.getColor(requireContext(), color)
 
     fun setStatusBarTextBlack(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -175,7 +175,6 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(@LayoutRes layoutRes:
 
         decorView.systemUiVisibility =
             decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() //set status text  light
-
     }
 
     fun <T: ViewDataBinding> bindingInflate(@LayoutRes layoutRes: Int, parent: ViewGroup): T {
