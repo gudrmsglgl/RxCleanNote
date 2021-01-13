@@ -15,7 +15,7 @@ constructor(
         else
             noteRemoteDataStore
 
-    open fun retrieveCacheDataStore(): NoteDataStore = noteCacheDataStore
+    open fun retrieveCacheDataStore() = noteCacheDataStore
 
-    open fun retrieveRemoteDataStore(): NoteDataStore = noteRemoteDataStore
+    open fun retrieveRemoteDataStore() = noteRemoteDataStore
 }

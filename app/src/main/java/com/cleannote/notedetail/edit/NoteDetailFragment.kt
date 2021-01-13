@@ -18,12 +18,12 @@ import com.cleannote.app.databinding.FragmentNoteDetailBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
+import com.cleannote.extension.menu.visibleIcon
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
-import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.ERROR
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.TextMode.*
