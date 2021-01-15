@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.afollestad.materialdialogs.MaterialDialog
 import com.bumptech.glide.RequestManager
 
@@ -20,6 +21,7 @@ import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.extension.menu.visibleIcon
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notedetail.BaseDetailFragment
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
@@ -45,16 +47,18 @@ class NoteDetailFragment constructor(
     private val glideRequestManager: RequestManager
 ) : BaseFragment<FragmentNoteDetailBinding>(R.layout.fragment_note_detail) {
 
+    private val viewModel
+            by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
+
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -85
 
     lateinit var noteUiModel: NoteUiModel
-    val viewModel: NoteDetailViewModel by viewModels { viewModelFactory }
 
     var onBackPressThenKey: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timber("d","NoteDetailFragment viewModelFactory: ${viewModelFactory}")
+        timber("d","NoteDetailFragment viewModelFactory: $viewModelFactory")
         timber("d", "NoteDetailFragment viewModel: $viewModel")
         initBinding()
         getPreviousFragmentNote()

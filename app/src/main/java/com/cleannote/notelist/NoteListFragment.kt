@@ -38,6 +38,7 @@ import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.extension.rxbinding.itemCount
 import com.cleannote.extension.rxbinding.lastVisibleItemPos
+import com.cleannote.extension.rxbinding.singleClick
 import com.cleannote.extension.transNoteUiModel
 import com.cleannote.extension.transNoteUiModels
 import com.cleannote.extension.transNoteView
@@ -230,7 +231,7 @@ constructor(
 
     private fun navDetailNote(noteUiModel: NoteUiModel){
         bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
-        findNavController().navigate(R.id.action_noteListFragment_to_noteDetailViewFragment, bundle)
+        findNavController().navigate(R.id.action_noteList_to_detail_nav_graph, bundle)
     }
 
     private fun addSearchViewToolbarContainer() = view?.let {

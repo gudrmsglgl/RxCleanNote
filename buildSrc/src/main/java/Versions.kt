@@ -9,7 +9,7 @@ object Versions {
     const val ktx = "1.2.0"
     const val databinding_ktx = "5.0.0"
     const val dagger = "2.30.1"
-    const val nav_components = "2.3.0-alpha06"
+    const val nav_components = "2.3.2"
     const val material_dialogs = "3.2.1"
     const val room = "2.1.0"
     const val appcompat = "1.1.0-rc01"
