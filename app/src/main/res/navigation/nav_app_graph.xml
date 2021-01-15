@@ -22,28 +22,12 @@
         android:label="fragment_note_list"
         tools:layout="@layout/fragment_note_list" >
         <action
-            android:id="@+id/action_noteListFragment_to_noteDetailFragment"
-            app:destination="@id/noteDetailFragment"
+            android:id="@+id/action_noteList_to_detail_nav_graph"
+            app:destination="@+id/nav_detail_graph"
             app:popUpTo="@id/noteListFragment"
             app:popUpToInclusive="false"/>
-        <action
-            android:id="@+id/action_noteListFragment_to_noteDetailViewFragment"
-            app:destination="@id/noteDetailViewFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/noteDetailFragment"
-        android:name="com.cleannote.notedetail.edit.NoteDetailFragment"
-        android:label="fragment_note_detail"
-        tools:layout="@layout/fragment_note_detail" />
-    <fragment
-        android:id="@+id/noteDetailViewFragment"
-        android:name="com.cleannote.notedetail.view.NoteDetailViewFragment"
-        android:label="fragment_note_detail_view"
-        tools:layout="@layout/fragment_note_detail_view" >
-        <action
-            android:id="@+id/action_noteDetailViewFragment_to_noteDetailFragment"
-            app:destination="@id/noteDetailFragment"
-            app:popUpTo="@id/noteDetailViewFragment"
-            app:popUpToInclusive="false"/>
-    </fragment>
+
+    <include app:graph="@navigation/nav_detail_graph"/>
+
 </navigation>

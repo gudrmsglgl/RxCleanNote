@@ -19,6 +19,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
 import com.cleannote.app.R
+import com.google.android.material.appbar.AppBarLayout
+import kotlin.math.absoluteValue
 
 
 fun View.visible() {
@@ -37,6 +39,7 @@ fun View.isVisible(): Boolean {
     return (visibility == VISIBLE)
 }
 
+fun AppBarLayout.offsetChangeRatio() = (this.y / this.totalScrollRange).absoluteValue
 
 @ColorInt
 fun resolveColor(

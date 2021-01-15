@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
-import com.cleannote.mapper.UserMapper
 import com.cleannote.notedetail.edit.NoteDetailFragment
 import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.cleannote.notelist.NoteListFragment

@@ -11,7 +11,7 @@ object Dependencies {
     val kotlin_coroutines_play_services = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.coroutines_play_services}"
     val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     val navigation_fragment = "androidx.navigation:navigation-fragment-ktx:${Versions.nav_components}"
-    val navigation_runtime = "androidx.navigation:navigation-runtime:${Versions.nav_components}"
+    val navigation_runtime = "androidx.navigation:navigation-runtime-ktx:${Versions.nav_components}"
     val navigation_ui = "androidx.navigation:navigation-ui-ktx:${Versions.nav_components}"
     val navigation_dynamic = "androidx.navigation:navigation-dynamic-features-fragment:${Versions.nav_components}"
     val material_dialogs = "com.afollestad.material-dialogs:core:${Versions.material_dialogs}"

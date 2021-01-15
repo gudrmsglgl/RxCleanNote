@@ -12,8 +12,7 @@ import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentSplashBinding
 import com.cleannote.common.*
 import com.cleannote.data.ui.InputType
-import com.cleannote.mapper.UserMapper
-import com.cleannote.presentation.data.State
+import com.cleannote.extension.rxbinding.singleClick
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.UserView
 import com.cleannote.presentation.splash.SplashViewModel

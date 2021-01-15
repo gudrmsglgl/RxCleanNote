@@ -32,11 +32,12 @@ import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-abstract class BaseFragment<DataBinding : ViewDataBinding>(@LayoutRes layoutRes: Int): Fragment(
-    layoutRes
-) {
+abstract class BaseFragment<DataBinding : ViewDataBinding>(
+    @LayoutRes layoutRes: Int
+): Fragment(layoutRes)
+{
 
-    lateinit var uiController: UIController
+    private lateinit var uiController: UIController
 
     private var disposables: CompositeDisposable? = null
 
@@ -136,22 +137,20 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(@LayoutRes layoutRes:
             displayProgressBar(false)
     }
 
-    fun View.singleClick() =
-        clicks().throttleFirst(2000, TimeUnit.MILLISECONDS)
-
     fun Disposable.addCompositeDisposable(){
         disposables?.add(this)
     }
 
     fun Drawable?.equalDrawable(@DrawableRes drawable: Int): Boolean = activity?.let{
-        var isNullDrawable = false
+        var isEqualDrawable: Boolean = true
         val loadDrawableBitmap  = ContextCompat.getDrawable(it, drawable)?.toBitmap()
-        if (loadDrawableBitmap == null || this == null){
-            isNullDrawable = true
-            return isNullDrawable
+
+        return if (loadDrawableBitmap == null || this == null)
+            !isEqualDrawable
+        else {
+            isEqualDrawable = this.toBitmap().sameAs(loadDrawableBitmap)
+            isEqualDrawable
         }
-        else
-            this.toBitmap().sameAs(loadDrawableBitmap)
     }?: false
 
     fun <T> DataState<T>.sendFirebaseThrowable(){
