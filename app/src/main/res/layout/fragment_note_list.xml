@@ -1,4 +1,4 @@
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="vm"
@@ -74,7 +74,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:fabSize="normal"
         app:borderWidth="0dp"
-        />
+        android:contentDescription="@string/desc_nl_fab" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
