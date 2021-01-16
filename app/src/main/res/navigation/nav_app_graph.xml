@@ -25,7 +25,11 @@
             android:id="@+id/action_noteList_to_detail_nav_graph"
             app:destination="@+id/nav_detail_graph"
             app:popUpTo="@id/noteListFragment"
-            app:popUpToInclusive="false"/>
+            app:popUpToInclusive="false"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <include app:graph="@navigation/nav_detail_graph"/>

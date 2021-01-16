@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailViewBinding
@@ -30,6 +31,12 @@ class NoteDetailViewFragment(
     private val viewModel
             by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
 
+    private val pagerCallback = object : ViewPager2.OnPageChangeCallback(){
+        override fun onPageSelected(position: Int) {
+            binding.indicator.selectIndicator(position)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPreviousFragmentNote()
@@ -38,7 +45,8 @@ class NoteDetailViewFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initBinding()
-        initViewPager()
+        initImagePager()
+        initIndicator()
         initToolbar()
         appbarOffsetChangeSource()
     }
@@ -54,17 +62,26 @@ class NoteDetailViewFragment(
         }
     }
 
-    private fun initViewPager(){
-        binding.imagePager.apply {
-            val imageViewAdapter = ImageViewAdapter(requestManager)
-            adapter = imageViewAdapter
+    private fun initImagePager() = binding
+        .imagePager
+        .apply {
+            adapter = ImageViewAdapter(requestManager)
+            registerOnPageChangeCallback(pagerCallback)
         }
-    }
+
+    private fun initIndicator() = binding
+        .indicator
+        .create(
+            size = viewModel.finalNote()?.noteImages?.size,
+            defaultRes = R.drawable.bg_default_indicator,
+            selectRes = R.drawable.bg_select_indicator,
+            selectPosition = 0
+        )
 
     private fun initToolbar() = binding
         .toolbar
         .setToolbar(
-            homeIcon = R.drawable.arrow_back,
+            homeIcon = R.drawable.ic_dv_back,
             menuRes = R.menu.menu_detail_view,
             onHomeClick = {
                 findNavController().popBackStack()
@@ -159,5 +176,10 @@ class NoteDetailViewFragment(
             R.id.action_noteDetailViewFragment_to_noteDetailFragment,
             bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote()?.transNoteUiModel())
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.imagePager.unregisterOnPageChangeCallback(pagerCallback)
     }
 }

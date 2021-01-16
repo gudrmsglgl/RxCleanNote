@@ -52,6 +52,13 @@
                 app:visible="@{vm.finalNote.noteImages.empty || vm.finalNote.noteImages == null}"
                 android:contentDescription="@string/desc_dv_empty_image" />
 
+            <com.cleannote.notedetail.view.Indicator
+                android:id="@+id/indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="50dp"/>
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
