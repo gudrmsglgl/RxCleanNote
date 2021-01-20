@@ -12,6 +12,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="recyclerview_start_end_margins">5dp</dimen>
     <dimen name="menu_width">30dp</dimen>
+    <dimen name="swipe_delete_width">80dp</dimen>
+    <dimen name="swipe_end_margin">25dp</dimen>
 
     <!-- detail view -->
     <dimen name="detail_view_appbar_size">300dp</dimen>
