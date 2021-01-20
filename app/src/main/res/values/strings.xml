@@ -68,6 +68,7 @@
 
     <!-- Description -->
     <string name="desc_nl_fab">new note btn</string>
+    <string name="desc_nl_item_delete_img">swipe delete img</string>
     <string name="desc_dv_empty_image">replace empty ViewPager</string>
     <string name="desc_dv_update_time">update time icon</string>
     <string name="desc_dv_content">content icon</string>

@@ -1,5 +1,6 @@
 package com.cleannote.notelist
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -25,6 +26,7 @@ import com.bumptech.glide.RequestManager
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
+import com.cleannote.app.databinding.ItemNoteListBinding
 import com.cleannote.app.databinding.LayoutMultideleteToolbarBinding
 import com.cleannote.app.databinding.LayoutSearchviewToolbarBinding
 import com.cleannote.common.BaseFragment
@@ -123,21 +125,34 @@ constructor(
         }
         .addCompositeDisposable()
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initRecyclerView(){
-        recycler_view.apply {
+        val swipeHelperCallback = SwipeHelperCallback(clamp = dimenPx(R.dimen.swipe_delete_width).toFloat())
+
+        binding.recyclerView.apply {
             addItemDecoration(TopSpacingItemDecoration(20))
             setHasFixedSize(true)
-            noteAdapter = NoteListAdapter(context, glideReqManager, viewModel).apply {
+            noteAdapter = NoteListAdapter(
+                context,
+                glideReqManager,
+                viewModel,
+                swipeHelperCallback
+            ).apply {
                 setHasStableIds(true)
             }
             itemTouchHelper = ItemTouchHelper(
-                NoteItemTouchHelperCallback(
+                swipeHelperCallback
+                /*NoteItemTouchHelperCallback(
                     this@NoteListFragment,
                     ColorDrawable(ContextCompat.getColor(context, R.color.colorPrimaryDark))
-                )
+                )*/
             )
             adapter = noteAdapter
             itemTouchHelper.attachToRecyclerView(this)
+            setOnTouchListener { _, _ ->
+                swipeHelperCallback.removePreviousClamp(this)
+                false
+            }
         }
     }
 

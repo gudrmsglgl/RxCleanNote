@@ -26,7 +26,8 @@ import timber.log.Timber
 class NoteListAdapter(
     val context: Context,
     val glideReqManager: RequestManager,
-    val noteListViewModel: NoteListViewModel
+    val noteListViewModel: NoteListViewModel,
+    private val swipeHelperCallback: SwipeHelperCallback
 ): ListAdapter<NoteUiModel, BaseHolder<NoteUiModel>>(NoteDiffCallback) {
 
     companion object{
@@ -77,7 +78,8 @@ class NoteListAdapter(
                     false
                 ),
                 requestManager = glideReqManager,
-                viewModel = noteListViewModel
+                viewModel = noteListViewModel,
+                swipeCallback = swipeHelperCallback
             )
     }
 
