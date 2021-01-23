@@ -1,6 +1,7 @@
 package com.cleannote.notelist
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -18,11 +19,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.bumptech.glide.RequestManager
+import com.cleannote.NoteApplication
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
@@ -45,12 +48,14 @@ import com.cleannote.extension.transNoteUiModel
 import com.cleannote.extension.transNoteUiModels
 import com.cleannote.extension.transNoteView
 import com.cleannote.extension.transNoteViews
+import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
+import com.cleannote.presentation.data.notelist.ListToolbarState
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
@@ -60,24 +65,35 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+
 class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val glideReqManager: RequestManager,
     private val sharedPref: SharedPreferences
 ): BaseFragment<FragmentNoteListBinding>(R.layout.fragment_note_list),
     OnBackPressListener,
-    TouchAdapter
+    SwipeAdapter
 {
-    private val bundle: Bundle = Bundle()
 
+    companion object{
+        const val LAST_VISIBLE_ITEM_POS = "lastVisibleItemPosKey"
+        const val ITEM_COUNT = "itemCountKey"
+    }
+
+    private val bundle: Bundle = Bundle()
     private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
-    private lateinit var noteAdapter: NoteListAdapter
-    private lateinit var itemTouchHelper: ItemTouchHelper
+
+    @Inject lateinit var noteAdapter: NoteListAdapter
+    @Inject lateinit var swipeHelperCallback: SwipeHelperCallback
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        inject()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initBinding()
         setStatusBarTextBlack()
         initRecyclerView()
@@ -89,6 +105,7 @@ constructor(
         subscribeInsertResult()
         subscribeDeleteResult()
         noteClick()
+        noteLongClick()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
             requestUpdate(bundle)
             requestDelete(bundle)
@@ -114,7 +131,9 @@ constructor(
 
     private fun noteClick() = noteAdapter
         .clickNoteSubject
-        .doOnNext { timber("d", "$it") }
+        .filter {
+            !swipeHelperCallback.isRemovePreviousDeleteMenu(binding.recyclerView)
+        }
         .subscribe {
             if (it.mode == Default){
                 navDetailNote(it)
@@ -125,36 +144,31 @@ constructor(
         }
         .addCompositeDisposable()
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initRecyclerView(){
-        val swipeHelperCallback = SwipeHelperCallback(clamp = dimenPx(R.dimen.swipe_delete_width).toFloat())
+    private fun noteLongClick() = noteAdapter
+        .longClickSubject
+        .subscribe {
+            viewModel.setToolbarState(MultiSelectState)
+            noteAdapter.changeNoteMode(MultiDefault)
+        }
+        .addCompositeDisposable()
 
-        binding.recyclerView.apply {
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initRecyclerView() = binding
+        .recyclerView
+        .apply {
             addItemDecoration(TopSpacingItemDecoration(20))
             setHasFixedSize(true)
-            noteAdapter = NoteListAdapter(
-                context,
-                glideReqManager,
-                viewModel,
-                swipeHelperCallback
-            ).apply {
-                setHasStableIds(true)
-            }
-            itemTouchHelper = ItemTouchHelper(
-                swipeHelperCallback
-                /*NoteItemTouchHelperCallback(
-                    this@NoteListFragment,
-                    ColorDrawable(ContextCompat.getColor(context, R.color.colorPrimaryDark))
-                )*/
-            )
+
+            ItemTouchHelper(
+                swipeHelperCallback.apply { setSwipeAdapter(this@NoteListFragment) }
+            ).attachToRecyclerView(this)
+
             adapter = noteAdapter
-            itemTouchHelper.attachToRecyclerView(this)
             setOnTouchListener { _, _ ->
                 swipeHelperCallback.removePreviousClamp(this)
                 false
             }
         }
-    }
 
     private fun scrollEventNextPageSource() = binding
         .recyclerView
@@ -403,27 +417,10 @@ constructor(
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        recycler_view.adapter = null
-    }
-
-    override fun onSwiped(position: Int) {
-        noteAdapter.changeNoteMode(SingleDelete, position)
-    }
-
     private fun onRefresh() = swipe_refresh.setOnRefreshListener {
         swipe_refresh.isRefreshing = false
         viewModel.clearQuery()
     }
-
-    override fun shouldBackPress(): Boolean = if (noteAdapter.isNotDefaultNote()) {
-        transSearchState(true)
-        false
-    } else
-        true
-
-    override fun isSwipeEnable(): Boolean = noteAdapter.isSwipeMode()
 
     fun transSearchState(shouldDefaultNoteMode: Boolean = true){
         if (curToolbarState() != SearchState)
@@ -442,9 +439,20 @@ constructor(
 
     private fun curToolbarState() = viewModel.toolbarState.value
 
-    companion object{
-        const val LAST_VISIBLE_ITEM_POS = "lastVisibleItemPosKey"
-        const val ITEM_COUNT = "itemCountKey"
+    private fun inject() = activity?.let{
+        (it.application as NoteApplication).applicationComponent.inject(this)
     }
 
+    override fun isSwipeEnabled(): Boolean  = noteAdapter.isSwipeMode()
+
+    override fun shouldBackPress(): Boolean = if (noteAdapter.isNotDefaultNote()) {
+        transSearchState(true)
+        false
+    } else
+        true
+
+    override fun onDestroy() {
+        super.onDestroy()
+        recycler_view.adapter = null
+    }
 }

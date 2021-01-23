@@ -26,9 +26,16 @@ import timber.log.Timber
 class NoteListAdapter(
     val context: Context,
     val glideReqManager: RequestManager,
-    val noteListViewModel: NoteListViewModel,
     private val swipeHelperCallback: SwipeHelperCallback
 ): ListAdapter<NoteUiModel, BaseHolder<NoteUiModel>>(NoteDiffCallback) {
+
+    private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
+    val clickNoteSubject: PublishSubject<NoteUiModel>
+        get() = _clickNoteSubject
+
+    private val _longClickSubject: PublishSubject<Unit> = PublishSubject.create()
+    val longClickSubject: PublishSubject<Unit>
+        get() = _longClickSubject
 
     companion object{
         private const val DEFAULT_ITEM = 1
@@ -46,9 +53,6 @@ class NoteListAdapter(
     override fun getItemId(position: Int): Long {
         return currentList[position].hashCode().toLong()
     }
-    private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
-    val clickNoteSubject: PublishSubject<NoteUiModel>
-        get() = _clickNoteSubject
 
     object NoteDiffCallback: DiffUtil.ItemCallback<NoteUiModel>(){
         override fun areItemsTheSame(oldItem: NoteUiModel, newItem: NoteUiModel): Boolean {
@@ -78,7 +82,6 @@ class NoteListAdapter(
                     false
                 ),
                 requestManager = glideReqManager,
-                viewModel = noteListViewModel,
                 swipeCallback = swipeHelperCallback
             )
     }
@@ -86,7 +89,7 @@ class NoteListAdapter(
     override fun getItemCount(): Int = currentList.size
 
     override fun onBindViewHolder(holder: BaseHolder<NoteUiModel>, position: Int) {
-        holder.bind(currentList[position], position, _clickNoteSubject)
+        holder.bind(currentList[position], position, _clickNoteSubject, _longClickSubject)
     }
 
     fun changeNoteMode(noteMode: NoteMode, position: Int? = null){
@@ -113,11 +116,6 @@ class NoteListAdapter(
 
     fun getMultiSelectedNotes(): List<NoteUiModel> =  currentList.filter { it.mode == MultiSelected }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        _clickNoteSubject.onComplete()
-    }
-
     fun setMultiSelectCheck(position: Int, binding: ItemNoteListBinding) {
         if (binding.checkboxDelete.isChecked){
             binding.checkboxDelete.isChecked = false
@@ -127,6 +125,12 @@ class NoteListAdapter(
             binding.checkboxDelete.isChecked = true
             currentList[position].apply { mode = MultiSelected }
         }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        _clickNoteSubject.onComplete()
+        _longClickSubject.onComplete()
     }
 
 }

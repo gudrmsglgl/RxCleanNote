@@ -7,7 +7,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class SingleDeleteHolder(val binding: ItemSingleDeleteNoteBinding): BaseHolder<NoteUiModel>(binding) {
 
-    override fun bind(item: NoteUiModel, position: Int, clickSubject: PublishSubject<NoteUiModel>) {
+    override fun bind(item: NoteUiModel, position: Int, clickSubject: PublishSubject<NoteUiModel>, longClickSubject: PublishSubject<Unit>) {
         binding.menuDeleteContainer.apply {
             clicks()
                 .map { item }

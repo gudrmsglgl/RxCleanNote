@@ -28,7 +28,7 @@ class TestNoteFragmentFactory
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
 
         NoteListFragment::class.java.name -> {
-            val fragment = NoteListFragment(viewModelFactory, glideReqManager, sharedPreferences)
+            val fragment = NoteListFragment(viewModelFactory, sharedPreferences)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }

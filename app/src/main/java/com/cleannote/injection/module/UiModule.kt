@@ -10,6 +10,9 @@ import com.bumptech.glide.request.RequestOptions
 import com.cleannote.UiThread
 import com.cleannote.app.R
 import com.cleannote.domain.interactor.executor.PostExecutionThread
+import com.cleannote.notelist.NoteListAdapter
+import com.cleannote.notelist.SwipeAdapter
+import com.cleannote.notelist.SwipeHelperCallback
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -22,6 +25,7 @@ abstract class UiModule {
 
     @Module
     companion object{
+
         @JvmStatic
         @Singleton
         @Provides
@@ -32,7 +36,6 @@ abstract class UiModule {
             .skipMemoryCache(false)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
 
-
         @JvmStatic
         @Singleton
         @Provides
@@ -40,5 +43,29 @@ abstract class UiModule {
             context: Context,
             requestOptions: RequestOptions
         ) = Glide.with(context).setDefaultRequestOptions(requestOptions)
+
+        @JvmStatic
+        @Provides
+        fun provideSwipeCallback(
+            context: Context
+        ) = SwipeHelperCallback(
+            clamp = context.resources.getDimension(R.dimen.swipe_delete_clamp),
+            extendClamp = context.resources.getDimension(R.dimen.swipe_clamp_extend)
+        )
+
+        @JvmStatic
+        @Provides
+        fun provideNoteAdapter(
+            context: Context,
+            glideReqManager: RequestManager,
+            swipeHelperCallback: SwipeHelperCallback
+        ) = NoteListAdapter(
+            context,
+            glideReqManager,
+            swipeHelperCallback
+        ).apply {
+            setHasStableIds(true)
+        }
+
     }
 }
