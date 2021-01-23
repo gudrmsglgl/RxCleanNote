@@ -4,9 +4,6 @@ import android.graphics.Canvas
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
-import androidx.core.util.rangeTo
-import androidx.core.util.toClosedRange
-import androidx.core.util.toRange
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
@@ -19,23 +16,25 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback() {
+class SwipeHelperCallback(
+    private var clamp: Float,
+    private val extendClamp: Float
+) : ItemTouchHelper.Callback() {
 
     companion object{
         const val ESCAPE_VELOCITY = 10
-        const val MARGIN_SWIPE = 100F
     }
 
     private var currentPosition: Int? = null
     private var previousPosition: Int?= null
     private var currentDx = 0f
 
+    private lateinit var swipeAdapter: SwipeAdapter
+
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
-    ): Int{
-        return makeMovementFlags(0, START or END)
-    }
+    ): Int = makeMovementFlags(0, START or END)
 
     override fun onMove(
         recyclerView: RecyclerView,
@@ -44,6 +43,10 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
     ): Boolean = false
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+    override fun isItemViewSwipeEnabled(): Boolean {
+        return swipeAdapter.isSwipeEnabled()
+    }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         currentDx = 0f
@@ -59,15 +62,7 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
     }
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        val isClamped = getTag(viewHolder)
-
-        //setTag(viewHolder, !isClamped && currentDx <= -clamp)
-        setTag(viewHolder, currentDx <= -clamp)
-
-        /*else{
-            debug("RIGHT DIRECTION: getSwipeThreshold")
-            setTag(viewHolder, !isClamped && currentDx >= clamp)
-        }*/
+        setClamp(viewHolder, isClamped = currentDx <= -clamp)
         return 2f
     }
 
@@ -80,22 +75,18 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+        if (actionState == ACTION_STATE_SWIPE){
             val view = swipeView(viewHolder)
-            val isClamped = getTag(viewHolder)
-            val x = clampViewPositionHorizontal(viewHolder, dX, isClamped, isCurrentlyActive)
+            val drawDx = clampViewPositionHorizontal(viewHolder, dX, isClamp(viewHolder), isCurrentlyActive)
 
-            currentDx = x
-            visibleDeleteMenu(
-                viewHolder,
-                isCurrentDxLeft = currentDx < 0
-            )
+            currentDx = drawDx
+            visibleDeleteMenu(viewHolder, setVisible = currentDx < 0)
 
             getDefaultUIUtil().onDraw(
                 c,
                 recyclerView,
                 view,
-                x,
+                drawDx,
                 dY,
                 actionState,
                 isCurrentlyActive
@@ -116,7 +107,6 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
                 drawLeftDxToClamp(clamp)
             }
         } else {
-            debug("dX: $dX, abs(dX)/clamp: ${abs(dX) / clamp}")
             val alpha = abs(dX) / clamp
             deleteMenuView(holder).apply {
                 this.alpha = alpha
@@ -131,7 +121,7 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
     private fun drawLeftDxAfterClamped(
         dX: Float,
         clampedDx: Float
-    ) = drawLeftDx(dxUpToLimit(-MARGIN_SWIPE -clampedDx, dX - clampedDx))
+    ) = drawLeftDx(dxUpToLimit(-extendClamp -clampedDx, dX - clampedDx))
     // isClamped: true -> dX: -(왼쪽)clamp 값 만큼 그림
 
     // isClamped: false -> dX: 계속 작어짐 (-적으로) max() -> 기준치를 넘으면 그 기준치가 최대임
@@ -149,28 +139,44 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float =
         defaultValue * ESCAPE_VELOCITY
 
-    private fun setTag(viewHolder: RecyclerView.ViewHolder, isClamped: Boolean){
+    private fun setClamp(viewHolder: RecyclerView.ViewHolder, isClamped: Boolean){
         viewHolder.itemView.tag = isClamped
     }
 
-    private fun getTag(viewHolder: RecyclerView.ViewHolder): Boolean{
+    private fun isClamp(viewHolder: RecyclerView.ViewHolder): Boolean{
         return viewHolder.itemView.tag as? Boolean ?: false
     }
 
     fun removePreviousClamp(recyclerView: RecyclerView){
         if (currentPosition == previousPosition) return
-        previousPosition?.let {
-            val viewHolder = recyclerView.findViewHolderForAdapterPosition(it) ?: return
-            //swipeOnCancel(viewHolder)
-            //resetHolderProperty(viewHolder)
-            noteItemOnCancel(viewHolder)
-            setTag(viewHolder, false)
-            previousPosition = null
+        else {
+            previousDeleteMenuClose(previousPosition, recyclerView)
         }
     }
 
-    fun cancelDeleteMenu(holder: RecyclerView.ViewHolder){
-        swipeOnCancel(holder)
+    fun isRemovePreviousDeleteMenu(recyclerView: RecyclerView): Boolean =
+        previousDeleteMenuClose(previousPosition, recyclerView)
+
+    private fun previousDeleteMenuClose(
+        param: Int?,
+        recyclerView: RecyclerView
+    ): Boolean{
+        return param?.let {
+            val viewHolder = recyclerView.findViewHolderForAdapterPosition(it) ?: return false
+            closeDeleteMenu(viewHolder)
+            true
+        }?: false
+    }
+
+    fun closeDeleteMenu(holder: RecyclerView.ViewHolder){
+        swipeRight(holder)
+            .withStartAction {
+                deleteMenuOnCancel(holder)
+            }
+            .withEndAction {
+                visibleDeleteMenu(holder, setVisible = false)
+            }
+        releaseClamp(holder)
     }
 
     private fun swipeView(viewHolder: RecyclerView.ViewHolder) =
@@ -181,21 +187,13 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
 
     private fun visibleDeleteMenu(
         viewHolder: RecyclerView.ViewHolder,
-        isCurrentDxLeft: Boolean
+        setVisible: Boolean
     ){
-        if (isCurrentDxLeft)
+        if (setVisible)
             (viewHolder as NoteViewHolder).binding.swipeMenuDelete.visible()
         else
             (viewHolder as NoteViewHolder).binding.swipeMenuDelete.gone()
     }
-
-    private fun swipeOnCancel(holder: RecyclerView.ViewHolder) = noteItemOnCancel(holder)
-        .withStartAction {
-            deleteMenuOnCancel(holder)
-        }
-        .withEndAction {
-            resetHolderProperty(holder)
-        }
 
     private fun deleteImageAnimator(holder: RecyclerView.ViewHolder) = deleteMenuView(holder)
         .findViewById<ImageView>(R.id.swipe_delete_img)
@@ -210,16 +208,19 @@ class SwipeHelperCallback(private var clamp: Float) : ItemTouchHelper.Callback()
                 .translationXBy(-100f)
         }
 
-    private fun noteItemOnCancel(holder: RecyclerView.ViewHolder) = swipeView(holder)
+    private fun swipeRight(holder: RecyclerView.ViewHolder) = swipeView(holder)
         .animate()
         .setInterpolator(LinearInterpolator())
         .translationX(0f)
         .setDuration(300L)
 
-    private fun resetHolderProperty(holder: RecyclerView.ViewHolder){
-        swipeView(holder).translationX = 0f
-        setTag(holder, false)
+    private fun releaseClamp(holder: RecyclerView.ViewHolder){
+        setClamp(holder, false)
         previousPosition = null
+    }
+
+    fun setSwipeAdapter(adapter: SwipeAdapter){
+        swipeAdapter = adapter
     }
 
     private fun debug(msg: String) = Timber.tag("RxCleanNote").d(msg)

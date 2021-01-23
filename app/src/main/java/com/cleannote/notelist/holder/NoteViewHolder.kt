@@ -1,8 +1,11 @@
 package com.cleannote.notelist.holder
 
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.databinding.ItemNoteListBinding
+import com.cleannote.extension.rxbinding.singleClick
 import com.cleannote.model.NoteMode
+import com.cleannote.model.NoteMode.SingleDelete
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.NoteListAdapter
 import com.cleannote.notelist.SwipeHelperCallback
@@ -16,17 +19,30 @@ import timber.log.Timber
 class NoteViewHolder(
     val binding: ItemNoteListBinding,
     private val requestManager: RequestManager,
-    val viewModel: NoteListViewModel,
     private val swipeCallback: SwipeHelperCallback
 ): BaseHolder<NoteUiModel>(binding){
-    override fun bind(item: NoteUiModel, position: Int, clickSubject: PublishSubject<NoteUiModel>) {
+
+    override fun bind(
+        item: NoteUiModel,
+        position: Int,
+        clickSubject: PublishSubject<NoteUiModel>,
+        longClickSubject: PublishSubject<Unit>
+    ) {
         binding.apply {
             glideReqManager = requestManager
             noteUiModel = item
 
+            /*swipeMenuDelete
+                .singleClick()
+                .map {
+                    item.apply { mode = SingleDelete }
+                }
+                .subscribe(clickSubject)*/
+
             swipeMenuDelete.setOnClickListener {
-                Timber.tag("RxCleanNote").d("swipeMenuDelete Click Clamped: ${this@NoteViewHolder.itemView.tag as? Boolean ?: false}")
-                swipeCallback.cancelDeleteMenu(this@NoteViewHolder)
+                if (isClamped(this@NoteViewHolder)){
+                    swipeCallback.closeDeleteMenu(this@NoteViewHolder)
+                }
             }
 
             with(itemNote){
@@ -34,13 +50,10 @@ class NoteViewHolder(
                     NoteMode.Default -> {
                         clicks()
                             .map { item }
-                            .subscribe( clickSubject )
+                            .subscribe(clickSubject)
 
                         longClicks { true }
-                            .subscribe {
-                                viewModel.setToolbarState(ListToolbarState.MultiSelectState)
-                                (bindingAdapter as NoteListAdapter).changeNoteMode(NoteMode.MultiDefault)
-                            }
+                            .subscribe (longClickSubject)
                     }
                     else -> {
                         clicks()
@@ -52,4 +65,6 @@ class NoteViewHolder(
             }
         }
     }
+
+    private fun isClamped(holder: NoteViewHolder) = holder.itemView.tag as? Boolean ?: false
 }

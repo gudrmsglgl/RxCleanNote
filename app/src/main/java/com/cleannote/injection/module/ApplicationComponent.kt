@@ -2,6 +2,7 @@ package com.cleannote.injection.module
 
 import com.cleannote.MainActivity
 import com.cleannote.NoteApplication
+import com.cleannote.notelist.NoteListFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -24,4 +25,5 @@ interface ApplicationComponent {
     }
 
     fun inject(mainActivity: MainActivity)
+    fun inject(fragment: NoteListFragment)
 }
