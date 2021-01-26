@@ -3,16 +3,14 @@ package com.cleannote.injection.module
 import android.content.Context
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.TransformationUtils
 import com.bumptech.glide.request.RequestOptions
 import com.cleannote.UiThread
 import com.cleannote.app.R
 import com.cleannote.domain.interactor.executor.PostExecutionThread
+import com.cleannote.notelist.SubjectManager
 import com.cleannote.notelist.NoteListAdapter
-import com.cleannote.notelist.SwipeAdapter
-import com.cleannote.notelist.SwipeHelperCallback
+import com.cleannote.notelist.swipe.SwipeHelperCallback
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -58,11 +56,11 @@ abstract class UiModule {
         fun provideNoteAdapter(
             context: Context,
             glideReqManager: RequestManager,
-            swipeHelperCallback: SwipeHelperCallback
+            subjectManager: SubjectManager
         ) = NoteListAdapter(
             context,
             glideReqManager,
-            swipeHelperCallback
+            subjectManager
         ).apply {
             setHasStableIds(true)
         }

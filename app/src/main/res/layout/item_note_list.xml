@@ -27,7 +27,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:background="#F90606"
-        android:visibility="visible">
+        android:visibility="gone">
         <ImageView
             android:id="@+id/swipe_delete_img"
             android:src="@drawable/ic_delete_24dp"
@@ -64,8 +64,10 @@
         android:buttonTint="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:checked="@{ noteUiModel.mode == NoteMode.MultiSelected ? true : false }"
-        app:visible="@{noteUiModel.mode == NoteMode.MultiDefault || noteUiModel.mode == NoteMode.MultiSelected}"/>
+        app:visible="@{noteUiModel.mode == NoteMode.SelectMode}"/>
+        <!--app:visible="@{noteUiModel.mode == NoteMode.MultiDefault || noteUiModel.mode == NoteMode.MultiSelected}"-->
+        <!--android:checked="@{ noteUiModel.mode == NoteMode.MultiSelected ? true : false }"-->
+
 
     <TextView
         android:id="@+id/note_title"
@@ -75,13 +77,15 @@
         android:textStyle="bold"
         android:layout_weight="45"
         android:text="@{noteUiModel.title}"
-        android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/note_title_color : @color/multi_delete_default_color}"
         android:lines="1"
         android:layout_marginTop="@dimen/default_view_margin"
         android:layout_marginBottom="@dimen/default_view_margin"
         android:layout_marginStart="@dimen/default_view_margin"
         android:maxLines="1"
-        android:ellipsize="end"/>
+        android:ellipsize="end"
+        android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/note_title_color : @color/multi_delete_default_color}"/>
+<!--    android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/note_title_color : @color/multi_delete_default_color}"-->
+
 
     <TextView
         android:id="@+id/note_timestamp"
@@ -96,6 +100,7 @@
         android:layout_marginEnd="@dimen/default_view_margin"
         android:gravity="end"
         android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/default_grey : @color/multi_delete_default_color}"/>
+    <!--android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/default_grey : @color/multi_delete_default_color}-->
 
 </LinearLayout>
 

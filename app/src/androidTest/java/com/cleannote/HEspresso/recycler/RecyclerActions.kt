@@ -90,7 +90,7 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
 
             override fun perform(uiController: UiController?, view: View?) {
                 if (view is RecyclerView) {
-                    size = (view.adapter as NoteListAdapter).getMultiSelectedNotes().size
+                    size = (view.adapter as NoteListAdapter).checkedNotes.size
                 }
             }
         })

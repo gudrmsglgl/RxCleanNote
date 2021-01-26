@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -21,7 +20,6 @@ import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.extension.menu.visibleIcon
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notedetail.BaseDetailFragment
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY

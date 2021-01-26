@@ -1,4 +1,4 @@
-package com.cleannote.notelist
+package com.cleannote.notelist.swipe
 
 import android.graphics.Canvas
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -11,7 +11,6 @@ import com.cleannote.app.R
 import com.cleannote.extension.gone
 import com.cleannote.extension.visible
 import com.cleannote.notelist.holder.NoteViewHolder
-import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -42,7 +41,7 @@ class SwipeHelperCallback(
         target: RecyclerView.ViewHolder
     ): Boolean = false
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { Unit }
 
     override fun isItemViewSwipeEnabled(): Boolean {
         return swipeAdapter.isSwipeEnabled()
@@ -107,27 +106,20 @@ class SwipeHelperCallback(
                 drawLeftDxToClamp(clamp)
             }
         } else {
-            val alpha = abs(dX) / clamp
-            deleteMenuView(holder).apply {
-                this.alpha = alpha
-            }
+            deleteMenuAlpha(holder, dX)
             drawLeftDxInLimitOrInit(limit = -clamp, dx = dX)
         }
     }
 
-    // isClapmed: true isCurrentlyActive: true
-    // 고정된 상태이므로 dX 부분을 처음 clamp 만큼 추가해줘야함
-    // dx -clamp
     private fun drawLeftDxAfterClamped(
         dX: Float,
         clampedDx: Float
-    ) = drawLeftDx(dxUpToLimit(-extendClamp -clampedDx, dX - clampedDx))
-    // isClamped: true -> dX: -(왼쪽)clamp 값 만큼 그림
+    ) = drawLeftDx(
+        dxUpToLimit(-extendClamp -clampedDx, dX - clampedDx)
+    )
 
-    // isClamped: false -> dX: 계속 작어짐 (-적으로) max() -> 기준치를 넘으면 그 기준치가 최대임
     private fun dxUpToLimit(limit: Float, dX: Float) = max(limit, dX)
 
-    // left 로 그려라
     private fun drawLeftDx(calculateLeftDx: Float) = min(calculateLeftDx, 0f)
 
     private fun drawLeftDxInLimitOrInit(limit: Float, dx: Float) = drawLeftDx(
@@ -150,25 +142,25 @@ class SwipeHelperCallback(
     fun removePreviousClamp(recyclerView: RecyclerView){
         if (currentPosition == previousPosition) return
         else {
-            previousDeleteMenuClose(previousPosition, recyclerView)
+            previousDeleteMenuClose(recyclerView)
         }
     }
 
-    fun isRemovePreviousDeleteMenu(recyclerView: RecyclerView): Boolean =
-        previousDeleteMenuClose(previousPosition, recyclerView)
-
-    private fun previousDeleteMenuClose(
-        param: Int?,
+    fun previousDeleteMenuClose(
         recyclerView: RecyclerView
     ): Boolean{
-        return param?.let {
+        return previousPosition?.let {
             val viewHolder = recyclerView.findViewHolderForAdapterPosition(it) ?: return false
             closeDeleteMenu(viewHolder)
             true
         }?: false
     }
 
-    fun closeDeleteMenu(holder: RecyclerView.ViewHolder){
+    fun isVisibleDeleteMenu(): Boolean = previousPosition?.let {
+        true
+    } ?: false
+
+    private fun closeDeleteMenu(holder: RecyclerView.ViewHolder){
         swipeRight(holder)
             .withStartAction {
                 deleteMenuOnCancel(holder)
@@ -208,6 +200,16 @@ class SwipeHelperCallback(
                 .translationXBy(-100f)
         }
 
+    private fun deleteMenuAlpha(
+        holder: RecyclerView.ViewHolder,
+        dX: Float
+    ){
+        deleteMenuView(holder)
+            .apply {
+                this.alpha = abs(dX) / clamp
+            }
+    }
+
     private fun swipeRight(holder: RecyclerView.ViewHolder) = swipeView(holder)
         .animate()
         .setInterpolator(LinearInterpolator())
@@ -223,5 +225,4 @@ class SwipeHelperCallback(
         swipeAdapter = adapter
     }
 
-    private fun debug(msg: String) = Timber.tag("RxCleanNote").d(msg)
 }
