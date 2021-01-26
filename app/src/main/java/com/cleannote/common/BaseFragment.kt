@@ -18,19 +18,16 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.cleannote.app.R
 import com.cleannote.data.ui.InfoType
 import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.cleannote.presentation.data.DataState
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.jakewharton.rxbinding4.view.clicks
 import com.wada811.databinding.dataBinding
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 abstract class BaseFragment<DataBinding : ViewDataBinding>(
     @LayoutRes layoutRes: Int

@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.AppBarLayout
@@ -27,6 +28,10 @@ fun View.isVisible(): Boolean {
 }
 
 fun AppBarLayout.offsetChangeRatio() = (this.y / this.totalScrollRange).absoluteValue
+
+fun TextView.changeTextColor(@ColorRes res: Int){
+    this.setTextColor(ContextCompat.getColor(this.context, res))
+}
 
 @ColorInt
 fun resolveColor(

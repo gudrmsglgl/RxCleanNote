@@ -1,70 +1,70 @@
 package com.cleannote.notelist.holder
 
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.view.isVisible
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.databinding.ItemNoteListBinding
-import com.cleannote.extension.rxbinding.singleClick
-import com.cleannote.model.NoteMode
-import com.cleannote.model.NoteMode.SingleDelete
+import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notelist.NoteListAdapter
-import com.cleannote.notelist.SwipeHelperCallback
-import com.cleannote.presentation.data.notelist.ListToolbarState
-import com.cleannote.presentation.notelist.NoteListViewModel
+import com.cleannote.notelist.SubjectManager
+import com.cleannote.notelist.swipe.SwipeHelperCallback
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.longClicks
-import io.reactivex.rxjava3.subjects.PublishSubject
-import timber.log.Timber
+import com.jakewharton.rxbinding4.widget.checkedChanges
 
 class NoteViewHolder(
     val binding: ItemNoteListBinding,
-    private val requestManager: RequestManager,
-    private val swipeCallback: SwipeHelperCallback
+    private val requestManager: RequestManager
 ): BaseHolder<NoteUiModel>(binding){
 
     override fun bind(
         item: NoteUiModel,
         position: Int,
-        clickSubject: PublishSubject<NoteUiModel>,
-        longClickSubject: PublishSubject<Unit>
+        subjectManager: SubjectManager
     ) {
         binding.apply {
             glideReqManager = requestManager
             noteUiModel = item
 
-            /*swipeMenuDelete
-                .singleClick()
-                .map {
-                    item.apply { mode = SingleDelete }
-                }
-                .subscribe(clickSubject)*/
+            initChecked()
 
-            swipeMenuDelete.setOnClickListener {
-                if (isClamped(this@NoteViewHolder)){
-                    swipeCallback.closeDeleteMenu(this@NoteViewHolder)
-                }
-            }
+            swipeMenuDelete
+                .clicks()
+                .filter { isClamped(this@NoteViewHolder) && swipeMenuDelete.isVisible }
+                .map { item }
+                .subscribe(subjectManager.deleteClickSubject)
 
-            with(itemNote){
-                when (item.mode){
-                    NoteMode.Default -> {
-                        clicks()
-                            .map { item }
-                            .subscribe(clickSubject)
 
-                        longClicks { true }
-                            .subscribe (longClickSubject)
-                    }
-                    else -> {
-                        clicks()
-                            .subscribe {
-                                (bindingAdapter as NoteListAdapter).setMultiSelectCheck(position, binding)
-                            }
+            itemNote
+                .clicks()
+                .map { item }
+                .doOnNext{
+                    if (checkboxDelete.isVisible) {
+                        checkboxDelete.isChecked = !checkboxDelete.isChecked
                     }
                 }
-            }
+                .subscribe(subjectManager.clickNoteSubject)
+
+            itemNote
+                .longClicks { true }
+                .subscribe(subjectManager.longClickSubject)
+
+            checkboxDelete
+                .checkedChanges()
+                .skipInitialValue()
+                .map { isChecked ->
+                    position to isChecked
+                }
+                .subscribe(subjectManager.multiClickSubject)
+
         }
     }
 
     private fun isClamped(holder: NoteViewHolder) = holder.itemView.tag as? Boolean ?: false
+
+    private fun initChecked() = with(binding){
+        if (checkboxDelete.isVisible) {
+            checkboxDelete.isChecked = false
+        }
+    }
+
 }
