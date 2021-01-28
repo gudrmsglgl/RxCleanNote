@@ -15,7 +15,7 @@ object NoteListScreen: BaseScreen<NoteListScreen>() {
 
     val recyclerView = NRecyclerView(R.id.recycler_view)
     val noDataTextView = NTextView(withId(R.id.tv_no_data))
-    val searchToolbar = NSearchToolbar(withId(R.id.searchview_toolbar))
+    val searchToolbar = NSearchToolbar(withId(R.id.search_toolbar))
     val multiDeleteToolbar = NMultiDeleteToolbar(withId(R.id.toolbar_multi_delete))
     val insertBtn = NFloatingButton(withId(R.id.add_new_note_fab))
     val deleteDialog = NDDeleteDialog(withId(R.layout.md_dialog_base))

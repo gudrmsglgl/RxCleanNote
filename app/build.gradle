@@ -30,7 +30,7 @@ android {
             testCoverageEnabled true
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -135,6 +135,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation AndroidTestDependencies.mockk_android
     androidTestImplementation AndroidTestDependencies.fragment_testing
+    androidTestImplementation AndroidTestDependencies.navigation_testing
     androidTestImplementation AndroidTestDependencies.espresso_contrib
     androidTestImplementation AndroidTestDependencies.idling_resource
     androidTestImplementation TestDependencies.archTesting

@@ -17,11 +17,17 @@ import com.cleannote.test.util.RecyclerViewMatcher
 @Suppress("UNCHECKED_CAST")
 class NRecyclerItem<out T>(
     @IdRes private val idRes: Int,
-    private val position: Int ): SwipeableActions, NBaseView<NRecyclerItem<T>>(RecyclerViewMatcher(idRes).atPositionOnView(position,-1))
+    private val position: Int
+): SwipeableActions,
+    NBaseView<NRecyclerItem<T>>(RecyclerViewMatcher(idRes).atPositionOnView(position,-1))
 {
     val checkBox = NCheckBox(RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.checkbox_delete))
     val itemTitle: NTextView = NTextView(
         RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.note_title)
     )
-    val swipeDeleteMode = NRecyclerItemMenu(withId(R.id.menu_delete_container))
+    val swipeDeleteMenu = NRcvDeleteSwipeMenu(
+        idRes,
+        position,
+        RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.swipe_menu_delete)
+    )
 }

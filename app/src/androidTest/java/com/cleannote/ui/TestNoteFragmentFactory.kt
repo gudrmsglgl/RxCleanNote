@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
 import com.cleannote.common.DateUtil
 import com.cleannote.common.UIController
-import com.cleannote.mapper.UserMapper
 import com.cleannote.notedetail.edit.NoteDetailFragment
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.splash.SplashFragment

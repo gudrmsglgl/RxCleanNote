@@ -279,9 +279,9 @@ class NoteListFragmentTest: BaseTest() {
             recyclerView {
                 firstItem<RecyclerItem> {
                     swipeLeft()
-                    swipeDeleteMode {
+                    swipeDeleteMenu {
+                        isDisplayed()
                         deleteImg.hasDrawable(R.drawable.ic_delete_24dp)
-                        deleteText.hasText(R.string.item_menu_delete)
                     }
                 }
             }
@@ -366,9 +366,9 @@ class NoteListFragmentTest: BaseTest() {
             recyclerView{
                 firstItem<RecyclerItem> {
                     swipeLeft()
-                    swipeDeleteMode {
+                    /*swipeDeleteMode {
                         deleteImg.click()
-                    }
+                    }*/
                 }
             }
             deleteDialog {
@@ -394,10 +394,10 @@ class NoteListFragmentTest: BaseTest() {
             noteListScreen {
                 recyclerView{
                     firstItem<RecyclerItem> {
-                        swipeRight()
-                        swipeDeleteMode {
+                        //swipeRight()
+                        /*swipeDeleteMode {
                             deleteImg.click()
-                        }
+                        }*/
                     }
                 }
                 deleteDialog {

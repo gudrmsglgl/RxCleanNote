@@ -108,8 +108,8 @@ class NoteDetailViewFragment(
         .addCompositeDisposable()
 
     private fun changeViewPagerAlpha(offset: Float) = with(binding){
-        if (imagePager.isVisible) imagePager.alpha = 1 - (offset)
-        else ivEmpty.alpha = 1 - (offset)
+        if (imagePager.isVisible) imagePager.alpha = 1 - offset
+        else ivEmpty.alpha = 1 - offset
     }
 
     private fun changeStatusBar(offset: Float){

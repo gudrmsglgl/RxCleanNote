@@ -56,8 +56,7 @@ class NoteDetailFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timber("d","NoteDetailFragment viewModelFactory: $viewModelFactory")
-        timber("d", "NoteDetailFragment viewModel: $viewModel")
+        
         initBinding()
         getPreviousFragmentNote()
         initRecyclerImages()

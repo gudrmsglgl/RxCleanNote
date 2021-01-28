@@ -4,12 +4,13 @@ import androidx.test.espresso.action.*
 
 interface SwipeableActions: BaseActions {
 
-    fun swipeLeft() {
-        viewInteraction.perform(ViewActions.swipeLeft())
-    }
-
-    fun swipeRight(){
-        viewInteraction.perform(ViewActions.swipeRight())
+    fun swipeLeft(){
+        viewInteraction.perform(GeneralSwipeAction(
+            Swipe.SLOW,
+            GeneralLocation.CENTER,
+            GeneralLocation.CENTER_LEFT,
+            Press.FINGER
+        ))
     }
 
     fun swipeUp() {

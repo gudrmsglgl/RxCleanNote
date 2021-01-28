@@ -2,7 +2,10 @@ package com.cleannote.ui
 
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.app.R
 import com.cleannote.model.NoteUiModel
@@ -13,6 +16,7 @@ import com.cleannote.ui.screen.DetailNoteScreen
 import io.mockk.every
 import io.mockk.verify
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
@@ -22,6 +26,8 @@ class NoteDetailFragmentTest: BaseTest() {
 
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
+
+    private lateinit var testNavHostController: TestNavHostController
 
     val screen = DetailNoteScreen
     private val note: NoteUiModel
@@ -35,6 +41,9 @@ class NoteDetailFragmentTest: BaseTest() {
     @Before
     fun setup(){
         setupUIController()
+        testNavHostController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        testNavHostController.setViewModelStore(ViewModelStore())
+        testNavHostController.setGraph(R.navigation.nav_detail_graph)
     }
 
     @Test
@@ -43,7 +52,13 @@ class NoteDetailFragmentTest: BaseTest() {
         launchFragmentInContainer<NoteDetailFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        )
+        ).onFragment { fragment ->
+            fragment.viewLifecycleOwnerLiveData.observeForever { viewLifecyclerOwner ->
+                if (viewLifecyclerOwner != null){
+                    Navigation.setViewNavController(fragment.requireView(), testNavHostController)
+                }
+            }
+        }
 
         screen {
             toolbar {
@@ -150,7 +165,7 @@ class NoteDetailFragmentTest: BaseTest() {
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         ).onFragment { fragment ->
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(fragment.requireView(), testNavHostController)
         }
         screen {
             toolbar {
@@ -160,7 +175,7 @@ class NoteDetailFragmentTest: BaseTest() {
             }
             deleteSuccessToast.isDisplayed()
         }
-        verify { navController.popBackStack() }
+        verify { testNavHostController.popBackStack() }
     }
 
     @Test
@@ -170,7 +185,7 @@ class NoteDetailFragmentTest: BaseTest() {
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         ).onFragment { fragment ->
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(fragment.requireView(), testNavHostController)
         }
         screen {
             toolbar {
@@ -180,7 +195,7 @@ class NoteDetailFragmentTest: BaseTest() {
             }
             deleteErrorToast.isDisplayed()
         }
-        verify(exactly = 0){ navController.popBackStack() }
+        verify(exactly = 0){ testNavHostController.popBackStack() }
     }
 
     @Test

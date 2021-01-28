@@ -1,15 +1,20 @@
     package com.cleannote.notelist
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -25,7 +30,6 @@ import com.cleannote.NoteApplication
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
 import com.cleannote.app.databinding.LayoutMultideleteToolbarBinding
-import com.cleannote.app.databinding.LayoutSearchviewToolbarBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.InputCaptureCallback
 import com.cleannote.data.ui.InputType
@@ -56,6 +60,7 @@ import com.jakewharton.rxbinding4.widget.checkedChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
+import kotlinx.android.synthetic.main.layout_search_toolbar.view.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -117,6 +122,7 @@ constructor(
             when(toolbarState){
                 is SearchState -> {
                     addSearchViewToolbarContainer()
+                    setupSearchViewToolbar()
                     noteAdapter.changeNoteMode(Default)
                 }
                 is MultiSelectState -> {
@@ -297,27 +303,86 @@ constructor(
     private fun addSearchViewToolbarContainer() = view?.let {
         binding.toolbarContentContainer.apply {
             removeAllViews()
-            addView(searchToolbarBinding(this).root)
+            addView(searchToolbarLayout(it.context))
         }
     }
 
-    private fun searchToolbarBinding(parent: ViewGroup): LayoutSearchviewToolbarBinding {
-        val binding: LayoutSearchviewToolbarBinding = bindingInflate(R.layout.layout_searchview_toolbar, parent)
-        return binding.apply {
-            fragment = this@NoteListFragment
-            searchTextChangeEventSource(searchView)
+    private fun searchToolbarLayout(context: Context) = View
+        .inflate(context, R.layout.layout_search_toolbar, null)
+        .apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
         }
-    }
 
-    private fun searchTextChangeEventSource(searchView: SearchView){
-        searchView.apply {
+    private fun setupSearchViewToolbar() = binding.toolbarContentContainer
+        .findViewById<Toolbar>(R.id.search_toolbar)
+        .apply {
+            searchEventSource()
+            filterMenu()
+        }
+
+    private fun Toolbar.searchEventSource() = findViewById<SearchView>(R.id.sv)
+        .apply {
             queryTextChangeEvents()
                 .skipInitialValue()
                 .debounce(1000, TimeUnit.MILLISECONDS)
                 .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
                 .addCompositeDisposable()
         }
+
+    private fun Toolbar.filterMenu() = findViewById<ImageView>(R.id.action_filter)
+        .singleClick()
+        .subscribe {
+            showFilterDialog()
+        }
+        .addCompositeDisposable()
+
+    /*private fun addSearchViewToolbarContainer() = view?.let {
+        binding.toolbarContentContainer.apply {
+            removeAllViews()
+            val searchToolbarView = View
+                .inflate(context, R.layout.layout_search_toolbar, this)
+                .apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                    )
+                }
+            addView(searchToolbarView)
+           *//* val searchToolbarBinding = searchToolbarBinding(this)
+            addView(searchToolbarBinding.root.apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+            })*//*
+            searchTextChangeEventSource(DataBindingUtil.findBinding(searchToolbarView)!!)
+        }
     }
+
+    private fun searchToolbarBinding(parent: ViewGroup): LayoutSearchToolbarBinding {
+        //val binding: LayoutSearchviewToolbarBinding = bindingInflate(R.layout.layout_searchview_toolbar, parent)
+        *//*val binding:LayoutSearchToolbarBinding = DataBindingUtil
+            .inflate(LayoutInflater.from(context), R.layout.layout_search_toolbar, parent, false)*//*
+        val stLayout = View.inflate(context, R.layout.layout_search_toolbar, null)
+        val binding = DataBindingUtil.bind<LayoutSearchToolbarBinding>(stLayout)
+        return binding!!.apply {
+            fragment = this@NoteListFragment
+        }
+    }
+
+    private fun searchTextChangeEventSource(binding: LayoutSearchToolbarBinding) = binding
+        .sv
+        .apply {
+            queryTextChangeEvents()
+                .skipInitialValue()
+                .debounce(1000, TimeUnit.MILLISECONDS)
+                .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
+                .addCompositeDisposable()
+        }
+*/
 
     private fun addMultiDeleteToolbarContainer() = view?.let {
         binding.toolbarContentContainer.apply {
@@ -343,8 +408,7 @@ constructor(
                 val view = getCustomView()
                 val filterOk = view.findViewById<Button>(R.id.filter_btn_ok)
 
-                val setOrderSource = 
-                    dialogOkClickSource(dialogView = view, okBtn = filterOk)
+                val setOrderSource = dialogOkClickSource(dialogView = view, okBtn = filterOk)
                     .subscribe { order ->
                         saveCacheThenOrdering(order)
                         scrollTop()

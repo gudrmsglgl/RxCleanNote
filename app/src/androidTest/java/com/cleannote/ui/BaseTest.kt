@@ -24,7 +24,7 @@ abstract class BaseTest {
     val mockUIController: UIController = mockk(relaxUnitFun = true)
     val navController = mockk<NavController>(relaxed = true)
 
-    val application: TestBaseApplication
+    private val application: TestBaseApplication
         = ApplicationProvider.getApplicationContext() as TestBaseApplication
 
     fun getComponent(): TestApplicationComponent {

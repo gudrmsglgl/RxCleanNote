@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<data>
-    <variable
-        name="fragment"
-        type="com.cleannote.notelist.NoteListFragment" />
-</data>
-
 <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/searchview_toolbar"
+    android:id="@+id/search_toolbar"
     android:background="@color/white"
     android:elevation="10dp">
 
@@ -19,7 +13,7 @@
         android:layout_height="match_parent">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/search_view"
+            android:id="@+id/sv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,18 +24,17 @@
             android:queryHint="@string/text_search"
             android:layout_marginEnd="@dimen/toolbar_item_margin"
             />
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="@dimen/toolbar_item_margin"
             android:layout_height="@dimen/toolbar_item_margin"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/search_view"
+            app:layout_constraintLeft_toRightOf="@id/sv"
             app:layout_constraintRight_toRightOf="parent"
             android:src="@drawable/ic_filter_list_grey_24dp"
             android:layout_gravity="end"
             android:id="@+id/action_filter"
             android:layout_marginEnd="@dimen/toolbar_item_margin"
-            android:onClick="@{()->fragment.showFilterDialog()}"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
