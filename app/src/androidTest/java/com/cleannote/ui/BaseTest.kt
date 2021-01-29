@@ -97,4 +97,4 @@ abstract class BaseTest {
     abstract fun injectTest()
 }
 
-typealias RecyclerItem = NRecyclerItem<BaseHolder<NoteUiModel>>
+typealias NoteItem = NRecyclerItem<BaseHolder<NoteUiModel>>

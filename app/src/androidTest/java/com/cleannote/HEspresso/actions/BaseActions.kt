@@ -1,6 +1,7 @@
 package com.cleannote.HEspresso.actions
 
 import android.view.InputDevice
+import android.view.MotionEvent
 import androidx.core.view.MotionEventCompat
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.*
@@ -12,7 +13,7 @@ interface BaseActions {
         viewInteraction.perform(
             GeneralClickAction(
                 Tap.SINGLE, location, Press.FINGER,
-                InputDevice.SOURCE_UNKNOWN, MotionEventCompat.BUTTON_PRIMARY
+                InputDevice.SOURCE_UNKNOWN, MotionEvent.BUTTON_PRIMARY
             )
         )
     }
@@ -21,7 +22,7 @@ interface BaseActions {
         viewInteraction.perform(
             GeneralClickAction(
                 Tap.LONG, location, Press.FINGER,
-                InputDevice.SOURCE_UNKNOWN, MotionEventCompat.BUTTON_PRIMARY
+                InputDevice.SOURCE_UNKNOWN, MotionEvent.BUTTON_PRIMARY
             )
         )
     }

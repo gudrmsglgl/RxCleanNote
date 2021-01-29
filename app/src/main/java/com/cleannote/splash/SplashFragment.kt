@@ -29,8 +29,8 @@ class SplashFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.tryLogin()
-        findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
+        //viewModel.tryLogin()
+        //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         logoClickListener()
         subscribeLoginResult()
     }
@@ -75,7 +75,7 @@ class SplashFragment constructor(
                 | Welcome ${userView.nick} 
                 | RxClean Note App""".trimMargin()
             showToast(loginMessage)
-            findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
+            //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         }?: showErrorMessage(
             "errorMessage",
             object : DialogBtnCallback{

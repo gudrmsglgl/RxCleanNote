@@ -14,7 +14,6 @@ import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -53,6 +52,7 @@ import com.cleannote.notelist.swipe.SwipeAdapter
 import com.cleannote.notelist.swipe.SwipeHelperCallback
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
+import com.cleannote.presentation.model.NoteView
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
@@ -250,8 +250,7 @@ constructor(
                 showLoadingProgressBar(dataState.isLoading)
                 when (dataState.status) {
                     SUCCESS -> {
-                        noteAdapter
-                            .submitList(dataState.data!!.transNoteUiModels(getNoteMode()))
+                        noteAdapter.submitList(currentNoteMode(dataState.data!!))
                     }
                     ERROR -> {
                         showErrorMessage(getString(R.string.searchErrorMsg))
@@ -339,51 +338,6 @@ constructor(
         }
         .addCompositeDisposable()
 
-    /*private fun addSearchViewToolbarContainer() = view?.let {
-        binding.toolbarContentContainer.apply {
-            removeAllViews()
-            val searchToolbarView = View
-                .inflate(context, R.layout.layout_search_toolbar, this)
-                .apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                    )
-                }
-            addView(searchToolbarView)
-           *//* val searchToolbarBinding = searchToolbarBinding(this)
-            addView(searchToolbarBinding.root.apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
-                )
-            })*//*
-            searchTextChangeEventSource(DataBindingUtil.findBinding(searchToolbarView)!!)
-        }
-    }
-
-    private fun searchToolbarBinding(parent: ViewGroup): LayoutSearchToolbarBinding {
-        //val binding: LayoutSearchviewToolbarBinding = bindingInflate(R.layout.layout_searchview_toolbar, parent)
-        *//*val binding:LayoutSearchToolbarBinding = DataBindingUtil
-            .inflate(LayoutInflater.from(context), R.layout.layout_search_toolbar, parent, false)*//*
-        val stLayout = View.inflate(context, R.layout.layout_search_toolbar, null)
-        val binding = DataBindingUtil.bind<LayoutSearchToolbarBinding>(stLayout)
-        return binding!!.apply {
-            fragment = this@NoteListFragment
-        }
-    }
-
-    private fun searchTextChangeEventSource(binding: LayoutSearchToolbarBinding) = binding
-        .sv
-        .apply {
-            queryTextChangeEvents()
-                .skipInitialValue()
-                .debounce(1000, TimeUnit.MILLISECONDS)
-                .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
-                .addCompositeDisposable()
-        }
-*/
-
     private fun addMultiDeleteToolbarContainer() = view?.let {
         binding.toolbarContentContainer.apply {
             removeAllViews()
@@ -399,7 +353,7 @@ constructor(
         }
     }
 
-    fun showFilterDialog() {
+    private fun showFilterDialog() {
         activity?.let { activity ->
             MaterialDialog(activity).show {
                 customView(R.layout.layout_filter)
@@ -529,6 +483,8 @@ constructor(
     }
 
     private fun getNoteMode() = if (curToolbarState() == MultiSelectState) SelectMode else Default
+
+    private fun currentNoteMode(data: List<NoteView>) = data.transNoteUiModels(getNoteMode())
 
     private fun curToolbarState() = viewModel.toolbarState.value
 
