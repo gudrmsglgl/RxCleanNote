@@ -29,6 +29,7 @@ import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
+import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.jakewharton.rxbinding4.material.offsetChanges
@@ -38,6 +39,7 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
+import java.util.*
 
 class NoteDetailFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
@@ -50,7 +52,7 @@ class NoteDetailFragment constructor(
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -85
 
-    lateinit var noteUiModel: NoteUiModel
+    //lateinit var noteUiModel: NoteUiModel
 
     var onBackPressThenKey: String? = null
 
@@ -58,11 +60,11 @@ class NoteDetailFragment constructor(
         super.onViewCreated(view, savedInstanceState)
         
         initBinding()
-        getPreviousFragmentNote()
-        initRecyclerImages()
+        //getPreviousFragmentNote()
+        initFooterRcvImages()
 
         appBarOffSetChangeSource()
-        titleBodyChangeSource()
+        textChangeEditModeSource()
 
         subscribeUpdateNote()
         subscribeDeleteNote()
@@ -75,14 +77,16 @@ class NoteDetailFragment constructor(
         }
     }
 
-    private fun initRecyclerImages(){
-        binding.noteBodyContainer.rcy_images.apply {
+    private fun initFooterRcvImages() = binding
+        .footer
+        .rcyImages
+        .apply {
             adapter = EditImagesAdapter(glideRequestManager)
             addItemDecoration(HorizontalItemDecoration(15))
         }
-    }
 
-    private fun subscribeUpdateNote() = viewModel.updatedNote
+    private fun subscribeUpdateNote() = viewModel
+        .updatedNote
         .observe(viewLifecycleOwner, Observer {
             if (it != null){
                 when (it.status) {
@@ -98,7 +102,8 @@ class NoteDetailFragment constructor(
             }
         })
 
-    private fun subscribeDeleteNote() = viewModel.deletedNote
+    private fun subscribeDeleteNote() = viewModel
+        .deletedNote
         .observe( viewLifecycleOwner, Observer {
             if (it != null){
                 when (it.status) {
@@ -115,11 +120,14 @@ class NoteDetailFragment constructor(
             }
         })
 
-    private fun titleBodyChangeSource() = Observable.merge(
-        note_title.textChanges().filter { note_title.isFocused  && noteUiModel.title != note_title.text.toString()},
-        note_body.textChanges().filter { note_body.isFocused && noteUiModel.body != note_body.text.toString()})
+    private fun textChangeEditModeSource() = Observable.merge(
+        note_title.textChanges().filter { note_title.isFocused  && !isTitleModified()},
+        note_body.textChanges().filter { note_body.isFocused && !isBodyModified() })
         .subscribe { editMode() }
         .addCompositeDisposable()
+
+    private fun isTitleModified() = viewModel.finalNote()?.title == binding.noteTitle.text.toString()
+    private fun isBodyModified() = viewModel.finalNote()?.body == binding.noteBody.text.toString()
 
     fun showDeleteDialog() {
         activity?.let {
@@ -127,7 +135,10 @@ class NoteDetailFragment constructor(
                 title(R.string.delete_title)
                 message(R.string.delete_message)
                 positiveButton(R.string.delete_ok){
-                    viewModel.deleteNote(noteUiModel.transNoteView())
+                    viewModel.deleteNote(
+                        currentNote()
+                        //noteUiModel.transNoteView()
+                    )
                 }
                 negativeButton(R.string.delete_cancel){
                     showToast(getString(R.string.deleteCancelMsg))
@@ -138,12 +149,12 @@ class NoteDetailFragment constructor(
         }
     }
 
-    private fun getPreviousFragmentNote(){
+    /*private fun getPreviousFragmentNote(){
         arguments?.let {
             noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
             defaultMode()
         }
-    }
+    }*/
 
 
     private fun appBarOffSetChangeSource() = app_bar.offsetChanges()
@@ -156,23 +167,31 @@ class NoteDetailFragment constructor(
 
 
     private fun defaultMode() = viewModel.defaultMode(
-        viewModel.finalNote() ?: noteUiModel.transNoteView()
+        //viewModel.finalNote() ?: noteUiModel.transNoteView()
+        currentNote()
     )
 
     fun editCancel() = viewModel.editCancel()
 
     private fun editMode() = viewModel.editMode()
 
-    fun editDoneMode() = viewModel.editDoneMode(
-        noteUiModel.copy(
-            title = note_title.text.toString(),
-            body = note_body.text.toString(),
-            updatedAt = dateUtil.getCurrentTimestamp()
-        ).transNoteView()
-    )
+    fun editDoneMode() = viewModel
+        .editDoneMode(
+            currentNote().copy(
+                title = note_title.text.toString(),
+                body = note_body.text.toString(),
+                updatedAt = dateUtil.getCurrentTimestamp()
+            )
+        )
 
+    fun navDetailViewFragment(){
+        // TODO:: Add MainActivity ,Xml
+        view?.clearFocus()
+        findNavController().popBackStack()
+    }
 
     fun navNoteListFragment(){
+        // TODO:: Delete Then this Execute
         view?.clearFocus()
         onBackPressThenKey?.let { reqKey ->
             setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(reqKey to viewModel.finalNote()?.transNoteUiModel()))
@@ -231,6 +250,12 @@ class NoteDetailFragment constructor(
                 }
             }
     }
+
+    private fun currentNote() = viewModel.finalNote() ?: emptyNoteView()
+
+    private fun emptyNoteView() = NoteView(
+        id = UUID.randomUUID().toString(), title = "", body = "", updatedAt = "",createdAt = "", noteImages = null
+    )
 
     enum class PickerType{
         CAMERA, GALLERY

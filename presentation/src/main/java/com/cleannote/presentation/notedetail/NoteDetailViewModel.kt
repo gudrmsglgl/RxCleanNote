@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.domain.interactor.usecases.notedetail.NoteDetailUseCases
 import com.cleannote.presentation.data.DataState
+import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.notedetail.BeforeAfterNoteView
 import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
@@ -22,7 +23,7 @@ constructor(
     val finalNote: LiveData<NoteView>
         get() = _finalNote
 
-    private val _updatedNote = MutableLiveData<DataState<NoteView>>()
+    private val _updatedNote = SingleLiveEvent<DataState<NoteView>>()
     val updatedNote: LiveData<DataState<NoteView>>
         get() = _updatedNote
 

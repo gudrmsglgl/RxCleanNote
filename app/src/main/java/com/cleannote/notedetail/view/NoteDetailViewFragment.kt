@@ -100,12 +100,17 @@ class NoteDetailViewFragment(
         }
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { offset ->
+            changeIndicatorAlpha(offset)
             changeViewPagerAlpha(offset)
             changeStatusBar(offset)
             changeToolbar(offset)
             changeBottomSheet(offset)
         }
         .addCompositeDisposable()
+
+    private fun changeIndicatorAlpha(offset: Float) = with(binding){
+        indicator.alpha = 1 - offset
+    }
 
     private fun changeViewPagerAlpha(offset: Float) = with(binding){
         if (imagePager.isVisible) imagePager.alpha = 1 - offset
