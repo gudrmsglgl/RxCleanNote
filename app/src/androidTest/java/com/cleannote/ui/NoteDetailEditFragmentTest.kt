@@ -10,19 +10,18 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.app.R
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
-import com.cleannote.notedetail.edit.NoteDetailFragment
+import com.cleannote.notedetail.edit.NoteDetailEditFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.ui.screen.DetailNoteScreen
 import io.mockk.every
 import io.mockk.verify
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class NoteDetailFragmentTest: BaseTest() {
+class NoteDetailEditFragmentTest: BaseTest() {
 
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
@@ -49,7 +48,7 @@ class NoteDetailFragmentTest: BaseTest() {
     @Test
     fun noteDetailDisplayed(){
 
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         ).onFragment { fragment ->
@@ -84,7 +83,7 @@ class NoteDetailFragmentTest: BaseTest() {
 
     @Test
     fun noteTitleCollapseExpandedThenToolbarSetTitle(){
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         )
@@ -101,7 +100,7 @@ class NoteDetailFragmentTest: BaseTest() {
 
     @Test
     fun noteTitleEditModeThenChangeIconMenu(){
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         )
@@ -118,7 +117,7 @@ class NoteDetailFragmentTest: BaseTest() {
     fun noteTitleEditDoneThenChangeIconMenu(){
         stubNoteRepositoryUpdate()
 
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         )
@@ -139,7 +138,7 @@ class NoteDetailFragmentTest: BaseTest() {
         val throwable = RuntimeException()
         val updateText = "test"
         stubThrowableNoteRepositoryUpdate(throwable)
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         )
@@ -161,7 +160,7 @@ class NoteDetailFragmentTest: BaseTest() {
     @Test
     fun noteDeleteSuccessThenNavNoteList(){
         stubNoteRepositoryDelete()
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         ).onFragment { fragment ->
@@ -181,7 +180,7 @@ class NoteDetailFragmentTest: BaseTest() {
     @Test
     fun noteDeleteErrorThenNotNavNoteList(){
         stubThrowableNoteRepositoryDelete(RuntimeException())
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         ).onFragment { fragment ->
@@ -200,7 +199,7 @@ class NoteDetailFragmentTest: BaseTest() {
 
     @Test
     fun noteTitleUpdateCancelThenRevertText(){
-        launchFragmentInContainer<NoteDetailFragment>(
+        launchFragmentInContainer<NoteDetailEditFragment>(
             factory = fragmentFactory,
             fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
         )

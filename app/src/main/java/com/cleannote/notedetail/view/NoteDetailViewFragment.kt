@@ -178,7 +178,7 @@ class NoteDetailViewFragment(
 
     private fun navDetailEditFragment(){
         findNavController().navigate(
-            R.id.action_noteDetailViewFragment_to_noteDetailFragment,
+            R.id.action_noteDetailViewFragment_to_noteDetailEditFragment,
             bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote()?.transNoteUiModel())
         )
     }

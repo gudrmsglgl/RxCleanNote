@@ -21,9 +21,9 @@ open class NoteListViewModelTest {
     lateinit var sharedPreferences: SharedPreferences
 
     lateinit var searchNotes: SearchNotes
-    lateinit var insertNewNote: InsertNewNote
-    lateinit var deleteNote: DeleteNote
-    lateinit var deleteMultipleNotes: DeleteMultipleNotes
+    private lateinit var insertNewNote: InsertNewNote
+    private lateinit var deleteNote: DeleteNote
+    private lateinit var deleteMultipleNotes: DeleteMultipleNotes
 
     @BeforeEach
     fun noteListViewModelSetup(){

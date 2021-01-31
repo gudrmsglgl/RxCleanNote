@@ -11,8 +11,8 @@
         android:label="fragment_note_detail_view"
         tools:layout="@layout/fragment_note_detail_view" >
         <action
-            android:id="@+id/action_noteDetailViewFragment_to_noteDetailFragment"
-            app:destination="@id/noteDetailFragment"
+            android:id="@+id/action_noteDetailViewFragment_to_noteDetailEditFragment"
+            app:destination="@id/noteDetailEditFragment"
             app:popUpTo="@id/noteDetailViewFragment"
             app:popUpToInclusive="false"
             app:enterAnim="@anim/slide_in_right"
@@ -21,8 +21,8 @@
             app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
-        android:id="@+id/noteDetailFragment"
-        android:name="com.cleannote.notedetail.edit.NoteDetailFragment"
-        android:label="fragment_note_detail"
-        tools:layout="@layout/fragment_note_detail" />
+        android:id="@+id/noteDetailEditFragment"
+        android:name="com.cleannote.notedetail.edit.NoteDetailEditFragment"
+        android:label="fragment_note_detail_edit"
+        tools:layout="@layout/fragment_note_detail_edit" />
 </navigation>

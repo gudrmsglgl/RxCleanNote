@@ -457,6 +457,7 @@ constructor(
     private fun requestUpdate(bundle: Bundle){
         bundle.getParcelable<NoteUiModel>(REQ_UPDATE_KEY)?.let {
             viewModel.reqUpdateFromDetailFragment(it.transNoteView())
+            scrollTop()
         }
     }
 

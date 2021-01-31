@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
-import com.cleannote.notedetail.edit.NoteDetailFragment
+import com.cleannote.notedetail.edit.NoteDetailEditFragment
 import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.splash.SplashFragment
@@ -30,8 +30,8 @@ class NoteFragmentFactory @Inject constructor(
             fragment
         }
 
-        NoteDetailFragment::class.java.name -> {
-            val fragment = NoteDetailFragment(viewModelFactory, dateUtil, glideReqManager)
+        NoteDetailEditFragment::class.java.name -> {
+            val fragment = NoteDetailEditFragment(viewModelFactory, dateUtil, glideReqManager)
             fragment
         }
 

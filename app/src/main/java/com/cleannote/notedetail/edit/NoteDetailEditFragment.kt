@@ -3,6 +3,7 @@ package com.cleannote.notedetail.edit
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
@@ -14,13 +15,11 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.bumptech.glide.RequestManager
 
 import com.cleannote.app.R
-import com.cleannote.app.databinding.FragmentNoteDetailBinding
+import com.cleannote.app.databinding.FragmentNoteDetailEditBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.extension.menu.visibleIcon
-import com.cleannote.model.NoteUiModel
-import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
@@ -37,30 +36,29 @@ import com.jakewharton.rxbinding4.widget.itemClicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
-import kotlinx.android.synthetic.main.fragment_note_detail.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 import java.util.*
 
-class NoteDetailFragment constructor(
+class NoteDetailEditFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     private val dateUtil: DateUtil,
     private val glideRequestManager: RequestManager
-) : BaseFragment<FragmentNoteDetailBinding>(R.layout.fragment_note_detail) {
+) : BaseFragment<FragmentNoteDetailEditBinding>(R.layout.fragment_note_detail_edit) {
 
     private val viewModel
             by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
 
     private val COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD = -85
 
-    //lateinit var noteUiModel: NoteUiModel
+    private lateinit var etTitle: EditText
+    private lateinit var etBody: EditText
 
-    var onBackPressThenKey: String? = null
+    private var hasKeyOnBackPress: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
         initBinding()
-        //getPreviousFragmentNote()
+        initBindingView()
         initFooterRcvImages()
 
         appBarOffSetChangeSource()
@@ -73,8 +71,13 @@ class NoteDetailFragment constructor(
     override fun initBinding() {
         binding.apply {
             vm = viewModel
-            fragment = this@NoteDetailFragment
+            fragment = this@NoteDetailEditFragment
         }
+    }
+
+    private fun initBindingView() {
+        etTitle = binding.noteTitle
+        etBody = binding.noteBody
     }
 
     private fun initFooterRcvImages() = binding
@@ -92,7 +95,7 @@ class NoteDetailFragment constructor(
                 when (it.status) {
                     is SUCCESS -> {
                         showToast(getString(R.string.updateSuccessMsg))
-                        onBackPressThenKey = REQ_UPDATE_KEY
+                        hasKeyOnBackPress = REQ_UPDATE_KEY
                     }
                     is ERROR -> {
                         showToast(getString(R.string.updateErrorMsg))
@@ -109,8 +112,8 @@ class NoteDetailFragment constructor(
                 when (it.status) {
                     is SUCCESS -> {
                         showToast(getString(R.string.deleteSuccessMsg))
-                        onBackPressThenKey = REQ_DELETE_KEY
-                        navNoteListFragment()
+                        hasKeyOnBackPress = REQ_DELETE_KEY
+                        navPopBackStack(inclusive = true)
                     }
                     is ERROR -> {
                         it.sendFirebaseThrowable()
@@ -121,13 +124,13 @@ class NoteDetailFragment constructor(
         })
 
     private fun textChangeEditModeSource() = Observable.merge(
-        note_title.textChanges().filter { note_title.isFocused  && !isTitleModified()},
-        note_body.textChanges().filter { note_body.isFocused && !isBodyModified() })
+        etTitle.textChanges().filter { etTitle.isFocused && !isTitleModified()},
+        etBody.textChanges().filter { etBody.isFocused && !isBodyModified()})
         .subscribe { editMode() }
         .addCompositeDisposable()
 
-    private fun isTitleModified() = viewModel.finalNote()?.title == binding.noteTitle.text.toString()
-    private fun isBodyModified() = viewModel.finalNote()?.body == binding.noteBody.text.toString()
+    private fun isTitleModified() = viewModel.finalNote()?.title == etTitle.text.toString()
+    private fun isBodyModified() = viewModel.finalNote()?.body == etBody.text.toString()
 
     fun showDeleteDialog() {
         activity?.let {
@@ -135,10 +138,7 @@ class NoteDetailFragment constructor(
                 title(R.string.delete_title)
                 message(R.string.delete_message)
                 positiveButton(R.string.delete_ok){
-                    viewModel.deleteNote(
-                        currentNote()
-                        //noteUiModel.transNoteView()
-                    )
+                    viewModel.deleteNote(currentNote())
                 }
                 negativeButton(R.string.delete_cancel){
                     showToast(getString(R.string.deleteCancelMsg))
@@ -149,15 +149,9 @@ class NoteDetailFragment constructor(
         }
     }
 
-    /*private fun getPreviousFragmentNote(){
-        arguments?.let {
-            noteUiModel = it[NOTE_DETAIL_BUNDLE_KEY] as NoteUiModel
-            defaultMode()
-        }
-    }*/
-
-
-    private fun appBarOffSetChangeSource() = app_bar.offsetChanges()
+    private fun appBarOffSetChangeSource() = binding
+        .appBar
+        .offsetChanges()
         .map { offset ->
             if (offset < COLLAPSING_TOOLBAR_VISIBILITY_THRESHOLD) TbCollapse
             else TbExpanded
@@ -178,25 +172,28 @@ class NoteDetailFragment constructor(
     fun editDoneMode() = viewModel
         .editDoneMode(
             currentNote().copy(
-                title = note_title.text.toString(),
-                body = note_body.text.toString(),
+                title = etTitle.text.toString(),
+                body = etBody.text.toString(),
                 updatedAt = dateUtil.getCurrentTimestamp()
             )
         )
 
-    fun navDetailViewFragment(){
-        // TODO:: Add MainActivity ,Xml
-        view?.clearFocus()
-        findNavController().popBackStack()
+    private fun requestToNoteList(){
+        hasKeyOnBackPress?.let { reqIdentityKey ->
+            setFragmentResult(
+                REQUEST_KEY_ON_BACK,
+                bundleOf(reqIdentityKey to viewModel.finalNote()?.transNoteUiModel())
+            )
+        }
     }
 
-    fun navNoteListFragment(){
-        // TODO:: Delete Then this Execute
+    fun navPopBackStack(inclusive: Boolean = false){
         view?.clearFocus()
-        onBackPressThenKey?.let { reqKey ->
-            setFragmentResult(REQUEST_KEY_ON_BACK , bundleOf(reqKey to viewModel.finalNote()?.transNoteUiModel()))
-        }
-        findNavController().popBackStack()
+        requestToNoteList()
+        if (inclusive)
+            findNavController().popBackStack(R.id.noteDetailViewFragment, inclusive)
+        else
+            findNavController().popBackStack()
     }
 
     fun isEditCancelMenu(): Boolean = toolbar_primary_icon.drawable

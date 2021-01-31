@@ -34,7 +34,7 @@ constructor(
     val toolbarState: LiveData<ListToolbarState>
         get() = _toolbarState
 
-    private val noteViews = mutableListOf<NoteView>()
+    private val totalLoadNotes = mutableListOf<NoteView>()
     private val _mediatorNoteList: MediatorLiveData<DataState<List<NoteView>>> = MediatorLiveData()
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _mediatorNoteList
@@ -68,12 +68,11 @@ constructor(
         _mediatorNoteList.postValue(DataState.loading())
         useCases.searchNotes.execute(
                 onSuccess = { searchedNotes ->
-
-                    updateNoteViews {
-                        addAll(searchedNotes.transNoteViews())
-                    }
-                    .setNoteListSuccessState(isbBackground = true)
-
+                    totalLoadNotes
+                        .apply {
+                            addAll(searchedNotes.transNoteViews())
+                            setNoteListSuccessState(isBackground = true)
+                        }
                 },
                 onError = {
                     _mediatorNoteList.postValue(DataState.error(it))
@@ -95,23 +94,22 @@ constructor(
 
     fun reqUpdateFromDetailFragment(param: NoteView){
         if (loadOrderingOnSharedPref() == ORDER_DESC)
-
-            updateNoteViews {
-                val findNoteView = find { it.id == param.id }
-                remove(findNoteView)
-                add(0, param)
-            }
-            .setNoteListSuccessState(isbBackground = false)
-
+            totalLoadNotes
+                .apply {
+                    val findNoteView = find { it.id == param.id }
+                    remove(findNoteView)
+                    add(0, param)
+                    setNoteListSuccessState(isBackground = false)
+                }
         else if (loadOrderingOnSharedPref() == ORDER_ASC)
             clearQuery()
     }
 
     fun reqDeleteFromDetailFragment(param: NoteView){
-        updateNoteViews {
+        totalLoadNotes.apply {
             remove(param)
+            setNoteListSuccessState(isBackground = false)
         }
-        .setNoteListSuccessState(isbBackground = false)
     }
 
     fun deleteNote(param: NoteView){
@@ -123,10 +121,11 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(param))
-                updateNoteViews {
-                    remove(param)
-                }
-                .setNoteListSuccessState(isbBackground = true)
+                totalLoadNotes
+                    .apply {
+                        remove(param)
+                        setNoteListSuccessState(isBackground = true)
+                    }
             },
             params = param.transNote()
         )
@@ -141,17 +140,18 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(null))
-                updateNoteViews {
-                    paramNotes.forEach { remove(it) }
-                }
-                .setNoteListSuccessState(isbBackground = true)
+                totalLoadNotes
+                    .apply {
+                        paramNotes.forEach { remove(it) }
+                        setNoteListSuccessState(isBackground = true)
+                    }
             },
             params = paramNotes.transNotes()
         )
     }
 
     fun setOrdering(ordering: String){
-        updateNoteViews { clear() }
+        totalLoadNotes.clear()
         _query.value = getQuery().apply {
             page = 1
             order = ordering
@@ -159,7 +159,7 @@ constructor(
     }
 
     fun searchKeyword(search: String) {
-        updateNoteViews { clear() }
+        totalLoadNotes.clear()
         _query.postValue(getQuery().apply {
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
@@ -175,10 +175,10 @@ constructor(
 
     // DB every 10 load Note
     // so load Note less than 10 Then Don't exist next page
-    fun isExistNextPage(): Boolean = noteViews.size / (getQuery().limit) == getQuery().page
+    fun isExistNextPage(): Boolean = totalLoadNotes.size / (getQuery().limit) == getQuery().page
 
     fun clearQuery() {
-        updateNoteViews { clear() }
+        totalLoadNotes.clear()
         _query.value = getQuery().apply {
             page = QUERY_DEFAULT_PAGE
             limit = QUERY_DEFAULT_LIMIT
@@ -199,17 +199,8 @@ constructor(
     private fun loadOrderingOnSharedPref() = sharedPreferences
         .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
 
-
-    private inline fun updateNoteViews(
-        updateData: MutableList<NoteView>.() -> Unit
-    ): List<NoteView>{
-        return noteViews.apply {
-            updateData.invoke(this)
-        }
-    }
-
-    private fun List<NoteView>.setNoteListSuccessState(isbBackground: Boolean){
-        if (isbBackground)
+    private fun List<NoteView>.setNoteListSuccessState(isBackground: Boolean){
+        if (isBackground)
             _mediatorNoteList.postValue(DataState.success(this))
         else
             _mediatorNoteList.value = DataState.success(this)

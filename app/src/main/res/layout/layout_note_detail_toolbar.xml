@@ -8,7 +8,7 @@
             type="com.cleannote.presentation.notedetail.NoteDetailViewModel" />
         <variable
             name="fragment"
-            type="com.cleannote.notedetail.edit.NoteDetailFragment" />
+            type="com.cleannote.notedetail.edit.NoteDetailEditFragment" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -27,7 +27,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/toolbar_primary_icon"
         android:src="@{vm.noteMode instanceof EditMode ? @drawable/ic_cancel_24dp : @drawable/ic_arrow_back_24dp}"
-        android:onClick="@{() -> fragment.editCancelMenu ? fragment.editCancel() : fragment.navNoteListFragment()}"
+        android:onClick="@{() -> fragment.editCancelMenu ? fragment.editCancel() : fragment.navPopBackStack(false)}"
         tools:ignore="ContentDescription" />
 
     <TextView
