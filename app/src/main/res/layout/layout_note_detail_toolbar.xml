@@ -20,12 +20,12 @@
 
 
     <ImageView
+        android:id="@+id/left_icon"
         android:layout_width="@dimen/toolbar_item_margin"
         android:layout_height="@dimen/toolbar_item_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:id="@+id/toolbar_primary_icon"
         android:src="@{vm.noteMode instanceof EditMode ? @drawable/ic_cancel_24dp : @drawable/ic_arrow_back_24dp}"
         android:onClick="@{() -> fragment.editCancelMenu ? fragment.editCancel() : fragment.navPopBackStack(false)}"
         tools:ignore="ContentDescription" />
@@ -35,8 +35,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/toolbar_primary_icon"
-        app:layout_constraintRight_toLeftOf="@id/toolbar_secondary_icon"
+        app:layout_constraintLeft_toRightOf="@id/left_icon"
+        app:layout_constraintRight_toLeftOf="@id/right_icon"
         app:layout_constraintHorizontal_bias="0"
         android:id="@+id/tool_bar_title"
         android:text='@{vm.finalNote.title}'
@@ -51,12 +51,12 @@
 
 
     <ImageView
+        android:id="@+id/right_icon"
         android:layout_width="@dimen/toolbar_item_margin"
         android:layout_height="@dimen/toolbar_item_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:id="@+id/toolbar_secondary_icon"
         android:layout_marginEnd="@dimen/default_view_margin"
         android:src="@{vm.noteMode instanceof EditMode ? @drawable/ic_done_24dp : @drawable/ic_delete_24dp}"
         android:onClick="@{() -> fragment.editDoneMenu ? fragment.editDoneMode() : fragment.showDeleteDialog()}"

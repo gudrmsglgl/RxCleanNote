@@ -47,14 +47,14 @@
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
                    android:minHeight="@dimen/toolbar_height"
-                   android:id="@+id/note_title"
+                   android:id="@+id/edit_title"
                    android:text='@{vm.finalNote.title}'
                    android:textColor="#000"
                    android:textSize="22sp"
                    android:importantForAutofill="no"
                    android:inputType="text"
                    app:releaseFocus="@{vm.noteMode}"
-                   />
+                   tools:ignore="LabelFor" />
 
            </LinearLayout>
 
@@ -66,6 +66,7 @@
                android:background="@color/colorPrimaryDark">
 
                <include
+                   android:id="@+id/detail_toolbar"
                    layout="@layout/layout_note_detail_toolbar"
                    app:vm = "@{vm}"
                    app:fragment = "@{fragment}"/>
@@ -107,7 +108,9 @@
                 android:paddingEnd="@dimen/default_view_margin"
                 android:hint="@string/detail_note_hint"
                 android:layout_marginTop="@dimen/default_view_margin"
-                app:releaseFocus="@{vm.noteMode}" />
+                app:releaseFocus="@{vm.noteMode}"
+                android:importantForAutofill="no"
+                android:inputType="text" />
 
             <include
                 android:id="@+id/footer"

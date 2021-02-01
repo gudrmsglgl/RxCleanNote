@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/title_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/link_input_title_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ic_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_link_24"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_link"
+            android:textSize="18sp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="5dp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/ic_link"
+            app:layout_constraintBottom_toBottomOf="@+id/ic_link"/>
+
+        <TextView
+            android:id="@+id/link_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/input_link_desc"
+            android:layout_marginTop="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/ic_link"
+            app:layout_constraintLeft_toLeftOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/body_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/link_input_title_margin"
+        android:layout_marginEnd="@dimen/link_input_title_margin"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/title_container"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <EditText
+            android:id="@+id/edit_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:hint="@string/input_link_edit"
+            android:inputType="text"
+            android:importantForAutofill="no"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_loaded"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/link_input_image_height"
+            android:scaleType="fitXY"
+            app:layout_constraintTop_toBottomOf="@+id/edit_link"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/footer_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/link_input_title_margin"
+        android:layout_marginEnd="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/body_container"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/tv_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/green"
+            android:text="@string/input_confirm"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/green"
+            android:text="@string/input_cancel"
+            android:layout_marginEnd="25dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tv_confirm"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

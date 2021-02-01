@@ -106,6 +106,7 @@ dependencies {
     implementation Dependencies.timber
     implementation Dependencies.material_dialogs
     implementation Dependencies.material_dialogs_input
+    implementation Dependencies.material_lifecycle
     implementation Dependencies.firebaseAnalyticsKTX
     implementation Dependencies.firebaseCrashticsKTX
     implementation Dependencies.glide

@@ -10,8 +10,8 @@ import com.cleannote.app.R
 import org.hamcrest.Matcher
 
 class NDToolbar(matcher: Matcher<View>): NBaseView<NDToolbar>(matcher) {
-    val primaryMenu = NImageView(ViewMatchers.withId(R.id.toolbar_primary_icon))
+    val primaryMenu = NImageView(ViewMatchers.withId(R.id.left_icon))
     val toolbarTitle = NTextView(ViewMatchers.withId(R.id.tool_bar_title))
-    val secondMenu = NImageView(ViewMatchers.withId(R.id.toolbar_secondary_icon))
+    val secondMenu = NImageView(ViewMatchers.withId(R.id.right_icon))
     val deleteDialog = NDDeleteDialog(ViewMatchers.withId(R.layout.md_dialog_base))
 }

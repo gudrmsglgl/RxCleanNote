@@ -15,6 +15,7 @@ object Dependencies {
     val navigation_ui = "androidx.navigation:navigation-ui-ktx:${Versions.nav_components}"
     val navigation_dynamic = "androidx.navigation:navigation-dynamic-features-fragment:${Versions.nav_components}"
     val material_dialogs = "com.afollestad.material-dialogs:core:${Versions.material_dialogs}"
+    val material_lifecycle = "com.afollestad.material-dialogs:lifecycle:${Versions.material_dialogs}"
     val material_dialogs_input = "com.afollestad.material-dialogs:input:${Versions.material_dialogs}"
     val room_runtime = "androidx.room:room-runtime:${Versions.room}"
     val room_ktx = "androidx.room:room-ktx:${Versions.room}"

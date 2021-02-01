@@ -17,6 +17,10 @@
     <dimen name="swipe_clamp_extend">20dp</dimen>
     <dimen name="swipe_end_margin">25dp</dimen>
 
+    <!-- detail edit -->
+    <dimen name="link_input_image_height">250dp</dimen>
+    <dimen name="link_input_title_margin">15dp</dimen>
+
     <!-- detail view -->
     <dimen name="detail_view_appbar_size">300dp</dimen>
     <dimen name="dv_margin_start">5dp</dimen>
