@@ -1,16 +1,15 @@
 package com.cleannote.notedetail.edit
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,14 +21,11 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailEditBinding
-import com.cleannote.app.databinding.LayoutLinkInputBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
@@ -48,14 +44,13 @@ import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.jakewharton.rxbinding4.material.offsetChanges
-import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.itemClicks
-import com.jakewharton.rxbinding4.widget.textChangeEvents
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 import java.util.*
@@ -194,7 +189,7 @@ class NoteDetailEditFragment constructor(
                                 loadImagePicker(PickerType.CAMERA)
                             }
                             R.id.link -> {
-                                inputLink()
+                                inputLinkDialog()
                             }
                         }
                     }
@@ -224,53 +219,46 @@ class NoteDetailEditFragment constructor(
             }
     }
 
-    private fun inputLink(){
+    private fun inputLinkDialog(){
         activity?.let { context ->
             view?.clearFocus()
             MaterialDialog(context).show {
                 customView(R.layout.layout_link_input)
                 val view = getCustomView()
                 val compositeDisposable = CompositeDisposable()
+                val pathSubject: PublishSubject<String> = PublishSubject.create()
                 var imagePath: String? = null
-                view.findViewById<EditText>(R.id.edit_link)
-                    .textChanges()
-                    .skipInitialValue()
-                    .debounce(1000L, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
+                val ivLink: ImageView = view.findViewById(R.id.iv_loaded)
+                val confirmBtn: TextView = view.findViewById(R.id.tv_confirm)
+
+                pathSubject
                     .subscribe {
-                        glideRequestManager
-                            .load(it.toString())
-                            .addListener(object : RequestListener<Drawable>{
-                                override fun onLoadFailed(
-                                    e: GlideException?,
-                                    model: Any?,
-                                    target: Target<Drawable>?,
-                                    isFirstResource: Boolean
-                                ): Boolean {
-                                    imagePath = null
-                                    return false
-                                }
-
-                                override fun onResourceReady(
-                                    resource: Drawable?,
-                                    model: Any?,
-                                    target: Target<Drawable>?,
-                                    dataSource: DataSource?,
-                                    isFirstResource: Boolean
-                                ): Boolean {
-                                    imagePath = it.toString()
-                                    return false
-                                }
-                            })
-                            .into(findViewById(R.id.iv_loaded))
-
+                        if (it.isNotEmpty())
+                            confirmBtn.activeOn()
+                        else
+                            confirmBtn.activeOff()
                     }
                     .also {
                         compositeDisposable.add(it)
                     }
 
-                view.findViewById<TextView>(R.id.tv_confirm)
-                    .singleClick()
+                inputLinkTextSource(view)
+                    .flatMapSingle {
+                        loadLinkImgSource(path = it.toString(), preview = ivLink)
+                    }
+                    .subscribe {
+                        val isResourceReady = it.first
+                        val path = it.second
+                        pathSubject.onNext(
+                            if (isResourceReady) path else ""
+                        )
+                    }
+                    .also {
+                        compositeDisposable.add(it)
+                    }
+
+                confirmClickSource(view)
+
                     .subscribe {
                         imagePath?.let {
                             viewModel.uploadImage(it, dateUtil.getCurrentTimestamp())
@@ -281,8 +269,7 @@ class NoteDetailEditFragment constructor(
                         compositeDisposable.add(it)
                     }
 
-                view.findViewById<TextView>(R.id.tv_cancel)
-                    .singleClick()
+                cancelClickSource(view)
                     .subscribe {
                         showToast(getString(R.string.cancel_message))
                         dismiss()
@@ -292,11 +279,75 @@ class NoteDetailEditFragment constructor(
                     }
 
                 onDismiss {
+                    pathSubject.onComplete()
                     compositeDisposable.dispose()
                 }
+
                 lifecycleOwner(viewLifecycleOwner)
             }
         }
+    }
+
+    private fun inputLinkTextSource(
+        view: View
+    ) = view
+        .findViewById<EditText>(R.id.edit_link)
+        .textChanges()
+        .skipInitialValue()
+        .debounce(1000L, TimeUnit.MILLISECONDS)
+        .observeOn(AndroidSchedulers.mainThread())
+
+    private fun loadLinkImgSource(
+        path: String,
+        preview: ImageView
+    ) = Single.create<Pair<Boolean, String>> {
+        glideRequestManager
+            .asBitmap()
+            .load(path)
+            .into(object : CustomTarget<Bitmap>(){
+
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    super.onLoadFailed(errorDrawable)
+                    it.onSuccess(false to path)
+                    emptyPathPreViewGone(path, preview)
+                    preview.setImageDrawable(errorDrawable)
+                }
+
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    it.onSuccess(true to path)
+                    preview.visible()
+                    preview.setImageBitmap(resource)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    preview.setImageDrawable(placeholder)
+                }
+            })
+    }
+
+    private fun confirmClickSource(view: View) = view
+        .findViewById<TextView>(R.id.tv_confirm)
+        .singleClick()
+
+    private fun cancelClickSource(view: View) = view
+        .findViewById<TextView>(R.id.tv_cancel)
+        .singleClick()
+
+    private fun emptyPathPreViewGone(path: String, view: ImageView) =
+        if (path.isEmpty()) view.gone()
+        else view.visible()
+
+    private fun TextView.activeOn(){
+        this.changeTextColor(R.color.green)
+        this.isEnabled = true
+    }
+
+    private fun TextView.activeOff(){
+        this.changeTextColor(R.color.default_grey)
+        this.isEnabled = false
     }
 
     private fun etTitle() = binding.editTitle

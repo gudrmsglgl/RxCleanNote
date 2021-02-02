@@ -71,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/link_input_image_height"
             android:scaleType="fitXY"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/edit_link"
             app:layout_constraintBottom_toBottomOf="parent"
             />
@@ -90,8 +91,9 @@
             android:id="@+id/tv_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/green"
+            android:textColor="@color/default_grey"
             android:text="@string/input_confirm"
+            android:enabled="false"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             />
