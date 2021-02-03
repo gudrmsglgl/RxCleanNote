@@ -29,6 +29,7 @@ constructor(
     private val _query: MutableLiveData<Query> = MutableLiveData(Query(
         order = loadOrderingOnSharedPref()
     ))
+    val queryLike get() = _query.value?.like ?: ""
 
     private val _toolbarState: MutableLiveData<ListToolbarState> = MutableLiveData(SearchState)
     val toolbarState: LiveData<ListToolbarState>

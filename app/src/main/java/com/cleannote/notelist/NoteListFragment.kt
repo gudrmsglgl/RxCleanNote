@@ -24,6 +24,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.cleannote.NoteApplication
 
 import com.cleannote.app.R
@@ -296,6 +297,7 @@ constructor(
 
     private fun navDetailNote(noteUiModel: NoteUiModel){
         bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+        view?.clearFocus()
         findNavController().navigate(R.id.action_noteList_to_detail_nav_graph, bundle)
     }
 
@@ -324,6 +326,14 @@ constructor(
 
     private fun Toolbar.searchEventSource() = findViewById<SearchView>(R.id.sv)
         .apply {
+            if (viewModel.queryLike.isNotEmpty()){
+                isIconified = false
+                setQuery(viewModel.queryLike, false)
+                clearFocus()
+            }
+            else{
+                isIconified = true
+            }
             queryTextChangeEvents()
                 .skipInitialValue()
                 .debounce(1000, TimeUnit.MILLISECONDS)
@@ -370,6 +380,7 @@ constructor(
                     }
 
                 onDismiss { setOrderSource.dispose() }
+                lifecycleOwner(viewLifecycleOwner)
             }
         }
     }
@@ -418,15 +429,16 @@ constructor(
             MaterialDialog(it).show {
                 title(R.string.delete_title)
                 message(text = deleteTitle(param))
-                positiveButton(R.string.delete_ok){
+                positiveButton(R.string.dialog_ok){
                     deleteNotes(param)
                 }
-                negativeButton(R.string.delete_cancel){
+                negativeButton(R.string.dialog_cancel){
                     showToast(getString(R.string.deleteCancelMsg))
                     transSearchState()
                     dismiss()
                 }
                 cancelable(false)
+                lifecycleOwner(viewLifecycleOwner)
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.cleannote.notedetail.edit
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -31,6 +32,7 @@ import com.cleannote.common.DateUtil
 import com.cleannote.extension.*
 import com.cleannote.extension.menu.visibleIcon
 import com.cleannote.extension.rxbinding.singleClick
+import com.cleannote.model.NoteImageUiModel
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
@@ -50,6 +52,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
@@ -66,6 +69,8 @@ class NoteDetailEditFragment constructor(
     private val viewModel
             by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
 
+    private lateinit var imageAdapter: EditImagesAdapter
+
     private val collapseBoundary = -85
 
     private var hasKeyOnBackPress: String? = null
@@ -74,9 +79,11 @@ class NoteDetailEditFragment constructor(
         super.onViewCreated(view, savedInstanceState)
         initBinding()
         initFooterRcvImages()
+        footerImageDeleteIconOnClick()
 
         toolbarStateSource()
         textChangeEditModeSource()
+        toolbarRightMenuSource()
 
         subscribeUpdateNote()
         subscribeDeleteNote()
@@ -93,9 +100,17 @@ class NoteDetailEditFragment constructor(
         .footer
         .rcyImages
         .apply {
-            adapter = EditImagesAdapter(glideRequestManager)
+            imageAdapter = EditImagesAdapter(glideRequestManager)
+            adapter = imageAdapter
             addItemDecoration(HorizontalItemDecoration(15))
         }
+
+    private fun footerImageDeleteIconOnClick() = imageAdapter
+        .imageDeleteSubject
+        .subscribe {
+            imageDeleteDialog(it)
+        }
+        .addCompositeDisposable()
 
     private fun textChangeEditModeSource() = Observable.merge(
         etTitle().textChanges().filter { etTitle().isFocused && !isTitleModified()},
@@ -112,6 +127,16 @@ class NoteDetailEditFragment constructor(
             noteTitleAlpha()
         }
         .addCompositeDisposable()
+
+    private fun toolbarRightMenuSource() = binding
+        .detailToolbar
+        .rightIcon
+        .singleClick()
+        .map { !isEditDoneMenu() }
+        .subscribe { isDeleteMenu ->
+            if (isDeleteMenu) showNoteDeleteDialog()
+            else editDoneMode()
+        }
 
     private fun subscribeUpdateNote() = viewModel
         .updatedNote
@@ -157,25 +182,45 @@ class NoteDetailEditFragment constructor(
             findNavController().popBackStack()
     }
 
-    fun showDeleteDialog() {
-        activity?.let {
-            MaterialDialog(it).show {
-                title(R.string.delete_title)
-                message(R.string.delete_message)
-                positiveButton(R.string.delete_ok){
-                    viewModel.deleteNote(currentNote())
-                }
-                negativeButton(R.string.delete_cancel){
-                    showToast(getString(R.string.deleteCancelMsg))
-                    dismiss()
-                }
-                cancelable(false)
-            }
+    private fun showDeleteDialog(
+        context: Context,
+        type: DeleteType
+    ) = MaterialDialog(context).show {
+        title(R.string.delete_title)
+        deleteMessage(type)
+        negativeButton(R.string.dialog_cancel){
+            showToast(getString(R.string.deleteCancelMsg))
+            dismiss()
         }
+        cancelable(false)
+        lifecycleOwner(viewLifecycleOwner)
+    }
+
+    private fun showNoteDeleteDialog() = activity?.let{
+        showDeleteDialog(it, DeleteType.NOTE)
+            .positiveButton(R.string.dialog_ok){
+                viewModel.deleteNote(currentNote())
+            }
+    }
+
+    private fun imageDeleteDialog(
+        imageModel: NoteImageUiModel
+    ) = activity?.let {
+     showDeleteDialog(it, DeleteType.IMG)
+        .positiveButton(R.string.dialog_ok){
+            viewModel.deleteImage(imageModel.imgPath, dateUtil.getCurrentTimestamp())
+        }
+    }
+
+    private fun MaterialDialog.deleteMessage(type: DeleteType) = when(type){
+        DeleteType.NOTE -> message(R.string.delete_message)
+        else -> message(R.string.delete_image_message)
     }
 
     fun addImagePopupMenu(view: View){
         activity?.let {
+            getView()?.clearFocus()
+            view.hideKeyboard()
             PopupMenu(it, view).apply {
                 menuInflater.inflate(R.menu.menu_image_add, menu)
                 visibleIcon(it)
@@ -227,49 +272,25 @@ class NoteDetailEditFragment constructor(
                 val view = getCustomView()
                 val compositeDisposable = CompositeDisposable()
                 val pathSubject: PublishSubject<String> = PublishSubject.create()
-                var imagePath: String? = null
                 val ivLink: ImageView = view.findViewById(R.id.iv_loaded)
                 val confirmBtn: TextView = view.findViewById(R.id.tv_confirm)
 
-                pathSubject
-                    .subscribe {
-                        if (it.isNotEmpty())
-                            confirmBtn.activeOn()
-                        else
-                            confirmBtn.activeOff()
-                    }
+                confirmBtnChangeActive(pathSubject, confirmBtn)
                     .also {
                         compositeDisposable.add(it)
                     }
 
-                inputLinkTextSource(view)
-                    .flatMapSingle {
-                        loadLinkImgSource(path = it.toString(), preview = ivLink)
-                    }
-                    .subscribe {
-                        val isResourceReady = it.first
-                        val path = it.second
-                        pathSubject.onNext(
-                            if (isResourceReady) path else ""
-                        )
-                    }
+                linkLoadSource(view = view, preview = ivLink, receiveSubject = pathSubject)
                     .also {
                         compositeDisposable.add(it)
                     }
 
-                confirmClickSource(view)
-
-                    .subscribe {
-                        imagePath?.let {
-                            viewModel.uploadImage(it, dateUtil.getCurrentTimestamp())
-                        }
-                        dismiss()
-                    }
-                    .also{
+                uploadImageSource(view, pathSubject)
+                    .also {
                         compositeDisposable.add(it)
                     }
 
-                cancelClickSource(view)
+                cancelClick(view)
                     .subscribe {
                         showToast(getString(R.string.cancel_message))
                         dismiss()
@@ -288,6 +309,46 @@ class NoteDetailEditFragment constructor(
         }
     }
 
+    private fun confirmBtnChangeActive(
+        pathSubject: PublishSubject<String>,
+        btn: TextView
+    ) = pathSubject
+        .subscribe {
+            if (it.isNotEmpty())
+                btn.activeOn()
+            else
+                btn.activeOff()
+        }
+
+    private fun linkLoadSource(
+        view: View,
+        preview: ImageView,
+        receiveSubject: PublishSubject<String>
+    ) = inputLinkTextSource(view)
+        .flatMapSingle {
+            glideLoadImageSource(path = it.toString(), preview = preview)
+        }
+        .subscribe {
+            val isResourceReady = it.first
+            val path = it.second
+            receiveSubject.onNext(
+                if (isResourceReady) path else ""
+            )
+        }
+
+    private fun MaterialDialog.uploadImageSource(
+        view: View,
+        pathSubject: PublishSubject<String>
+    ) = Observable.combineLatest(
+        confirmClick(view),
+        pathSubject,
+        BiFunction { _: Unit, path: String -> path }
+    ).subscribe {
+        if (it.isNotEmpty())
+            viewModel.uploadImage(it, dateUtil.getCurrentTimestamp())
+        dismiss()
+    }
+
     private fun inputLinkTextSource(
         view: View
     ) = view
@@ -297,7 +358,7 @@ class NoteDetailEditFragment constructor(
         .debounce(1000L, TimeUnit.MILLISECONDS)
         .observeOn(AndroidSchedulers.mainThread())
 
-    private fun loadLinkImgSource(
+    private fun glideLoadImageSource(
         path: String,
         preview: ImageView
     ) = Single.create<Pair<Boolean, String>> {
@@ -328,11 +389,11 @@ class NoteDetailEditFragment constructor(
             })
     }
 
-    private fun confirmClickSource(view: View) = view
+    private fun confirmClick(view: View) = view
         .findViewById<TextView>(R.id.tv_confirm)
         .singleClick()
 
-    private fun cancelClickSource(view: View) = view
+    private fun cancelClick(view: View) = view
         .findViewById<TextView>(R.id.tv_cancel)
         .singleClick()
 
@@ -366,7 +427,7 @@ class NoteDetailEditFragment constructor(
 
     fun editCancel() = viewModel.editCancel()
     private fun editMode() = viewModel.editMode()
-    fun editDoneMode() = viewModel.editDoneMode(
+    private fun editDoneMode() = viewModel.editDoneMode(
         currentNote().copy(
             title = etTitle().text.toString(),
             body = etBody().text.toString(),
@@ -375,7 +436,7 @@ class NoteDetailEditFragment constructor(
     )
 
     fun isEditCancelMenu(): Boolean = tbLeftIcon().drawable.equalDrawable(R.drawable.ic_cancel_24dp)
-    fun isEditDoneMenu(): Boolean = tbRightIcon().drawable.equalDrawable(R.drawable.ic_done_24dp)
+    private fun isEditDoneMenu(): Boolean = tbRightIcon().drawable.equalDrawable(R.drawable.ic_done_24dp)
 
     private fun transToolbarState(offset: Int): DetailToolbarState =
         if (offset < collapseBoundary) TbCollapse else TbExpanded
@@ -397,5 +458,9 @@ class NoteDetailEditFragment constructor(
 
     enum class PickerType{
         CAMERA, GALLERY
+    }
+
+    enum class DeleteType{
+        NOTE, IMG
     }
 }

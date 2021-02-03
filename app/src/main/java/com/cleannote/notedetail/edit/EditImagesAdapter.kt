@@ -9,10 +9,14 @@ import com.bumptech.glide.RequestManager
 import com.cleannote.app.R
 import com.cleannote.model.NoteImageUiModel
 import com.cleannote.notedetail.holder.EditImageHolder
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditImagesAdapter(
     val requestManager: RequestManager
 ): ListAdapter<NoteImageUiModel, EditImageHolder>(ImageDiffCallback) {
+
+    private val _imgDeleteSubject: PublishSubject<NoteImageUiModel> = PublishSubject.create()
+    val imageDeleteSubject get() = _imgDeleteSubject
 
     object ImageDiffCallback: DiffUtil.ItemCallback<NoteImageUiModel>(){
         override fun areItemsTheSame(oldItem: NoteImageUiModel, newItem: NoteImageUiModel): Boolean {
@@ -32,6 +36,6 @@ class EditImagesAdapter(
     }
 
     override fun onBindViewHolder(holder: EditImageHolder, position: Int) {
-        holder.bind(currentList[position])
+        holder.bind(currentList[position], _imgDeleteSubject)
     }
 }

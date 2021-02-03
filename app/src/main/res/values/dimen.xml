@@ -41,7 +41,8 @@
 
     <dimen name="default_view_margin">10dp</dimen>
     <dimen name="default_view_margin_negative">-16dp</dimen>
-    <dimen name="attach_image">200dp</dimen>
+    <dimen name="detail_edit_image">200dp</dimen>
+    <dimen name="detail_edit_ic_delete">50dp</dimen>
     <dimen name="menu_item_icon_size">24dp</dimen>
 
 </resources>

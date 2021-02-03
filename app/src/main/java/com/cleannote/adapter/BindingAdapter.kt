@@ -81,10 +81,6 @@ object BindingAdapter {
         imageModel: NoteImageUiModel
     ){
         glideManager
-           /* .applyDefaultRequestOptions(
-                RequestOptions
-                    .bitmapTransform(RoundedCorners(10))
-            )*/
             .load(imageModel.imgPath)
             .thumbnail(0.1f)
             .into(imageView)

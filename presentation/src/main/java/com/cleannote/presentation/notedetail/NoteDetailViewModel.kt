@@ -81,6 +81,24 @@ constructor(
         noteImages = finalNoteAddImage(path)
     )
 
+    fun deleteImage(path: String, updateTime: String){
+        executeUpdate(
+            BeforeAfterNoteView(
+                before = finalNote()!!,
+                after = deletedFinalNoteOfImage(path, updateTime)
+            )
+        )
+    }
+
+    private fun deletedFinalNoteOfImage(
+        path: String,
+        updateTime: String
+    ) = finalNote()!!.copy(
+        updatedAt = updateTime,
+        noteImages = finalNoteRemoveImage(path)
+    )
+
+
     private fun executeUpdate(param: BeforeAfterNoteView){
         _updatedNote.postValue(DataState.loading())
         detailUseCases.updateNote.execute(
@@ -122,11 +140,16 @@ constructor(
 
     fun finalNote() = _finalNote.value
 
-    private fun finalNoteAddImage(
-        path: String
-    ): List<NoteImageView> = finalNoteImages().apply {
-        add(0, path.createNoteImageView(notePk = finalNote()!!.id))
-    }
+    private fun finalNoteAddImage(path: String): List<NoteImageView> = finalNoteImages()
+        .apply {
+            add(0, path.createNoteImageView(notePk = finalNote()!!.id))
+        }
+
+    private fun finalNoteRemoveImage(path: String): List<NoteImageView> = finalNoteImages()
+        .apply {
+            val targetImage = find { it.imagePath == path }
+            remove(targetImage)
+        }
 
     private fun finalNoteImages() = finalNote()!!
         .noteImages

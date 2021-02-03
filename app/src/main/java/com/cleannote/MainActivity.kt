@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), UIController {
     }
 
     private fun dialogIsCancelable(infoType: InfoType): Boolean{
-        return infoType !is InfoType.Question
+        return infoType !is Question
     }
 
     private fun MaterialDialog.dialogButton(

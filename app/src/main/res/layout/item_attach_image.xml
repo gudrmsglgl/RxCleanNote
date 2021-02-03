@@ -9,12 +9,35 @@
             name="imageModel"
             type="com.cleannote.model.NoteImageUiModel" />
     </data>
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/attach_image"
-        android:layout_width="@dimen/attach_image"
-        android:layout_height="@dimen/attach_image"
-        app:glideManager="@{reqManager}"
-        app:imageModel="@{imageModel}"
-        android:scaleType="fitXY"
-        />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="@dimen/detail_edit_image"
+        android:layout_height="@dimen/detail_edit_image">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/attach_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:glideManager="@{reqManager}"
+            app:imageModel="@{imageModel}"
+            android:scaleType="fitXY"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+        <LinearLayout
+            android:id="@+id/ic_delete"
+            android:layout_width="@dimen/detail_edit_ic_delete"
+            android:layout_height="@dimen/detail_edit_ic_delete"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_delete_attach"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
