@@ -1,6 +1,7 @@
 package com.cleannote.presentation.notelist
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
@@ -40,6 +41,9 @@ constructor(
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _mediatorNoteList
 
+    private var _isLastNote = false
+    val isLastNote get() = _isLastNote
+
     private val _insertNote: SingleLiveEvent<DataState<NoteView>> = SingleLiveEvent()
     val insertResult: SingleLiveEvent<DataState<NoteView>>
         get() = _insertNote
@@ -74,6 +78,7 @@ constructor(
                             addAll(searchedNotes.transNoteViews())
                             setNoteListSuccessState(isBackground = true)
                         }
+                    checkLastNote(searchedNotes.size)
                 },
                 onError = {
                     _mediatorNoteList.postValue(DataState.error(it))
@@ -176,7 +181,14 @@ constructor(
 
     // DB every 10 load Note
     // so load Note less than 10 Then Don't exist next page
-    fun isExistNextPage(): Boolean = totalLoadNotes.size / (getQuery().limit) == getQuery().page
+    fun isExistNextPage(): Boolean{
+        val totalNoteSize = totalLoadNotes.size
+        val queryLimit = getQuery().limit
+        val queryPage = getQuery().page
+
+        Log.d("RxCleanNote", "totalNoteSize: $totalNoteSize / queryLimit: $queryLimit == queryPage: $queryPage")
+        return totalLoadNotes.size / (getQuery().limit) == getQuery().page
+    }
 
     fun clearQuery() {
         totalLoadNotes.clear()
@@ -205,5 +217,9 @@ constructor(
             _mediatorNoteList.postValue(DataState.success(this))
         else
             _mediatorNoteList.value = DataState.success(this)
+    }
+
+    private fun checkLastNote(loadSize: Int){
+        _isLastNote = loadSize < getQuery().limit
     }
 }
