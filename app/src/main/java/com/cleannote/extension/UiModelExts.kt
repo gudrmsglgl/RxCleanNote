@@ -30,4 +30,6 @@ fun String.transNoteView() = NoteView(
     updatedAt = getCurrentTimestamp()
 )
 
-private fun getCurrentTimestamp() = SimpleDateFormat("YYYY-MM-dd hh:mm:ss", Locale.KOREA).format(Date())
+private fun getCurrentTimestamp() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(
+    Calendar.getInstance().time
+)

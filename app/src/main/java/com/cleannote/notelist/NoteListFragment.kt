@@ -138,7 +138,7 @@ constructor(
         .subjectManager
         .clickNoteSubject
         .filter {
-            !swipeHelperCallback.previousDeleteMenuClose(binding.recyclerView)
+            !swipeDeleteMenuClose()
         }
         .subscribe {
             if (it.mode == Default)
@@ -207,7 +207,7 @@ constructor(
             mapOf(LAST_VISIBLE_ITEM_POS to it.lastVisibleItemPos(), ITEM_COUNT to it.itemCount())
         }
         .filter {
-            it[LAST_VISIBLE_ITEM_POS] == it[ITEM_COUNT] && viewModel.isExistNextPage()
+            it[LAST_VISIBLE_ITEM_POS] == it[ITEM_COUNT] && !viewModel.isLastNote
         }
         .subscribe {
             viewModel.nextPage()
@@ -217,9 +217,8 @@ constructor(
     private fun scrollEventCloseDeleteMenu() = binding
         .recyclerView
         .scrollStateChanges()
-        .subscribe {
-            swipeHelperCallback.previousDeleteMenuClose(binding.recyclerView)
-        }
+        .filter { swipeHelperCallback.isVisibleDeleteMenu() }
+        .subscribe { swipeDeleteMenuClose() }
         .addCompositeDisposable()
 
     private fun createNote() = binding
@@ -284,11 +283,13 @@ constructor(
                 when (dataState.status) {
                     SUCCESS -> {
                         transSearchState()
+                        swipeDeleteMenuClose()
                         showToast(getString(R.string.deleteSuccessMsg))
                     }
                     ERROR -> {
-                        showErrorMessage(getString(R.string.deleteErrorMsg))
                         transSearchState()
+                        swipeDeleteMenuClose()
+                        showErrorMessage(getString(R.string.deleteErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
                 }
@@ -435,6 +436,7 @@ constructor(
                 negativeButton(R.string.dialog_cancel){
                     showToast(getString(R.string.deleteCancelMsg))
                     transSearchState()
+                    swipeDeleteMenuClose()
                     dismiss()
                 }
                 cancelable(false)
@@ -494,6 +496,8 @@ constructor(
             binding.recyclerView.scrollToPosition(0)
         }, 100L)
     }
+
+    private fun swipeDeleteMenuClose() = swipeHelperCallback.previousDeleteMenuClose(binding.recyclerView)
 
     private fun getNoteMode() = if (curToolbarState() == MultiSelectState) SelectMode else Default
 
