@@ -10,5 +10,6 @@ data class Query(
     var limit: Int = QUERY_DEFAULT_LIMIT,
     var sort: String = SORT_UPDATED_AT,
     var order: String = ORDER_DESC,
-    var like: String? = null
+    var like: String? = null,
+    var startIndex: Int? = null
 )

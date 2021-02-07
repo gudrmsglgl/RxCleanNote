@@ -34,12 +34,13 @@ abstract class CachedNoteDao {
         SELECT * FROM notes 
         WHERE title LIKE '%' || :like || '%' 
         OR body LIKE '%' || :like || '%'
-        ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit)
+        ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
     """)
     abstract fun searchNotesDESC(
         page: Int,
         limit: Int,
-        like: String
+        like: String,
+        startIndex: Int
     ): List<CachedNoteImages>
 
     @Transaction
@@ -47,12 +48,13 @@ abstract class CachedNoteDao {
         SELECT * FROM notes 
         WHERE title LIKE '%' || :like || '%' 
         OR body LIKE '%' || :like || '%'
-        ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit)
+        ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
     """)
     abstract fun searchNotesASC(
         page: Int,
         limit: Int,
-        like: String
+        like: String,
+        startIndex: Int
     ): List<CachedNoteImages>
 
     @Update

@@ -8,8 +8,8 @@ import com.cleannote.data.model.QueryEntity
 fun CachedNoteDao.searchNoteBySorted(
     query: QueryEntity
 ): List<CachedNoteImages> = when(query.order) {
-    NoteQueryUtil.NOTE_SORT_DESC -> searchNotesDESC(query.page, query.limit, query.like ?: "")
-    else -> searchNotesASC(query.page, query.limit, query.like ?: "")
+    NoteQueryUtil.NOTE_SORT_DESC -> searchNotesDESC(query.page, query.limit, query.like ?: "", query.startIndex ?: 0)
+    else -> searchNotesASC(query.page, query.limit, query.like ?: "", query.startIndex ?: 0)
 }
 
 fun CachedNoteDao.currentNoteSize(

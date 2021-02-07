@@ -25,7 +25,7 @@ class NoteViewHolder(
             glideReqManager = requestManager
             noteUiModel = item
 
-            initChecked()
+            //initChecked()
 
             swipeMenuDelete
                 .clicks()

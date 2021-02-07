@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
@@ -17,7 +18,10 @@ import com.cleannote.extension.*
 import com.cleannote.extension.toolbar.setToolbar
 import com.cleannote.extension.toolbar.setUI
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notedetail.Keys.IS_EXECUTE_INSERT
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
+import com.cleannote.notedetail.Keys.REQ_SCROLL_TOP_KEY
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.material.offsetChanges
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -84,7 +88,7 @@ class NoteDetailViewFragment(
             homeIcon = R.drawable.ic_dv_back,
             menuRes = R.menu.menu_detail_view,
             onHomeClick = {
-                findNavController().popBackStack()
+                navPopBackStack()
             },
             onMenuClick = {
                 navDetailEditFragment()
@@ -181,6 +185,19 @@ class NoteDetailViewFragment(
             R.id.action_noteDetailViewFragment_to_noteDetailEditFragment,
             bundleOf(NOTE_DETAIL_BUNDLE_KEY to viewModel.finalNote()?.transNoteUiModel())
         )
+    }
+
+    fun navPopBackStack(){
+        if (isExecuteInsert()) reqScrollTop()
+        findNavController().popBackStack()
+    }
+
+    private fun isExecuteInsert() = arguments?.let {
+        return it.getBoolean(IS_EXECUTE_INSERT)
+    } ?: false
+
+    private fun reqScrollTop(){
+        setFragmentResult(REQUEST_KEY_ON_BACK, bundleOf(REQ_SCROLL_TOP_KEY to true))
     }
 
     override fun onDestroyView() {

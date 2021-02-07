@@ -45,9 +45,11 @@ import com.cleannote.extension.rxbinding.lastVisibleItemPos
 import com.cleannote.extension.rxbinding.singleClick
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notedetail.Keys.IS_EXECUTE_INSERT
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
+import com.cleannote.notedetail.Keys.REQ_SCROLL_TOP_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
 import com.cleannote.notelist.swipe.SwipeAdapter
 import com.cleannote.notelist.swipe.SwipeHelperCallback
@@ -110,6 +112,7 @@ constructor(
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
             requestUpdate(bundle)
             requestDelete(bundle)
+            requestScrollTop(bundle)
         }
     }
 
@@ -142,7 +145,7 @@ constructor(
         }
         .subscribe {
             if (it.mode == Default)
-                navDetailNote(it)
+                navDetailNote(it, isInsertExecute = false)
         }
         .addCompositeDisposable()
 
@@ -266,7 +269,7 @@ constructor(
                 showLoadingProgressBar(dataState.isLoading)
                 when (dataState.status) {
                     SUCCESS -> {
-                        navDetailNote(dataState.data!!.transNoteUiModel())
+                        navDetailNote(dataState.data!!.transNoteUiModel(), isInsertExecute = true)
                     }
                     ERROR -> {
                         showErrorMessage(getString(R.string.insertErrorMsg))
@@ -296,8 +299,12 @@ constructor(
             }
         })
 
-    private fun navDetailNote(noteUiModel: NoteUiModel){
+    private fun navDetailNote(
+        noteUiModel: NoteUiModel,
+        isInsertExecute: Boolean
+    ){
         bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
+        bundle.putBoolean(IS_EXECUTE_INSERT, isInsertExecute)
         view?.clearFocus()
         findNavController().navigate(R.id.action_noteList_to_detail_nav_graph, bundle)
     }
@@ -481,9 +488,15 @@ constructor(
         }
     }
 
+    private fun requestScrollTop(bundle: Bundle){
+        val shouldScrollTop = bundle.getBoolean(REQ_SCROLL_TOP_KEY)
+        if (shouldScrollTop)
+            scrollTop()
+    }
+
     private fun onRefresh() = swipe_refresh.setOnRefreshListener {
         swipe_refresh.isRefreshing = false
-        viewModel.clearQuery()
+        viewModel.initNotes()
     }
 
     fun transSearchState(){

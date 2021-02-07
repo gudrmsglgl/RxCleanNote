@@ -5,5 +5,6 @@ data class QueryEntity (
     val limit: Int,
     val sort: String,
     val order: String,
-    val like: String?
+    val like: String?,
+    val startIndex: Int?
 )

@@ -41,7 +41,7 @@ fun QueryEntity.transQuery() = Query(
 )
 
 fun Query.transQueryEntity() = QueryEntity(
-    this.page, this.limit, this.sort, this.order, this.like
+    this.page, this.limit, this.sort, this.order, this.like, this.startIndex
 )
 
 fun UserEntity.transUser() = User(this.userId, this.nickName)

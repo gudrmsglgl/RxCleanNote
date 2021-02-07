@@ -6,7 +6,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.afollestad.materialdialogs.MaterialDialog
@@ -21,6 +20,7 @@ import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.cleannote.extension.isVisible
 import com.cleannote.notedetail.edit.NoteDetailEditFragment
+import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -166,6 +166,7 @@ class MainActivity : AppCompatActivity(), UIController {
             ?.forEach { fragment ->
                 when (fragment){
                     is OnBackPressListener -> if (fragment.shouldBackPress()) super.onBackPressed()
+                    is NoteDetailViewFragment -> fragment.navPopBackStack()
                     is NoteDetailEditFragment -> fragment.navPopBackStack()
                     else -> super.onBackPressed()
                 }
