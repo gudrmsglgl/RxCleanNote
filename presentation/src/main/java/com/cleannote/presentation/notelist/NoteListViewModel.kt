@@ -1,7 +1,6 @@
 package com.cleannote.presentation.notelist
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.*
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_DESC
@@ -232,7 +231,6 @@ constructor(
     }
 
     private fun List<NoteView>.takeTargetToLast(target: NoteView): List<NoteView>{
-        Log.d("RxCleanNote","removeTargetIndex: ${indexOf(target)}")
         val fromLastToDeleteIndex = (lastIndex - indexOf(target)).plus(1)
         return this.takeLast(fromLastToDeleteIndex)
     }
@@ -247,7 +245,6 @@ constructor(
     ){
         setQuery(getQuery()
             .apply {
-                Log.d("RxCleanNote", "deletePage: ${deletedPage}, startIndex: $index")
                 page =  deletedPage
                 startIndex = index
             }

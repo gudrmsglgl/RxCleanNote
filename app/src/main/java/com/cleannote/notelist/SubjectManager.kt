@@ -17,11 +17,8 @@ class SubjectManager @Inject constructor(){
     private val _deleteClickSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
     val deleteClickSubject get() = _deleteClickSubject
 
-    private val _multiClickSubject: PublishSubject<Pair<Int, Boolean>> = PublishSubject.create()
-    val multiClickSubject get() = _multiClickSubject
-
     private val subjects: Set<Subject<*>> =
-        setOf(_clickNoteSubject, _longClickSubject,_deleteClickSubject, _multiClickSubject)
+        setOf(_clickNoteSubject, _longClickSubject,_deleteClickSubject)
 
     fun releaseSubjects(){
         subjects.forEach {

@@ -5,11 +5,11 @@ import com.bumptech.glide.RequestManager
 import com.cleannote.app.databinding.ItemNoteListBinding
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notelist.NoteListAdapter
 import com.cleannote.notelist.SubjectManager
-import com.cleannote.notelist.swipe.SwipeHelperCallback
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.longClicks
-import com.jakewharton.rxbinding4.widget.checkedChanges
+import timber.log.Timber
 
 class NoteViewHolder(
     val binding: ItemNoteListBinding,
@@ -25,7 +25,8 @@ class NoteViewHolder(
             glideReqManager = requestManager
             noteUiModel = item
 
-            //initChecked()
+            if (item.mode == MultiDefault) checkboxDelete.isChecked = false
+            else if (item.mode == MultiSelect) checkboxDelete.isChecked = true
 
             swipeMenuDelete
                 .clicks()
@@ -38,9 +39,8 @@ class NoteViewHolder(
                 .clicks()
                 .map { item }
                 .doOnNext{
-                    if (checkboxDelete.isVisible) {
+                    if (it.mode != Default)
                         checkboxDelete.isChecked = !checkboxDelete.isChecked
-                    }
                 }
                 .subscribe(subjectManager.clickNoteSubject)
 
@@ -48,23 +48,9 @@ class NoteViewHolder(
                 .longClicks { true }
                 .subscribe(subjectManager.longClickSubject)
 
-            checkboxDelete
-                .checkedChanges()
-                .skipInitialValue()
-                .map { isChecked ->
-                    position to isChecked
-                }
-                .subscribe(subjectManager.multiClickSubject)
-
         }
     }
 
     private fun isClamped(holder: NoteViewHolder) = holder.itemView.tag as? Boolean ?: false
-
-    private fun initChecked() = with(binding){
-        if (checkboxDelete.isVisible) {
-            checkboxDelete.isChecked = false
-        }
-    }
 
 }

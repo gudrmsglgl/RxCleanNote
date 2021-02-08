@@ -64,10 +64,9 @@
         android:buttonTint="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:visible="@{noteUiModel.mode == NoteMode.SelectMode}"/>
-        <!--app:visible="@{noteUiModel.mode == NoteMode.MultiDefault || noteUiModel.mode == NoteMode.MultiSelected}"-->
-        <!--android:checked="@{ noteUiModel.mode == NoteMode.MultiSelected ? true : false }"-->
-
+        app:visible="@{noteUiModel.mode == NoteMode.MultiDefault || noteUiModel.mode == NoteMode.MultiSelect}"
+        />
+    <!--android:checked="@{ noteUiModel.mode == NoteMode.MultiSelect ? true : false}"-->
 
     <TextView
         android:id="@+id/edit_title"
