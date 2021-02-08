@@ -14,5 +14,6 @@ data class NoteUiModel(val id: String,
 
 enum class NoteMode{
     Default,
-    SelectMode
+    MultiDefault,
+    MultiSelect
 }

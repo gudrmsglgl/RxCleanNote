@@ -1,4 +1,4 @@
-    package com.cleannote.notelist
+package com.cleannote.notelist
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -108,7 +108,6 @@ constructor(
         noteOnClick()
         noteOnLongClick()
         noteSwipeMenuOnDeleteClick()
-        noteOnMultiCheck()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
             requestUpdate(bundle)
             requestDelete(bundle)
@@ -127,12 +126,12 @@ constructor(
                 is SearchState -> {
                     addSearchViewToolbarContainer()
                     setupSearchViewToolbar()
-                    noteAdapter.changeNoteMode(Default)
+                    noteAdapter.changeAllNoteMode(Default)
+                    noteAdapter.deleteCheckClear()
                 }
                 is MultiSelectState -> {
                     addMultiDeleteToolbarContainer()
-                    noteAdapter.deleteCheckClear()
-                    noteAdapter.changeNoteMode(SelectMode)
+                    noteAdapter.changeAllNoteMode(MultiDefault)
                 }
             }}
         )
@@ -144,8 +143,15 @@ constructor(
             !swipeDeleteMenuClose()
         }
         .subscribe {
-            if (it.mode == Default)
-                navDetailNote(it, isInsertExecute = false)
+            when (it.mode) {
+                Default -> navDetailNote(it.first, isInsertExecute = false)
+                MultiDefault -> {
+                    noteAdapter.deleteChecked(it)
+                }
+                else -> {
+                    noteAdapter.deleteNotChecked(it)
+                }
+            }
         }
         .addCompositeDisposable()
 
@@ -165,23 +171,6 @@ constructor(
             showDeleteDialog(listOf(it))
         }
         .addCompositeDisposable()
-
-    private fun noteOnMultiCheck() = noteAdapter
-        .subjectManager
-        .multiClickSubject
-        .subscribe {
-            checkDeleteNotes(it)
-        }
-        .addCompositeDisposable()
-
-    private fun checkDeleteNotes(param: Pair<Int, Boolean>){
-        val position = param.first
-        val isChecked = param.second
-        if (isChecked)
-            noteAdapter.deleteChecked(position)
-        else
-            noteAdapter.deleteNotChecked(position)
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initRecyclerView() = binding
@@ -253,7 +242,8 @@ constructor(
                 showLoadingProgressBar(dataState.isLoading)
                 when (dataState.status) {
                     SUCCESS -> {
-                        noteAdapter.submitList(currentNoteMode(dataState.data!!))
+                        noteAdapter.fetchRecyclerView(currentNoteMode(dataState.data!!))
+                        //noteAdapter.submitList(currentNoteMode(dataState.data!!))
                     }
                     ERROR -> {
                         showErrorMessage(getString(R.string.searchErrorMsg))
@@ -285,11 +275,13 @@ constructor(
                 showLoadingProgressBar(dataState.isLoading)
                 when (dataState.status) {
                     SUCCESS -> {
+                        noteAdapter.deleteCheckClear()
                         transSearchState()
                         swipeDeleteMenuClose()
                         showToast(getString(R.string.deleteSuccessMsg))
                     }
                     ERROR -> {
+                        noteAdapter.deleteCheckClear()
                         transSearchState()
                         swipeDeleteMenuClose()
                         showErrorMessage(getString(R.string.deleteErrorMsg))
@@ -512,7 +504,7 @@ constructor(
 
     private fun swipeDeleteMenuClose() = swipeHelperCallback.previousDeleteMenuClose(binding.recyclerView)
 
-    private fun getNoteMode() = if (curToolbarState() == MultiSelectState) SelectMode else Default
+    private fun getNoteMode() = if (curToolbarState() == MultiSelectState) MultiDefault else Default
 
     private fun currentNoteMode(data: List<NoteView>) = data.transNoteUiModels(getNoteMode())
 

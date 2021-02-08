@@ -12,6 +12,7 @@ import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.holder.BaseHolder
 import com.cleannote.notelist.holder.NoteViewHolder
+import timber.log.Timber
 
 class NoteListAdapter(
     val context: Context,
@@ -19,9 +20,9 @@ class NoteListAdapter(
     val subjectManager: SubjectManager
 ): ListAdapter<NoteUiModel, BaseHolder<NoteUiModel>>(NoteDiffCallback) {
 
-    private val _checkedNotes: MutableSet<NoteUiModel> = hashSetOf()
+    private val _checkedNotes: HashMap<String, NoteUiModel> = hashMapOf()
     val checkedNotes: List<NoteUiModel>
-        get() = _checkedNotes.toList()
+        get() = _checkedNotes.values.toList()
 
     override fun getItemId(position: Int): Long {
         return currentList[position].hashCode().toLong()
@@ -55,7 +56,29 @@ class NoteListAdapter(
         holder.bind(currentList[position], position, subjectManager)
     }
 
-    fun changeNoteMode(noteMode: NoteMode){
+    fun fetchRecyclerView(loadNotes: List<NoteUiModel>){
+        if (_checkedNotes.isNotEmpty())
+            submitList(
+                changeLoadNotesToCheckNotes(loadNotes)
+            )
+        else
+            submitList(loadNotes)
+    }
+
+    private fun changeLoadNotesToCheckNotes(loadedNotes: List<NoteUiModel>) = loadedNotes
+        .toMutableList()
+        .apply {
+            _checkedNotes.forEach { ( _ , value) ->
+                val target = find { it.id == value.id }
+                val targetIndex = indexOf(target)
+                if (targetIndex != -1){
+                    remove(target)
+                    add(targetIndex, value)
+                }
+            }
+        }
+
+    fun changeAllNoteMode(noteMode: NoteMode){
         val changedNote = currentList
             .map { it.apply { mode = noteMode } }
 
@@ -63,12 +86,29 @@ class NoteListAdapter(
         notifyDataSetChanged()
     }
 
+    private fun changeNoteMode(item: NoteUiModel, mode: NoteMode){
+        currentList.apply {
+            val selectItem = find { it.id == item.id }
+            selectItem?.mode = mode
+        }
+    }
+
     fun isDefaultMode() = currentList.any {
         it.mode == Default
     }
 
-    fun deleteChecked(position: Int) = _checkedNotes.add(currentList[position])
-    fun deleteNotChecked(position: Int) = _checkedNotes.remove(currentList[position])
+    fun deleteChecked(item: NoteUiModel){
+        changeNoteMode(item, MultiSelect)
+        _checkedNotes.put(item.id, item)
+        submitList(currentList)
+    }
+
+    fun deleteNotChecked(item: NoteUiModel){
+        changeNoteMode(item, MultiDefault)
+        _checkedNotes.remove(item.id)
+        submitList(currentList)
+    }
+
     fun deleteCheckClear() = _checkedNotes.clear()
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
