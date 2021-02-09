@@ -17,6 +17,7 @@ import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.UserView
 import com.cleannote.presentation.splash.SplashViewModel
 import kotlinx.android.synthetic.main.fragment_splash.*
+import timber.log.Timber
 
 /**
  * A simple [Fragment] subclass.
@@ -83,7 +84,7 @@ class SplashFragment constructor(
                     showRetryLoginDialog()
                 }
                 override fun cancelProceed() {
-                    timber("d", "취소 되었습니다.")
+                    Timber.tag("RxCleanNote").d("취소 되었습니다.")
                 }
             })
     }

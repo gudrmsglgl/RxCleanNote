@@ -12,7 +12,6 @@ import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.holder.BaseHolder
 import com.cleannote.notelist.holder.NoteViewHolder
-import timber.log.Timber
 
 class NoteListAdapter(
     val context: Context,

@@ -5,11 +5,9 @@ import com.bumptech.glide.RequestManager
 import com.cleannote.app.databinding.ItemNoteListBinding
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notelist.NoteListAdapter
 import com.cleannote.notelist.SubjectManager
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.longClicks
-import timber.log.Timber
 
 class NoteViewHolder(
     val binding: ItemNoteListBinding,

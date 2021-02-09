@@ -30,12 +30,11 @@ import com.cleannote.NoteApplication
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
 import com.cleannote.app.databinding.LayoutMultideleteToolbarBinding
-import com.cleannote.common.BaseFragment
-import com.cleannote.common.InputCaptureCallback
+import com.cleannote.common.*
+import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.data.ui.InputType
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.notelist.NoteListViewModel
-import com.cleannote.common.OnBackPressListener
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
@@ -51,6 +50,8 @@ import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_SCROLL_TOP_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
+import com.cleannote.notelist.dialog.ListDeleteDialog
+import com.cleannote.notelist.dialog.ListFilterDialog
 import com.cleannote.notelist.swipe.SwipeAdapter
 import com.cleannote.notelist.swipe.SwipeHelperCallback
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
@@ -59,6 +60,7 @@ import com.cleannote.presentation.model.NoteView
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
+import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.checkedChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.BiFunction
@@ -144,7 +146,7 @@ constructor(
         }
         .subscribe {
             when (it.mode) {
-                Default -> navDetailNote(it.first, isInsertExecute = false)
+                Default -> navDetailNote(it, isInsertExecute = false)
                 MultiDefault -> {
                     noteAdapter.deleteChecked(it)
                 }
@@ -243,7 +245,6 @@ constructor(
                 when (dataState.status) {
                     SUCCESS -> {
                         noteAdapter.fetchRecyclerView(currentNoteMode(dataState.data!!))
-                        //noteAdapter.submitList(currentNoteMode(dataState.data!!))
                     }
                     ERROR -> {
                         showErrorMessage(getString(R.string.searchErrorMsg))
@@ -365,58 +366,14 @@ constructor(
 
     private fun showFilterDialog() {
         activity?.let { activity ->
-            MaterialDialog(activity).show {
-                customView(R.layout.layout_filter)
-                cancelable(true)
-
-                val view = getCustomView()
-                val filterOk = view.findViewById<Button>(R.id.filter_btn_ok)
-
-                val setOrderSource = dialogOkClickSource(dialogView = view, okBtn = filterOk)
-                    .subscribe { order ->
-                        saveCacheThenOrdering(order)
-                        scrollTop()
-                        dismiss()
-                    }
-
-                onDismiss { setOrderSource.dispose() }
-                lifecycleOwner(viewLifecycleOwner)
-            }
+            ListFilterDialog(activity, sharedPref)
+                .showDialog { dialog, order ->
+                    saveCacheThenOrdering(order)
+                    scrollTop()
+                    dialog.dismiss()
+                }
+                .lifecycleOwner(viewLifecycleOwner)
         }
-    }
-
-    private fun dialogOkClickSource(
-        dialogView: View,
-        okBtn: View
-    ) = Observable.combineLatest(
-        selectedRadioBtnSource(dialogView),
-        okBtn.singleClick(),
-        BiFunction { selectedRadioBtn: Int, _: Unit ->
-            selectedRadioBtn
-        })
-        .map {
-            if (it == R.id.radio_btn_desc)
-                ORDER_DESC
-            else
-                ORDER_ASC
-        }
-
-    private fun selectedRadioBtnSource(view: View) = initCheckedRadioGroup(view).checkedChanges()
-
-    private fun initCheckedRadioGroup(view: View): RadioGroup {
-        return view
-            .findViewById<RadioGroup>(R.id.radio_group)
-            .apply {
-                check(getCachedRadioBtn())
-            }
-    }
-
-    @IdRes
-    private fun getCachedRadioBtn(): Int{
-        return if (ORDER_DESC == sharedPref.getString(FILTER_ORDERING_KEY, ORDER_DESC))
-            R.id.radio_btn_desc
-        else
-            R.id.radio_btn_asc
     }
 
     private fun saveCacheThenOrdering(order: String){
@@ -426,37 +383,17 @@ constructor(
 
     fun showDeleteDialog(param: List<NoteUiModel>) {
         activity?.let {
-            MaterialDialog(it).show {
-                title(R.string.delete_title)
-                message(text = deleteTitle(param))
-                positiveButton(R.string.dialog_ok){
+            ListDeleteDialog(DeleteDialog(it))
+                .showDeleteDialog(param)
+                .positiveButton {
                     deleteNotes(param)
                 }
-                negativeButton(R.string.dialog_cancel){
-                    showToast(getString(R.string.deleteCancelMsg))
+                .negativeButton {
                     transSearchState()
                     swipeDeleteMenuClose()
-                    dismiss()
                 }
-                cancelable(false)
-                lifecycleOwner(viewLifecycleOwner)
-            }
+                .lifecycleOwner(viewLifecycleOwner)
         }
-    }
-
-    private fun deleteTitle(
-        deleteMemos: List<NoteUiModel>
-    ): String = when {
-        deleteMemos.size == 1 -> {
-            """
-                |${deleteMemos[0].title}
-                |메모를 삭제 하시겠습니까?
-            """.trimMargin()
-        }
-        deleteMemos.size > 1 -> {
-            getString(R.string.delete_multi_select_message)
-        }
-        else -> ""
     }
 
     private fun deleteNotes(param: List<NoteUiModel>){

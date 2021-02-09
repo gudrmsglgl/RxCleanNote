@@ -51,15 +51,6 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         setUIController(mockController = null)
     }
 
-    fun timber(type: String, message: String){
-        Timber.tag("RxCleanNote")
-        when (type) {
-            "d" -> Timber.d(message)
-            "i" -> Timber.i(message)
-            "e" -> Timber.e(message)
-        }
-    }
-
     fun showLoadingProgressBar(show: Boolean) = with(uiController){
         displayProgressBar(show)
     }
@@ -119,7 +110,7 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
             try{
                 uiController = context as UIController
             }catch (e: ClassCastException) {
-                timber("d", "$context must implement com.cleannote.common.UIController")
+                Timber.tag("RxCleanNote").d("$context must implement com.cleannote.common.UIController")
             }
     }
 

@@ -1,7 +1,6 @@
 package com.cleannote.notedetail.edit
 
 import android.app.Activity
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -29,6 +28,7 @@ import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailEditBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
+import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.extension.*
 import com.cleannote.extension.menu.visibleIcon
 import com.cleannote.extension.rxbinding.singleClick
@@ -36,6 +36,7 @@ import com.cleannote.model.NoteImageUiModel
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
+import com.cleannote.notedetail.edit.dialog.EditDeleteDialog
 import com.cleannote.presentation.data.State.ERROR
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
@@ -108,7 +109,7 @@ class NoteDetailEditFragment constructor(
     private fun footerImageDeleteIconOnClick() = imageAdapter
         .imageDeleteSubject
         .subscribe {
-            imageDeleteDialog(it)
+            showImageDeleteDialog(it)
         }
         .addCompositeDisposable()
 
@@ -182,39 +183,22 @@ class NoteDetailEditFragment constructor(
             findNavController().popBackStack()
     }
 
-    private fun showDeleteDialog(
-        context: Context,
-        type: DeleteType
-    ) = MaterialDialog(context).show {
-        title(R.string.delete_title)
-        deleteMessage(type)
-        negativeButton(R.string.dialog_cancel){
-            showToast(getString(R.string.deleteCancelMsg))
-            dismiss()
-        }
-        cancelable(false)
-        lifecycleOwner(viewLifecycleOwner)
-    }
-
     private fun showNoteDeleteDialog() = activity?.let{
-        showDeleteDialog(it, DeleteType.NOTE)
-            .positiveButton(R.string.dialog_ok){
+        EditDeleteDialog(DeleteDialog(it))
+            .showNoteDeleteDialog()
+            .positiveButton {
                 viewModel.deleteNote(currentNote())
             }
+            .lifecycleOwner(viewLifecycleOwner)
     }
 
-    private fun imageDeleteDialog(
-        imageModel: NoteImageUiModel
-    ) = activity?.let {
-     showDeleteDialog(it, DeleteType.IMG)
-        .positiveButton(R.string.dialog_ok){
-            viewModel.deleteImage(imageModel.imgPath, dateUtil.getCurrentTimestamp())
-        }
-    }
-
-    private fun MaterialDialog.deleteMessage(type: DeleteType) = when(type){
-        DeleteType.NOTE -> message(R.string.delete_message)
-        else -> message(R.string.delete_image_message)
+    private fun showImageDeleteDialog(imageModel: NoteImageUiModel) = activity?.let {
+        EditDeleteDialog(DeleteDialog(it))
+            .showImageDeleteDialog()
+            .positiveButton {
+                viewModel.deleteImage(imageModel.imgPath, dateUtil.getCurrentTimestamp())
+            }
+            .lifecycleOwner(viewLifecycleOwner)
     }
 
     fun addImagePopupMenu(view: View){
@@ -460,7 +444,4 @@ class NoteDetailEditFragment constructor(
         CAMERA, GALLERY
     }
 
-    enum class DeleteType{
-        NOTE, IMG
-    }
 }
