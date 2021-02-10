@@ -6,23 +6,20 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.cleannote.app.R
 
-class DeleteDialog(
+class ErrorDialog(
     override val context: Context,
     private val viewLifeCycleOwner: LifecycleOwner
-): BaseDeleteDialog {
+): BaseDialog {
 
-    override fun makeDefaultDialog() = MaterialDialog(context)
+    override fun makeDefaultDialog(): MaterialDialog = MaterialDialog(context)
+        .title(R.string.dialog_title_error)
+
+    fun showDialog(errMessage: String) = makeDefaultDialog()
         .show {
-            title(R.string.delete_title)
-            positiveButton(R.string.dialog_ok)
-            negativeButton(R.string.dialog_cancel){
-                showToast(R.string.deleteCancelMsg)
+            message(text = errMessage)
+            positiveButton {
                 dismiss()
             }
-            cancelable(false)
             lifecycleOwner(viewLifeCycleOwner)
         }
-
-    override fun showDialog(message: String): MaterialDialog = makeDefaultDialog()
-        .message(text = message)
 }

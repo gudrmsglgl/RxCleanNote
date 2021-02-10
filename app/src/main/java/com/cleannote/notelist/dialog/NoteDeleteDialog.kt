@@ -1,17 +1,16 @@
 package com.cleannote.notelist.dialog
 
+import com.afollestad.materialdialogs.MaterialDialog
 import com.cleannote.app.R
-import com.cleannote.common.dialog.BaseDialog
+import com.cleannote.common.dialog.BaseDeleteDialog
 import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.model.NoteUiModel
 
-class ListDeleteDialog(dialog: DeleteDialog): BaseDialog by dialog {
-    fun showDeleteDialog(
-        notes: List<NoteUiModel>
-    ) = makeDefaultDialog()
-        .message(text = deleteTitle(notes))
+class NoteDeleteDialog(val dialog: DeleteDialog): BaseDeleteDialog by dialog {
 
-    private fun deleteTitle(
+    fun showDialog(notes: List<NoteUiModel>): MaterialDialog = showDialog(message(notes))
+
+    private fun message(
         deleteMemos: List<NoteUiModel>
     ): String = when {
         deleteMemos.size == 1 -> {

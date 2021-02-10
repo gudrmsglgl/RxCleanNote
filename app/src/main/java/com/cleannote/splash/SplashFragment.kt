@@ -32,7 +32,6 @@ class SplashFragment constructor(
         super.onViewCreated(view, savedInstanceState)
         //viewModel.tryLogin()
         //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
-        logoClickListener()
         subscribeLoginResult()
     }
 
@@ -40,16 +39,7 @@ class SplashFragment constructor(
         println("TODO: dataBinding")
     }
 
-    private fun logoClickListener(){
-        splash_logo.singleClick()
-            .subscribe {
-                showInputDialog(
-                    getString(R.string.dialog_login),
-                    InputType.Login,
-                    inputCaptureCallback
-                )}
-            .addCompositeDisposable()
-    }
+
 
     private fun subscribeLoginResult() = viewModel.loginResult
         .observe(viewLifecycleOwner,
@@ -59,7 +49,6 @@ class SplashFragment constructor(
                         is LOADING -> showLoadingProgressBar(true)
                         is SUCCESS -> {
                             showLoadingProgressBar(false)
-                            showSuccessLoginUser(it.data)
                         }
                         is ERROR -> {
                             showLoadingProgressBar(false)
@@ -69,35 +58,4 @@ class SplashFragment constructor(
                 }
             })
 
-    private fun showSuccessLoginUser(data: List<UserView>?){
-        data?.let {
-            val userView = it[0]
-            val loginMessage = """
-                | Welcome ${userView.nick} 
-                | RxClean Note App""".trimMargin()
-            showToast(loginMessage)
-            //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
-        }?: showErrorMessage(
-            "errorMessage",
-            object : DialogBtnCallback{
-                override fun confirmProceed() {
-                    showRetryLoginDialog()
-                }
-                override fun cancelProceed() {
-                    Timber.tag("RxCleanNote").d("취소 되었습니다.")
-                }
-            })
-    }
-
-    private fun showRetryLoginDialog(){
-        val retryMessage = getString(R.string.dialog_login_retry)
-        showInputDialog(retryMessage, InputType.Login, inputCaptureCallback)
-    }
-
-    private val inputCaptureCallback: InputCaptureCallback = object : InputCaptureCallback{
-        override fun onTextCaptured(text: String) = with(viewModel) {
-            setUserId(text)
-            tryLogin()
-        }
-    }
 }

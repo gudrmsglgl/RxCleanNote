@@ -7,10 +7,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -20,10 +18,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.cleannote.NoteApplication
 
@@ -32,12 +26,10 @@ import com.cleannote.app.databinding.FragmentNoteListBinding
 import com.cleannote.app.databinding.LayoutMultideleteToolbarBinding
 import com.cleannote.common.*
 import com.cleannote.common.dialog.DeleteDialog
-import com.cleannote.data.ui.InputType
+import com.cleannote.common.dialog.InputDialog
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
-import com.cleannote.domain.Constants.ORDER_ASC
-import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.extension.*
 import com.cleannote.extension.rxbinding.itemCount
 import com.cleannote.extension.rxbinding.lastVisibleItemPos
@@ -50,7 +42,7 @@ import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_SCROLL_TOP_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
-import com.cleannote.notelist.dialog.ListDeleteDialog
+import com.cleannote.notelist.dialog.NoteDeleteDialog
 import com.cleannote.notelist.dialog.ListFilterDialog
 import com.cleannote.notelist.swipe.SwipeAdapter
 import com.cleannote.notelist.swipe.SwipeHelperCallback
@@ -60,10 +52,6 @@ import com.cleannote.presentation.model.NoteView
 import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
-import com.jakewharton.rxbinding4.view.clicks
-import com.jakewharton.rxbinding4.widget.checkedChanges
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.layout_search_toolbar.view.*
 import java.util.concurrent.TimeUnit
@@ -219,22 +207,19 @@ constructor(
         .addNewNoteFab
         .singleClick()
         .subscribe {
-            showNewNoteDialog {
-                viewModel.insertNotes(it.transNoteView())
-            }
+            showInputDialog()
         }
         .addCompositeDisposable()
 
-    private inline fun showNewNoteDialog(crossinline func: (String) -> Unit){
-        showInputDialog(
-            getString(R.string.dialog_newnote),
-            InputType.NewNote,
-            object : InputCaptureCallback {
-                override fun onTextCaptured(text: String) {
-                    func.invoke(text)
-                }
+    private fun showInputDialog() = activity?.let { context ->
+        InputDialog(context)
+            .setHint(getString(R.string.dialog_new_note_hint))
+            .setMessage(getString(R.string.dialog_new_note))
+            .onPositiveClick {
+                if (it != null)
+                    viewModel.insertNotes(it.transNoteView())
             }
-        )
+            .lifecycleOwner(viewLifecycleOwner)
     }
 
     private fun subscribeNoteList() = viewModel
@@ -321,20 +306,27 @@ constructor(
     private fun setupSearchViewToolbar() = binding.toolbarContentContainer
         .findViewById<Toolbar>(R.id.search_toolbar)
         .apply {
-            searchEventSource()
+            searchViewSetQuery(R.id.sv, viewModel.queryLike)
+            searchEventSource(R.id.sv)
             filterMenu()
         }
 
-    private fun Toolbar.searchEventSource() = findViewById<SearchView>(R.id.sv)
+    private fun Toolbar.searchViewSetQuery(
+        @IdRes idRes: Int,
+        keyword: String
+    ) = findViewById<SearchView>(idRes)
         .apply {
-            if (viewModel.queryLike.isNotEmpty()){
+            if (keyword.isNotEmpty()) {
                 isIconified = false
-                setQuery(viewModel.queryLike, false)
+                setQuery(keyword, false)
                 clearFocus()
             }
-            else{
+            else
                 isIconified = true
-            }
+        }
+
+    private fun Toolbar.searchEventSource(@IdRes idRes: Int) = findViewById<SearchView>(idRes)
+        .apply {
             queryTextChangeEvents()
                 .skipInitialValue()
                 .debounce(1000, TimeUnit.MILLISECONDS)
@@ -366,13 +358,12 @@ constructor(
 
     private fun showFilterDialog() {
         activity?.let { activity ->
-            ListFilterDialog(activity, sharedPref)
-                .showDialog { dialog, order ->
-                    saveCacheThenOrdering(order)
+            ListFilterDialog(activity, sharedPref, viewLifecycleOwner)
+                .showDialog { dialog, checkedOrder ->
+                    saveCacheThenOrdering(checkedOrder)
                     scrollTop()
                     dialog.dismiss()
                 }
-                .lifecycleOwner(viewLifecycleOwner)
         }
     }
 
@@ -383,8 +374,8 @@ constructor(
 
     fun showDeleteDialog(param: List<NoteUiModel>) {
         activity?.let {
-            ListDeleteDialog(DeleteDialog(it))
-                .showDeleteDialog(param)
+            NoteDeleteDialog(DeleteDialog(it, viewLifecycleOwner))
+                .showDialog(param)
                 .positiveButton {
                     deleteNotes(param)
                 }
@@ -392,7 +383,6 @@ constructor(
                     transSearchState()
                     swipeDeleteMenuClose()
                 }
-                .lifecycleOwner(viewLifecycleOwner)
         }
     }
 

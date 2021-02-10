@@ -18,8 +18,9 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
+import com.cleannote.common.dialog.ErrorDialog
 import com.cleannote.data.ui.InfoType
-import com.cleannote.data.ui.InputType
 import com.cleannote.data.ui.UIMessage
 import com.cleannote.data.ui.UIType
 import com.cleannote.presentation.data.DataState
@@ -72,36 +73,8 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         Toast.makeText(it, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun showErrorMessage(
-        message: String,
-        dialogBtnCallback: DialogBtnCallback? = null
-    ) = with(uiController) {
-        showUIMessage(
-            UIMessage(message, UIType.Dialog, InfoType.Warning),
-            dialogBtnCallback
-        )
-    }
-
-    fun showConfirmMessage(
-        message: String,
-        dialogBtnCallback: DialogBtnCallback? = null
-    ) = with(uiController){
-        showUIMessage(
-            UIMessage(message, UIType.Dialog, InfoType.Confirm),
-            dialogBtnCallback
-        )
-    }
-
-    fun showInputDialog(
-        message: String,
-        inputType: InputType,
-        inputCaptureCallback: InputCaptureCallback? = null
-    ) = with(uiController){
-        showUIMessage(
-            UIMessage(message, UIType.Input, null, inputType),
-            null,
-            inputCaptureCallback
-        )
+    fun showErrorMessage(errorMsg: String) = activity?.let {
+        ErrorDialog(it, viewLifecycleOwner).showDialog(errorMsg)
     }
 
     fun setUIController(mockController: UIController?){

@@ -8,6 +8,4 @@ import com.cleannote.app.R
 object MainActivityScreen: BaseScreen<MainActivityScreen>() {
     val noteListScreen = NoteListScreen
     val noteDetailScreen = DetailNoteScreen
-    val newNoteDialog = NLNewNoteDialog(withId(R.layout.md_dialog_stub_input))
-    val errorDialog = NErrorDialog(withId(R.layout.md_dialog_base))
 }

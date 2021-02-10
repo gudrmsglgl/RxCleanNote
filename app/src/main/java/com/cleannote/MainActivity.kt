@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity(), UIController {
 
     private fun getInputHint(inputType: InputType) = when(inputType){
         InputType.Login -> getString(R.string.dialog_id_hint)
-        else -> getString(R.string.dialog_newnote_hint)
+        else -> getString(R.string.dialog_new_note_hint)
     }
 
     private fun showToast(message: String){

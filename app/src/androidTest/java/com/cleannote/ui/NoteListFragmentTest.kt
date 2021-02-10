@@ -99,11 +99,11 @@ class NoteListFragmentTest: BaseTest() {
         stubInitOrdering(query.order)
         stubThrowableNoteRepositorySearchNotes(RuntimeException(errorMsg), query)
 
-        ActivityScenario.launch(MainActivity::class.java)
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        activity {
+        noteListScreen {
             errorDialog {
-                title.hasText(R.string.dialog_title_warning)
+                title.hasText(R.string.dialog_title_error)
                 message.hasText(R.string.searchErrorMsg)
                 positiveBtn.click()
             }
@@ -311,24 +311,23 @@ class NoteListFragmentTest: BaseTest() {
         stubInitOrdering(query.order)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        ActivityScenario.launch(MainActivity::class.java)
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        activity {
-            noteListScreen {
-                insertBtn {
-                    click()
-                }
+        noteListScreen {
+            insertBtn {
+                click()
             }
             newNoteDialog {
                 message {
-                    hasText(R.string.dialog_newnote)
+                    hasText(R.string.dialog_new_note)
                 }
                 editTitle {
-                    hasHint(R.string.dialog_newnote_hint)
+                    hasHint(R.string.dialog_new_note_hint)
                     typeText("FabTest")
                 }
             }
         }
+
     }
 
     @Test
@@ -401,14 +400,12 @@ class NoteListFragmentTest: BaseTest() {
                     title.hasText(R.string.delete_title)
                     positiveBtn.click()
                 }
+                errorDialog {
+                    title.hasText(R.string.dialog_title_warning)
+                    positiveBtn.click()
+                }
+                recyclerView.hasSize(notes.size)
             }
-
-            errorDialog {
-                title.hasText(R.string.dialog_title_warning)
-                positiveBtn.click()
-            }
-
-            noteListScreen.recyclerView.hasSize(notes.size)
         }
     }
 

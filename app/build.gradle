@@ -17,7 +17,7 @@ android {
         versionName Application.version_name
 
         testInstrumentationRunner "com.cleannote.MyTestRunner"
-        testInstrumentationRunnerArguments clearPackageData: 'true'
+        //testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     testOptions {

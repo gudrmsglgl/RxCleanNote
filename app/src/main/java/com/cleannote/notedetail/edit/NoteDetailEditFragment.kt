@@ -36,7 +36,6 @@ import com.cleannote.model.NoteImageUiModel
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
-import com.cleannote.notedetail.edit.dialog.EditDeleteDialog
 import com.cleannote.presentation.data.State.ERROR
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
@@ -149,7 +148,7 @@ class NoteDetailEditFragment constructor(
                         hasKeyOnBackPress = REQ_UPDATE_KEY
                     }
                     is ERROR -> {
-                        showToast(getString(R.string.updateErrorMsg))
+                        showErrorMessage(getString(R.string.updateErrorMsg))
                         it.sendFirebaseThrowable()
                     }
                 }
@@ -167,8 +166,8 @@ class NoteDetailEditFragment constructor(
                         navPopBackStack(inclusive = true)
                     }
                     is ERROR -> {
+                        showErrorMessage(getString(R.string.deleteErrorMsg))
                         it.sendFirebaseThrowable()
-                        showToast(getString(R.string.deleteErrorMsg))
                     }
                 }
             }
@@ -184,21 +183,19 @@ class NoteDetailEditFragment constructor(
     }
 
     private fun showNoteDeleteDialog() = activity?.let{
-        EditDeleteDialog(DeleteDialog(it))
-            .showNoteDeleteDialog()
+        DeleteDialog(it, viewLifecycleOwner)
+            .showDialog(getString(R.string.delete_message))
             .positiveButton {
                 viewModel.deleteNote(currentNote())
             }
-            .lifecycleOwner(viewLifecycleOwner)
     }
 
     private fun showImageDeleteDialog(imageModel: NoteImageUiModel) = activity?.let {
-        EditDeleteDialog(DeleteDialog(it))
-            .showImageDeleteDialog()
+        DeleteDialog(it, viewLifecycleOwner)
+            .showDialog(getString(R.string.delete_image_message))
             .positiveButton {
                 viewModel.deleteImage(imageModel.imgPath, dateUtil.getCurrentTimestamp())
             }
-            .lifecycleOwner(viewLifecycleOwner)
     }
 
     fun addImagePopupMenu(view: View){
@@ -248,151 +245,13 @@ class NoteDetailEditFragment constructor(
             }
     }
 
-    private fun inputLinkDialog(){
-        activity?.let { context ->
-            view?.clearFocus()
-            MaterialDialog(context).show {
-                customView(R.layout.layout_link_input)
-                val view = getCustomView()
-                val compositeDisposable = CompositeDisposable()
-                val pathSubject: PublishSubject<String> = PublishSubject.create()
-                val ivLink: ImageView = view.findViewById(R.id.iv_loaded)
-                val confirmBtn: TextView = view.findViewById(R.id.tv_confirm)
-
-                confirmBtnChangeActive(pathSubject, confirmBtn)
-                    .also {
-                        compositeDisposable.add(it)
-                    }
-
-                linkLoadSource(view = view, preview = ivLink, receiveSubject = pathSubject)
-                    .also {
-                        compositeDisposable.add(it)
-                    }
-
-                uploadImageSource(view, pathSubject)
-                    .also {
-                        compositeDisposable.add(it)
-                    }
-
-                cancelClick(view)
-                    .subscribe {
-                        showToast(getString(R.string.cancel_message))
-                        dismiss()
-                    }
-                    .also {
-                        compositeDisposable.add(it)
-                    }
-
-                onDismiss {
-                    pathSubject.onComplete()
-                    compositeDisposable.dispose()
-                }
-
-                lifecycleOwner(viewLifecycleOwner)
+    private fun inputLinkDialog() = activity?.let { context ->
+        view?.clearFocus()
+        LinkImageDialog(context, glideRequestManager, viewLifecycleOwner)
+            .onUploadImage {
+                if (it.isNotEmpty())
+                    viewModel.uploadImage(it, dateUtil.getCurrentTimestamp())
             }
-        }
-    }
-
-    private fun confirmBtnChangeActive(
-        pathSubject: PublishSubject<String>,
-        btn: TextView
-    ) = pathSubject
-        .subscribe {
-            if (it.isNotEmpty())
-                btn.activeOn()
-            else
-                btn.activeOff()
-        }
-
-    private fun linkLoadSource(
-        view: View,
-        preview: ImageView,
-        receiveSubject: PublishSubject<String>
-    ) = inputLinkTextSource(view)
-        .flatMapSingle {
-            glideLoadImageSource(path = it.toString(), preview = preview)
-        }
-        .subscribe {
-            val isResourceReady = it.first
-            val path = it.second
-            receiveSubject.onNext(
-                if (isResourceReady) path else ""
-            )
-        }
-
-    private fun MaterialDialog.uploadImageSource(
-        view: View,
-        pathSubject: PublishSubject<String>
-    ) = Observable.combineLatest(
-        confirmClick(view),
-        pathSubject,
-        BiFunction { _: Unit, path: String -> path }
-    ).subscribe {
-        if (it.isNotEmpty())
-            viewModel.uploadImage(it, dateUtil.getCurrentTimestamp())
-        dismiss()
-    }
-
-    private fun inputLinkTextSource(
-        view: View
-    ) = view
-        .findViewById<EditText>(R.id.edit_link)
-        .textChanges()
-        .skipInitialValue()
-        .debounce(1000L, TimeUnit.MILLISECONDS)
-        .observeOn(AndroidSchedulers.mainThread())
-
-    private fun glideLoadImageSource(
-        path: String,
-        preview: ImageView
-    ) = Single.create<Pair<Boolean, String>> {
-        glideRequestManager
-            .asBitmap()
-            .load(path)
-            .into(object : CustomTarget<Bitmap>(){
-
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-                    super.onLoadFailed(errorDrawable)
-                    it.onSuccess(false to path)
-                    emptyPathPreViewGone(path, preview)
-                    preview.setImageDrawable(errorDrawable)
-                }
-
-                override fun onResourceReady(
-                    resource: Bitmap,
-                    transition: Transition<in Bitmap>?
-                ) {
-                    it.onSuccess(true to path)
-                    preview.visible()
-                    preview.setImageBitmap(resource)
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    preview.setImageDrawable(placeholder)
-                }
-            })
-    }
-
-    private fun confirmClick(view: View) = view
-        .findViewById<TextView>(R.id.tv_confirm)
-        .singleClick()
-
-    private fun cancelClick(view: View) = view
-        .findViewById<TextView>(R.id.tv_cancel)
-        .singleClick()
-
-    private fun emptyPathPreViewGone(path: String, view: ImageView) =
-        if (path.isEmpty()) view.gone()
-        else view.visible()
-
-    private fun TextView.activeOn(){
-        this.changeTextColor(R.color.green)
-        this.isEnabled = true
-    }
-
-    private fun TextView.activeOff(){
-        this.changeTextColor(R.color.default_grey)
-        this.isEnabled = false
     }
 
     private fun etTitle() = binding.editTitle

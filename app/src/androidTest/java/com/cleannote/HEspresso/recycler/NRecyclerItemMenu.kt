@@ -10,5 +10,4 @@ import org.hamcrest.Matcher
 
 class NRecyclerItemMenu(matcher: Matcher<View>): NBaseView<NRecyclerItemMenu>(matcher) {
     val deleteImg = NImageView(withId(R.id.swipe_delete_img))
-    val deleteText = NTextView(withId(R.id.swipe_delete_text))
 }

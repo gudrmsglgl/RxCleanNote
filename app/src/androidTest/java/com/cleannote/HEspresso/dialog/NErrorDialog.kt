@@ -13,5 +13,4 @@ class NErrorDialog(matcher: Matcher<View>): NBaseView<NErrorDialog>(matcher) {
     val title = NTextView(withId(R.id.md_text_title))
     val message = NTextView(withText(R.string.searchErrorMsg))
     val positiveBtn = NButton(withId(R.id.md_button_positive))
-    val negativeBtn = NButton(withId(R.id.md_button_negative))
 }

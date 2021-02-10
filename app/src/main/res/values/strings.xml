@@ -34,6 +34,7 @@
     <!-- Material Dialog -->
     <string name="dialog_title_confirm">Confirm</string>
     <string name="dialog_title_warning">Warn</string>
+    <string name="dialog_title_error">Error</string>
     <string name="dialog_title_question">Answer</string>
     <string name="dialog_btn_yes">Yes</string>
     <string name="dialog_btn_no">No</string>
@@ -42,8 +43,9 @@
     <string name="dialog_id_hint">아이디를 입력하세요.</string>
     <string name="dialog_login_retry">로그인 실패 했습니다.</string>
     <string name="dialog_login_input_dismiss">입력이 취소 되었습니다.</string>
-    <string name="dialog_newnote">새노트</string>
-    <string name="dialog_newnote_hint">타이틀 입력 해주세요.</string>
+    <string name="dialog_new_note">새노트</string>
+    <string name="dialog_input_cancel">입력이 취소 되었습니다.</string>
+    <string name="dialog_new_note_hint">타이틀 입력 해주세요.</string>
 
     <!-- Toast Message-->
     <string name="searchErrorMsg">메모를 불러오는데 실패 했습니다.</string>

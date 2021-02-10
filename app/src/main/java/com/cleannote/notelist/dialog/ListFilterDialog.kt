@@ -6,10 +6,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
+import androidx.lifecycle.LifecycleOwner
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.cleannote.app.R
 import com.cleannote.common.dialog.BaseDialog
 import com.cleannote.domain.Constants
@@ -20,7 +22,8 @@ import io.reactivex.rxjava3.functions.BiFunction
 
 class ListFilterDialog(
     override val context: Context,
-    private val sharedPref: SharedPreferences
+    private val sharedPref: SharedPreferences,
+    private val viewLifeCycleOwner: LifecycleOwner
 ): BaseDialog {
 
     override fun makeDefaultDialog(): MaterialDialog = MaterialDialog(context).show {
@@ -37,7 +40,7 @@ class ListFilterDialog(
                 .subscribe {
                     okBtnSource.invoke(this, it)
                 }
-
+            lifecycleOwner(viewLifeCycleOwner)
             onDismiss { setOrderSource.dispose() }
         }
 

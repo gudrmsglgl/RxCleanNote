@@ -10,6 +10,6 @@ import com.cleannote.app.R
 import org.hamcrest.Matcher
 
 class NLNewNoteDialog(matcher: Matcher<View>): NBaseView<NLNewNoteDialog>(matcher) {
-    val message = NTextView(withText(R.string.dialog_newnote))
+    val message = NTextView(withText(R.string.dialog_new_note))
     val editTitle = NEditText(withId(R.id.md_input_message))
 }

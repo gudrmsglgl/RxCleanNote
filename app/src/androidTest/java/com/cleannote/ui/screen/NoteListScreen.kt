@@ -4,6 +4,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.cleannote.HEspresso.button.NFloatingButton
 import com.cleannote.HEspresso.dialog.NDDeleteDialog
+import com.cleannote.HEspresso.dialog.NErrorDialog
+import com.cleannote.HEspresso.dialog.NLNewNoteDialog
 import com.cleannote.HEspresso.recycler.NRecyclerView
 import com.cleannote.HEspresso.text.NTextView
 import com.cleannote.HEspresso.text.NToast
@@ -18,7 +20,9 @@ object NoteListScreen: BaseScreen<NoteListScreen>() {
     val searchToolbar = NSearchToolbar(withId(R.id.search_toolbar))
     val multiDeleteToolbar = NMultiDeleteToolbar(withId(R.id.toolbar_multi_delete))
     val insertBtn = NFloatingButton(withId(R.id.add_new_note_fab))
+    val newNoteDialog = NLNewNoteDialog(withId(R.layout.md_dialog_stub_input))
     val deleteDialog = NDDeleteDialog(withId(R.layout.md_dialog_base))
     val deleteSuccessToast = NToast(withText(R.string.deleteSuccessMsg))
     val deleteErrorToast = NToast(withText(R.string.deleteErrorMsg))
+    val errorDialog = NErrorDialog(withId(R.layout.md_dialog_base))
 }

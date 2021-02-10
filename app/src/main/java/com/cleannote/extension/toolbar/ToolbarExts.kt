@@ -3,7 +3,6 @@ package com.cleannote.extension.toolbar
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.MenuItem
-import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
