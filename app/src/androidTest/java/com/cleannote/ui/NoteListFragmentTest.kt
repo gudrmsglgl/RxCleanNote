@@ -1,5 +1,6 @@
 package com.cleannote.ui
 
+import android.app.Activity
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
@@ -305,29 +306,29 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun clickFabDisplayInputDialog_onAndroid(){
+    fun createNoteThenInputTitleDialog_onAndroid(){
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        ActivityScenario.launch(MainActivity::class.java)
 
-        noteListScreen {
-            insertBtn {
-                click()
-            }
-            newNoteDialog {
-                message {
-                    hasText(R.string.dialog_new_note)
+        activity{
+            noteListScreen {
+                insertBtn {
+                    click()
                 }
-                editTitle {
-                    hasHint(R.string.dialog_new_note_hint)
-                    typeText("FabTest")
+                newNoteDialog {
+                    message {
+                        hasText(R.string.dialog_new_note)
+                    }
+                    inputTitle {
+                        typeText("FabTest")
+                    }
                 }
             }
         }
-
     }
 
     @Test
@@ -352,15 +353,24 @@ class NoteListFragmentTest: BaseTest() {
         }
     }
 
-    @Test
+    /*@Test
     fun swipeDeleteMenuSuccessThenNotesDelete_onAndroid(){
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
+        val query = QueryFactory.makeQuery()
+            .apply {
+                order = ORDER_ASC
+                startIndex = null
+            }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
+
+        val deleteQuery = query.copy(startIndex = 1)
+        val deletedNotes = NoteFactory.makeNotes(1, 10)
+        stubNoteRepositorySearchNotes(Single.just(deletedNotes), deleteQuery)
+
         stubNoteRepositoryDelete()
 
-        ActivityScenario.launch(MainActivity::class.java)
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         noteListScreen {
             recyclerView{
@@ -374,9 +384,9 @@ class NoteListFragmentTest: BaseTest() {
                 positiveBtn.click()
             }
             deleteSuccessToast.isDisplayed()
-            recyclerView.hasSize(notes.size.minus(1))
+            recyclerView.hasSize(deletedNotes.size)
         }
-    }
+    }*/
 
     @Test
     fun swipeDeleteMenuFailThenNotDeleteNotes_onAndroid(){
@@ -401,7 +411,7 @@ class NoteListFragmentTest: BaseTest() {
                     positiveBtn.click()
                 }
                 errorDialog {
-                    title.hasText(R.string.dialog_title_warning)
+                    title.hasText(R.string.dialog_title_error)
                     positiveBtn.click()
                 }
                 recyclerView.hasSize(notes.size)
@@ -455,14 +465,14 @@ class NoteListFragmentTest: BaseTest() {
                 }
                 firstItem<NoteItem> {
                     click()
-                    checkBox{
+                    checkBox {
                         isDisplayed()
                         isChecked()
                     }
                 }
                 visibleLastItem<NoteItem> {
                     click()
-                    checkBox{
+                    checkBox {
                         isDisplayed()
                         isChecked()
                     }
@@ -482,6 +492,11 @@ class NoteListFragmentTest: BaseTest() {
                 }
             }
             deleteDialog {
+                positiveBtn.click()
+            }
+            errorDialog {
+                title.hasText(R.string.dialog_title_error)
+                message.hasText(R.string.deleteErrorMsg)
                 positiveBtn.click()
             }
             searchToolbar {
@@ -504,6 +519,8 @@ class NoteListFragmentTest: BaseTest() {
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDeleteMultiNotes()
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        val deletedNotes = NoteFactory.makeNotes(2, 10) // b/c when vm multiDelete then initNotes
+        stubNoteRepositorySearchNotes(Single.just(deletedNotes), query)
 
         noteListScreen {
             recyclerView {
@@ -517,7 +534,7 @@ class NoteListFragmentTest: BaseTest() {
                         isChecked()
                     }
                 }
-                visibleLastItem<NoteItem> {
+                childAt<NoteItem>(1){
                     click()
                     checkBox{
                         isDisplayed()
@@ -540,6 +557,7 @@ class NoteListFragmentTest: BaseTest() {
             searchToolbar {
                 isDisplayed()
             }
+            idle(5000L)
             recyclerView {
                 firstItem<NoteItem> {
                     checkBox.isNotDisplayed()

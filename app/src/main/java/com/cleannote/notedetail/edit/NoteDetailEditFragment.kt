@@ -1,28 +1,16 @@
 package com.cleannote.notedetail.edit
 
 import android.app.Activity
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.PopupMenu
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
-import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailEditBinding
@@ -48,16 +36,10 @@ import com.github.dhaval2404.imagepicker.ImagePicker
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.widget.itemClicks
 import com.jakewharton.rxbinding4.widget.textChanges
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.functions.BiFunction
-import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
 class NoteDetailEditFragment constructor(
@@ -148,7 +130,7 @@ class NoteDetailEditFragment constructor(
                         hasKeyOnBackPress = REQ_UPDATE_KEY
                     }
                     is ERROR -> {
-                        showErrorMessage(getString(R.string.updateErrorMsg))
+                        showErrorDialog(getString(R.string.updateErrorMsg))
                         it.sendFirebaseThrowable()
                     }
                 }
@@ -166,7 +148,7 @@ class NoteDetailEditFragment constructor(
                         navPopBackStack(inclusive = true)
                     }
                     is ERROR -> {
-                        showErrorMessage(getString(R.string.deleteErrorMsg))
+                        showErrorDialog(getString(R.string.deleteErrorMsg))
                         it.sendFirebaseThrowable()
                     }
                 }

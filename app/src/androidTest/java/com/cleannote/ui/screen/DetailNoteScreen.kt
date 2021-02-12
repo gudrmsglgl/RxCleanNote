@@ -2,10 +2,10 @@ package com.cleannote.ui.screen
 
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.cleannote.HEspresso.edit.NDEditText
-import com.cleannote.HEspresso.scroll.NDScrollView
-import com.cleannote.HEspresso.text.NToast
-import com.cleannote.HEspresso.toolbar.NDToolbar
+import com.cleannote.espresso.edit.NDEditText
+import com.cleannote.espresso.scroll.NDScrollView
+import com.cleannote.espresso.text.NToast
+import com.cleannote.espresso.toolbar.NDToolbar
 import com.cleannote.app.R
 
 object DetailNoteScreen: BaseScreen<DetailNoteScreen>() {

@@ -73,7 +73,7 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         Toast.makeText(it, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun showErrorMessage(errorMsg: String) = activity?.let {
+    fun showErrorDialog(errorMsg: String) = activity?.let {
         ErrorDialog(it, viewLifecycleOwner).showDialog(errorMsg)
     }
 

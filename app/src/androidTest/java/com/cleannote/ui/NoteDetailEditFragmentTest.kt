@@ -8,9 +8,11 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.app.R
+import com.cleannote.extension.transNoteView
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.edit.NoteDetailEditFragment
+import com.cleannote.presentation.extensions.transNote
 import com.cleannote.test.NoteFactory
 import com.cleannote.ui.screen.DetailNoteScreen
 import io.mockk.every

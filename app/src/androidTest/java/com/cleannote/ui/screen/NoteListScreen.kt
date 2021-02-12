@@ -2,15 +2,15 @@ package com.cleannote.ui.screen
 
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.cleannote.HEspresso.button.NFloatingButton
-import com.cleannote.HEspresso.dialog.NDDeleteDialog
-import com.cleannote.HEspresso.dialog.NErrorDialog
-import com.cleannote.HEspresso.dialog.NLNewNoteDialog
-import com.cleannote.HEspresso.recycler.NRecyclerView
-import com.cleannote.HEspresso.text.NTextView
-import com.cleannote.HEspresso.text.NToast
-import com.cleannote.HEspresso.toolbar.NMultiDeleteToolbar
-import com.cleannote.HEspresso.toolbar.NSearchToolbar
+import com.cleannote.espresso.button.NFloatingButton
+import com.cleannote.espresso.dialog.NDDeleteDialog
+import com.cleannote.espresso.dialog.NErrorDialog
+import com.cleannote.espresso.dialog.NLNewNoteDialog
+import com.cleannote.espresso.recycler.NRecyclerView
+import com.cleannote.espresso.text.NTextView
+import com.cleannote.espresso.text.NToast
+import com.cleannote.espresso.toolbar.NMultiDeleteToolbar
+import com.cleannote.espresso.toolbar.NSearchToolbar
 import com.cleannote.app.R
 
 object NoteListScreen: BaseScreen<NoteListScreen>() {

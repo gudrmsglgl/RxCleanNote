@@ -232,7 +232,7 @@ constructor(
                         noteAdapter.fetchRecyclerView(currentNoteMode(dataState.data!!))
                     }
                     ERROR -> {
-                        showErrorMessage(getString(R.string.searchErrorMsg))
+                        showErrorDialog(getString(R.string.searchErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
                 }
@@ -248,7 +248,7 @@ constructor(
                         navDetailNote(dataState.data!!.transNoteUiModel(), isInsertExecute = true)
                     }
                     ERROR -> {
-                        showErrorMessage(getString(R.string.insertErrorMsg))
+                        showErrorDialog(getString(R.string.insertErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
                 }
@@ -270,7 +270,7 @@ constructor(
                         noteAdapter.deleteCheckClear()
                         transSearchState()
                         swipeDeleteMenuClose()
-                        showErrorMessage(getString(R.string.deleteErrorMsg))
+                        showErrorDialog(getString(R.string.deleteErrorMsg))
                         dataState.sendFirebaseThrowable()
                     }
                 }

@@ -6,18 +6,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentSplashBinding
 import com.cleannote.common.*
-import com.cleannote.data.ui.InputType
-import com.cleannote.extension.rxbinding.singleClick
 import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.model.UserView
 import com.cleannote.presentation.splash.SplashViewModel
-import kotlinx.android.synthetic.main.fragment_splash.*
-import timber.log.Timber
 
 /**
  * A simple [Fragment] subclass.
@@ -52,7 +46,7 @@ class SplashFragment constructor(
                         }
                         is ERROR -> {
                             showLoadingProgressBar(false)
-                            showErrorMessage("login fail")
+                            showErrorDialog("login fail")
                         }
                     }
                 }

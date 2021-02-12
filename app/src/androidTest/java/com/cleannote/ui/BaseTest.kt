@@ -2,7 +2,7 @@ package com.cleannote.ui
 
 import androidx.navigation.NavController
 import androidx.test.core.app.ApplicationProvider
-import com.cleannote.HEspresso.recycler.NRecyclerItem
+import com.cleannote.espresso.recycler.NRecyclerItem
 import com.cleannote.TestBaseApplication
 import com.cleannote.common.UIController
 import com.cleannote.domain.Constants
@@ -10,14 +10,12 @@ import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.injection.TestApplicationComponent
 import com.cleannote.model.NoteUiModel
-import com.cleannote.notelist.NoteListAdapter
 import com.cleannote.notelist.holder.BaseHolder
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 
 abstract class BaseTest {
