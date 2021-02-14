@@ -47,4 +47,5 @@ constructor(
 
     fun currentPageNoteSize(queryEntity: QueryEntity) = noteCache.currentPageNoteSize(queryEntity)
 
+    fun nextPageExist(queryEntity: QueryEntity) = noteCache.nextPageExist(queryEntity)
 }

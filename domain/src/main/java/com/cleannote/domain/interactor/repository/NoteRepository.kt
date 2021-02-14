@@ -15,4 +15,5 @@ interface NoteRepository {
     fun updateNote(note: Note): Completable
     fun deleteNote(note: Note): Completable
     fun deleteMultipleNotes(notes: List<Note>): Completable
+    fun nextPageExist(query: Query): Single<Boolean>
 }

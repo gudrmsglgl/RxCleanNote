@@ -1,10 +1,7 @@
 package com.cleannote.cache
 
 import com.cleannote.cache.dao.CachedNoteDao
-import com.cleannote.cache.extensions.currentNoteSize
-import com.cleannote.cache.extensions.divideCacheNote
-import com.cleannote.cache.extensions.searchNoteBySorted
-import com.cleannote.cache.extensions.transEntity
+import com.cleannote.cache.extensions.*
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.repository.NoteCache
@@ -16,7 +13,7 @@ class NoteCacheImpl @Inject constructor(private val noteDao: CachedNoteDao,
                                         private val preferencesHelper: PreferencesHelper): NoteCache
 {
 
-    private val SHOULD_PAGE_UPDATE_TIME = (60 * 3 * 1000).toLong()
+    private val shouldUpdateTime = (60 * 3 * 1000).toLong()
 
 
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> =
@@ -39,7 +36,7 @@ class NoteCacheImpl @Inject constructor(private val noteDao: CachedNoteDao,
 
     override fun isCached(page: Int): Single<Boolean> = Single.defer {
         val currentTime = System.currentTimeMillis()
-        val isCache = currentTime - getLastCacheTime(page) < SHOULD_PAGE_UPDATE_TIME
+        val isCache = currentTime - getLastCacheTime(page) < shouldUpdateTime
         Single.just(isCache)
     }
 
@@ -69,6 +66,12 @@ class NoteCacheImpl @Inject constructor(private val noteDao: CachedNoteDao,
     override fun currentPageNoteSize(queryEntity: QueryEntity): Single<Int> = Single.defer {
         Single.just(
             noteDao.currentNoteSize(queryEntity)
+        )
+    }
+
+    override fun nextPageExist(queryEntity: QueryEntity): Single<Boolean> = Single.defer {
+        Single.just(
+            noteDao.nextPageIsExist(queryEntity)
         )
     }
 

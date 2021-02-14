@@ -35,6 +35,10 @@ abstract class BaseTest {
             .getString(Constants.FILTER_ORDERING_KEY, Constants.ORDER_DESC)
     }.returns(order)
 
+    fun stubNextPageExist(stub: Boolean) = every {
+        getComponent().provideNoteRepository().nextPageExist(any())
+    } returns Single.just(stub)
+
     fun stubNoteRepositorySearchNotes(data: Single<List<Note>>, query: Query? = null) {
         every {
             getComponent().provideNoteRepository().searchNotes(query ?: any())

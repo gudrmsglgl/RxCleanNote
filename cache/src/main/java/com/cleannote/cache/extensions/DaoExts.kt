@@ -15,6 +15,11 @@ fun CachedNoteDao.searchNoteBySorted(
 fun CachedNoteDao.currentNoteSize(
     queryEntity: QueryEntity
 ): Int = when (queryEntity.order) {
-    NoteQueryUtil.NOTE_SORT_DESC -> currentPageNoteSizeOnDESC(queryEntity.page, queryEntity.limit)
-    else -> currentPageNoteSizeOnASC(queryEntity.page, queryEntity.limit)
+    NoteQueryUtil.NOTE_SORT_DESC -> currentPageNoteSizeOnDESC(queryEntity.page, queryEntity.limit, queryEntity.startIndex ?: 0)
+    else -> currentPageNoteSizeOnASC(queryEntity.page, queryEntity.limit, queryEntity.startIndex ?: 0)
+}
+
+fun CachedNoteDao.nextPageIsExist(queryEntity: QueryEntity) = when (queryEntity.order){
+    NoteQueryUtil.NOTE_SORT_DESC -> nextPageIsExistOnDESC(queryEntity.page, queryEntity.limit, queryEntity.like ?: "", queryEntity.startIndex ?: 0)
+    else -> nextPageIsExistOnASC(queryEntity.page, queryEntity.limit, queryEntity.like ?: "", queryEntity.startIndex ?: 0)
 }

@@ -57,6 +57,38 @@ abstract class CachedNoteDao {
         startIndex: Int
     ): List<CachedNoteImages>
 
+    @Transaction
+    @Query("""
+        SELECT EXISTS (
+            SELECT * FROM notes
+            WHERE title LIKE '%' || :like || '%'
+            OR body LIKE '%' || :like || '%'
+            ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
+        )
+    """)
+    abstract fun nextPageIsExistOnDESC(
+        page: Int,
+        limit: Int,
+        like: String,
+        startIndex: Int
+    ): Boolean
+
+    @Transaction
+    @Query("""
+        SELECT EXISTS (
+            SELECT * FROM notes
+            WHERE title LIKE '%' || :like || '%'
+            OR body LIKE '%' || :like || '%'
+            ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
+        )
+    """)
+    abstract fun nextPageIsExistOnASC(
+        page: Int,
+        limit: Int,
+        like: String,
+        startIndex: Int
+    ): Boolean
+
     @Update
     abstract fun updateNote(note: CachedNote)
 
@@ -78,11 +110,11 @@ abstract class CachedNoteDao {
     @Query("DELETE FROM note_images WHERE note_pk = :notePk")
     abstract fun deleteNoteImagesByNotePk(notePk: String)
 
-    @Query("SELECT COUNT(*) FROM notes ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit)")
-    abstract fun currentPageNoteSizeOnASC(page: Int, limit: Int): Int
+    @Query("SELECT COUNT(*) FROM notes ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex")
+    abstract fun currentPageNoteSizeOnASC(page: Int, limit: Int, startIndex: Int): Int
 
-    @Query("SELECT COUNT(*) FROM notes ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit)")
-    abstract fun currentPageNoteSizeOnDESC(page: Int, limit: Int): Int
+    @Query("SELECT COUNT(*) FROM notes ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex")
+    abstract fun currentPageNoteSizeOnDESC(page: Int, limit: Int, startIndex: Int): Int
 
     @Transaction
     open fun insertNoteAndImages(note: NoteEntity): Long{
