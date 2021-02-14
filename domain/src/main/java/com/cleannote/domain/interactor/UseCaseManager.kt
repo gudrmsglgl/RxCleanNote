@@ -1,10 +1,14 @@
 package com.cleannote.domain.interactor
 
-abstract class UseCaseManager{
+abstract class UseCaseManager(vararg param: UseCase<*,*>){
 
-    private val _useCases: MutableList<UseCase<*,*>> = mutableListOf()
+    private val _useCases: HashSet<UseCase<*,*>> = hashSetOf()
 
-    fun addUseCases(vararg useCases: UseCase<*, *>){
+    init {
+        addUseCases(*param)
+    }
+
+    private fun addUseCases(vararg useCases: UseCase<*, *>){
         _useCases.addAll(useCases)
     }
 

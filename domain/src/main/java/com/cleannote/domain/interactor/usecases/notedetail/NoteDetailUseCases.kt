@@ -9,9 +9,4 @@ class NoteDetailUseCases
 constructor(
     val updateNote: UpdateNote,
     val deleteNote: DeleteNote
-): UseCaseManager()
-{
-    init {
-        addUseCases(updateNote, deleteNote)
-    }
-}
+): UseCaseManager(updateNote, deleteNote)

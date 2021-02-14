@@ -58,6 +58,10 @@ constructor(
         .retrieveCacheDataStore()
         .deleteMultipleNotes(notes.transNoteEntityList())
 
+    override fun nextPageExist(query: Query): Single<Boolean> = factory
+        .retrieveCacheDataStore()
+        .nextPageExist(query.transQueryEntity())
+
     private fun defaultSearchNote(
         queryEntity: QueryEntity
     ) = factory

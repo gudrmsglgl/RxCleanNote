@@ -11,6 +11,8 @@ import com.cleannote.cache.model.CachedNote
 import com.cleannote.cache.test.factory.NoteFactory
 import com.cleannote.cache.test.factory.QueryFactory
 import com.cleannote.data.model.NoteEntity
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -218,6 +220,19 @@ open class CachedNoteDaoTest: BaseNoteDaoTest(){
                 whenSearchNotesBySorted(queryDesc).size
             )
     }
+
+    @Test
+    fun nextPageIsExistReturnBoolean(){
+        val queryDesc = QueryFactory.makeQueryEntity(page = 3, order = NOTE_SORT_DESC)
+        val noteEntities = NoteFactory.createNoteEntityList(end = 10)
+
+        whenSaveNotesAndImages(noteEntities)
+
+        val p3Exist = noteDao.nextPageIsExist(queryDesc)
+
+        assertThat(p3Exist, `is`(false))
+    }
+
 
     private fun loadExistingNote(index: Int, total: Int): NoteEntity{
         val savedNote = NoteFactory.createNoteEntityList(end = total)

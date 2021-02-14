@@ -69,6 +69,7 @@ class NoteListFragmentTest: BaseTest() {
         val notes = NoteFactory.makeNotes(1,11)
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
@@ -353,7 +354,7 @@ class NoteListFragmentTest: BaseTest() {
         }
     }
 
-    /*@Test
+    @Test
     fun swipeDeleteMenuSuccessThenNotesDelete_onAndroid(){
         val query = QueryFactory.makeQuery()
             .apply {
@@ -362,11 +363,12 @@ class NoteListFragmentTest: BaseTest() {
             }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        val deleteQuery = query.copy(startIndex = 1)
+        /*val deleteQuery = query.copy(startIndex = 1)
         val deletedNotes = NoteFactory.makeNotes(1, 10)
-        stubNoteRepositorySearchNotes(Single.just(deletedNotes), deleteQuery)
+        stubNoteRepositorySearchNotes(Single.just(deletedNotes), deleteQuery)*/
 
         stubNoteRepositoryDelete()
 
@@ -384,9 +386,9 @@ class NoteListFragmentTest: BaseTest() {
                 positiveBtn.click()
             }
             deleteSuccessToast.isDisplayed()
-            recyclerView.hasSize(deletedNotes.size)
+            recyclerView.hasSize(notes.size.minus(1))
         }
-    }*/
+    }
 
     @Test
     fun swipeDeleteMenuFailThenNotDeleteNotes_onAndroid(){
@@ -516,6 +518,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDeleteMultiNotes()
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)

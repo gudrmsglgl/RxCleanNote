@@ -40,8 +40,12 @@ constructor(
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _mediatorNoteList
 
-    private var _isLastNote = false
-    val isLastNote get() = _isLastNote
+    /*private var _isLastNote = false
+    val isLastNote get() = _isLastNote*/
+
+    private var _isNextPageExist: MediatorLiveData<DataState<Boolean>> = MediatorLiveData()
+    val isNextPageExist: Boolean
+        get() = _isNextPageExist.value?.data ?: false
 
     private val _insertNote: SingleLiveEvent<DataState<NoteView>> = SingleLiveEvent()
     val insertResult: SingleLiveEvent<DataState<NoteView>>
@@ -68,12 +72,25 @@ constructor(
         useCases.disposeUseCases()
     }
 
+    private fun executeNextPageExist(query: Query){
+        useCases.nextPageExist.execute(
+            onSuccess = {
+                _isNextPageExist.postValue(DataState.success(it))
+            },
+            onError = {
+                _isNextPageExist.postValue(DataState.error(it))
+            },
+            params = query
+        )
+    }
+
     fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
         useCases.searchNotes.execute(
                 onSuccess = { loadNotes ->
                     totalLoadNotes.addAllUpdate(loadNotes, isBackground = true)
-                    checkLastNote(loadSize = loadNotes.size)
+                    executeNextPageExist(nextPageQuery())
+                    //checkLastNote(loadSize = loadNotes.size)
                 },
                 onError = {
                     _mediatorNoteList.postValue(DataState.error(it))
@@ -99,6 +116,7 @@ constructor(
     }
 
     fun reqDeleteFromDetailFragment(param: NoteView){
+        executeNextPageExist(nextPageQuery(param))
         totalLoadNotes.deleteSync(param, isBackground = false)
     }
 
@@ -111,10 +129,24 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(param))
+                executeNextPageExist(nextPageQuery(param))
                 totalLoadNotes.deleteSync(param, isBackground = true)
             },
             params = param.transNote()
         )
+    }
+
+    fun nextPageQuery(noteView: NoteView): Query{
+        val nextPage = totalLoadNotes.findPage(noteView) + 1
+        val startIndex = totalLoadNotes.indexOf(noteView) % getQuery().limit
+        return getQuery().copy(
+            page = nextPage, startIndex = startIndex
+        )
+    }
+
+    fun nextPageQuery(): Query{
+        val nextPage = getQuery().page + 1
+        return getQuery().copy(page = nextPage)
     }
 
     fun deleteMultiNotes(paramNotes: List<NoteView>){
@@ -210,7 +242,7 @@ constructor(
     private fun MutableList<NoteView>.deleteSync(
         target: NoteView,
         isBackground: Boolean
-    ) = if (!isLastNote)
+    ) = if (isNextPageExist)
             deleteSyncCacheNotes(target)
         else
             deleteUpdate(target, isBackground)
@@ -256,7 +288,7 @@ constructor(
         clearQuery()
     }
 
-    private fun checkLastNote(loadSize: Int){
+   /* private fun checkLastNote(loadSize: Int){
         _isLastNote = loadSize < getQuery().limit
-    }
+    }*/
 }

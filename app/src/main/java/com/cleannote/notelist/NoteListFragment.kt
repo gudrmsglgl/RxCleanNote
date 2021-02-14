@@ -189,7 +189,7 @@ constructor(
             mapOf(LAST_VISIBLE_ITEM_POS to it.lastVisibleItemPos(), ITEM_COUNT to it.itemCount())
         }
         .filter {
-            it[LAST_VISIBLE_ITEM_POS] == it[ITEM_COUNT] && !viewModel.isLastNote
+            it[LAST_VISIBLE_ITEM_POS] == it[ITEM_COUNT] && viewModel.isNextPageExist//!viewModel.isLastNote
         }
         .subscribe {
             viewModel.nextPage()
