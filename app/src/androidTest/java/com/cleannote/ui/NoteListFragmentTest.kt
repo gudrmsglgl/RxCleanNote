@@ -1,6 +1,5 @@
 package com.cleannote.ui
 
-import android.app.Activity
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
@@ -46,6 +45,7 @@ class NoteListFragmentTest: BaseTest() {
     fun searchNotesEmptyThenNoteNotDisplayed_onAndroid(){
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(emptyList()), query)
 
         launchFragmentInContainer<NoteListFragment>(
@@ -99,6 +99,7 @@ class NoteListFragmentTest: BaseTest() {
         val errorMsg = "Test Error"
         val query = QueryFactory.makeQuery()
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubThrowableNoteRepositorySearchNotes(RuntimeException(errorMsg), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
@@ -113,15 +114,15 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun filterDialogDisplayed_onAndroid(){
+    fun filterDialogDisplayedOfCheckedCacheOrder_onAndroid(){
         val notes = NoteFactory.makeNotes(0, 10)
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         noteListScreen {
-
             searchToolbar {
 
                 filterMenu {
@@ -157,7 +158,6 @@ class NoteListFragmentTest: BaseTest() {
 
             }
         }
-
     }
 
     @Test
@@ -165,6 +165,7 @@ class NoteListFragmentTest: BaseTest() {
         val defaultNotes = NoteFactory.makeNotes(0, 10)
         val defaultQuery =  QueryFactory.makeQuery().apply { order = ORDER_ASC }
         stubInitOrdering(defaultQuery.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(defaultNotes), defaultQuery)
 
         val orderedNotes = NoteFactory.makeNotes(10,0)
@@ -205,6 +206,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery()
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         val text = "searchNote"
@@ -240,6 +242,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         val text = "empty"
@@ -274,6 +277,7 @@ class NoteListFragmentTest: BaseTest() {
         val initQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(initQuery.order)
+        stubNextPageExist(true)
         stubNoteRepositorySearchNotes(Single.just(notes), initQuery)
 
         val nextQuery = QueryFactory.makeQuery().apply {
@@ -295,13 +299,13 @@ class NoteListFragmentTest: BaseTest() {
                 idle(1000)
                 swipeUp()
                 hasSize(notes.size + nextNotes.size)
+                idle(3000)
                 scrollToEnd()
                 visibleLastItem<NoteItem> {
                     itemTitle {
                         hasText(nextNotes[getLastVisiblePosition()-notes.size].title) // nextNote[0~9], so minus notes.size: 19 - 10
                     }
                 }
-                idle(3000)
             }
         }
     }
@@ -311,6 +315,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         ActivityScenario.launch(MainActivity::class.java)
@@ -337,6 +342,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery()
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
@@ -365,11 +371,6 @@ class NoteListFragmentTest: BaseTest() {
         stubInitOrdering(query.order)
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
-
-        /*val deleteQuery = query.copy(startIndex = 1)
-        val deletedNotes = NoteFactory.makeNotes(1, 10)
-        stubNoteRepositorySearchNotes(Single.just(deletedNotes), deleteQuery)*/
-
         stubNoteRepositoryDelete()
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
@@ -382,7 +383,6 @@ class NoteListFragmentTest: BaseTest() {
                 }
             }
             deleteDialog {
-                title.hasText(R.string.delete_title)
                 positiveBtn.click()
             }
             deleteSuccessToast.isDisplayed()
@@ -395,6 +395,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDelete(RuntimeException())
 
@@ -409,7 +410,6 @@ class NoteListFragmentTest: BaseTest() {
                     }
                 }
                 deleteDialog {
-                    title.hasText(R.string.delete_title)
                     positiveBtn.click()
                 }
                 errorDialog {
@@ -426,6 +426,7 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
@@ -456,8 +457,10 @@ class NoteListFragmentTest: BaseTest() {
         val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
+        stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDeleteMultiNotes(RuntimeException())
+
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
         noteListScreen {
@@ -481,17 +484,7 @@ class NoteListFragmentTest: BaseTest() {
                 }
             }
             multiDeleteToolbar {
-                isDisplayed()
-                btnCancel {
-                    isDisplayed()
-                    hasDrawable(R.drawable.ic_cancel_24dp)
-                }
-                title.hasText(R.string.tb_multi_delete_title)
-                btnConfirm {
-                    isDisplayed()
-                    hasDrawable(R.drawable.ic_done_24dp)
-                    click()
-                }
+                btnConfirm.click()
             }
             deleteDialog {
                 positiveBtn.click()
@@ -519,11 +512,13 @@ class NoteListFragmentTest: BaseTest() {
         val notes = NoteFactory.makeNotes(0, 10)
         stubInitOrdering(query.order)
         stubNextPageExist(false)
-        stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDeleteMultiNotes()
+
+        // b/c when vm multiDelete then initNotes -> recall searchNotes()
+        val deletedNotes = NoteFactory.makeNotes(2, 10)
+        stubNoteRepositorySearchNotes(query, Single.just(notes), Single.just(deletedNotes))
+
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
-        val deletedNotes = NoteFactory.makeNotes(2, 10) // b/c when vm multiDelete then initNotes
-        stubNoteRepositorySearchNotes(Single.just(deletedNotes), query)
 
         noteListScreen {
             recyclerView {
@@ -531,6 +526,7 @@ class NoteListFragmentTest: BaseTest() {
                     longClick()
                 }
                 firstItem<NoteItem> {
+                    itemTitle.hasText(notes[0].title)
                     click()
                     checkBox{
                         isDisplayed()
@@ -547,12 +543,7 @@ class NoteListFragmentTest: BaseTest() {
                 checkSize = getCheckedSize()
             }
             multiDeleteToolbar {
-                isDisplayed()
-                btnConfirm {
-                    isDisplayed()
-                    hasDrawable(R.drawable.ic_done_24dp)
-                    click()
-                }
+                btnConfirm.click()
             }
             deleteDialog {
                 positiveBtn.click()
@@ -563,13 +554,13 @@ class NoteListFragmentTest: BaseTest() {
             idle(5000L)
             recyclerView {
                 firstItem<NoteItem> {
+                    itemTitle.hasText(deletedNotes[0].title)
                     checkBox.isNotDisplayed()
                 }
                 hasSize(notes.size - checkSize)
             }
         }
     }
-
 
     override fun setupUIController(){
         every { mockUIController.isDisplayProgressBar() }.returns(false)

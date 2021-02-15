@@ -45,6 +45,12 @@ abstract class BaseTest {
         } returns data
     }
 
+    fun stubNoteRepositorySearchNotes(query: Query? = null, vararg data: Single<List<Note>>){
+        every {
+            getComponent().provideNoteRepository().searchNotes(query ?: any())
+        } returnsMany listOf(*data)
+    }
+
     fun stubThrowableNoteRepositorySearchNotes(throwable: Throwable, query: Query? = null) {
         every {
             getComponent().provideNoteRepository().searchNotes(query ?: any())
