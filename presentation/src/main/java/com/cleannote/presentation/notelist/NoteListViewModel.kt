@@ -1,15 +1,9 @@
 package com.cleannote.presentation.notelist
 
-import android.content.SharedPreferences
 import androidx.lifecycle.*
-import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_DESC
-import com.cleannote.domain.Constants.QUERY_DEFAULT_LIMIT
-import com.cleannote.domain.Constants.QUERY_DEFAULT_PAGE
-import com.cleannote.domain.Constants.SORT_UPDATED_AT
 import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
 import com.cleannote.domain.model.Note
-import com.cleannote.domain.model.Query
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.State.SUCCESS
@@ -23,13 +17,10 @@ import com.cleannote.presentation.model.NoteView
 class NoteListViewModel
 constructor(
     private val useCases: NoteListUseCases,
-    private val sharedPreferences: SharedPreferences
+    private val queryMgr: QueryManager
 ): ViewModel() {
 
-    private val _query: MutableLiveData<Query> = MutableLiveData(Query(
-        order = loadOrderingOnSharedPref()
-    ))
-    val queryLike get() = _query.value?.like ?: ""
+    val queryLike get() = queryMgr.queryLike()
 
     private val _toolbarState: MutableLiveData<ListToolbarState> = MutableLiveData(SearchState)
     val toolbarState: LiveData<ListToolbarState>
@@ -40,12 +31,8 @@ constructor(
     val noteList: LiveData<DataState<List<NoteView>>>
         get() = _mediatorNoteList
 
-    /*private var _isLastNote = false
-    val isLastNote get() = _isLastNote*/
-
-    private var _isNextPageExist: MediatorLiveData<DataState<Boolean>> = MediatorLiveData()
     val isNextPageExist: Boolean
-        get() = _isNextPageExist.value?.data ?: false
+        get() = queryMgr.isNextPageExist
 
     private val _insertNote: SingleLiveEvent<DataState<NoteView>> = SingleLiveEvent()
     val insertResult: SingleLiveEvent<DataState<NoteView>>
@@ -60,7 +47,7 @@ constructor(
             addSource(_insertNote){
                 if (it.status is SUCCESS) initNotes()
             }
-            addSource(_query) {
+            addSource(queryMgr.query){
                 searchNotes()
             }
         }
@@ -68,20 +55,9 @@ constructor(
 
     override fun onCleared() {
         _mediatorNoteList.removeSource(_insertNote)
-        _mediatorNoteList.removeSource(_query)
+        _mediatorNoteList.removeSource(queryMgr.query)
+        queryMgr.dispose()
         useCases.disposeUseCases()
-    }
-
-    private fun executeNextPageExist(query: Query){
-        useCases.nextPageExist.execute(
-            onSuccess = {
-                _isNextPageExist.postValue(DataState.success(it))
-            },
-            onError = {
-                _isNextPageExist.postValue(DataState.error(it))
-            },
-            params = query
-        )
     }
 
     fun searchNotes(){
@@ -89,13 +65,12 @@ constructor(
         useCases.searchNotes.execute(
                 onSuccess = { loadNotes ->
                     totalLoadNotes.addAllUpdate(loadNotes, isBackground = true)
-                    executeNextPageExist(nextPageQuery())
-                    //checkLastNote(loadSize = loadNotes.size)
+                    updateNextPageExist()
                 },
                 onError = {
                     _mediatorNoteList.postValue(DataState.error(it))
                 },
-                params = getQuery())
+                params = queryMgr.getQuery())
     }
 
     fun insertNotes(param: NoteView){
@@ -110,13 +85,13 @@ constructor(
             params = param.transNote())
     }
 
-    fun reqUpdateFromDetailFragment(param: NoteView) = when(loadOrderingOnSharedPref()){
+    fun reqUpdateFromDetailFragment(param: NoteView) = when(queryMgr.cacheOrdering()){
         ORDER_DESC -> totalLoadNotes.fetchFirstPositionUpdate(param)
         else -> initNotes()
     }
 
     fun reqDeleteFromDetailFragment(param: NoteView){
-        executeNextPageExist(nextPageQuery(param))
+        updateNextPageExist(param)
         totalLoadNotes.deleteSync(param, isBackground = false)
     }
 
@@ -129,24 +104,11 @@ constructor(
             },
             onComplete = {
                 _deleteResult.postValue(DataState.success(param))
-                executeNextPageExist(nextPageQuery(param))
+                updateNextPageExist(param)
                 totalLoadNotes.deleteSync(param, isBackground = true)
             },
             params = param.transNote()
         )
-    }
-
-    fun nextPageQuery(noteView: NoteView): Query{
-        val nextPage = totalLoadNotes.findPage(noteView) + 1
-        val startIndex = totalLoadNotes.indexOf(noteView) % getQuery().limit
-        return getQuery().copy(
-            page = nextPage, startIndex = startIndex
-        )
-    }
-
-    fun nextPageQuery(): Query{
-        val nextPage = getQuery().page + 1
-        return getQuery().copy(page = nextPage)
     }
 
     fun deleteMultiNotes(paramNotes: List<NoteView>){
@@ -166,56 +128,34 @@ constructor(
 
     fun setOrdering(ordering: String){
         totalLoadNotes.clear()
-        setQuery(
-            getQuery().apply {
-                page = QUERY_DEFAULT_PAGE
-                order = ordering
-                startIndex = null
-            }
-        )
+        queryMgr.resortingByOrder(ordering)
     }
 
     fun searchKeyword(search: String) {
         totalLoadNotes.clear()
-        _query.postValue(getQuery().apply {
-            page = QUERY_DEFAULT_PAGE
-            limit = QUERY_DEFAULT_LIMIT
-            sort = SORT_UPDATED_AT
-            order = loadOrderingOnSharedPref()
-            like = search
-        })
+        queryMgr.resetSearchQuery(search)
     }
 
-    fun nextPage() = setQuery(
-        getQuery().apply { page += 1 }
-    )
+    fun nextPage() = queryMgr.updateNextPage()
 
     fun setToolbarState(toolbarState: ListToolbarState){
         _toolbarState.value = toolbarState
     }
 
-    private fun getQuery() = _query.value ?: Query(
-        order = loadOrderingOnSharedPref()
-    )
-
-    private fun clearQuery() = setQuery(
-        getQuery()
-            .apply {
-                page = QUERY_DEFAULT_PAGE
-                limit = QUERY_DEFAULT_LIMIT
-                sort = SORT_UPDATED_AT
-                order = loadOrderingOnSharedPref()
-                like = null
-                startIndex = null
-            }
-    )
-
-    private fun setQuery(query: Query){
-        _query.value = query
+    private fun updateNextPageExist(param: NoteView) = with(queryMgr) {
+        executeNextPageExist(
+            nextPageQuery(
+                nextPage = totalLoadNotes.findPage(param) + 1,
+                startIndex = totalLoadNotes.indexOf(param) % queryMgr.getQuery().limit
+            )
+        )
     }
 
-    private fun loadOrderingOnSharedPref() = sharedPreferences
-        .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+    private fun updateNextPageExist() = with(queryMgr){
+        executeNextPageExist(
+            nextPageQuery()
+        )
+    }
 
     private fun List<NoteView>.setNoteListSuccessState(isBackground: Boolean){
         if (isBackground)
@@ -257,9 +197,9 @@ constructor(
 
     private fun MutableList<NoteView>.deleteSyncCacheNotes(target: NoteView){
         val deletedPage = findPage(target)
-        val deletedIndex = indexOf(target) % getQuery().limit
+        val deletedIndex = indexOf(target) % queryMgr.getQuery().limit
         removeAll(takeTargetToLast(target))
-        recallSearchNoteOnDeletedIdx(deletedPage, deletedIndex)
+        queryMgr.resetPageWithIndex(deletedPage, deletedIndex)
     }
 
     private fun List<NoteView>.takeTargetToLast(target: NoteView): List<NoteView>{
@@ -268,27 +208,12 @@ constructor(
     }
 
     private fun List<NoteView>.findPage(target: NoteView): Int{
-        return (indexOf(target) / getQuery().limit) + 1
-    }
-
-    private fun recallSearchNoteOnDeletedIdx(
-        deletedPage: Int,
-        index: Int
-    ){
-        setQuery(getQuery()
-            .apply {
-                page =  deletedPage
-                startIndex = index
-            }
-        )
+        return (indexOf(target) / queryMgr.getQuery().limit) + 1
     }
 
     fun initNotes() {
         totalLoadNotes.clear()
-        clearQuery()
+        queryMgr.clearQuery()
     }
 
-   /* private fun checkLastNote(loadSize: Int){
-        _isLastNote = loadSize < getQuery().limit
-    }*/
 }

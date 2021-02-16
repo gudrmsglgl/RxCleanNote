@@ -1,12 +1,14 @@
 package com.cleannote.ui
 
+import android.content.SharedPreferences
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import com.cleannote.MainActivity
 import com.cleannote.ui.screen.MainActivityScreen
 import com.cleannote.ui.screen.NoteListScreen
-import com.cleannote.MainActivity
 import com.cleannote.app.R
+import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.model.Note
@@ -27,7 +29,7 @@ class NoteListFragmentTest: BaseTest() {
     val espressoIdlingResourceRule = EspressoIdlingResourceRule()
 
     val activity = MainActivityScreen
-    val noteListScreen = NoteListScreen
+    val screenNoteList = NoteListScreen
 
     init {
         injectTest()
@@ -36,6 +38,9 @@ class NoteListFragmentTest: BaseTest() {
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
 
+    @Inject
+    lateinit var sharedPref: SharedPreferences
+
     @Before
     fun setup(){
         setupUIController()
@@ -43,8 +48,7 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun searchNotesEmptyThenNoteNotDisplayed_onAndroid(){
-        val query = QueryFactory.makeQuery()
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(emptyList()), query)
 
@@ -52,7 +56,7 @@ class NoteListFragmentTest: BaseTest() {
             factory = fragmentFactory
         )
 
-        noteListScreen {
+        screenNoteList {
             recyclerView {
                 isGone()
             }
@@ -66,45 +70,39 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun searchNoteSuccessThenNotesDisplayed_onAndroid(){
-        val notes = NoteFactory.makeNotes(1,11)
-        val query = QueryFactory.makeQuery()
-        stubInitOrdering(query.order)
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
+        val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
-
+        screenNoteList {
             recyclerView {
                 isDisplayed()
                 hasSize(notes.size)
-
                 firstItem<NoteItem> {
                     itemTitle {
                         hasText(notes[0].title)
                     }
                 }
             }
-
             noDataTextView {
                 isGone()
             }
         }
-
     }
 
     @Test
     fun searchNotesThrowableThenErrorDialogMessage_onAndroid(){
         val errorMsg = "Test Error"
-        val query = QueryFactory.makeQuery()
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubThrowableNoteRepositorySearchNotes(RuntimeException(errorMsg), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             errorDialog {
                 title.hasText(R.string.dialog_title_error)
                 message.hasText(R.string.searchErrorMsg)
@@ -115,76 +113,76 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun filterDialogDisplayedOfCheckedCacheOrder_onAndroid(){
-        val notes = NoteFactory.makeNotes(0, 10)
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        stubInitOrdering(query.order)
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
+        val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
+
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             searchToolbar {
-
                 filterMenu {
                     isDisplayed()
                     hasDrawable(R.drawable.ic_filter_list_grey_24dp)
                     click()
                 }
-
-                filterDialog {
-                    mainTitle {
-                        isDisplayed()
-                        hasText(R.string.filter_title)
-                    }
-                    subTitle {
-                        isDisplayed()
-                        hasText(R.string.filter_desc)
-                    }
-                    radioBtnAsc {
-                        click()
-                        isChecked()
-                    }
-                    radioBtnDesc {
-                        isNotChecked()
-                    }
-                    sortBtn {
-                        isDisplayed()
-                        hasText(R.string.filter_btn_ok)
-                    }
-                    pressBack()
-                    idle(500L)
-                    doesNotExist()
+            }
+            filterDialog {
+                mainTitle {
+                    isDisplayed()
+                    hasText(R.string.filter_title)
+                }
+                subTitle {
+                    isDisplayed()
+                    hasText(R.string.filter_desc)
                 }
 
+                if (cacheOrder() == ORDER_DESC)
+                    radioBtnDesc.isChecked()
+                else
+                    radioBtnAsc.isChecked()
+
+                sortBtn {
+                    isDisplayed()
+                    hasText(R.string.filter_btn_ok)
+                }
+                pressBack()
+                idle(500L)
+                doesNotExist()
             }
         }
     }
 
     @Test
-    fun filterSetOrderingDESCThenReturnSearchNotesDESC_onAndroid(){
-        val defaultNotes = NoteFactory.makeNotes(0, 10)
-        val defaultQuery =  QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        stubInitOrdering(defaultQuery.order)
+    fun filterSetOrderingThenReturnSortingNotes_onAndroid(){
+        val defaultNotes = NoteFactory.makeNotes(10, cacheOrder())
+        val defaultQuery =  QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(defaultNotes), defaultQuery)
 
-        val orderedNotes = NoteFactory.makeNotes(10,0)
-        val orderQuery = QueryFactory.makeQuery().apply { order = ORDER_DESC }
-        stubSaveOrdering(orderQuery.order)
+        val orderedNotes = NoteFactory.makeNotes(10, cacheOrderReverse())
+        val orderQuery = QueryFactory.makeQuery(cacheOrderReverse())
         stubNoteRepositorySearchNotes(Single.just(orderedNotes), orderQuery)
         
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             searchToolbar{
                 filterMenu {
                     click()
                 }
-                filterDialog {
-                    radioBtnDesc.click()
-                    sortBtn.click()
-                }
             }
+
+            filterDialog {
+                if (cacheOrder() == ORDER_DESC)
+                    radioBtnAsc.click()
+                else
+                    radioBtnDesc.click()
+
+                sortBtn.click()
+            }
+
             recyclerView {
                 hasSize(orderedNotes.size)
                 firstItem<NoteItem> {
@@ -203,26 +201,25 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun searchTextQueryThenReturnSearchedNotes_onAndroid(){
-        val query = QueryFactory.makeQuery()
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        val text = "searchNote"
-        val searchQuery = QueryFactory.makeQuery().apply { like = text }
+        val keyword = "searchNote"
+        val searchQuery = QueryFactory.makeQuery(cacheOrder()).apply { like = keyword }
         val note = NoteFactory.makeNote(title = "searchText", date = "03")
         val searchedNotes = listOf(note)
         stubNoteRepositorySearchNotes(Single.just(searchedNotes), searchQuery)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             searchToolbar {
                 searchView {
                     searchBtn.click()
                     searchEditView {
-                        searchText(text)
+                        searchText(keyword)
                     }
                 }
                 idle(1500) // for RxDebounce(1000)
@@ -239,20 +236,19 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun searchTextQueryEmptyNotesThenNoDataTextView_onAndroid(){
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         val text = "empty"
-        val searchQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC; like = text }
+        val searchQuery = QueryFactory.makeQuery(cacheOrder()).apply { like = text }
         val emptyNotes = emptyList<Note>()
         stubNoteRepositorySearchNotes(Single.just(emptyNotes), searchQuery)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             searchToolbar {
                 searchView {
                     searchBtn.click()
@@ -274,32 +270,27 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun scrollRecyclerViewReturnNextNotes_onAndroid(){
-        val initQuery = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(initQuery.order)
+        val stubNotes = NoteFactory.makeNotes(20, cacheOrder())
+
+        val initQuery = QueryFactory.makeQuery(cacheOrder())
+        val notes = stubNotes.subList(0, 9)
         stubNextPageExist(true)
         stubNoteRepositorySearchNotes(Single.just(notes), initQuery)
 
-        val nextQuery = QueryFactory.makeQuery().apply {
-            order = ORDER_ASC
-            page = 2 }
-        val nextNotes = NoteFactory.makeNotes(10,20)
+        val nextQuery = QueryFactory.makeQuery(cacheOrder()).apply { page = 2 }
+        val nextNotes = stubNotes.subList(10, 19)
         stubNoteRepositorySearchNotes(Single.just(nextNotes), nextQuery)
 
-        val endQuery = QueryFactory.makeQuery().apply {
-            order = ORDER_ASC
-            page = 3 }
+        val endQuery = QueryFactory.makeQuery(cacheOrder()).apply { page = 3 }
         val endNotes: List<Note> = emptyList()
         stubNoteRepositorySearchNotes(Single.just(endNotes), endQuery)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             recyclerView {
-                idle(1000)
                 swipeUp()
                 hasSize(notes.size + nextNotes.size)
-                idle(3000)
                 scrollToEnd()
                 visibleLastItem<NoteItem> {
                     itemTitle {
@@ -312,16 +303,15 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun createNoteThenInputTitleDialog_onAndroid(){
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         ActivityScenario.launch(MainActivity::class.java)
 
         activity{
-            noteListScreen {
+            screenNoteList {
                 insertBtn {
                     click()
                 }
@@ -339,15 +329,14 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun recyclerViewSwipeLeftThenVisibleDeleteMenu_onAndroid(){
-        val query = QueryFactory.makeQuery()
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             recyclerView {
                 firstItem<NoteItem> {
                     swipeLeft()
@@ -362,20 +351,15 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun swipeDeleteMenuSuccessThenNotesDelete_onAndroid(){
-        val query = QueryFactory.makeQuery()
-            .apply {
-                order = ORDER_ASC
-                startIndex = null
-            }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder()).apply { startIndex = null }
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDelete()
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             recyclerView{
                 firstItem<NoteItem> {
                     swipeLeft()
@@ -392,9 +376,8 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun swipeDeleteMenuFailThenNotDeleteNotes_onAndroid(){
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDelete(RuntimeException())
@@ -402,7 +385,7 @@ class NoteListFragmentTest: BaseTest() {
         ActivityScenario.launch(MainActivity::class.java)
 
         activity {
-            noteListScreen {
+            screenNoteList {
                 recyclerView{
                     firstItem<NoteItem> {
                         swipeLeft()
@@ -423,15 +406,14 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun noteLongClickThenMultiSelectStateToolbar_onAndroid(){
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             recyclerView {
                 firstItem<NoteItem> {
                     longClick()
@@ -454,16 +436,15 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun multiDeleteThrowableThenSearchStateDefaultNotes_onAndroid(){
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDeleteMultiNotes(RuntimeException())
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             recyclerView {
                 firstItem<NoteItem> {
                     longClick()
@@ -508,19 +489,22 @@ class NoteListFragmentTest: BaseTest() {
     @Test
     fun multiDeleteSuccessThenSearchStateDefaultNotesOfCheckDeleted_onAndroid(){
         var checkSize = 0
-        val query = QueryFactory.makeQuery().apply { order = ORDER_ASC }
-        val notes = NoteFactory.makeNotes(0, 10)
-        stubInitOrdering(query.order)
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositoryDeleteMultiNotes()
 
         // b/c when vm multiDelete then initNotes -> recall searchNotes()
-        val deletedNotes = NoteFactory.makeNotes(2, 10)
-        stubNoteRepositorySearchNotes(query, Single.just(notes), Single.just(deletedNotes))
+        val deletedNotes = NoteFactory.makeNotes(8, cacheOrder())
+        stubNoteRepositorySearchNotes(
+            query,
+            Single.just(notes),
+            Single.just(deletedNotes)
+        )
 
         launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
 
-        noteListScreen {
+        screenNoteList {
             recyclerView {
                 firstItem<NoteItem> {
                     longClick()
@@ -569,5 +553,14 @@ class NoteListFragmentTest: BaseTest() {
 
     override fun injectTest() {
         getComponent().inject(this)
+    }
+
+    private fun cacheOrder() = sharedPref.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+
+    private fun cacheOrderReverse(): String{
+        return if (cacheOrder() == ORDER_DESC)
+            ORDER_ASC
+        else
+            ORDER_DESC
     }
 }

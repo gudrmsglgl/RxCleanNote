@@ -13,6 +13,7 @@ import com.cleannote.domain.interactor.usecases.notelist.SearchNotes
 import com.cleannote.domain.interactor.usecases.splash.Login
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.cleannote.presentation.notelist.NoteListViewModel
+import com.cleannote.presentation.notelist.QueryManager
 import com.cleannote.presentation.splash.SplashViewModel
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +24,8 @@ class ViewModelFactory
     private val login: Login,
     private val noteListUseCases: NoteListUseCases,
     private val noteDetailUseCases: NoteDetailUseCases,
-    private val sharedPreferences: SharedPreferences
+    private val queryManager: QueryManager
+    //private val sharedPreferences: SharedPreferences
 ): ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -31,7 +33,7 @@ class ViewModelFactory
 
         SplashViewModel::class.java -> SplashViewModel(login) as T
 
-        NoteListViewModel::class.java -> NoteListViewModel(noteListUseCases, sharedPreferences) as T
+        NoteListViewModel::class.java -> NoteListViewModel(noteListUseCases, queryManager) as T
 
         NoteDetailViewModel::class.java -> NoteDetailViewModel(noteDetailUseCases) as T
 

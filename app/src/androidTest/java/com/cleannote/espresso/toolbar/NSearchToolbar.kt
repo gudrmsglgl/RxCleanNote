@@ -13,6 +13,5 @@ class NSearchToolbar(private val viewMatcher: Matcher<View>):
     NBaseView<NSearchToolbar>(viewMatcher),ToolbarAssertion
 {
     val filterMenu = NImageView(ViewMatchers.withId(R.id.action_filter))
-    val filterDialog = NLFilterDialog(ViewMatchers.withId(R.id.filter_dialog))
     val searchView = NSearchView(ViewMatchers.withId(R.id.sv))
 }

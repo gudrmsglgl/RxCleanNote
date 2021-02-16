@@ -6,15 +6,15 @@ import com.cleannote.espresso.recycler.NRecyclerItem
 import com.cleannote.TestBaseApplication
 import com.cleannote.common.UIController
 import com.cleannote.domain.Constants
+import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
+import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.injection.TestApplicationComponent
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.holder.BaseHolder
-import io.mockk.Runs
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
+import com.cleannote.presentation.notelist.QueryManager
+import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -28,12 +28,6 @@ abstract class BaseTest {
     fun getComponent(): TestApplicationComponent {
         return application.applicationComponent as TestApplicationComponent
     }
-
-    fun stubInitOrdering(order: String) = every {
-        getComponent()
-            .provideSharedPreferences()
-            .getString(Constants.FILTER_ORDERING_KEY, Constants.ORDER_DESC)
-    }.returns(order)
 
     fun stubNextPageExist(stub: Boolean) = every {
         getComponent().provideNoteRepository().nextPageExist(any())
@@ -56,14 +50,6 @@ abstract class BaseTest {
             getComponent().provideNoteRepository().searchNotes(query ?: any())
         } returns Single.error(throwable)
     }
-
-    fun stubSaveOrdering(order: String) = every {
-        getComponent()
-            .provideSharedPreferences()
-            .edit()
-            .putString(any(), any())
-            .apply()
-    } just Runs
 
     fun stubNoteRepositoryUpdate(){
         every {

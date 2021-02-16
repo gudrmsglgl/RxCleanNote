@@ -12,6 +12,7 @@ import com.cleannote.espresso.text.NToast
 import com.cleannote.espresso.toolbar.NMultiDeleteToolbar
 import com.cleannote.espresso.toolbar.NSearchToolbar
 import com.cleannote.app.R
+import com.cleannote.espresso.dialog.NLFilterDialog
 
 object NoteListScreen: BaseScreen<NoteListScreen>() {
 
@@ -21,6 +22,7 @@ object NoteListScreen: BaseScreen<NoteListScreen>() {
     val multiDeleteToolbar = NMultiDeleteToolbar(withId(R.id.toolbar_multi_delete))
     val insertBtn = NFloatingButton(withId(R.id.add_new_note_fab))
     val newNoteDialog = NLNewNoteDialog(withId(R.layout.md_dialog_stub_input))
+    val filterDialog = NLFilterDialog(withId(R.id.filter_dialog))
     val deleteDialog = NDDeleteDialog(withId(R.layout.md_dialog_base))
     val deleteSuccessToast = NToast(withText(R.string.deleteSuccessMsg))
     val deleteErrorToast = NToast(withText(R.string.deleteErrorMsg))

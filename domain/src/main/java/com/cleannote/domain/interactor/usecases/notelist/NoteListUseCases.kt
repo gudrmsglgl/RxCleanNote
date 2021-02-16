@@ -11,8 +11,7 @@ constructor(
     val searchNotes: SearchNotes,
     val insertNewNote: InsertNewNote,
     val deleteNote: DeleteNote,
-    val deleteMultipleNotes: DeleteMultipleNotes,
-    val nextPageExist: NextPageExist
+    val deleteMultipleNotes: DeleteMultipleNotes
 ): UseCaseManager(
-    searchNotes, insertNewNote, deleteNote, deleteMultipleNotes, nextPageExist
+    searchNotes, insertNewNote, deleteNote, deleteMultipleNotes
 )

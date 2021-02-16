@@ -1,5 +1,6 @@
 package com.cleannote.test
 
+import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.model.Note
 import com.cleannote.model.NoteUiModel
 import java.util.*
@@ -33,11 +34,11 @@ object NoteFactory {
         updatedAt = "2020-07-${date} 12:00:$date"
     )
 
-    fun makeNotes(start: Int, end: Int): List<Note> =
-        if (start < end)
-            (start until end).map { makeNote(title = "$it TestTitle", date = it.toString()) }
+    fun makeNotes(size: Int, order: String): List<Note> =
+        if (order == ORDER_ASC)
+            (0 until size).map { makeNote(title = "$it TestTitle", date = it.toString()) }
         else
-            (start downTo end).map { makeNote(title = "$it TestTitle", date = it.toString()) }
+            (size-1 downTo 0).map { makeNote(title = "$it TestTitle", date = it.toString()) }
 
 
 }

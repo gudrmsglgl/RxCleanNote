@@ -22,7 +22,8 @@ abstract class TestApplicationModule {
         @Singleton
         @Provides
         @JvmStatic
-        fun provideSharedPreferences(): SharedPreferences = mockk()
+        fun provideSharedPref(context: Context) =
+            context.getSharedPreferences(Constants.PREF_NOTE_PACKAGE_NAME, Context.MODE_PRIVATE)
 
     }
 }
