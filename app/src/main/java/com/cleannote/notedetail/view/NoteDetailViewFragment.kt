@@ -83,7 +83,7 @@ class NoteDetailViewFragment(
         )
 
     private fun initToolbar() = binding
-        .toolbar
+        .tbDetailView
         .setToolbar(
             homeIcon = R.drawable.ic_dv_back,
             menuRes = R.menu.menu_detail_view,
@@ -142,7 +142,7 @@ class NoteDetailViewFragment(
     }
 
     private fun toolbarUiOnAppbarCollapse() = with(binding){
-        toolbar.setUI(
+        tbDetailView.setUI(
             titleParam = viewModel.finalNote()?.title,
             iconColor = R.color.black,
             backgroundColor = Color.WHITE
@@ -150,7 +150,7 @@ class NoteDetailViewFragment(
     }
 
     private fun toolbarUiOnAppbarExpand() = with(binding){
-        toolbar.setUI(
+        tbDetailView.setUI(
             titleParam = null,
             iconColor = if(imagePager.isVisible) R.color.white else R.color.black,
             backgroundColor = Color.TRANSPARENT

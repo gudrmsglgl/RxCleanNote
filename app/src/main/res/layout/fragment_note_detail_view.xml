@@ -29,7 +29,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:toolbarId="@id/toolbar"
+            app:toolbarId="@id/tb_detail_view"
             app:titleEnabled="false"
             app:statusBarScrim="@android:color/transparent">
 
@@ -60,7 +60,7 @@
                 android:layout_marginBottom="50dp"/>
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/tb_detail_view"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/toolbar_height"
                 app:titleTextColor="@color/black"

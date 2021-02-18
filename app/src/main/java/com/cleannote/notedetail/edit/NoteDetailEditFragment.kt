@@ -4,6 +4,8 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
@@ -76,6 +78,11 @@ class NoteDetailEditFragment constructor(
             vm = viewModel
             fragment = this@NoteDetailEditFragment
         }
+    }
+
+    @VisibleForTesting(otherwise = PRIVATE)
+    fun initNoteDefaultMode(){
+        viewModel.defaultMode(currentNote())
     }
 
     private fun initFooterRcvImages() = binding
@@ -247,7 +254,7 @@ class NoteDetailEditFragment constructor(
     private fun currentNote() = viewModel.finalNote() ?: emptyNoteView()
 
     private fun emptyNoteView() = NoteView(
-        id = UUID.randomUUID().toString(), title = "", body = "", updatedAt = "",createdAt = "", noteImages = null
+        id = UUID.randomUUID().toString(), title = "emptyTile", body = "emptyBody", updatedAt = "2021-10-10",createdAt = "2021-10-10", noteImages = null
     )
 
     fun editCancel() = viewModel.editCancel()

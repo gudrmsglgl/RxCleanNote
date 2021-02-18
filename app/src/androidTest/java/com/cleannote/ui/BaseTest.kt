@@ -1,6 +1,7 @@
 package com.cleannote.ui
 
 import androidx.navigation.NavController
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import com.cleannote.espresso.recycler.NRecyclerItem
 import com.cleannote.TestBaseApplication
@@ -20,7 +21,8 @@ import io.reactivex.Single
 
 abstract class BaseTest {
     val mockUIController: UIController = mockk(relaxUnitFun = true)
-    val navController = mockk<NavController>(relaxed = true)
+    val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+    val mockNavController = mockk<NavController>(relaxed = true)
 
     private val application: TestBaseApplication
         = ApplicationProvider.getApplicationContext() as TestBaseApplication

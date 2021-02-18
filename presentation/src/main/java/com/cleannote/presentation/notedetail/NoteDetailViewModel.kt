@@ -1,13 +1,15 @@
 package com.cleannote.presentation.notedetail
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.cleannote.domain.interactor.usecases.notedetail.NoteDetailUseCases
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.notedetail.BeforeAfterNoteView
-import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
+import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.extensions.createNoteImageView
 import com.cleannote.presentation.extensions.transNote
@@ -57,45 +59,45 @@ constructor(
         setFinalNote(finalNote(), isAsync = false)
     }
 
-    fun editDoneMode(param: NoteView){
+    fun editDoneMode(param: NoteView) = finalNote()?.let {
         noteMode(EditDoneMode)
         executeUpdate(
-            BeforeAfterNoteView(before = finalNote()!!, after = param)
+            BeforeAfterNoteView(before = it, after = param)
         )
     }
 
-    fun uploadImage(path: String, updateTime: String){
+    fun uploadImage(path: String, updateTime: String) = finalNote()?.let {
         executeUpdate(
             BeforeAfterNoteView(
-                before = finalNote()!!,
-                after = updatedFinalNoteOfImage(path, updateTime)
+                before = it,
+                after = it.transAddImage(path, updateTime)
             )
         )
     }
 
-    private fun updatedFinalNoteOfImage(
+    private fun NoteView.transAddImage(
         path: String,
         updateTime: String
-    ) = finalNote()!!.copy(
+    ) = this.copy(
         updatedAt = updateTime,
-        noteImages = finalNoteAddImage(path)
+        noteImages = addImage(path, this.id)
     )
 
-    fun deleteImage(path: String, updateTime: String){
+    fun deleteImage(path: String, updateTime: String) = finalNote()?.let{
         executeUpdate(
             BeforeAfterNoteView(
-                before = finalNote()!!,
-                after = deletedFinalNoteOfImage(path, updateTime)
+                before = it,
+                after = it.transDeletedImage(path, updateTime)
             )
         )
     }
 
-    private fun deletedFinalNoteOfImage(
+    private fun NoteView.transDeletedImage(
         path: String,
         updateTime: String
-    ) = finalNote()!!.copy(
+    ) = this.copy(
         updatedAt = updateTime,
-        noteImages = finalNoteRemoveImage(path)
+        noteImages = removeImage(path)
     )
 
 
@@ -140,23 +142,25 @@ constructor(
 
     fun finalNote() = _finalNote.value
 
-    private fun finalNoteAddImage(path: String): List<NoteImageView> = finalNoteImages()
+    private fun addImage(path: String, notePk: String): List<NoteImageView> = finalNoteImages()
         .apply {
-            add(0, path.createNoteImageView(notePk = finalNote()!!.id))
+            add(0, path.createNoteImageView(notePk))
         }
 
-    private fun finalNoteRemoveImage(path: String): List<NoteImageView> = finalNoteImages()
+    private fun removeImage(path: String): List<NoteImageView> = finalNoteImages()
         .apply {
             val targetImage = find { it.imagePath == path }
             remove(targetImage)
         }
 
-    private fun finalNoteImages() = finalNote()!!
-        .noteImages
-        ?.toMutableList() ?: mutableListOf()
+    private fun finalNoteImages() = finalNote()
+        ?.noteImages
+        ?.toMutableList()
+        ?: mutableListOf()
 
     override fun onCleared() {
         super.onCleared()
+        detailUseCases.disposeUseCases()
         Log.d("RxCleanNote", "NoteDetailViewModel onCleared()")
     }
 }
