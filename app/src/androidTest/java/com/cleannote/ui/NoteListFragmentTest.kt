@@ -555,7 +555,9 @@ class NoteListFragmentTest: BaseTest() {
         getComponent().inject(this)
     }
 
-    private fun cacheOrder() = sharedPref.getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
+    private fun cacheOrder() = sharedPref.getString(
+        FILTER_ORDERING_KEY, ORDER_DESC
+    ) ?: ORDER_DESC
 
     private fun cacheOrderReverse(): String{
         return if (cacheOrder() == ORDER_DESC)

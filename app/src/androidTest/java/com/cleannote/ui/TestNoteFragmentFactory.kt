@@ -8,6 +8,7 @@ import com.bumptech.glide.RequestManager
 import com.cleannote.common.DateUtil
 import com.cleannote.common.UIController
 import com.cleannote.notedetail.edit.NoteDetailEditFragment
+import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.splash.SplashFragment
 import javax.inject.Inject
@@ -28,6 +29,14 @@ class TestNoteFragmentFactory
 
         NoteListFragment::class.java.name -> {
             val fragment = NoteListFragment(viewModelFactory, sharedPreferences)
+            if (this::uiController.isInitialized){
+                fragment.setUIController(uiController)
+            }
+            fragment
+        }
+
+        NoteDetailViewFragment::class.java.name -> {
+            val fragment = NoteDetailViewFragment(viewModelFactory, glideReqManager)
             if (this::uiController.isInitialized){
                 fragment.setUIController(uiController)
             }

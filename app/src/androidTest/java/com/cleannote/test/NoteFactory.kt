@@ -7,6 +7,9 @@ import java.util.*
 
 object NoteFactory {
 
+    fun testNote() = NoteUiModel(
+        id = UUID.randomUUID().toString(), title = "emptyTile", body = "emptyBody", updatedAt = "2021-10-10",createdAt = "2021-10-10"
+    )
 
     fun makeNote(
         id: String? = null,
