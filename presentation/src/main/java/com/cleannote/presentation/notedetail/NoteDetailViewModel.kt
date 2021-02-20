@@ -100,7 +100,6 @@ constructor(
         noteImages = removeImage(path)
     )
 
-
     private fun executeUpdate(param: BeforeAfterNoteView){
         _updatedNote.postValue(DataState.loading())
         detailUseCases.updateNote.execute(
@@ -140,8 +139,6 @@ constructor(
         )
     }
 
-    fun finalNote() = _finalNote.value
-
     private fun addImage(path: String, notePk: String): List<NoteImageView> = finalNoteImages()
         .apply {
             add(0, path.createNoteImageView(notePk))
@@ -157,6 +154,10 @@ constructor(
         ?.noteImages
         ?.toMutableList()
         ?: mutableListOf()
+
+    fun finalNote() = _finalNote.value
+    fun isTitleModified(currentTitle: String) = finalNote()?.title == currentTitle
+    fun isBodyModified(currentBody: String) = finalNote()?.body == currentBody
 
     override fun onCleared() {
         super.onCleared()

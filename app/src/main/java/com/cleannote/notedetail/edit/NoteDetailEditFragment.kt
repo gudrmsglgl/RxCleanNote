@@ -1,8 +1,8 @@
 package com.cleannote.notedetail.edit
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.PopupMenu
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
@@ -26,15 +26,16 @@ import com.cleannote.model.NoteImageUiModel
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
-import com.cleannote.presentation.data.State.ERROR
-import com.cleannote.presentation.data.State.SUCCESS
+import com.cleannote.notedetail.edit.PickerType.Companion.CAMERA
+import com.cleannote.notedetail.edit.PickerType.Companion.GALLERY
+import com.cleannote.notedetail.edit.PickerType.Companion.LINK
+import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
-import com.github.dhaval2404.imagepicker.ImagePicker
 import com.jakewharton.rxbinding4.material.offsetChanges
 import com.jakewharton.rxbinding4.widget.itemClicks
 import com.jakewharton.rxbinding4.widget.textChanges
@@ -42,7 +43,6 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 import java.util.*
-import kotlin.math.absoluteValue
 
 class NoteDetailEditFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
@@ -52,6 +52,8 @@ class NoteDetailEditFragment constructor(
 
     private val viewModel
             by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
+
+    private val imageLoader: ImageLoader by lazy { ImageLoader(this, glideRequestManager) }
 
     private lateinit var imageAdapter: EditImagesAdapter
 
@@ -65,9 +67,9 @@ class NoteDetailEditFragment constructor(
         initFooterRcvImages()
         footerImageDeleteIconOnClick()
 
-        toolbarStateSource()
-        textChangeEditModeSource()
-        toolbarRightMenuSource()
+        changeTbState()
+        changeEditMode(binding.editTitle, binding.noteBody)
+        tbRightMenuOnClick()
 
         subscribeUpdateNote()
         subscribeDeleteNote()
@@ -101,13 +103,18 @@ class NoteDetailEditFragment constructor(
         }
         .addCompositeDisposable()
 
-    private fun textChangeEditModeSource() = Observable.merge(
-        etTitle().textChanges().filter { etTitle().isFocused && !isTitleModified()},
-        etBody().textChanges().filter { etBody().isFocused && !isBodyModified()})
-        .subscribe { editMode() }
+    private fun changeEditMode(
+        title: EditText,
+        body: EditText
+    ) = Observable.merge(
+        title.textChanges()
+            .filter { title.isFocused && !viewModel.isTitleModified(title.text.toString())},
+        body.textChanges()
+            .filter { body.isFocused && !viewModel.isBodyModified(body.text.toString())})
+        .subscribe { viewModel.editMode() }
         .addCompositeDisposable()
 
-    private fun toolbarStateSource() = binding
+    private fun changeTbState() = binding
         .appBar
         .offsetChanges()
         .map { transToolbarState(it) }
@@ -117,7 +124,7 @@ class NoteDetailEditFragment constructor(
         }
         .addCompositeDisposable()
 
-    private fun toolbarRightMenuSource() = binding
+    private fun tbRightMenuOnClick() = binding
         .detailToolbar
         .rightIcon
         .singleClick()
@@ -132,11 +139,16 @@ class NoteDetailEditFragment constructor(
         .observe(viewLifecycleOwner, Observer {
             if (it != null){
                 when (it.status) {
+                    is LOADING -> {
+                        showLoadingProgressBar(true)
+                    }
                     is SUCCESS -> {
+                        showLoadingProgressBar(false)
                         showToast(getString(R.string.updateSuccessMsg))
                         hasKeyOnBackPress = REQ_UPDATE_KEY
                     }
                     is ERROR -> {
+                        showLoadingProgressBar(false)
                         showErrorDialog(getString(R.string.updateErrorMsg))
                         it.sendFirebaseThrowable()
                     }
@@ -195,61 +207,24 @@ class NoteDetailEditFragment constructor(
                 menuInflater.inflate(R.menu.menu_image_add, menu)
                 visibleIcon(it)
                 itemClicks()
-                    .subscribe { menuItem ->
-                        when (menuItem.itemId){
-                            R.id.album -> {
-                                loadImagePicker(PickerType.GALLERY)
-                            }
-                            R.id.camera -> {
-                                loadImagePicker(PickerType.CAMERA)
-                            }
-                            R.id.link -> {
-                                inputLinkDialog()
-                            }
-                        }
+                .map { menuItem ->
+                    when (menuItem.itemId){
+                        R.id.album -> GALLERY
+                        R.id.camera -> CAMERA
+                        else -> LINK
                     }
-                    .addCompositeDisposable()
+                }
+                .subscribe { menuType ->
+                    imageLoader
+                        .onLoaded(menuType) { path ->
+                            if (path.isNotEmpty())
+                                viewModel.uploadImage(path, dateUtil.getCurrentTimestamp())
+                        }
+                }.addCompositeDisposable()
                 show()
             }
         }
     }
-
-    private fun loadImagePicker(type: PickerType){
-        val builder = ImagePicker.with(this)
-        if (type == PickerType.CAMERA)
-            builder.cameraOnly()
-        else
-            builder.galleryOnly()
-        builder.compress(1024)
-            .start { resultCode, data ->
-                if (resultCode == Activity.RESULT_OK) {
-                    //You can also get File Path from intent
-                    val filePath:String = ImagePicker.getFilePath(data)!!
-                    viewModel.uploadImage(filePath,dateUtil.getCurrentTimestamp())
-                } else if (resultCode == ImagePicker.RESULT_ERROR) {
-                    showToast(ImagePicker.getError(data))
-                } else {
-                    showToast(getString(R.string.cancel_message))
-                }
-            }
-    }
-
-    private fun inputLinkDialog() = activity?.let { context ->
-        view?.clearFocus()
-        LinkImageDialog(context, glideRequestManager, viewLifecycleOwner)
-            .onUploadImage {
-                if (it.isNotEmpty())
-                    viewModel.uploadImage(it, dateUtil.getCurrentTimestamp())
-            }
-    }
-
-    private fun etTitle() = binding.editTitle
-    private fun etBody() = binding.noteBody
-    private fun tbLeftIcon() = binding.detailToolbar.leftIcon
-    private fun tbRightIcon() = binding.detailToolbar.rightIcon
-
-    private fun isTitleModified() = viewModel.finalNote()?.title == etTitle().text.toString()
-    private fun isBodyModified() = viewModel.finalNote()?.body == etBody().text.toString()
 
     private fun currentNote() = viewModel.finalNote() ?: emptyNoteView()
 
@@ -257,24 +232,22 @@ class NoteDetailEditFragment constructor(
         id = UUID.randomUUID().toString(), title = "emptyTile", body = "emptyBody", updatedAt = "2021-10-10",createdAt = "2021-10-10", noteImages = null
     )
 
-    fun editCancel() = viewModel.editCancel()
-    private fun editMode() = viewModel.editMode()
     private fun editDoneMode() = viewModel.editDoneMode(
         currentNote().copy(
-            title = etTitle().text.toString(),
-            body = etBody().text.toString(),
+            title = binding.editTitle.text.toString(),
+            body = binding.noteBody.text.toString(),
             updatedAt = dateUtil.getCurrentTimestamp()
         )
     )
 
-    fun isEditCancelMenu(): Boolean = tbLeftIcon().drawable.equalDrawable(R.drawable.ic_cancel_24dp)
-    private fun isEditDoneMenu(): Boolean = tbRightIcon().drawable.equalDrawable(R.drawable.ic_done_24dp)
+    fun isEditCancelMenu(): Boolean = binding.detailToolbar.leftIcon.drawable.equalDrawable(R.drawable.ic_cancel_24dp)
+    private fun isEditDoneMenu(): Boolean = binding.detailToolbar.rightIcon.drawable.equalDrawable(R.drawable.ic_done_24dp)
 
     private fun transToolbarState(offset: Int): DetailToolbarState =
         if (offset < collapseBoundary) TbCollapse else TbExpanded
 
     private fun noteTitleAlpha(){
-        val alpha = (binding.appBar.y / binding.appBar.totalScrollRange).absoluteValue
+        val alpha = binding.appBar.offsetChangeRatio()
         binding.editTitle.alpha = 1 - alpha
         binding.detailToolbar.toolBarTitle.alpha = alpha
     }
@@ -286,10 +259,6 @@ class NoteDetailEditFragment constructor(
                 bundleOf(reqIdentityKey to viewModel.finalNote()?.transNoteUiModel())
             )
         }
-    }
-
-    enum class PickerType{
-        CAMERA, GALLERY
     }
 
 }
