@@ -1,4 +1,4 @@
-package com.cleannote.notedetail.edit
+package com.cleannote.notedetail.edit.dialog
 
 import android.content.Context
 import android.graphics.Bitmap
