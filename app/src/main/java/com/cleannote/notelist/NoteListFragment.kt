@@ -31,9 +31,7 @@ import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.extension.*
-import com.cleannote.extension.rxbinding.itemCount
-import com.cleannote.extension.rxbinding.lastVisibleItemPos
-import com.cleannote.extension.rxbinding.singleClick
+import com.cleannote.extension.rxbinding.*
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.IS_EXECUTE_INSERT
@@ -54,6 +52,7 @@ import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.layout_search_toolbar.view.*
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -65,11 +64,6 @@ constructor(
     OnBackPressListener,
     SwipeAdapter
 {
-
-    companion object{
-        const val LAST_VISIBLE_ITEM_POS = "lastVisibleItemPosKey"
-        const val ITEM_COUNT = "itemCountKey"
-    }
 
     private val bundle: Bundle = Bundle()
     private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
@@ -185,12 +179,8 @@ constructor(
     private fun scrollEventNextPageSource() = binding
         .recyclerView
         .scrollEvents()
-        .map {
-            mapOf(LAST_VISIBLE_ITEM_POS to it.lastVisibleItemPos(), ITEM_COUNT to it.itemCount())
-        }
-        .filter {
-            it[LAST_VISIBLE_ITEM_POS] == it[ITEM_COUNT] && viewModel.isNextPageExist
-        }
+        .filter {  it.lastVisibleItemPos() == it.shouldNextPagePos() && viewModel.isNextPageExist }
+        .throttleFirst(130L, TimeUnit.MILLISECONDS)
         .subscribe {
             viewModel.nextPage()
         }
@@ -239,7 +229,8 @@ constructor(
             }}
         )
 
-    private fun subscribeInsertResult() = viewModel.insertResult
+    private fun subscribeInsertResult() = viewModel
+        .insertResult
         .observe(viewLifecycleOwner, Observer { dataState ->
             if (dataState != null){
                 showLoadingProgressBar(dataState.isLoading)
@@ -255,7 +246,8 @@ constructor(
             }
         })
 
-    private fun subscribeDeleteResult() = viewModel.deleteResult
+    private fun subscribeDeleteResult() = viewModel
+        .deleteResult
         .observe(viewLifecycleOwner, Observer { dataState ->
             if (dataState != null) {
                 showLoadingProgressBar(dataState.isLoading)
@@ -303,7 +295,8 @@ constructor(
             )
         }
 
-    private fun setupSearchViewToolbar() = binding.toolbarContentContainer
+    private fun setupSearchViewToolbar() = binding
+        .toolbarContentContainer
         .findViewById<Toolbar>(R.id.search_toolbar)
         .apply {
             searchViewSetQuery(R.id.sv, viewModel.queryLike)

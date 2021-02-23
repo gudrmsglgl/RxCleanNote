@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit
 fun RecyclerViewScrollEvent.lastVisibleItemPos(): Int =
     (this.view.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
 
-fun RecyclerViewScrollEvent.itemCount(): Int? =
-    this.view.adapter?.itemCount?.minus(1)
+fun RecyclerViewScrollEvent.shouldNextPagePos(): Int? =
+    this.view.adapter?.itemCount?.minus(4)
 
 fun View.singleClick() =
     clicks().throttleFirst(2000, TimeUnit.MILLISECONDS)

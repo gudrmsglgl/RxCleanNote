@@ -1,6 +1,5 @@
 package com.cleannote.presentation.common
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.cleannote.domain.interactor.UseCase
 

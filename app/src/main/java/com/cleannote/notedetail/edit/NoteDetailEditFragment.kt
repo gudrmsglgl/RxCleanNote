@@ -1,9 +1,9 @@
 package com.cleannote.notedetail.edit
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.EditText
-import android.widget.PopupMenu
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.os.bundleOf
@@ -20,15 +20,13 @@ import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
 import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.extension.*
-import com.cleannote.extension.menu.visibleIcon
+import com.cleannote.extension.menu.showImageLoaderMenu
 import com.cleannote.extension.rxbinding.singleClick
 import com.cleannote.model.NoteImageUiModel
 import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
-import com.cleannote.notedetail.edit.PickerType.Companion.CAMERA
-import com.cleannote.notedetail.edit.PickerType.Companion.GALLERY
-import com.cleannote.notedetail.edit.PickerType.Companion.LINK
+import com.cleannote.notedetail.edit.dialog.LoadingImageUpdateDialog
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.TextMode.*
@@ -36,13 +34,14 @@ import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
+import com.jakewharton.rxbinding4.core.scrollChangeEvents
 import com.jakewharton.rxbinding4.material.offsetChanges
-import com.jakewharton.rxbinding4.widget.itemClicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.footer_note_detail.view.*
 import kotlinx.android.synthetic.main.layout_note_detail_toolbar.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class NoteDetailEditFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
@@ -52,25 +51,25 @@ class NoteDetailEditFragment constructor(
 
     private val viewModel
             by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
-
-    private val imageLoader: ImageLoader by lazy { ImageLoader(this, glideRequestManager) }
-
+    private val imageLoader: ImageLoader
+            by lazy { ImageLoader(this, glideRequestManager) }
+    private val lottieLoadingDialog: LoadingImageUpdateDialog
+            by lazy { LoadingImageUpdateDialog.newInstance() }
     private lateinit var imageAdapter: EditImagesAdapter
 
     private val collapseBoundary = -85
-
     private var hasKeyOnBackPress: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setStatusBarTextBlack()
         initBinding()
         initFooterRcvImages()
         footerImageDeleteIconOnClick()
-
         changeTbState()
         changeEditMode(binding.editTitle, binding.noteBody)
         tbRightMenuOnClick()
-
+        scrollReleaseFocus()
         subscribeUpdateNote()
         subscribeDeleteNote()
     }
@@ -133,6 +132,21 @@ class NoteDetailEditFragment constructor(
             if (isDeleteMenu) showNoteDeleteDialog()
             else editDoneMode()
         }
+        .addCompositeDisposable()
+
+    private fun scrollReleaseFocus() = binding
+        .editBody
+        .scrollChangeEvents()
+        .map { it.scrollY }
+        .throttleFirst(250L, TimeUnit.MILLISECONDS)
+        .subscribe {
+            val pView = view
+            if (it != 0 && pView != null) {
+                pView.clearFocus()
+                pView.hideKeyboard()
+            }
+        }
+        .addCompositeDisposable()
 
     private fun subscribeUpdateNote() = viewModel
         .updatedNote
@@ -140,15 +154,13 @@ class NoteDetailEditFragment constructor(
             if (it != null){
                 when (it.status) {
                     is LOADING -> {
-                        showLoadingProgressBar(true)
+                        hideLottieImgLoadingDialog()
                     }
                     is SUCCESS -> {
-                        showLoadingProgressBar(false)
-                        showToast(getString(R.string.updateSuccessMsg))
+                        showUpdateMsg()
                         hasKeyOnBackPress = REQ_UPDATE_KEY
                     }
                     is ERROR -> {
-                        showLoadingProgressBar(false)
                         showErrorDialog(getString(R.string.updateErrorMsg))
                         it.sendFirebaseThrowable()
                     }
@@ -203,25 +215,14 @@ class NoteDetailEditFragment constructor(
         activity?.let {
             getView()?.clearFocus()
             view.hideKeyboard()
-            PopupMenu(it, view).apply {
-                menuInflater.inflate(R.menu.menu_image_add, menu)
-                visibleIcon(it)
-                itemClicks()
-                .map { menuItem ->
-                    when (menuItem.itemId){
-                        R.id.album -> GALLERY
-                        R.id.camera -> CAMERA
-                        else -> LINK
-                    }
-                }
-                .subscribe { menuType ->
-                    imageLoader
-                        .onLoaded(menuType) { path ->
-                            if (path.isNotEmpty())
-                                viewModel.uploadImage(path, dateUtil.getCurrentTimestamp())
+            it.showImageLoaderMenu(view){ menuType ->
+                imageLoader
+                    .onLoaded(menuType) { path ->
+                        if (path.isNotEmpty()){
+                            viewModel.uploadImage(path, dateUtil.getCurrentTimestamp())
+                            showLottieImgLoadingDialog()
                         }
-                }.addCompositeDisposable()
-                show()
+                    }
             }
         }
     }
@@ -261,4 +262,25 @@ class NoteDetailEditFragment constructor(
         }
     }
 
+    private fun showLottieImgLoadingDialog(){
+        if (!lottieLoadingDialog.isAdded) lottieLoadingDialog.show(childFragmentManager, "lottie_dialog")
+    }
+
+    private fun hideLottieImgLoadingDialog(){
+        if (lottieLoadingDialog.isAdded){
+            Handler().postDelayed({
+                lottieLoadingDialog.dismiss()
+            }, 1700)
+        }
+    }
+
+    private fun showUpdateMsg(){
+        if (lottieLoadingDialog.isAdded){
+            Handler().postDelayed({
+                showToast(getString(R.string.updateSuccessMsg))
+            }, 1600)
+        }
+        else
+            showToast(getString(R.string.updateSuccessMsg))
+    }
 }

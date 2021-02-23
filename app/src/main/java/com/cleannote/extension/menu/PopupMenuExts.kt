@@ -8,8 +8,40 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.PopupMenu
+import androidx.annotation.MenuRes
+import androidx.fragment.app.FragmentActivity
 import com.cleannote.app.R
+import com.cleannote.notedetail.edit.PickerType
+import com.cleannote.notedetail.edit.PickerType.Companion.GALLERY
+import com.jakewharton.rxbinding4.widget.itemClicks
+import io.reactivex.rxjava3.disposables.Disposable
+
+inline fun FragmentActivity.showImageLoaderMenu(
+    anchor: View,
+    crossinline receiver: (Int) -> Unit
+){
+    PopupMenu(this, anchor).apply {
+        menuInflater.inflate(R.menu.menu_image_add, menu)
+        visibleIcon(this@showImageLoaderMenu)
+        val disposable = itemClicks()
+            .map { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.album -> GALLERY
+                    R.id.camera -> PickerType.CAMERA
+                    else -> PickerType.LINK
+                }
+            }
+            .subscribe {
+                receiver.invoke(it)
+            }
+        setOnDismissListener {
+            disposable.dispose()
+        }
+        show()
+    }
+}
 
 fun PopupMenu.visibleIcon(context: Context){
     val menu = this.menu

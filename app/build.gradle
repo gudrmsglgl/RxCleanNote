@@ -112,6 +112,7 @@ dependencies {
     implementation Dependencies.glide
     implementation Dependencies.imagePicker
     implementation Dependencies.imagePickerInline
+    implementation Dependencies.lottie
     implementation AndroidTestDependencies.idling_resource
 
     implementation SupportDependencies.appcompat
