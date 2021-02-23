@@ -80,5 +80,5 @@
     <string name="desc_dv_empty_image">replace empty ViewPager</string>
     <string name="desc_dv_update_time">update time icon</string>
     <string name="desc_dv_content">content icon</string>
-
+    <string name="desc_ev_img_loading">Edit Image Loading icon</string>
 </resources>

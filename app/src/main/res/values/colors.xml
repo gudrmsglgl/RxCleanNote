@@ -6,6 +6,7 @@
 
     <!-- Secondary theme colors -->
     <color name="white">#fff</color>
+    <color name="edit_body">#E9F1F1F1</color>
     <color name="black">#000</color>
     <color name="green">#6ED472</color>
     <color name="transparent">@android:color/transparent</color>

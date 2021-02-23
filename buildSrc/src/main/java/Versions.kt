@@ -53,4 +53,5 @@ object Versions {
     const val firebase_crashlytics = "17.2.1"
     const val glide_version = "4.11.0"
     const val imgPicker_version = "1.7.5"
+    const val lottie_version = "3.6.1"
 }

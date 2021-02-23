@@ -48,8 +48,8 @@ class Indicator: LinearLayoutCompat {
 
     private fun relativeSizeToWidth(size: Int) = when {
         size <= 3 -> 200
-        size in 4..7 -> 170
-        else -> 140
+        size in 4..6 -> 150
+        else -> 80
     }
 
     fun selectIndicator(position: Int){

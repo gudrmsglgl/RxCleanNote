@@ -50,4 +50,5 @@ object Dependencies {
     val glide = "com.github.bumptech.glide:glide:${Versions.glide_version}"
     val imagePicker = "com.github.dhaval2404:imagepicker:${Versions.imgPicker_version}"
     val imagePickerInline = "com.github.florent37:inline-activity-result-kotlin:1.0.4"
+    val lottie = "com.airbnb.android:lottie:${Versions.lottie_version}"
 }

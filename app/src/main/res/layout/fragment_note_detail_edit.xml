@@ -42,7 +42,6 @@
                android:clipToPadding="false"
                android:orientation="vertical"
                >
-
                <EditText
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
@@ -63,7 +62,7 @@
                android:layout_width="match_parent"
                android:layout_height="@dimen/toolbar_height"
                app:layout_collapseMode="pin"
-               android:background="@color/colorPrimaryDark">
+               android:background="@color/white">
 
                <include
                    android:id="@+id/detail_toolbar"
@@ -81,13 +80,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/note_scroll_view">
+        android:background="@color/white"
+        android:id="@+id/edit_body">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/white"
             android:id="@+id/note_body_container">
 
 
@@ -99,16 +99,14 @@
                 android:text="@{vm.finalNote.body}"
                 android:textSize="18sp"
                 android:textColor="#000"
-                android:padding="5dp"
+                android:padding="15dp"
                 android:gravity="top"
                 android:imeOptions="flagNoExtractUi"
-                android:background="#fff"
-                android:paddingTop="@dimen/default_view_margin"
-                android:paddingStart="@dimen/default_view_margin"
-                android:paddingEnd="@dimen/default_view_margin"
+                android:background="@drawable/bg_detail_view_content"
+                android:layout_marginStart="@dimen/dv_margin_start"
+                android:layout_marginEnd="@dimen/dv_margin_start"
                 android:hint="@string/detail_note_hint"
                 android:layout_marginTop="@dimen/default_view_margin"
-                app:releaseFocus="@{vm.noteMode}"
                 android:importantForAutofill="no"
                 android:inputType="text" />
 

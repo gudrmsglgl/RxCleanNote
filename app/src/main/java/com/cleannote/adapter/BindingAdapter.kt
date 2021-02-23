@@ -66,7 +66,7 @@ object BindingAdapter {
         (recyclerView.adapter as EditImagesAdapter).submitList(images)
         val scroller = object : LinearSmoothScroller(recyclerView.context){
             override fun getHorizontalSnapPreference(): Int {
-                return LinearSmoothScroller.SNAP_TO_START
+                return LinearSmoothScroller.SNAP_TO_END
             }
         }
         scroller.targetPosition = 0
@@ -81,6 +81,9 @@ object BindingAdapter {
         imageModel: NoteImageUiModel
     ){
         glideManager
+            .applyDefaultRequestOptions(
+                RequestOptions.bitmapTransform(RoundedCorners(30))
+            )
             .load(imageModel.imgPath)
             .thumbnail(0.1f)
             .into(imageView)
