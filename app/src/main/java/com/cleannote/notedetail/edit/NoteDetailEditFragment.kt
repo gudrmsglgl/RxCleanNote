@@ -27,12 +27,12 @@ import com.cleannote.notedetail.Keys.REQUEST_KEY_ON_BACK
 import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
 import com.cleannote.notedetail.edit.dialog.LoadingImageUpdateDialog
+import com.cleannote.notedetail.edit.factory.NoteFactory
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
-import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.core.scrollChangeEvents
 import com.jakewharton.rxbinding4.material.offsetChanges
@@ -81,14 +81,9 @@ class NoteDetailEditFragment constructor(
         }
     }
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    fun initNoteDefaultMode(){
-        viewModel.defaultMode(currentNote())
-    }
-
     private fun initFooterRcvImages() = binding
         .footer
-        .rcyImages
+        .rcvImages
         .apply {
             imageAdapter = EditImagesAdapter(glideRequestManager)
             adapter = imageAdapter
@@ -227,12 +222,6 @@ class NoteDetailEditFragment constructor(
         }
     }
 
-    private fun currentNote() = viewModel.finalNote() ?: emptyNoteView()
-
-    private fun emptyNoteView() = NoteView(
-        id = UUID.randomUUID().toString(), title = "emptyTile", body = "emptyBody", updatedAt = "2021-10-10",createdAt = "2021-10-10", noteImages = null
-    )
-
     private fun editDoneMode() = viewModel.editDoneMode(
         currentNote().copy(
             title = binding.editTitle.text.toString(),
@@ -241,11 +230,15 @@ class NoteDetailEditFragment constructor(
         )
     )
 
-    fun isEditCancelMenu(): Boolean = binding.detailToolbar.leftIcon.drawable.equalDrawable(R.drawable.ic_cancel_24dp)
-    private fun isEditDoneMenu(): Boolean = binding.detailToolbar.rightIcon.drawable.equalDrawable(R.drawable.ic_done_24dp)
-
-    private fun transToolbarState(offset: Int): DetailToolbarState =
-        if (offset < collapseBoundary) TbCollapse else TbExpanded
+    private fun transToolbarState(offset: Int): DetailToolbarState {
+        return if (offset < collapseBoundary){
+            binding.editTitle.contentDescription = getString(R.string.desc_state_collapse)
+            TbCollapse
+        } else {
+            binding.editTitle.contentDescription = getString(R.string.desc_state_expanded)
+            TbExpanded
+        }
+    }
 
     private fun noteTitleAlpha(){
         val alpha = binding.appBar.offsetChangeRatio()
@@ -282,5 +275,14 @@ class NoteDetailEditFragment constructor(
         }
         else
             showToast(getString(R.string.updateSuccessMsg))
+    }
+
+    private fun currentNote() = viewModel.finalNote() ?: NoteFactory.defaultNote()
+    fun isEditCancelMenu(): Boolean = binding.detailToolbar.leftIcon.drawable.equalDrawable(R.drawable.ic_cancel_24dp)
+    private fun isEditDoneMenu(): Boolean = binding.detailToolbar.rightIcon.drawable.equalDrawable(R.drawable.ic_done_24dp)
+
+    @VisibleForTesting(otherwise = PRIVATE)
+    fun initNoteDefaultMode(){
+        viewModel.defaultMode(currentNote())
     }
 }

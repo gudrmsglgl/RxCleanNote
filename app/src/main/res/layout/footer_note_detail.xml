@@ -17,7 +17,7 @@
     android:background="@color/white">
 
     <LinearLayout
-        android:id="@+id/detail_footer_add"
+        android:id="@+id/detail_footer_popup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -47,13 +47,13 @@
         app:layout_constraintGuide_percent="0.05" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcy_images"
+        android:id="@+id/rcv_images"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/detail_footer_add"
+        app:layout_constraintTop_toBottomOf="@+id/detail_footer_popup"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
         android:text="@string/tv_footer_no_images"
-        app:layout_constraintTop_toBottomOf="@+id/detail_footer_add"
+        app:layout_constraintTop_toBottomOf="@+id/detail_footer_popup"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

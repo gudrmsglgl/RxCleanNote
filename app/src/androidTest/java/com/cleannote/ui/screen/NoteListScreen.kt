@@ -6,7 +6,7 @@ import com.cleannote.espresso.button.NFloatingButton
 import com.cleannote.espresso.dialog.NDDeleteDialog
 import com.cleannote.espresso.dialog.NErrorDialog
 import com.cleannote.espresso.dialog.NLNewNoteDialog
-import com.cleannote.espresso.recycler.NRecyclerView
+import com.cleannote.espresso.recycler.list.NRecyclerView
 import com.cleannote.espresso.text.NTextView
 import com.cleannote.espresso.text.NToast
 import com.cleannote.espresso.toolbar.NMultiDeleteToolbar

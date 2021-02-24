@@ -3,18 +3,16 @@ package com.cleannote.ui
 import androidx.navigation.NavController
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
-import com.cleannote.espresso.recycler.NRecyclerItem
+import com.cleannote.espresso.recycler.list.NRecyclerItem
 import com.cleannote.TestBaseApplication
 import com.cleannote.common.UIController
-import com.cleannote.domain.Constants
-import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
-import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
+import com.cleannote.espresso.recycler.edit.NImgRecyclerItem
 import com.cleannote.injection.TestApplicationComponent
 import com.cleannote.model.NoteUiModel
+import com.cleannote.notedetail.holder.EditImageHolder
 import com.cleannote.notelist.holder.BaseHolder
-import com.cleannote.presentation.notelist.QueryManager
 import io.mockk.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -94,3 +92,4 @@ abstract class BaseTest {
 }
 
 typealias NoteItem = NRecyclerItem<BaseHolder<NoteUiModel>>
+typealias ImageItem = NImgRecyclerItem
