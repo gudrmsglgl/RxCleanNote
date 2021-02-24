@@ -342,7 +342,7 @@ class NoteListFragmentTest: BaseTest() {
                     swipeLeft()
                     swipeDeleteMenu {
                         isDisplayed()
-                        deleteImg.hasDrawable(R.drawable.ic_delete_24dp)
+                        deleteImg.hasDrawable(R.drawable.ic_delete_list)
                     }
                 }
             }

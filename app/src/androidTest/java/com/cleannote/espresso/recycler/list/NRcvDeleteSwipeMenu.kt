@@ -1,4 +1,4 @@
-package com.cleannote.espresso.recycler
+package com.cleannote.espresso.recycler.list
 
 import android.view.View
 import com.cleannote.espresso.image.NImageView

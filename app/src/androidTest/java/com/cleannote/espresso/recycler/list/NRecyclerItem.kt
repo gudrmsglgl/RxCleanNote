@@ -1,4 +1,4 @@
-package com.cleannote.espresso.recycler
+package com.cleannote.espresso.recycler.list
 
 import androidx.annotation.IdRes
 import com.cleannote.espresso.actions.SwipeableActions

@@ -16,10 +16,4 @@ open class NBaseView<out T>(private val viewMatcher: Matcher<View>): BaseActions
     operator fun invoke(function: T.() -> Unit){
         function(this as T)
     }
-
-    fun perform(function: T.() -> Unit): T {
-        function(this as T)
-        return this
-    }
-
 }

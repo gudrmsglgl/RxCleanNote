@@ -81,4 +81,7 @@
     <string name="desc_dv_update_time">update time icon</string>
     <string name="desc_dv_content">content icon</string>
     <string name="desc_ev_img_loading">Edit Image Loading icon</string>
+
+    <string name="desc_state_expanded">expanded</string>
+    <string name="desc_state_collapse">collapse</string>
 </resources>

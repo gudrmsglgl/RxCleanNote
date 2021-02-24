@@ -1,7 +1,9 @@
-package com.cleannote.espresso.recycler
+package com.cleannote.espresso.recycler.list
 
 import androidx.annotation.IdRes
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import com.cleannote.espresso.recycler.RecyclerActions
+import com.cleannote.espresso.recycler.RecyclerAdapterAssertion
 import com.cleannote.espresso.view.NBaseView
 
 class NRecyclerView(@IdRes val idRes: Int): NBaseView<NRecyclerView>(withId(idRes)),
