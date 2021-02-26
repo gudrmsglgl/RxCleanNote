@@ -11,7 +11,6 @@ import org.hamcrest.Matcher
 
 class NErrorDialog(matcher: Matcher<View>): NBaseView<NErrorDialog>(matcher) {
     val title = NTextView(withId(R.id.md_text_title))
-    //val message = NTextView(withText(R.string.searchErrorMsg))
     val message = NTextView(withId(R.id.md_text_message))
     val positiveBtn = NButton(withId(R.id.md_button_positive))
 }

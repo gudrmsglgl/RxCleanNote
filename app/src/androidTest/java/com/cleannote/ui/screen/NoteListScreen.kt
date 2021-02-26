@@ -15,7 +15,6 @@ import com.cleannote.app.R
 import com.cleannote.espresso.dialog.NLFilterDialog
 
 object NoteListScreen: BaseScreen<NoteListScreen>() {
-
     val recyclerView = NRecyclerView(R.id.recycler_view)
     val noDataTextView = NTextView(withId(R.id.tv_no_data))
     val searchToolbar = NSearchToolbar(withId(R.id.search_toolbar))
@@ -25,6 +24,5 @@ object NoteListScreen: BaseScreen<NoteListScreen>() {
     val filterDialog = NLFilterDialog(withId(R.id.filter_dialog))
     val deleteDialog = NDDeleteDialog(withId(R.layout.md_dialog_base))
     val deleteSuccessToast = NToast(withText(R.string.deleteSuccessMsg))
-    val deleteErrorToast = NToast(withText(R.string.deleteErrorMsg))
     val errorDialog = NErrorDialog(withId(R.layout.md_dialog_base))
 }

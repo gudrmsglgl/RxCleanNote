@@ -19,8 +19,6 @@ class MenuItem(private val menuPos: Int){
         func.invoke(this)
     }
 
-    private fun click() = dataInteraction.perform(ViewActions.click())
-
     fun isDisplayed() = dataInteraction.check(ViewAssertions.matches(
         ViewMatchers.isDisplayed()
     ))
