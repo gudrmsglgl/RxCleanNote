@@ -8,11 +8,10 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.R
 import com.cleannote.common.DateUtil
-import com.cleannote.extension.transNoteUiModel
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.edit.NoteDetailEditFragment
 import com.cleannote.test.NoteFactory
-import com.cleannote.ui.screen.DetailNoteScreen
+import com.cleannote.ui.screen.DetailEditNoteScreen
 import io.mockk.every
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +33,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     @Inject
     lateinit var dateUtil: DateUtil
 
-    val screenDetailEdit = DetailNoteScreen
+    private val screenDetailEdit = DetailEditNoteScreen
     private val note: NoteUiModel = NoteFactory.defaultNote()
 
     init {
@@ -146,6 +145,25 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
+    fun titleUpdateErrorThenNotContainUpdateText_onAndroid(){
+        stubThrowableNoteRepositoryUpdate(RuntimeException())
+        val updateTitle = "updatedTitle"
+        screenDetailEdit {
+            editTitle.typeText(updateTitle)
+            toolbar.secondMenu {
+                hasDrawable(R.drawable.ic_done_24dp)
+                click()
+            }
+            errorDialog {
+                title.hasText(R.string.dialog_title_error)
+                message.hasText(R.string.updateErrorMsg)
+                positiveBtn.click()
+            }
+            editTitle.notContainText(updateTitle)
+        }
+    }
+
+    @Test
     fun bodyUpdateThenContainTypeText_onAndroid(){
         val updateBody = "updatedBody"
         stubNoteRepositoryUpdate()
@@ -168,6 +186,25 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
+    fun bodyUpdateErrorThenNotContainUpdateText_onAndroid(){
+        stubThrowableNoteRepositoryUpdate(RuntimeException())
+        val updateBody = "updatedBody"
+        screenDetailEdit {
+            scrollview.body.typeText(updateBody)
+            toolbar.secondMenu {
+                hasDrawable(R.drawable.ic_done_24dp)
+                click()
+            }
+            errorDialog {
+                title.hasText(R.string.dialog_title_error)
+                message.hasText(R.string.updateErrorMsg)
+                positiveBtn.click()
+            }
+            scrollview.body.notContainText(updateBody)
+        }
+    }
+
+    @Test
     fun footerPopupMenuDisplay_onAndroid(){
         screenDetailEdit {
             footer.popupMenu{
@@ -180,151 +217,35 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun attachImgDeleteClickThenUpdateImgRcv_onAndroid(){
+    fun attachImgDeleteClickThenShowDeleteDialog_onAndroid(){
+        screenDetailEdit {
+            footer.imageRcv {
+                firstItem {
+                    img.icDelete.click()
+                }
+            }
+            deleteDialog {
+                title.isDisplayed()
+            }
+        }
+    }
+
+    @Test
+    fun attachImgDeleteThenTvNoImgDisplay_onAndroid(){
         stubNoteRepositoryUpdate()
         screenDetailEdit {
             footer.imageRcv {
                 firstItem {
                     img.icDelete.click()
-                    // todo DeleteDialog()
                 }
             }
-        }
-    }
-
-
-    /*@Test
-    fun noteTitleCollapseExpandedThenToolbarSetTitle(){
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        )
-        screen {
-            noteTitle {
-                hasText(note.title)
+            deleteDialog {
+                positiveBtn.click()
             }
-            scrollview.body.swipeUp()
-            toolbar.toolbarTitle.hasText(note.title)
-            scrollview.body.swipeDown()
-            noteTitle.hasText(note.title)
-        }
-    }
-
-    @Test
-    fun noteTitleEditModeThenChangeIconMenu(){
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        )
-        screen {
-            noteTitle.typeText("test")
-            toolbar {
-                primaryMenu.hasDrawable(R.drawable.ic_cancel_24dp)
-                secondMenu.hasDrawable(R.drawable.ic_done_24dp)
-            }
-        }
-    }
-
-    @Test
-    fun noteTitleEditDoneThenChangeIconMenu(){
-        stubNoteRepositoryUpdate()
-
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        )
-        screen {
-            noteTitle.typeText("test")
-            toolbar {
-                secondMenu.click()
-                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
-            }
-            noteTitle.isFocused(false)
-            noteTitle.containText("test")
             updateSuccessToast.isDisplayed()
+            footer.tvNoImages.isDisplayed()
         }
     }
-
-    @Test
-    fun noteTitleEditDoneThenThrowableNotUpdatedTitle(){
-        val throwable = RuntimeException()
-        val updateText = "test"
-        stubThrowableNoteRepositoryUpdate(throwable)
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        )
-        screen {
-            noteTitle.typeText(updateText)
-            toolbar {
-                secondMenu.click()
-                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
-            }
-            noteTitle{
-                isFocused(false)
-                notContainText(updateText)
-            }
-            updateErrorToast.isDisplayed()
-            idle(3500)
-        }
-    }
-
-    @Test
-    fun noteDeleteSuccessThenNavNoteList(){
-        stubNoteRepositoryDelete()
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        ).onFragment { fragment ->
-            Navigation.setViewNavController(fragment.requireView(), testNavHostController)
-        }
-        screen {
-            toolbar {
-                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
-                secondMenu.click()
-                deleteDialog.positiveBtn.click()
-            }
-            deleteSuccessToast.isDisplayed()
-        }
-        verify { testNavHostController.popBackStack() }
-    }
-
-    @Test
-    fun noteDeleteErrorThenNotNavNoteList(){
-        stubThrowableNoteRepositoryDelete(RuntimeException())
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        ).onFragment { fragment ->
-            Navigation.setViewNavController(fragment.requireView(), testNavHostController)
-        }
-        screen {
-            toolbar {
-                secondMenu.hasDrawable(R.drawable.ic_delete_24dp)
-                secondMenu.click()
-                deleteDialog.positiveBtn.click()
-            }
-            deleteErrorToast.isDisplayed()
-        }
-        verify(exactly = 0){ testNavHostController.popBackStack() }
-    }
-
-    @Test
-    fun noteTitleUpdateCancelThenRevertText(){
-        launchFragmentInContainer<NoteDetailEditFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = bundleOf(NOTE_DETAIL_BUNDLE_KEY to note)
-        )
-        screen {
-            noteTitle.typeText("test")
-            toolbar {
-                primaryMenu.click()
-                primaryMenu.hasDrawable(R.drawable.ic_arrow_back_24dp)
-            }
-            noteTitle.isFocused(false)
-            noteTitle.hasText(titleText)
-        }
-    }*/
 
     private fun launchFragmentInContainerNavController(){
         navController.setViewModelStore(ViewModelStore())

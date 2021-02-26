@@ -11,7 +11,6 @@ import org.hamcrest.Matcher
 
 class NDDeleteDialog(matcher: Matcher<View>): NBaseView<NDDeleteDialog>(matcher) {
     val title = NTextView(withId(R.id.md_text_title))
-    //val positiveBtn = NButton(withId(R.id.md_button_positive))
     val positiveBtn = NButton(withText(R.string.dialog_ok))
     val negativeBtn = NButton(withId(R.id.md_button_negative))
 }
