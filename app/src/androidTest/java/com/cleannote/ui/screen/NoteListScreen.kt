@@ -9,8 +9,8 @@ import com.cleannote.espresso.dialog.NLNewNoteDialog
 import com.cleannote.espresso.recycler.list.NRecyclerView
 import com.cleannote.espresso.text.NTextView
 import com.cleannote.espresso.text.NToast
-import com.cleannote.espresso.toolbar.NMultiDeleteToolbar
-import com.cleannote.espresso.toolbar.NSearchToolbar
+import com.cleannote.espresso.toolbar.list.NMultiDeleteToolbar
+import com.cleannote.espresso.toolbar.list.NSearchToolbar
 import com.cleannote.app.R
 import com.cleannote.espresso.dialog.NLFilterDialog
 

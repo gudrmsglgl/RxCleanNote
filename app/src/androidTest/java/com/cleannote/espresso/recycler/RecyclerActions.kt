@@ -93,7 +93,7 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
                 }
             }
         })
-        println("checkedSize: ${size}")
+
         return size
     }
 }
