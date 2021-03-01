@@ -41,13 +41,9 @@ class NoteDetailViewFragment(
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        getPreviousFragmentNote()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        getPreviousFragmentNote()
         initBinding()
         initImagePager()
         initIndicator()

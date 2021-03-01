@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.navigation.NavController
@@ -12,6 +13,7 @@ import androidx.test.espresso.IdlingRegistry
 import com.bumptech.glide.RequestManager
 import com.cleannote.DataBindingIdlingResource
 import com.cleannote.app.R
+import com.cleannote.model.NoteUiModel
 import com.cleannote.monitorFragment
 import com.cleannote.notedetail.Keys
 import com.cleannote.notedetail.Keys.IS_EXECUTE_INSERT
@@ -58,45 +60,41 @@ class NoteDetailViewFragmentTest: BaseTest() {
     }
 
     @Test
-    fun toolbarIsDisplayed(){
+    fun detailViewDisplay_onAndroid(){
+        val note = NoteFactory.makeNoteUiModel(id = "#1", title = "testTitle", body = "testBody", date = "2021-02-17")
+        launchDetailViewFragment(note)
+
+        screenDetailView {
+            toolbar {
+                homeIcon.isDisplayed()
+                title.hasEmptyText()
+                editIcon.isDisplayed()
+            }
+        }
 
     }
 
-    @Test
-    fun scrollDownThenToolbarTitleVisible_onAndroid(){
-        val note = NoteFactory.makeNoteUiModel(id = "#1", title = "testTitle", body = "testBody", date = "2021-02-17")
+    private fun launchDetailViewFragment(note: NoteUiModel){
         val stubBundle = Bundle().apply {
             putParcelable(NOTE_DETAIL_BUNDLE_KEY, note)
             putBoolean(IS_EXECUTE_INSERT, false)
         }
-        navController.setViewModelStore(ViewModelStore())
-        assertThat(navController.backStack.size, `is`(0))
-        navController.setGraph(R.navigation.nav_detail_graph)
-        assertThat(navController.currentDestination?.id, `is`(R.id.noteDetailViewFragment))
-        assertThat(navController.backStack.size, `is`(2))
-        navController.setCurrentDestination(R.id.noteDetailViewFragment)
-        assertThat(navController.backStack.size, `is`(2))
-        assertThat(navController.currentDestination?.id, `is`(R.id.noteDetailViewFragment))
 
-        /*val fragmentScenario = launchFragmentInContainer<NoteDetailViewFragment>(
-            factory = fragmentFactory,
-            fragmentArgs = stubBundle
-        ).onFragment { fragment ->
-            fragment.viewLifecycleOwnerLiveData.observeForever { lifecycleOwner ->
-                if (lifecycleOwner != null) {
-                    Navigation.setViewNavController(fragment.requireView(), navController)
+        navController.setViewModelStore(ViewModelStore())
+        navController.setGraph(R.navigation.nav_detail_graph)
+
+        val scenario = launchFragmentInContainer(fragmentArgs = stubBundle) {
+            NoteDetailViewFragment(viewModelFactory, reqManager).also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { lifecycleOwner ->
+                    fragment.setUIController(mockUIController)
+                    if (lifecycleOwner != null) {
+                        Navigation.setViewNavController(fragment.requireView(), navController)
+                    }
                 }
             }
         }
 
-        dataBindingIdlingResource.monitorFragment(fragmentScenario)*/
-
-        /*screenDetailView {
-            toolbar {
-                homeIcon.isDisplayed()
-                title.hasEmptyText()
-            }
-        }*/
+        dataBindingIdlingResource.monitorFragment(scenario)
     }
 
     override fun setupUIController() {

@@ -13,7 +13,9 @@
     android:id="@+id/view_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    style="@style/Theme.AppCompat.Light"
+    android:theme="@style/Theme.AppCompat.Light">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_detail_view"

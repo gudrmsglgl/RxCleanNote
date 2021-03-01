@@ -32,7 +32,6 @@ class NoteViewHolder(
                 .map { item }
                 .subscribe(subjectManager.deleteClickSubject)
 
-
             itemNote
                 .clicks()
                 .map { item }

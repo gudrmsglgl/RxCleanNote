@@ -5,7 +5,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.cleannote.espresso.edit.NDEditText
 import com.cleannote.espresso.scroll.NDScrollView
 import com.cleannote.espresso.text.NToast
-import com.cleannote.espresso.toolbar.NDToolbar
+import com.cleannote.espresso.toolbar.list.NDToolbar
 import com.cleannote.app.R
 import com.cleannote.espresso.dialog.NDDeleteDialog
 import com.cleannote.espresso.dialog.NErrorDialog

@@ -1,4 +1,4 @@
-package com.cleannote.espresso.toolbar
+package com.cleannote.espresso.toolbar.list
 
 import android.view.View
 import androidx.test.espresso.matcher.ViewMatchers.withId

@@ -98,15 +98,19 @@ class NoteListAdapter(
     }
 
     fun deleteChecked(item: NoteUiModel){
+        val index = currentList.indexOf(item)
         changeNoteMode(item, MultiSelect)
         _checkedNotes.put(item.id, item)
         submitList(currentList)
+        //notifyItemChanged(index)
     }
 
     fun deleteNotChecked(item: NoteUiModel){
+        val index = currentList.indexOf(item)
         changeNoteMode(item, MultiDefault)
         _checkedNotes.remove(item.id)
         submitList(currentList)
+        //notifyItemChanged(index)
     }
 
     fun deleteCheckClear() = _checkedNotes.clear()
