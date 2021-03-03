@@ -1,13 +1,9 @@
 package com.cleannote.ui
 
 import android.os.Bundle
-import androidx.core.os.bundleOf
-import androidx.fragment.app.testing.launchFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.espresso.IdlingRegistry
 import com.bumptech.glide.RequestManager
@@ -15,15 +11,14 @@ import com.cleannote.DataBindingIdlingResource
 import com.cleannote.app.R
 import com.cleannote.model.NoteUiModel
 import com.cleannote.monitorFragment
-import com.cleannote.notedetail.Keys
+import com.cleannote.notedetail.Keys.GLIDE_DETAIL_VIEW_STATE_KEY
 import com.cleannote.notedetail.Keys.IS_EXECUTE_INSERT
 import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
+import com.cleannote.notedetail.view.GlideLoadState
 import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.ui.screen.DetailViewScreen
 import io.mockk.every
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -33,16 +28,14 @@ class NoteDetailViewFragmentTest: BaseTest() {
 
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-
     @Inject
     lateinit var reqManager: RequestManager
 
     val screenDetailView = DetailViewScreen
 
-    private val dataBindingIdlingResource: DataBindingIdlingResource = DataBindingIdlingResource()
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
 
     init {
         injectTest()
@@ -60,19 +53,87 @@ class NoteDetailViewFragmentTest: BaseTest() {
     }
 
     @Test
-    fun detailViewDisplay_onAndroid(){
-        val note = NoteFactory.makeNoteUiModel(id = "#1", title = "testTitle", body = "testBody", date = "2021-02-17")
+    fun startDetailViewDisplay_onAndroid(){
+        val note = NoteFactory.defaultNote()
         launchDetailViewFragment(note)
 
         screenDetailView {
-            toolbar {
+            appbar.toolbar {
                 homeIcon.isDisplayed()
                 title.hasEmptyText()
                 editIcon.isDisplayed()
             }
+            emptyImage.isGone()
+            headerViewPager {
+                firstItem {
+                    image {
+                        isDisplayed()
+                        idle(1000L) // for glide load complete
+                        glideLoadState(
+                            GLIDE_DETAIL_VIEW_STATE_KEY,
+                            GlideLoadState.STATE_SUCCESS
+                        )
+                    }
+                }
+            }
+            body {
+                title.hasText(note.title)
+                contentContainer.content.hasText(note.body)
+                updateTime.hasText(note.updatedAt)
+            }
         }
-
     }
+
+    @Test
+    fun detailViewImgLoadFail_onAndroid(){
+        val note = NoteFactory.errorImageNote()
+        launchDetailViewFragment(note)
+
+        screenDetailView {
+            headerViewPager {
+                firstItem {
+                    image {
+                        isDisplayed()
+                        idle(1000L) // for glide load complete
+                        glideLoadState(
+                            GLIDE_DETAIL_VIEW_STATE_KEY,
+                            GlideLoadState.STATE_FAIL
+                        )
+                        hasDrawable(R.drawable.error)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun detailViewImgNull_onAndroid(){
+        val note = NoteFactory.emptyImageNote()
+        launchDetailViewFragment(note)
+
+        screenDetailView {
+            headerViewPager.isGone()
+            emptyImage.isDisplayed()
+        }
+    }
+
+   /* @Test
+    fun collapseThenTbTitleVisibleTbMenuColorBlack_onAndroid(){
+        val note = NoteFactory.defaultNote()
+        launchDetailViewFragment(note)
+
+        screenDetailView {
+            appbar {
+                idle(1000)
+                swipeUp()
+                toolbar {
+                    title {
+                        hasText(note.title)
+                    }
+                }
+            }
+        }
+    }*/
 
     private fun launchDetailViewFragment(note: NoteUiModel){
         val stubBundle = Bundle().apply {

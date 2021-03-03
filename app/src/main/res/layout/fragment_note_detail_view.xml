@@ -140,6 +140,7 @@
                 android:contentDescription="@string/desc_dv_content" />
 
             <LinearLayout
+                android:id="@+id/dv_content_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="250dp"
@@ -149,6 +150,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/iv_dv_update">
 
                 <TextView
+                    android:id="@+id/tv_dv_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@{vm.finalNote.body}"/>

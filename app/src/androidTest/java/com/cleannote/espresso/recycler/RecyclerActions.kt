@@ -24,7 +24,6 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
         viewInteraction.perform(object : ViewAction{
             override fun getDescription(): String = "Scroll RecyclerView to the bottom"
 
-
             override fun getConstraints(): Matcher<View> = ViewMatchers.isAssignableFrom(RecyclerView::class.java)
 
             override fun perform(uiController: UiController, view: View?) {

@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import com.bumptech.glide.RequestManager
 import com.cleannote.app.R
 import com.cleannote.model.NoteImageUiModel
-import com.cleannote.notedetail.holder.ViewImageHolder
+import com.cleannote.notedetail.holder.DetailViewImgHolder
 
 class ImageViewAdapter(
-    val requestManager: RequestManager
-): ListAdapter<NoteImageUiModel, ViewImageHolder>(DIFF_CALLBACK) {
+    private val requestManager: RequestManager
+): ListAdapter<NoteImageUiModel, DetailViewImgHolder>(DIFF_CALLBACK) {
 
     object DIFF_CALLBACK: DiffUtil.ItemCallback<NoteImageUiModel>(){
         override fun areItemsTheSame(
@@ -30,17 +30,17 @@ class ImageViewAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewImageHolder {
-        return ViewImageHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailViewImgHolder {
+        return DetailViewImgHolder(
             binding = DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
-                R.layout.item_view_image, parent,
+                R.layout.item_detail_view_img, parent,
                 false),
             requestManager = requestManager
         )
     }
 
-    override fun onBindViewHolder(holder: ViewImageHolder, position: Int) {
+    override fun onBindViewHolder(holder: DetailViewImgHolder, position: Int) {
         holder.bind(currentList[position])
     }
 }

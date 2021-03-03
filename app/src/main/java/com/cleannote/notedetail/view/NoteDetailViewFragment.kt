@@ -3,6 +3,7 @@ package com.cleannote.notedetail.view
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
@@ -148,7 +149,7 @@ class NoteDetailViewFragment(
     private fun toolbarUiOnAppbarExpand() = with(binding){
         tbDetailView.setUI(
             titleParam = null,
-            iconColor = if(imagePager.isVisible) R.color.white else R.color.black,
+            iconColor = if (imagePager.isVisible) R.color.white else R.color.black,
             backgroundColor = Color.TRANSPARENT
         )
     }
