@@ -22,6 +22,30 @@ object NoteFactory {
         ).transNoteUiModel()
     }
 
+    fun errorImageNote(): NoteUiModel {
+        val notePk = UUID.randomUUID().toString()
+        return NoteView(
+            id = notePk,
+            title = "emptyTile",
+            body = "emptyBody",
+            updatedAt = "2021-10-10",
+            createdAt = "2021-10-10",
+            noteImages = listOf(NoteImageView(UUID.randomUUID().toString(), notePk, "https://test"))
+        ).transNoteUiModel()
+    }
+
+    fun emptyImageNote(): NoteUiModel {
+        val notePk = UUID.randomUUID().toString()
+        return NoteView(
+            id = notePk,
+            title = "emptyTile",
+            body = "emptyBody",
+            updatedAt = "2021-10-10",
+            createdAt = "2021-10-10",
+            noteImages = null
+        ).transNoteUiModel()
+    }
+
     fun makeNote(
         id: String? = null,
         title: String,

@@ -13,8 +13,8 @@
         android:id="@+id/detail_vp_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:glideManager="@{reqManager}"
-        app:imageModel="@{imageModel}"
+        app:dvGlideManager="@{reqManager}"
+        app:dvImageModel="@{imageModel}"
         android:scaleType="fitXY"
         android:contentDescription="@string/desc_dv_img" />
 </layout>

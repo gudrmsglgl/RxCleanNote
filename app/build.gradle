@@ -6,6 +6,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.crashlytics'
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/gimhyeong-geun/AndroidStudioProjects/keystore/upload-keystore')
+            storePassword '4566123'
+            keyAlias 'upload'
+            keyPassword '4566123'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
@@ -17,7 +25,6 @@ android {
         versionName Application.version_name
 
         testInstrumentationRunner "com.cleannote.MyTestRunner"
-        //testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     testOptions {
@@ -32,6 +39,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 

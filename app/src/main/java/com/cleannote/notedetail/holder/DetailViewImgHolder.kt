@@ -2,11 +2,11 @@ package com.cleannote.notedetail.holder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.cleannote.app.databinding.ItemViewImageBinding
+import com.cleannote.app.databinding.ItemDetailViewImgBinding
 import com.cleannote.model.NoteImageUiModel
 
-class ViewImageHolder(
-    val binding: ItemViewImageBinding,
+class DetailViewImgHolder(
+    val binding: ItemDetailViewImgBinding,
     val requestManager: RequestManager
 ): RecyclerView.ViewHolder(binding.root) {
 
