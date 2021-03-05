@@ -39,6 +39,9 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFile 'proguard-retrofit2.pro'
+            proguardFile 'proguard-glide.pro'
+            proguardFile 'proguard-gson.pro'
             signingConfig signingConfigs.release
         }
     }
@@ -100,6 +103,7 @@ dependencies {
     implementation Dependencies.fragment_ktx
     implementation Dependencies.dagger
     implementation Dependencies.databinding_ktx
+    implementation Dependencies.retrofit_gson
     implementation Dependencies.rxKotlin
     implementation Dependencies.rxAndroid
     implementation Dependencies.rxbinding
