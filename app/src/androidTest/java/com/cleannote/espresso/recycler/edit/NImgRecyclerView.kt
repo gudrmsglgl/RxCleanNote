@@ -4,7 +4,6 @@ import androidx.annotation.IdRes
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.cleannote.espresso.recycler.RecyclerActions
 import com.cleannote.espresso.recycler.RecyclerAdapterAssertion
-import com.cleannote.espresso.recycler.list.NRecyclerItem
 import com.cleannote.espresso.view.NBaseView
 
 class NImgRecyclerView(@IdRes val rcvRes: Int): NBaseView<NImgRecyclerView>(withId(rcvRes)),

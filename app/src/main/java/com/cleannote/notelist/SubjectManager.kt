@@ -1,7 +1,6 @@
 package com.cleannote.notelist
 
 import com.cleannote.model.NoteUiModel
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import javax.inject.Inject
@@ -17,8 +16,11 @@ class SubjectManager @Inject constructor(){
     private val _deleteClickSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
     val deleteClickSubject get() = _deleteClickSubject
 
+    private val _checkNoteSubject: PublishSubject<Pair<NoteUiModel, Boolean>> = PublishSubject.create()
+    val checkNoteSubject get() = _checkNoteSubject
+
     private val subjects: Set<Subject<*>> =
-        setOf(_clickNoteSubject, _longClickSubject,_deleteClickSubject)
+        setOf(_clickNoteSubject, _longClickSubject, _deleteClickSubject, _checkNoteSubject)
 
     fun releaseSubjects(){
         subjects.forEach {

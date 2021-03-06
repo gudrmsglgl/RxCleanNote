@@ -69,7 +69,7 @@
     <!--android:checked="@{ noteUiModel.mode == NoteMode.MultiSelect ? true : false}"-->
 
     <TextView
-        android:id="@+id/edit_title"
+        android:id="@+id/tv_title_list"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="@dimen/title_list_item_text_size"

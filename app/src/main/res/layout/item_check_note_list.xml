@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="com.cleannote.model.NoteMode"/>
+        <import type="com.cleannote.model.NoteUiModel"/>
+        <variable
+            name="noteUiModel"
+            type="NoteUiModel" />
+        <variable
+            name="glideReqManager"
+            type="com.bumptech.glide.RequestManager" />
+    </data>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/item_note"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginTop="@dimen/item_margin_top"
+        android:layout_marginStart="@dimen/item_margin_start_end"
+        android:layout_marginEnd="@dimen/item_margin_start_end"
+        app:cardElevation="@dimen/item_elevation"
+        app:cardCornerRadius="@dimen/item_corner_radius">
+
+        <LinearLayout
+            android:id="@+id/swipe_view"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:weightSum="100"
+            android:gravity="center_vertical"
+            android:background="@color/white">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/note_thumbnail"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="30"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                app:glideReqManager="@{glideReqManager}"
+                app:noteUiModel="@{noteUiModel}"/>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox_delete"
+                android:buttonTint="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:visible="@{noteUiModel.mode == NoteMode.MultiDefault || noteUiModel.mode == NoteMode.MultiSelect}"
+                />
+            <!--android:checked="@{ noteUiModel.mode == NoteMode.MultiSelect ? true : false}"-->
+
+            <TextView
+                android:id="@+id/tv_title_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/title_list_item_text_size"
+                android:textStyle="bold"
+                android:layout_weight="45"
+                android:text="@{noteUiModel.title}"
+                android:lines="1"
+                android:layout_marginTop="@dimen/default_view_margin"
+                android:layout_marginBottom="@dimen/default_view_margin"
+                android:layout_marginStart="@dimen/default_view_margin"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/note_title_color : @color/multi_delete_default_color}"/>
+            <!--    android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/note_title_color : @color/multi_delete_default_color}"-->
+
+
+            <TextView
+                android:id="@+id/note_timestamp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/date_list_item_text_size"
+                android:layout_weight="25"
+                android:text="@{noteUiModel.updatedAt}"
+                android:lines="2"
+                android:layout_marginTop="@dimen/default_view_margin"
+                android:layout_marginBottom="@dimen/default_view_margin"
+                android:layout_marginEnd="@dimen/default_view_margin"
+                android:gravity="end"
+                android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/default_grey : @color/multi_delete_default_color}"/>
+            <!--android:textColor="@{noteUiModel.mode == NoteMode.Default ? @color/default_grey : @color/multi_delete_default_color}-->
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

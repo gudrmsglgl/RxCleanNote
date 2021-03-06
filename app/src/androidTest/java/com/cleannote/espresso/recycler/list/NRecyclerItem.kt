@@ -17,7 +17,7 @@ class NRecyclerItem<out T>(
 {
     val checkBox = NCheckBox(RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.checkbox_delete))
     val itemTitle: NTextView = NTextView(
-        RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.edit_title)
+        RecyclerViewMatcher(idRes).atPositionOnView(position, R.id.tv_title_list)
     )
     val swipeDeleteMenu = NRcvDeleteSwipeMenu(
         idRes,

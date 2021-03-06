@@ -77,22 +77,4 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
         return lastVisiblePosition
     }
 
-    fun getCheckedSize(): Int {
-        var size = 0
-
-        viewInteraction.perform(object : ViewAction{
-            override fun getConstraints(): Matcher<View> =
-                Matchers.allOf(ViewMatchers.isAssignableFrom(RecyclerView::class.java), ViewMatchers.isDisplayed())
-
-            override fun getDescription(): String = "Get RecyclerView adapter size"
-
-            override fun perform(uiController: UiController?, view: View?) {
-                if (view is RecyclerView) {
-                    size = (view.adapter as NoteListAdapter).checkedNotes.size
-                }
-            }
-        })
-
-        return size
-    }
 }

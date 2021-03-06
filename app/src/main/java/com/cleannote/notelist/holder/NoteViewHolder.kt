@@ -23,8 +23,8 @@ class NoteViewHolder(
             glideReqManager = requestManager
             noteUiModel = item
 
-            if (item.mode == MultiDefault) checkboxDelete.isChecked = false
-            else if (item.mode == MultiSelect) checkboxDelete.isChecked = true
+            /*if (item.mode == MultiDefault) checkboxDelete.isChecked = false
+            else if (item.mode == MultiSelect) checkboxDelete.isChecked = true*/
 
             swipeMenuDelete
                 .clicks()
@@ -35,10 +35,10 @@ class NoteViewHolder(
             itemNote
                 .clicks()
                 .map { item }
-                .doOnNext{
+                /*.doOnNext{
                     if (it.mode != Default)
                         checkboxDelete.isChecked = !checkboxDelete.isChecked
-                }
+                }*/
                 .subscribe(subjectManager.clickNoteSubject)
 
             itemNote
