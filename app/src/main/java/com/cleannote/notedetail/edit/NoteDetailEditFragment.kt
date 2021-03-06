@@ -67,7 +67,7 @@ class NoteDetailEditFragment constructor(
         initFooterRcvImages()
         footerImageDeleteIconOnClick()
         changeTbState()
-        changeEditMode(binding.editTitle, binding.noteBody)
+        changeEditMode(binding.etTitleDetailEdit, binding.noteBody)
         tbRightMenuOnClick()
         scrollReleaseFocus()
         subscribeUpdateNote()
@@ -224,7 +224,7 @@ class NoteDetailEditFragment constructor(
 
     private fun editDoneMode() = viewModel.editDoneMode(
         currentNote().copy(
-            title = binding.editTitle.text.toString(),
+            title = binding.etTitleDetailEdit.text.toString(),
             body = binding.noteBody.text.toString(),
             updatedAt = dateUtil.getCurrentTimestamp()
         )
@@ -232,17 +232,17 @@ class NoteDetailEditFragment constructor(
 
     private fun transToolbarState(offset: Int): DetailToolbarState {
         return if (offset < collapseBoundary){
-            binding.editTitle.contentDescription = getString(R.string.desc_state_collapse)
+            binding.etTitleDetailEdit.contentDescription = getString(R.string.desc_state_collapse)
             TbCollapse
         } else {
-            binding.editTitle.contentDescription = getString(R.string.desc_state_expanded)
+            binding.etTitleDetailEdit.contentDescription = getString(R.string.desc_state_expanded)
             TbExpanded
         }
     }
 
     private fun noteTitleAlpha(){
         val alpha = binding.appBar.offsetChangeRatio()
-        binding.editTitle.alpha = 1 - alpha
+        binding.etTitleDetailEdit.alpha = 1 - alpha
         binding.detailToolbar.toolBarTitle.alpha = alpha
     }
 

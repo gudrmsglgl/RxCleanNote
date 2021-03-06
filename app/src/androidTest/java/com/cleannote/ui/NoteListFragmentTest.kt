@@ -435,6 +435,39 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
+    fun multiDeleteModeNoteClickThenCheckBoxIsChecked_onAndroid(){
+        val query = QueryFactory.makeQuery(cacheOrder())
+        val notes = NoteFactory.makeNotes(10, cacheOrder())
+        stubNextPageExist(false)
+        stubNoteRepositorySearchNotes(Single.just(notes), query)
+
+        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+
+        screenNoteList {
+            recyclerView {
+                firstItem<NoteItem> {
+                    longClick()
+                }
+                firstItem<NoteItem> {
+                    click()
+                    checkBox {
+                        isDisplayed()
+                        isChecked()
+                    }
+                }
+                visibleLastItem<NoteItem> {
+                    click()
+                    click()
+                    checkBox.isNotChecked()
+                    click()
+                    checkBox.isChecked()
+                }
+            }
+            idle(1000) // for rx debounce
+        }
+    }
+
+    @Test
     fun multiDeleteThrowableThenSearchStateDefaultNotes_onAndroid(){
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
@@ -464,6 +497,7 @@ class NoteListFragmentTest: BaseTest() {
                     }
                 }
             }
+            idle(1000) // for rx debounce
             multiDeleteToolbar {
                 btnConfirm.click()
             }
@@ -488,7 +522,6 @@ class NoteListFragmentTest: BaseTest() {
 
     @Test
     fun multiDeleteSuccessThenSearchStateDefaultNotesOfCheckDeleted_onAndroid(){
-        var checkSize = 0
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -512,20 +545,20 @@ class NoteListFragmentTest: BaseTest() {
                 firstItem<NoteItem> {
                     itemTitle.hasText(notes[0].title)
                     click()
-                    checkBox{
+                    checkBox {
                         isDisplayed()
                         isChecked()
                     }
                 }
                 childAt<NoteItem>(1){
                     click()
-                    checkBox{
+                    checkBox {
                         isDisplayed()
                         isChecked()
                     }
                 }
-                checkSize = getCheckedSize()
             }
+            idle(1000) // for rx debounce
             multiDeleteToolbar {
                 btnConfirm.click()
             }
@@ -535,13 +568,12 @@ class NoteListFragmentTest: BaseTest() {
             searchToolbar {
                 isDisplayed()
             }
-            idle(5000L)
             recyclerView {
                 firstItem<NoteItem> {
                     itemTitle.hasText(deletedNotes[0].title)
                     checkBox.isNotDisplayed()
                 }
-                hasSize(notes.size - checkSize)
+                hasSize(deletedNotes.size)
             }
         }
     }

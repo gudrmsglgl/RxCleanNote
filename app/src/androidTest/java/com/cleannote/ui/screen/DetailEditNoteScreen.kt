@@ -13,7 +13,7 @@ import com.cleannote.espresso.footer.NDEFooterView
 
 object DetailEditNoteScreen: BaseScreen<DetailEditNoteScreen>() {
     val toolbar = NDToolbar(ViewMatchers.withId(R.id.detail_toolbar))
-    val editTitle = NDEditText(ViewMatchers.withId(R.id.edit_title))
+    val editTitle = NDEditText(ViewMatchers.withId(R.id.et_title_detail_edit))
     val scrollview = NDScrollView(ViewMatchers.withId(R.id.edit_body))
     val footer = NDEFooterView(ViewMatchers.withId(R.id.footer))
     val deleteDialog = NDDeleteDialog(ViewMatchers.withId(R.layout.md_dialog_base))

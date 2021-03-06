@@ -11,6 +11,7 @@ import com.cleannote.model.NoteMode
 import com.cleannote.model.NoteMode.*
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.holder.BaseHolder
+import com.cleannote.notelist.holder.NoteCheckViewHolder
 import com.cleannote.notelist.holder.NoteViewHolder
 import timber.log.Timber
 
@@ -20,9 +21,20 @@ class NoteListAdapter(
     val subjectManager: SubjectManager
 ): ListAdapter<NoteUiModel, BaseHolder<NoteUiModel>>(NoteDiffCallback) {
 
+    companion object {
+        const val TYPE_DEFAULT = 0
+        const val TYPE_CHECK = 1
+    }
+
     private val _checkedNotes: HashMap<String, NoteUiModel> = hashMapOf()
     val checkedNotes: List<NoteUiModel>
         get() = _checkedNotes.values.toList()
+
+    override fun getItemViewType(position: Int) = when (currentList[position].mode)
+    {
+        Default -> TYPE_DEFAULT
+        else -> TYPE_CHECK
+    }
 
     override fun getItemId(position: Int): Long {
         return currentList[position].hashCode().toLong()
@@ -38,17 +50,27 @@ class NoteListAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder<NoteUiModel>{
-        return NoteViewHolder(
-            binding = DataBindingUtil.inflate(
-                LayoutInflater.from(parent.context),
-                R.layout.item_note_list,
-                parent,
-                false
-            ),
-            requestManager = glideReqManager
-        )
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder<NoteUiModel> =
+        when (viewType) {
+            TYPE_DEFAULT -> NoteViewHolder(
+                binding = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_note_list,
+                    parent,
+                    false
+                ),
+                requestManager = glideReqManager
+            )
+            else -> NoteCheckViewHolder(
+                binding = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_check_note_list,
+                    parent,
+                    false
+                ),
+                requestManager = glideReqManager
+            )
+        }
 
     override fun getItemCount(): Int = currentList.size
 
@@ -90,6 +112,7 @@ class NoteListAdapter(
         currentList.apply {
             val selectItem = find { it.id == item.id }
             selectItem?.mode = mode
+            Timber.tag("RxCleanNote").d("ChangeMode:${selectItem.toString()}")
         }
     }
 
@@ -98,19 +121,15 @@ class NoteListAdapter(
     }
 
     fun deleteChecked(item: NoteUiModel){
-        val index = currentList.indexOf(item)
         changeNoteMode(item, MultiSelect)
         _checkedNotes.put(item.id, item)
         submitList(currentList)
-        //notifyItemChanged(index)
     }
 
     fun deleteNotChecked(item: NoteUiModel){
-        val index = currentList.indexOf(item)
         changeNoteMode(item, MultiDefault)
         _checkedNotes.remove(item.id)
         submitList(currentList)
-        //notifyItemChanged(index)
     }
 
     fun deleteCheckClear() = _checkedNotes.clear()

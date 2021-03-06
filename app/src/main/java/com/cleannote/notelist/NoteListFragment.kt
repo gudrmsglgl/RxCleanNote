@@ -90,6 +90,7 @@ constructor(
         subscribeInsertResult()
         subscribeDeleteResult()
         noteOnClick()
+        noteOnCheck()
         noteOnLongClick()
         noteSwipeMenuOnDeleteClick()
         setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
@@ -127,17 +128,20 @@ constructor(
             !swipeDeleteMenuClose()
         }
         .subscribe {
-            when (it.mode) {
-                Default -> navDetailNote(it, isInsertExecute = false)
-                MultiDefault -> {
-                    noteAdapter.deleteChecked(it)
-                }
-                else -> {
-                    noteAdapter.deleteNotChecked(it)
-                }
-            }
+            navDetailNote(it, isInsertExecute = false)
         }
         .addCompositeDisposable()
+
+    private fun noteOnCheck() = noteAdapter
+        .subjectManager
+        .checkNoteSubject
+        .subscribe {
+            val isChecked = it.second
+            if (isChecked)
+                noteAdapter.deleteChecked(it.first)
+            else
+                noteAdapter.deleteNotChecked(it.first)
+        }
 
     private fun noteOnLongClick() = noteAdapter
         .subjectManager
@@ -366,16 +370,20 @@ constructor(
     }
 
     fun showDeleteDialog(param: List<NoteUiModel>) {
-        activity?.let {
-            NoteDeleteDialog(DeleteDialog(it, viewLifecycleOwner))
-                .showDialog(param)
-                .positiveButton {
-                    deleteNotes(param)
-                }
-                .negativeButton {
-                    transSearchState()
-                    swipeDeleteMenuClose()
-                }
+        if (param.isEmpty())
+            showToast(getString(R.string.delete_multi_select_empty))
+        else {
+            activity?.let {
+                NoteDeleteDialog(DeleteDialog(it, viewLifecycleOwner))
+                    .showDialog(param)
+                    .positiveButton {
+                        deleteNotes(param)
+                    }
+                    .negativeButton {
+                        transSearchState()
+                        swipeDeleteMenuClose()
+                    }
+            }
         }
     }
 

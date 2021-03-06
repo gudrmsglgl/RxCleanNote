@@ -46,7 +46,7 @@
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
                    android:minHeight="@dimen/toolbar_height"
-                   android:id="@+id/edit_title"
+                   android:id="@+id/et_title_detail_edit"
                    android:text='@{vm.finalNote.title}'
                    android:textColor="#000"
                    android:textSize="22sp"
