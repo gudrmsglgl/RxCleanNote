@@ -18,11 +18,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.cleannote.common.dialog.ErrorDialog
-import com.cleannote.data.ui.InfoType
-import com.cleannote.data.ui.UIMessage
-import com.cleannote.data.ui.UIType
 import com.cleannote.presentation.data.DataState
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.wada811.databinding.dataBinding
@@ -39,7 +35,7 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
 
     private var disposables: CompositeDisposable? = null
 
-    val binding: DataBinding by dataBinding()
+    internal val binding: DataBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

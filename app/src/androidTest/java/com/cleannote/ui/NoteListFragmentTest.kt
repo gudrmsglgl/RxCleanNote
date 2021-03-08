@@ -514,7 +514,7 @@ class NoteListFragmentTest: BaseTest() {
             }
             recyclerView {
                 firstItem<NoteItem> {
-                    checkBox.isNotDisplayed()
+                    checkBox.doesNotExist()
                 }
             }
         }
@@ -570,8 +570,8 @@ class NoteListFragmentTest: BaseTest() {
             }
             recyclerView {
                 firstItem<NoteItem> {
+                    checkBox.doesNotExist()
                     itemTitle.hasText(deletedNotes[0].title)
-                    checkBox.isNotDisplayed()
                 }
                 hasSize(deletedNotes.size)
             }

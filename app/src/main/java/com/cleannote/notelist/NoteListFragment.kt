@@ -1,17 +1,10 @@
 package com.cleannote.notelist
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import androidx.annotation.IdRes
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -23,13 +16,11 @@ import com.cleannote.NoteApplication
 
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
-import com.cleannote.app.databinding.LayoutMultideleteToolbarBinding
 import com.cleannote.common.*
 import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.common.dialog.InputDialog
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.notelist.NoteListViewModel
-import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.extension.*
 import com.cleannote.extension.rxbinding.*
 import com.cleannote.model.NoteMode.*
@@ -41,32 +32,30 @@ import com.cleannote.notedetail.Keys.REQ_DELETE_KEY
 import com.cleannote.notedetail.Keys.REQ_SCROLL_TOP_KEY
 import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
 import com.cleannote.notelist.dialog.NoteDeleteDialog
-import com.cleannote.notelist.dialog.ListFilterDialog
 import com.cleannote.notelist.swipe.SwipeAdapter
 import com.cleannote.notelist.swipe.SwipeHelperCallback
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.model.NoteView
-import com.jakewharton.rxbinding4.appcompat.queryTextChangeEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.layout_search_toolbar.view.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private val sharedPref: SharedPreferences
+    internal val sharedPref: SharedPreferences
 ): BaseFragment<FragmentNoteListBinding>(R.layout.fragment_note_list),
     OnBackPressListener,
     SwipeAdapter
 {
 
     private val bundle: Bundle = Bundle()
-    private val viewModel: NoteListViewModel by viewModels { viewModelFactory }
+    internal val viewModel: NoteListViewModel by viewModels { viewModelFactory }
+    private val tbFactory: NoteListTbFactory by lazy { NoteListTbFactory(this) }
 
     @Inject lateinit var noteAdapter: NoteListAdapter
     @Inject lateinit var swipeHelperCallback: SwipeHelperCallback
@@ -109,13 +98,12 @@ constructor(
         .observe(viewLifecycleOwner, Observer { toolbarState ->
             when(toolbarState){
                 is SearchState -> {
-                    addSearchViewToolbarContainer()
-                    setupSearchViewToolbar()
+                    tbFactory.addSearchViewToolbarContainer()
                     noteAdapter.changeAllNoteMode(Default)
                     noteAdapter.deleteCheckClear()
                 }
                 is MultiSelectState -> {
-                    addMultiDeleteToolbarContainer()
+                    tbFactory.addMultiDeleteToolbarContainer()
                     noteAdapter.changeAllNoteMode(MultiDefault)
                 }
             }}
@@ -177,7 +165,6 @@ constructor(
                 swipeHelperCallback.removePreviousClamp(this)
                 false
             }
-
         }
 
     private fun scrollEventNextPageSource() = binding
@@ -283,92 +270,6 @@ constructor(
         findNavController().navigate(R.id.action_noteList_to_detail_nav_graph, bundle)
     }
 
-    private fun addSearchViewToolbarContainer() = view?.let {
-        binding.toolbarContentContainer.apply {
-            removeAllViews()
-            addView(searchToolbarLayout(it.context))
-        }
-    }
-
-    private fun searchToolbarLayout(context: Context) = View
-        .inflate(context, R.layout.layout_search_toolbar, null)
-        .apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-        }
-
-    private fun setupSearchViewToolbar() = binding
-        .toolbarContentContainer
-        .findViewById<Toolbar>(R.id.search_toolbar)
-        .apply {
-            searchViewSetQuery(R.id.sv, viewModel.queryLike)
-            searchEventSource(R.id.sv)
-            filterMenu()
-        }
-
-    private fun Toolbar.searchViewSetQuery(
-        @IdRes idRes: Int,
-        keyword: String
-    ) = findViewById<SearchView>(idRes)
-        .apply {
-            if (keyword.isNotEmpty()) {
-                isIconified = false
-                setQuery(keyword, false)
-                clearFocus()
-            }
-            else
-                isIconified = true
-        }
-
-    private fun Toolbar.searchEventSource(@IdRes idRes: Int) = findViewById<SearchView>(idRes)
-        .apply {
-            queryTextChangeEvents()
-                .skipInitialValue()
-                .debounce(1000, TimeUnit.MILLISECONDS)
-                .subscribe { viewModel.searchKeyword(it.queryText.toString()) }
-                .addCompositeDisposable()
-        }
-
-    private fun Toolbar.filterMenu() = findViewById<ImageView>(R.id.action_filter)
-        .singleClick()
-        .subscribe {
-            showFilterDialog()
-        }
-        .addCompositeDisposable()
-
-    private fun addMultiDeleteToolbarContainer() = view?.let {
-        binding.toolbarContentContainer.apply {
-            removeAllViews()
-            addView(multiDeleteToolbarBinding(this).root)
-        }
-    }
-
-    private fun multiDeleteToolbarBinding(parent: ViewGroup): LayoutMultideleteToolbarBinding {
-        val binding: LayoutMultideleteToolbarBinding = bindingInflate(R.layout.layout_multidelete_toolbar, parent)
-        return binding.apply {
-            fragment = this@NoteListFragment
-            adapter = noteAdapter
-        }
-    }
-
-    private fun showFilterDialog() {
-        activity?.let { activity ->
-            ListFilterDialog(activity, sharedPref, viewLifecycleOwner)
-                .showDialog { dialog, checkedOrder ->
-                    saveCacheThenOrdering(checkedOrder)
-                    scrollTop()
-                    dialog.dismiss()
-                }
-        }
-    }
-
-    private fun saveCacheThenOrdering(order: String){
-        sharedPref.edit().putString(FILTER_ORDERING_KEY, order).apply()
-        viewModel.setOrdering(order)
-    }
-
     fun showDeleteDialog(param: List<NoteUiModel>) {
         if (param.isEmpty())
             showToast(getString(R.string.delete_multi_select_empty))
@@ -414,8 +315,9 @@ constructor(
             scrollTop()
     }
 
-    private fun onRefresh() = swipe_refresh.setOnRefreshListener {
-        swipe_refresh.isRefreshing = false
+    private fun onRefresh() = binding.swipeRefresh.setOnRefreshListener {
+        binding.swipeRefresh.isRefreshing = false
+        tbFactory.setupSearchViewToolbarInit()
         viewModel.initNotes()
     }
 
@@ -424,7 +326,7 @@ constructor(
             viewModel.setToolbarState(SearchState)
     }
 
-    private fun scrollTop(){
+    internal fun scrollTop(){
         Handler().postDelayed({
             binding.recyclerView.scrollToPosition(0)
         }, 100L)
@@ -450,4 +352,8 @@ constructor(
     } else
         true
 
+    override fun onDestroyView() {
+        tbFactory.rxDispose()
+        super.onDestroyView()
+    }
 }

@@ -6,6 +6,7 @@ import com.cleannote.espresso.check.NCheckBox
 import com.cleannote.espresso.text.NTextView
 import com.cleannote.espresso.view.NBaseView
 import com.cleannote.app.R
+import com.cleannote.notelist.holder.NoteCheckViewHolder
 import com.cleannote.test.util.RecyclerViewMatcher
 
 @Suppress("UNCHECKED_CAST")
