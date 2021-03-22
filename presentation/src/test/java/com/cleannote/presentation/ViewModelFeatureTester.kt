@@ -2,21 +2,18 @@ package com.cleannote.presentation
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.cleannote.domain.interactor.UseCase
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State
-import com.cleannote.presentation.extensions.verifyExecute
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.mockito.verification.VerificationMode
 
-// C: Child ClassType, D: UseCase Domain Model, Param: UseCase Param, R: UseCase Return In ViewModel
+// C: Child ClassType, D: UseCase Domain Return Type, Param: UseCase Param, R: ViewModel DataState Type
 @Suppress("UNCHECKED_CAST")
-abstract class ViewModelFeatureTester<C, D, Param, R>(val captors: ArgumentCaptors<D>)
+abstract class ViewModelFeatureTester<C, D, Param, R>(private val captors: ArgumentCaptors<D>)
 {
     val state: MutableLiveData<State>  = MutableLiveData()
     private val stateObserver: Observer<State> = mock()

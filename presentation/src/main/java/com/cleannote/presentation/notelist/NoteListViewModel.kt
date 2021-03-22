@@ -1,5 +1,6 @@
 package com.cleannote.presentation.notelist
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
@@ -17,7 +18,7 @@ import com.cleannote.presentation.model.NoteView
 class NoteListViewModel
 constructor(
     private val useCases: NoteListUseCases,
-    private val queryMgr: QueryManager
+    internal val queryMgr: QueryManager
 ): ViewModel() {
 
     val queryLike get() = queryMgr.queryLike()
@@ -151,7 +152,8 @@ constructor(
         )
     }
 
-    private fun updateNextPageExist() = with(queryMgr){
+    @VisibleForTesting
+    fun updateNextPageExist() = with(queryMgr){
         executeNextPageExist(
             nextPageQuery()
         )

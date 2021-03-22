@@ -1,6 +1,7 @@
 package com.cleannote.presentation.notelist
 
 import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
@@ -31,6 +32,7 @@ class QueryManager
         get() = _isNextPageExist.value?.data ?: false
 
     fun executeNextPageExist(query: Query){
+        _isNextPageExist.postValue(DataState.loading())
         nextPageExist.execute(
             onSuccess = {
                 _isNextPageExist.postValue(DataState.success(it))
@@ -115,4 +117,7 @@ class QueryManager
         .getString(FILTER_ORDERING_KEY, ORDER_DESC) ?: ORDER_DESC
 
     fun dispose() = nextPageExist.dispose()
+
+    @VisibleForTesting
+    fun isNextPageExist() = _isNextPageExist.value
 }
