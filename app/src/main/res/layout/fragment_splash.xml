@@ -1,23 +1,27 @@
 <layout>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/splash_fragment_container">
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/splash_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_splash_xml_splash_fragment_container_scene">
 
-
-
-    <ImageView
-        android:id="@+id/splash_logo"
-        android:layout_width="@dimen/splash_logo_width"
-        android:layout_height="@dimen/splash_logo_width"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:src="@drawable/splash_logo"
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/android_logo"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            app:lottie_rawRes="@raw/android_jetpack"
+            app:lottie_autoPlay="true"
+            app:lottie_speed="3"
         />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <View
+            android:id="@+id/bottom"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:background="@color/default_grey"/>
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

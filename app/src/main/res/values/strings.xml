@@ -75,6 +75,7 @@
     <string name="dv_update_time">업데이트 시간</string>
 
     <!-- Description -->
+    <string name="desc_ic_splash">splash icon</string>
     <string name="desc_nl_fab">new note btn</string>
     <string name="desc_nl_item_delete_img">swipe delete img</string>
     <string name="desc_dv_img">detail view header img</string>
