@@ -2,6 +2,8 @@ package com.cleannote.splash
 
 import android.os.Bundle
 import android.view.View
+import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -24,16 +26,29 @@ class SplashFragment constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //viewModel.tryLogin()
+        setBackground()
+         //viewModel.tryLogin()
         //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         subscribeLoginResult()
     }
 
+    fun setBackground() = binding.splashFragmentContainer.setTransitionListener(object : MotionLayout.TransitionListener {
+        override fun onTransitionStarted(p0: MotionLayout?, p1: Int, p2: Int) {
+        }
+
+        override fun onTransitionChange(p0: MotionLayout?, p1: Int, p2: Int, p3: Float) {
+        }
+
+        override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {
+        }
+
+        override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {
+        }
+    })
+
     override fun initBinding() {
         println("TODO: dataBinding")
     }
-
-
 
     private fun subscribeLoginResult() = viewModel.loginResult
         .observe(viewLifecycleOwner,

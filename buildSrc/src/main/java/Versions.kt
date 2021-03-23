@@ -13,7 +13,7 @@ object Versions {
     const val material_dialogs = "3.3.0"
     const val room = "2.1.0"
     const val appcompat = "1.1.0-rc01"
-    const val constraintlayout = "1.1.3"
+    const val constraintlayout = "2.0.4"
     const val material_design = "1.1.0"
     const val play_core = "1.7.1"
     const val play_services = "4.3.3"

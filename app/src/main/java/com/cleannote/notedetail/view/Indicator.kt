@@ -13,11 +13,11 @@ class Indicator: LinearLayoutCompat {
 
     private val lineView: MutableList<TextView> = mutableListOf()
 
-    constructor(context: Context?): super(context){
+    constructor(context: Context): super(context){
         mContext = context
     }
 
-    constructor(context: Context?, attrs: AttributeSet?): super(context, attrs){
+    constructor(context: Context, attrs: AttributeSet?): super(context, attrs){
         mContext = context
     }
 
