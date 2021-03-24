@@ -1,50 +1,76 @@
 package com.cleannote.splash
 
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
+import android.text.TextPaint
 import android.view.View
-import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-
+import com.airbnb.lottie.LottieDrawable
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentSplashBinding
 import com.cleannote.common.*
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.splash.SplashViewModel
+import com.jakewharton.rxbinding4.view.layoutChangeEvents
 
-/**
- * A simple [Fragment] subclass.
- */
+
 class SplashFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory
 ): BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash) {
+
+    companion object {
+        const val LOGO_MAX_FRAME = 59
+    }
 
     private val viewModel: SplashViewModel by viewModels { viewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setBackground()
+        initLottieLogo()
+        initRxText()
          //viewModel.tryLogin()
         //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         subscribeLoginResult()
     }
 
-    fun setBackground() = binding.splashFragmentContainer.setTransitionListener(object : MotionLayout.TransitionListener {
-        override fun onTransitionStarted(p0: MotionLayout?, p1: Int, p2: Int) {
-        }
+    private fun initRxText(){
+        binding.tvRx.layoutChangeEvents()
+            .subscribe {
+                val rxColorArray = intArrayOf(Color.parseColor("#FBBBE2"), Color.parseColor("#B80083"),Color.parseColor("#410055"))
+                val textShader: Shader = LinearGradient(
+                    0f, 0f, it.view.width.toFloat(), it.view.height.toFloat(), rxColorArray,null, Shader.TileMode.CLAMP
+                )
+                binding.tvRx.paint.shader = textShader
+            }
+        binding.tvNote.layoutChangeEvents()
+            .subscribe {
+                val noteColorArray = intArrayOf(
+                    Color.parseColor("#64B678"),
+                    Color.parseColor("#478AEA"),
+                    Color.parseColor("#8446CC")
+                )
+                val textShader: Shader = LinearGradient(
+                    0f, 0f, it.view.width.toFloat(), it.view.height.toFloat(), noteColorArray, null, Shader.TileMode.CLAMP
+                )
+                binding.tvNote.paint.shader = textShader
+            }
+    }
 
-        override fun onTransitionChange(p0: MotionLayout?, p1: Int, p2: Int, p3: Float) {
+    private fun initLottieLogo() = binding.androidLogo.apply {
+        addAnimatorUpdateListener {
+            if (binding.androidLogo.frame == LOGO_MAX_FRAME) {
+                setMinProgress(0.9f)
+                speed = 3f
+                repeatCount = LottieDrawable.INFINITE
+                playAnimation()
+            }
         }
-
-        override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {
-        }
-
-        override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {
-        }
-    })
+        playAnimation()
+    }
 
     override fun initBinding() {
         println("TODO: dataBinding")
@@ -53,7 +79,7 @@ class SplashFragment constructor(
     private fun subscribeLoginResult() = viewModel.loginResult
         .observe(viewLifecycleOwner,
             Observer {
-                if (it != null){
+                if (it != null) {
                     when (it.status) {
                         is LOADING -> showLoadingProgressBar(true)
                         is SUCCESS -> {

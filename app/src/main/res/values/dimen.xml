@@ -8,6 +8,9 @@
     <dimen name="toolbar_title_margin">32dp</dimen>
     <dimen name="page_title_size">20sp</dimen>
 
+    <!-- splash -->
+    <dimen name="logo_text">50sp</dimen>
+
     <!-- note list -->
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="recyclerview_start_end_margins">5dp</dimen>

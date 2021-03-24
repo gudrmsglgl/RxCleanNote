@@ -10,12 +10,29 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/android_logo"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             app:lottie_rawRes="@raw/android_jetpack"
-            app:lottie_autoPlay="true"
-            app:lottie_speed="3"
+            app:lottie_speed="5"
         />
+
+        <TextView
+            android:id="@+id/tv_rx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tv_rx"
+            android:textSize="@dimen/logo_text"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/tv_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tv_clean_note"
+            android:textSize="@dimen/logo_text"
+            android:alpha="0"
+            />
 
         <View
             android:id="@+id/bottom"
