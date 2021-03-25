@@ -6,15 +6,15 @@
     <Transition
         android:id="@+id/delay_start"
         motion:constraintSetStart="@id/const_delay"
-        motion:constraintSetEnd="@+id/start"
+        motion:constraintSetEnd="@+id/const_start"
         motion:duration="1000"
         motion:motionInterpolator="linear"
         motion:autoTransition="animateToEnd"
         />
 
     <Transition
-        android:id="@+id/transition_logo_top"
-        motion:constraintSetStart="@id/start"
+        android:id="@+id/transition_logo_set"
+        motion:constraintSetStart="@id/const_start"
         motion:constraintSetEnd="@+id/const_logo_set"
         motion:autoTransition="animateToEnd"
         motion:motionInterpolator="easeInOut"
@@ -28,8 +28,18 @@
                motion:percentX="1.8" />
            <KeyAttribute
                motion:motionTarget="@+id/android_logo"
+               motion:framePosition="50"
+               android:rotation="-10" />
+           <KeyAttribute
+               motion:motionTarget="@+id/android_logo"
                motion:framePosition="60"
                android:rotation="-90" />
+           <KeyAttribute
+               motion:motionTarget="@+id/tv_rx"
+               motion:framePosition="20"
+               android:scaleX="100"
+               android:scaleY="100"
+               android:alpha="0"/>
        </KeyFrameSet>
     </Transition>
 
@@ -79,13 +89,41 @@
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintBottom_toBottomOf="parent"/>
+        <Constraint
+            android:id="@+id/tv_oval_rx"
+            android:layout_width="@dimen/oval_rx"
+            android:layout_height="@dimen/oval_rx"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="@+id/rxGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/rxGuideline"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintVertical_bias="0.4" />
+        <Constraint
+            android:id="@+id/tv_oval_jet"
+            android:layout_width="@dimen/oval_jet"
+            android:layout_height="@dimen/oval_jet"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="@+id/jetGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/jetGuideline"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintVertical_bias="0.3" />
+        <Constraint
+            android:id="@+id/tv_oval_clean"
+            android:layout_width="@dimen/oval_clean"
+            android:layout_height="@dimen/oval_clean"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="@+id/cleanGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/cleanGuideline"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintVertical_bias="0.5"/>
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/start">
+    <ConstraintSet android:id="@+id/const_start">
         <Constraint
             android:id="@+id/android_logo"
             android:layout_width="250dp"
             android:layout_height="250dp"
+            android:elevation="4dp"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintBottom_toTopOf="@+id/bottom"/>
         <Constraint
@@ -104,6 +142,33 @@
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintHorizontal_bias="0.15"/>
+        <Constraint
+            android:id="@+id/tv_oval_rx"
+            android:layout_width="@dimen/oval_rx"
+            android:layout_height="@dimen/oval_rx"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="@+id/rxGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/rxGuideline"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintVertical_bias="0.4"  />
+        <Constraint
+            android:id="@+id/tv_oval_jet"
+            android:layout_width="@dimen/oval_jet"
+            android:layout_height="@dimen/oval_jet"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="@+id/jetGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/jetGuideline"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintVertical_bias="0.3"/>
+        <Constraint
+            android:id="@+id/tv_oval_clean"
+            android:layout_width="@dimen/oval_clean"
+            android:layout_height="@dimen/oval_clean"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="@+id/cleanGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/cleanGuideline"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintVertical_bias="0.5"/>
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/const_logo_set">
@@ -115,8 +180,7 @@
             motion:layout_constraintTop_toTopOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintBottom_toBottomOf="parent"
-            motion:layout_constraintVertical_bias="0.3"
-            />
+            motion:layout_constraintVertical_bias="0.3" />
         <Constraint
             android:id="@+id/bottom"
             android:layout_width="match_parent"
@@ -145,6 +209,33 @@
             motion:layout_constraintTop_toTopOf="@+id/tv_rx"
             motion:layout_constraintBottom_toBottomOf="@+id/tv_rx"
             motion:layout_constraintEnd_toEndOf="parent"/>
+        <Constraint
+            android:id="@+id/tv_oval_rx"
+            android:layout_width="@dimen/oval_rx"
+            android:layout_height="@dimen/oval_rx"
+            android:alpha="0"
+            android:translationY="150dp"
+            android:translationX="-30dp"
+            motion:layout_constraintStart_toStartOf="@+id/rxGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/rxGuideline" />
+        <Constraint
+            android:id="@+id/tv_oval_jet"
+            android:layout_width="@dimen/oval_jet"
+            android:layout_height="@dimen/oval_jet"
+            android:alpha="0"
+            android:translationY="400dp"
+            android:translationX="-120dp"
+            motion:layout_constraintStart_toStartOf="@+id/jetGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/jetGuideline" />
+        <Constraint
+            android:id="@+id/tv_oval_clean"
+            android:layout_width="@dimen/oval_clean"
+            android:layout_height="@dimen/oval_clean"
+            android:alpha="0"
+            android:translationY="350dp"
+            android:translationX="-155dp"
+            motion:layout_constraintStart_toStartOf="@+id/cleanGuideline"
+            motion:layout_constraintEnd_toEndOf="@+id/cleanGuideline" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/const_text_set">
@@ -185,6 +276,15 @@
             motion:layout_constraintTop_toTopOf="@+id/tv_rx"
             motion:layout_constraintBottom_toBottomOf="@+id/tv_rx"
             motion:layout_constraintStart_toEndOf="@+id/tv_rx"/>
+        <Constraint
+            android:id="@+id/tv_oval_rx"
+            android:alpha="0" />
+        <Constraint
+            android:id="@+id/tv_oval_jet"
+            android:alpha="0"/>
+        <Constraint
+            android:id="@+id/tv_oval_clean"
+            android:alpha="0"/>
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/const_logo_bound">
@@ -225,6 +325,15 @@
             motion:layout_constraintTop_toTopOf="@+id/tv_rx"
             motion:layout_constraintBottom_toBottomOf="@+id/tv_rx"
             motion:layout_constraintStart_toEndOf="@+id/tv_rx"/>
+        <Constraint
+            android:id="@+id/tv_oval_rx"
+            android:alpha="0" />
+        <Constraint
+            android:id="@+id/tv_oval_jet"
+            android:alpha="0"/>
+        <Constraint
+            android:id="@+id/tv_oval_clean"
+            android:alpha="0"/>
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
@@ -264,6 +373,15 @@
             motion:layout_constraintTop_toTopOf="@+id/tv_rx"
             motion:layout_constraintBottom_toBottomOf="@+id/tv_rx"
             motion:layout_constraintStart_toEndOf="@+id/tv_rx"/>
+        <Constraint
+            android:id="@+id/tv_oval_rx"
+            android:alpha="0" />
+        <Constraint
+            android:id="@+id/tv_oval_jet"
+            android:alpha="0"/>
+        <Constraint
+            android:id="@+id/tv_oval_clean"
+            android:alpha="0"/>
     </ConstraintSet>
 
 
