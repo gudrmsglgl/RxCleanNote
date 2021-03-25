@@ -10,6 +10,10 @@
 
     <!-- splash -->
     <dimen name="logo_text">50sp</dimen>
+    <dimen name="oval_rx">110dp</dimen>
+    <dimen name="oval_jet">150dp</dimen>
+    <dimen name="oval_clean">180dp</dimen>
+    <dimen name="oval_text_sp">18sp</dimen>
 
     <!-- note list -->
     <dimen name="fab_margin">16dp</dimen>

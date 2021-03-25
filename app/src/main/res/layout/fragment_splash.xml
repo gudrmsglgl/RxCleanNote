@@ -34,6 +34,57 @@
             android:alpha="0"
             />
 
+        <TextView
+            android:id="@+id/tv_oval_rx"
+            android:layout_width="@dimen/oval_rx"
+            android:layout_height="@dimen/oval_rx"
+            android:background="@drawable/bg_oval"
+            android:gravity="center"
+            android:text="@string/tv_oval_rxjava"
+            android:textSize="@dimen/oval_text_sp"
+            android:textColor="@color/white"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rxGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.078" />
+
+        <TextView
+            android:id="@+id/tv_oval_jet"
+            android:layout_width="@dimen/oval_jet"
+            android:layout_height="@dimen/oval_jet"
+            android:background="@drawable/bg_oval"
+            android:gravity="center"
+            android:text="@string/tv_oval_jet"
+            android:textSize="@dimen/oval_text_sp"
+            android:textColor="@color/white"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/jetGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <TextView
+            android:id="@+id/tv_oval_clean"
+            android:layout_width="@dimen/oval_clean"
+            android:layout_height="@dimen/oval_clean"
+            android:background="@drawable/bg_oval"
+            android:gravity="center"
+            android:text="@string/tv_oval_clean"
+            android:textSize="@dimen/oval_text_sp"
+            android:textColor="@color/white"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/cleanGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.41" />
+
         <View
             android:id="@+id/bottom"
             android:layout_width="match_parent"

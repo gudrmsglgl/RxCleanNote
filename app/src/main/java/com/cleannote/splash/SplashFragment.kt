@@ -4,8 +4,11 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
-import android.text.TextPaint
+import android.os.Handler
 import android.view.View
+import android.widget.TextView
+import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,9 +16,11 @@ import com.airbnb.lottie.LottieDrawable
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentSplashBinding
 import com.cleannote.common.*
+import com.cleannote.extension.changeTextColor
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.splash.SplashViewModel
 import com.jakewharton.rxbinding4.view.layoutChangeEvents
+import timber.log.Timber
 
 
 class SplashFragment constructor(
@@ -31,13 +36,14 @@ class SplashFragment constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initLottieLogo()
-        initRxText()
+        initTextLogoGradation()
+        initOval()
          //viewModel.tryLogin()
         //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
         subscribeLoginResult()
     }
 
-    private fun initRxText(){
+    private fun initTextLogoGradation(){
         binding.tvRx.layoutChangeEvents()
             .subscribe {
                 val rxColorArray = intArrayOf(Color.parseColor("#FBBBE2"), Color.parseColor("#B80083"),Color.parseColor("#410055"))
@@ -46,6 +52,7 @@ class SplashFragment constructor(
                 )
                 binding.tvRx.paint.shader = textShader
             }
+
         binding.tvNote.layoutChangeEvents()
             .subscribe {
                 val noteColorArray = intArrayOf(
@@ -72,6 +79,23 @@ class SplashFragment constructor(
         playAnimation()
     }
 
+    private fun initOval() = binding.splashFragmentContainer.setTransitionListener(object : MotionLayout.TransitionListener{
+        override fun onTransitionStarted(motion: MotionLayout, startId: Int, endId: Int) {
+        }
+
+        override fun onTransitionChange(p0: MotionLayout?, startId: Int, p2: Int, progress: Float) {
+            if (startId == R.id.const_start && progress > 0.2f) {
+                ovalDefaultToYellow(binding.tvOvalRx)
+                ovalDefaultToYellow(binding.tvOvalJet)
+                ovalDefaultToYellow(binding.tvOvalClean)
+            }
+        }
+
+        override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {}
+
+        override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {}
+    })
+
     override fun initBinding() {
         println("TODO: dataBinding")
     }
@@ -93,4 +117,8 @@ class SplashFragment constructor(
                 }
             })
 
+    private fun ovalDefaultToYellow(tv: TextView){
+        tv.background = ContextCompat.getDrawable(this@SplashFragment.requireContext(), R.drawable.bg_oval_solid)
+        tv.changeTextColor(R.color.black)
+    }
 }

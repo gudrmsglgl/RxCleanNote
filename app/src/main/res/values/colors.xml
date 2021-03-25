@@ -20,5 +20,5 @@
     <color name="multi_delete_default_color">#CDCDCD</color>
 
     <color name="default_grey">#686868</color>
-
+    <color name="yellow">#FFD180</color>
 </resources>

@@ -57,6 +57,9 @@
     <string name="deleteCancelMsg">삭제가 취소 되었습니다.</string>
 
     <!-- Splash -->
+    <string name="tv_oval_rxjava">RxJava</string>
+    <string name="tv_oval_jet">JetPack</string>
+    <string name="tv_oval_clean">Clean Architecture</string>
     <string name="tv_rx">Rx</string>
     <string name="tv_clean_note">CleanNote</string>
 
