@@ -74,7 +74,7 @@ class NoteDetailEditFragment constructor(
         subscribeDeleteNote()
     }
 
-    override fun initBinding() {
+    private fun initBinding() {
         binding.apply {
             vm = viewModel
             fragment = this@NoteDetailEditFragment

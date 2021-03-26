@@ -61,6 +61,7 @@ constructor(
         useCases.disposeUseCases()
     }
 
+    @VisibleForTesting
     fun searchNotes(){
         _mediatorNoteList.postValue(DataState.loading())
         useCases.searchNotes.execute(

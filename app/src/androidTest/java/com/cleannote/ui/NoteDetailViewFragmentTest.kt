@@ -117,24 +117,6 @@ class NoteDetailViewFragmentTest: BaseTest() {
         }
     }
 
-   /* @Test
-    fun collapseThenTbTitleVisibleTbMenuColorBlack_onAndroid(){
-        val note = NoteFactory.defaultNote()
-        launchDetailViewFragment(note)
-
-        screenDetailView {
-            appbar {
-                idle(1000)
-                swipeUp()
-                toolbar {
-                    title {
-                        hasText(note.title)
-                    }
-                }
-            }
-        }
-    }*/
-
     private fun launchDetailViewFragment(note: NoteUiModel){
         val stubBundle = Bundle().apply {
             putParcelable(NOTE_DETAIL_BUNDLE_KEY, note)

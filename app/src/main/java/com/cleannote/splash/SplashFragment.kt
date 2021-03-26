@@ -12,12 +12,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.airbnb.lottie.LottieDrawable
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentSplashBinding
 import com.cleannote.common.*
 import com.cleannote.extension.changeTextColor
+import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.model.NoteView
+import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.presentation.splash.SplashViewModel
 import com.jakewharton.rxbinding4.view.layoutChangeEvents
 import timber.log.Timber
@@ -25,22 +30,22 @@ import timber.log.Timber
 
 class SplashFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory
-): BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash) {
+): BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash), MotionLayout.TransitionListener {
 
     companion object {
         const val LOGO_MAX_FRAME = 59
     }
 
-    private val viewModel: SplashViewModel by viewModels { viewModelFactory }
+    private val viewModel: NoteListViewModel
+        by navGraphViewModels(R.id.nav_app_graph) { viewModelFactory }
+
+    private val noteObserver: Observer<DataState<List<NoteView>>> = Observer {}
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initLottieLogo()
         initTextLogoGradation()
-        initOval()
-         //viewModel.tryLogin()
-        //findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
-        subscribeLoginResult()
+        binding.splashFragmentContainer.setTransitionListener(this)
     }
 
     private fun initTextLogoGradation(){
@@ -79,46 +84,31 @@ class SplashFragment constructor(
         playAnimation()
     }
 
-    private fun initOval() = binding.splashFragmentContainer.setTransitionListener(object : MotionLayout.TransitionListener{
-        override fun onTransitionStarted(motion: MotionLayout, startId: Int, endId: Int) {
-        }
-
-        override fun onTransitionChange(p0: MotionLayout?, startId: Int, p2: Int, progress: Float) {
-            if (startId == R.id.const_start && progress > 0.2f) {
-                ovalDefaultToYellow(binding.tvOvalRx)
-                ovalDefaultToYellow(binding.tvOvalJet)
-                ovalDefaultToYellow(binding.tvOvalClean)
-            }
-        }
-
-        override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {}
-
-        override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {}
-    })
-
-    override fun initBinding() {
-        println("TODO: dataBinding")
-    }
-
-    private fun subscribeLoginResult() = viewModel.loginResult
-        .observe(viewLifecycleOwner,
-            Observer {
-                if (it != null) {
-                    when (it.status) {
-                        is LOADING -> showLoadingProgressBar(true)
-                        is SUCCESS -> {
-                            showLoadingProgressBar(false)
-                        }
-                        is ERROR -> {
-                            showLoadingProgressBar(false)
-                            showErrorDialog("login fail")
-                        }
-                    }
-                }
-            })
-
     private fun ovalDefaultToYellow(tv: TextView){
         tv.background = ContextCompat.getDrawable(this@SplashFragment.requireContext(), R.drawable.bg_oval_solid)
         tv.changeTextColor(R.color.black)
     }
+
+    override fun onTransitionStarted(motion: MotionLayout, startId: Int, endId: Int) {
+        if (startId == R.id.const_delay){
+            viewModel.noteList.observe(viewLifecycleOwner, noteObserver)
+        }
+    }
+
+    override fun onTransitionChange(p0: MotionLayout?, startId: Int, p2: Int, progress: Float) {
+        if (startId == R.id.const_start && progress > 0.2f) {
+            ovalDefaultToYellow(binding.tvOvalRx)
+            ovalDefaultToYellow(binding.tvOvalJet)
+            ovalDefaultToYellow(binding.tvOvalClean)
+        }
+    }
+
+    override fun onTransitionCompleted(p0: MotionLayout?, state: Int) {
+        if (state == R.id.end) {
+            findNavController().navigate(R.id.action_splashFragment_to_noteListFragment)
+            viewModel.noteList.removeObserver(noteObserver)
+        }
+    }
+
+    override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {}
 }
