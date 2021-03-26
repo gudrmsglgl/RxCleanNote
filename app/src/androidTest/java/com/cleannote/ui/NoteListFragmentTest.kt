@@ -2,6 +2,10 @@ package com.cleannote.ui
 
 import android.content.SharedPreferences
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.MainActivity
@@ -41,6 +45,9 @@ class NoteListFragmentTest: BaseTest() {
     @Inject
     lateinit var sharedPref: SharedPreferences
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @Before
     fun setup(){
         setupUIController()
@@ -52,9 +59,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(emptyList()), query)
 
-        launchFragmentInContainer<NoteListFragment>(
-            factory = fragmentFactory
-        )
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -75,7 +80,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -100,7 +105,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubThrowableNoteRepositorySearchNotes(RuntimeException(errorMsg), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             errorDialog {
@@ -118,7 +123,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             searchToolbar {
@@ -165,7 +170,7 @@ class NoteListFragmentTest: BaseTest() {
         val orderQuery = QueryFactory.makeQuery(cacheOrderReverse())
         stubNoteRepositorySearchNotes(Single.just(orderedNotes), orderQuery)
         
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             searchToolbar{
@@ -212,7 +217,7 @@ class NoteListFragmentTest: BaseTest() {
         val searchedNotes = listOf(note)
         stubNoteRepositorySearchNotes(Single.just(searchedNotes), searchQuery)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             searchToolbar {
@@ -246,7 +251,7 @@ class NoteListFragmentTest: BaseTest() {
         val emptyNotes = emptyList<Note>()
         stubNoteRepositorySearchNotes(Single.just(emptyNotes), searchQuery)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             searchToolbar {
@@ -285,7 +290,7 @@ class NoteListFragmentTest: BaseTest() {
         val endNotes: List<Note> = emptyList()
         stubNoteRepositorySearchNotes(Single.just(endNotes), endQuery)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -334,7 +339,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -357,7 +362,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubNoteRepositoryDelete()
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView{
@@ -382,25 +387,23 @@ class NoteListFragmentTest: BaseTest() {
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDelete(RuntimeException())
 
-        ActivityScenario.launch(MainActivity::class.java)
+        launchFragmentInContainerNavController()
 
-        activity {
-            screenNoteList {
-                recyclerView{
-                    firstItem<NoteItem> {
-                        swipeLeft()
-                        swipeDeleteMenu.click()
-                    }
+        screenNoteList {
+            recyclerView{
+                firstItem<NoteItem> {
+                    swipeLeft()
+                    swipeDeleteMenu.click()
                 }
-                deleteDialog {
-                    positiveBtn.click()
-                }
-                errorDialog {
-                    title.hasText(R.string.dialog_title_error)
-                    positiveBtn.click()
-                }
-                recyclerView.hasSize(notes.size)
             }
+            deleteDialog {
+                positiveBtn.click()
+            }
+            errorDialog {
+                title.hasText(R.string.dialog_title_error)
+                positiveBtn.click()
+            }
+            recyclerView.hasSize(notes.size)
         }
     }
 
@@ -411,7 +414,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -441,7 +444,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(notes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -475,7 +478,7 @@ class NoteListFragmentTest: BaseTest() {
         stubNoteRepositorySearchNotes(Single.just(notes), query)
         stubThrowableNoteRepositoryDeleteMultiNotes(RuntimeException())
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -535,7 +538,7 @@ class NoteListFragmentTest: BaseTest() {
             Single.just(deletedNotes)
         )
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
+        launchFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView {
@@ -585,6 +588,24 @@ class NoteListFragmentTest: BaseTest() {
 
     override fun injectTest() {
         getComponent().inject(this)
+    }
+
+    private fun launchFragmentInContainerNavController(){
+        navController.setViewModelStore(ViewModelStore())
+        navController.setGraph(R.navigation.nav_app_graph)
+        launchFragmentInContainer {
+            NoteListFragment(
+                viewModelFactory,
+                sharedPref
+            ).also { fragment ->
+                fragment.setUIController(mockUIController)
+                fragment.viewLifecycleOwnerLiveData.observeForever { lifecycleOwner ->
+                    if (lifecycleOwner != null) {
+                        Navigation.setViewNavController(fragment.requireView(), navController)
+                    }
+                }
+            }
+        }
     }
 
     private fun cacheOrder() = sharedPref.getString(

@@ -136,6 +136,4 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
     fun <T: ViewDataBinding> bindingInflate(@LayoutRes layoutRes: Int, parent: ViewGroup): T {
         return DataBindingUtil.inflate(LayoutInflater.from(context), layoutRes, parent, false)
     }
-
-    abstract fun initBinding()
 }

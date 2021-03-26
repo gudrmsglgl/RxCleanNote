@@ -6,12 +6,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.cleannote.NoteApplication
 
 import com.cleannote.app.R
@@ -54,7 +53,9 @@ constructor(
 {
 
     private val bundle: Bundle = Bundle()
-    internal val viewModel: NoteListViewModel by viewModels { viewModelFactory }
+    internal val viewModel: NoteListViewModel
+        by navGraphViewModels(R.id.nav_app_graph) { viewModelFactory }
+
     private val tbFactory: NoteListTbFactory by lazy { NoteListTbFactory(this) }
 
     @Inject lateinit var noteAdapter: NoteListAdapter
@@ -89,7 +90,7 @@ constructor(
         }
     }
 
-    override fun initBinding() {
+    private fun initBinding() {
         binding.vm = viewModel
     }
 
@@ -193,14 +194,13 @@ constructor(
         .addCompositeDisposable()
 
     private fun showInputDialog() = activity?.let { context ->
-        InputDialog(context)
+        InputDialog(context, viewLifecycleOwner)
             .setHint(getString(R.string.dialog_new_note_hint))
             .setMessage(getString(R.string.dialog_new_note))
             .onPositiveClick {
                 if (it != null)
                     viewModel.insertNotes(it.transNoteView())
             }
-            .lifecycleOwner(viewLifecycleOwner)
     }
 
     private fun subscribeNoteList() = viewModel

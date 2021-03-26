@@ -3,7 +3,6 @@ package com.cleannote.notedetail.view
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
@@ -52,7 +51,7 @@ class NoteDetailViewFragment(
         appbarOffsetChangeSource()
     }
 
-    override fun initBinding() {
+    private fun initBinding() {
         binding.vm = viewModel
     }
 
