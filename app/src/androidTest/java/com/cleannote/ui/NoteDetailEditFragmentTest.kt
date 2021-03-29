@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.bumptech.glide.RequestManager
+import com.cleannote.TestNoteFragmentFactory
 import com.cleannote.app.R
 import com.cleannote.common.DateUtil
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.edit.NoteDetailEditFragment
 import com.cleannote.test.NoteFactory
+import com.cleannote.ui.base.BaseTest
 import com.cleannote.ui.screen.DetailEditNoteScreen
 import io.mockk.every
 import org.junit.Before

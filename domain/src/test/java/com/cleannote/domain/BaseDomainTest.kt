@@ -1,12 +1,9 @@
 package com.cleannote.domain
 
-import com.cleannote.domain.interactor.UseCase
 import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.nhaarman.mockitokotlin2.mock
-import io.reactivex.Completable
-import io.reactivex.Flowable
 import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseDomainTest<D, Param> {
@@ -21,7 +18,7 @@ abstract class BaseDomainTest<D, Param> {
         repository = mock()
     }
 
-    fun mockRxSchedulers(){
+    private fun mockRxSchedulers(){
         threadExecutor = mock()
         postExecutionThread = mock()
     }

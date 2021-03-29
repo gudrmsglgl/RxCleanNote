@@ -8,6 +8,7 @@ import androidx.navigation.Navigation
 import androidx.test.espresso.IdlingRegistry
 import com.bumptech.glide.RequestManager
 import com.cleannote.DataBindingIdlingResource
+import com.cleannote.TestNoteFragmentFactory
 import com.cleannote.app.R
 import com.cleannote.model.NoteUiModel
 import com.cleannote.monitorFragment
@@ -17,6 +18,7 @@ import com.cleannote.notedetail.Keys.NOTE_DETAIL_BUNDLE_KEY
 import com.cleannote.notedetail.view.GlideLoadState
 import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.cleannote.test.NoteFactory
+import com.cleannote.ui.base.BaseTest
 import com.cleannote.ui.screen.DetailViewScreen
 import io.mockk.every
 import org.junit.After

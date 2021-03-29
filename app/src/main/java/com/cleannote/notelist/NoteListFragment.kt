@@ -131,6 +131,7 @@ constructor(
             else
                 noteAdapter.deleteNotChecked(it.first)
         }
+        .addCompositeDisposable()
 
     private fun noteOnLongClick() = noteAdapter
         .subjectManager

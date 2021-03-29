@@ -1,4 +1,4 @@
-package com.cleannote.ui
+package com.cleannote
 
 import android.content.SharedPreferences
 import androidx.fragment.app.Fragment

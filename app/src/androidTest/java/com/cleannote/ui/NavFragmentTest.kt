@@ -9,6 +9,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.bumptech.glide.RequestManager
+import com.cleannote.TestNoteFragmentFactory
 import com.cleannote.app.R
 import com.cleannote.common.DateUtil
 import com.cleannote.domain.Constants
@@ -16,6 +17,8 @@ import com.cleannote.notedetail.edit.NoteDetailEditFragment
 import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
+import com.cleannote.ui.base.BaseTest
+import com.cleannote.ui.base.NoteItem
 import com.cleannote.ui.screen.DetailEditNoteScreen
 import com.cleannote.ui.screen.NoteListScreen
 import io.mockk.every
@@ -56,16 +59,12 @@ class NavFragmentTest: BaseTest() {
 
     @Test
     fun noteListItemClickThenNavDetailView_onAndroid(){
-        navController.setGraph(R.navigation.nav_app_graph)
         val stubNotes = NoteFactory.makeNotes(10, cacheOrder())
         val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(stubNotes), query)
 
-        launchFragmentInContainer<NoteListFragment>(factory = fragmentFactory)
-            .onFragment {
-                Navigation.setViewNavController(it.requireView(), navController)
-            }
+        launchNoteListFragmentInContainerNavController()
 
         screenNoteList {
             recyclerView.firstItem<NoteItem> {
@@ -113,6 +112,25 @@ class NavFragmentTest: BaseTest() {
             errorDialog.positiveBtn.click()
         }
         navController.isCurDestId(R.id.noteDetailEditFragment)
+    }
+
+    private fun launchNoteListFragmentInContainerNavController(){
+        navController.setViewModelStore(ViewModelStore())
+        navController.setGraph(R.navigation.nav_app_graph)
+        navController.setCurrentDestination(R.id.noteListFragment)
+        launchFragmentInContainer {
+            NoteListFragment(
+                viewModelFactory,
+                sharedPref
+            ).also { fragment ->
+                fragment.setUIController(mockUIController)
+                fragment.viewLifecycleOwnerLiveData.observeForever { lifecycleOwner ->
+                    if (lifecycleOwner != null) {
+                        Navigation.setViewNavController(fragment.requireView(), navController)
+                    }
+                }
+            }
+        }
     }
 
     private fun launchDetailEditFragmentInContainerNavController(){

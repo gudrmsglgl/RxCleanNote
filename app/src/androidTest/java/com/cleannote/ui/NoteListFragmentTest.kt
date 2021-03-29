@@ -2,13 +2,13 @@ package com.cleannote.ui
 
 import android.content.SharedPreferences
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.MainActivity
+import com.cleannote.TestNoteFragmentFactory
 import com.cleannote.ui.screen.MainActivityScreen
 import com.cleannote.ui.screen.NoteListScreen
 import com.cleannote.app.R
@@ -20,6 +20,8 @@ import com.cleannote.notelist.NoteListFragment
 import com.cleannote.test.NoteFactory
 import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
+import com.cleannote.ui.base.BaseTest
+import com.cleannote.ui.base.NoteItem
 import io.mockk.every
 import io.reactivex.Single
 import org.junit.*

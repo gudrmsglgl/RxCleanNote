@@ -4,12 +4,10 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -23,9 +21,7 @@ import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
-import com.cleannote.presentation.splash.SplashViewModel
 import com.jakewharton.rxbinding4.view.layoutChangeEvents
-import timber.log.Timber
 
 
 class SplashFragment constructor(
