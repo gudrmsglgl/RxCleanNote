@@ -7,6 +7,6 @@ class DataStoreStubberContainer(
     private val rDataStore: NoteRemoteDataStore,
     private val cDataStore: NoteCacheDataStore
 ): Stubber<DataStoreStubberContainer>() {
-    val remoteDataStore: NoteRemoteDataStoreStubber = NoteRemoteDataStoreStubber(rDataStore)
-    val cacheDataStore: NoteCacheDataStoreStubber = NoteCacheDataStoreStubber(cDataStore)
+    val rDataStoreStubber: NoteRemoteDataStoreStubber = NoteRemoteDataStoreStubber(rDataStore)
+    val cDataStoreStubber: NoteCacheDataStoreStubber = NoteCacheDataStoreStubber(cDataStore)
 }

@@ -3,7 +3,7 @@ package com.cleannote.data.repository
 import com.cleannote.data.BaseNoteRepositoryTest
 import com.cleannote.data.extensions.transNoteEntity
 import com.cleannote.data.test.factory.NoteFactory
-import com.nhaarman.mockitokotlin2.verify
+import com.cleannote.domain.model.Note
 import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -16,15 +16,14 @@ class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
         val note = NoteFactory.createNote(id = "#1", title = "deleted")
 
         stubContainer {
-            cacheDataStore.stubDeleteNote(param = note.transNoteEntity(), stub = Completable.complete())
+            cDataStoreStubber.deleteNote(param = note.transNoteEntity(), stub = Completable.complete())
         }
 
         whenDataRepositoryDeleteNote(note)
             .test()
 
-        verifyContainer {
-            verify(cacheDataStore)
-                .deleteNote(note.transNoteEntity())
+        dataStoreVerifyScope {
+            deleteNote(note.transNoteEntity())
         }
     }
 
@@ -34,7 +33,7 @@ class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
         val note = NoteFactory.createNote(id = "#1", title = "deleted")
 
         stubContainer {
-            cacheDataStore.stubDeleteNote(param = note.transNoteEntity(), stub = Completable.complete())
+            cDataStoreStubber.deleteNote(param = note.transNoteEntity(), stub = Completable.complete())
         }
 
         whenDataRepositoryDeleteNote(note)
@@ -48,7 +47,7 @@ class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
         val note = NoteFactory.createNote(id = "#1", title = "deleted")
 
         stubContainer {
-            cacheDataStore.stubDeleteNote(param = note.transNoteEntity(), stub = Completable.complete())
+            cDataStoreStubber.deleteNote(param = note.transNoteEntity(), stub = Completable.complete())
         }
 
         whenDataRepositoryDeleteNote(note)
@@ -56,4 +55,5 @@ class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
             .assertNoValues()
     }
 
+    private fun whenDataRepositoryDeleteNote(note: Note) = noteDataRepository.deleteNote(note)
 }

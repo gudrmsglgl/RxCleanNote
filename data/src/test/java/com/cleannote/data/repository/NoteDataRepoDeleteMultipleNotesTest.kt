@@ -3,7 +3,7 @@ package com.cleannote.data.repository
 import com.cleannote.data.BaseNoteRepositoryTest
 import com.cleannote.data.extensions.transNoteEntityList
 import com.cleannote.data.test.factory.NoteFactory
-import com.nhaarman.mockitokotlin2.verify
+import com.cleannote.domain.model.Note
 import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -16,15 +16,14 @@ class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
         val selectedNotes = NoteFactory.createNoteList(0,5)
 
         stubContainer {
-            cacheDataStore.stubDeleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
+            cDataStoreStubber.deleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
         }
 
         whenDataRepositoryDeleteMultiNotes(selectedNotes)
             .test()
 
-        verifyContainer {
-            verify(cacheDataStore)
-                .deleteMultipleNotes(selectedNotes.transNoteEntityList())
+        dataStoreVerifyScope {
+            deleteMultipleNotes(selectedNotes.transNoteEntityList())
         }
     }
 
@@ -34,7 +33,7 @@ class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
         val selectedNotes = NoteFactory.createNoteList(0,5)
 
         stubContainer {
-            cacheDataStore.stubDeleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
+            cDataStoreStubber.deleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
         }
 
         whenDataRepositoryDeleteMultiNotes(selectedNotes)
@@ -48,7 +47,7 @@ class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
         val selectedNotes = NoteFactory.createNoteList(0,5)
 
         stubContainer {
-            cacheDataStore.stubDeleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
+            cDataStoreStubber.deleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
         }
 
         whenDataRepositoryDeleteMultiNotes(selectedNotes)
@@ -56,4 +55,5 @@ class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
             .assertNoValues()
     }
 
+    private fun whenDataRepositoryDeleteMultiNotes(notes: List<Note>) = noteDataRepository.deleteMultipleNotes(notes)
 }

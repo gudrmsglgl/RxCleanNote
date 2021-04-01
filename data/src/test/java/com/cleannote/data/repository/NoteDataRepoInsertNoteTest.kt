@@ -20,20 +20,19 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: Call RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
     fun remoteCacheDataStoreSuccessThenCallRemoteCacheDataStore(){
         stubContainer {
-            remoteDataStore
-                .stubInsertNote(param = noteEntity, stub = Completable.complete())
-            cacheDataStore
-                .stubInsertNote(param = noteEntity, stub = successRow)
+            rDataStoreStubber
+                .insertNote(param = noteEntity, stub = Completable.complete())
+            cDataStoreStubber
+                .insertNote(param = noteEntity, stub = successRow)
         }
 
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer {
-            verify(cacheDataStore)
-                .insertCacheNewNote(noteEntity)
-            verify(remoteDataStore)
-                .insertRemoteNewNote(noteEntity)
+        dataStoreVerifyScope {
+            cacheInsertNote(noteEntity)
+            times(1)
+                .remoteInsertNote(noteEntity)
         }
     }
 
@@ -41,21 +40,20 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: CacheStore InsertCacheNewNote -> RemoteStore InsertRemoteNewNote")
     fun verifyOrderingFirstCacheDataStoreNextRemoteDataStore(){
         stubContainer {
-            remoteDataStore
-                .stubInsertNote(param = noteEntity, stub = Completable.complete())
-            cacheDataStore
-                .stubInsertNote(param = noteEntity, stub = successRow)
+            rDataStoreStubber
+                .insertNote(param = noteEntity, stub = Completable.complete())
+            cDataStoreStubber
+                .insertNote(param = noteEntity, stub = successRow)
         }
 
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer {
-            inOrder(cacheDataStore, remoteDataStore){
-                verify(cacheDataStore)
-                    .insertCacheNewNote(noteEntity)
-                verify(remoteDataStore)
-                    .insertRemoteNewNote(noteEntity)
+        dataStoreVerifyScope {
+            inOrder(cDataStore, rDataStore){
+                cacheInsertNote(noteEntity)
+                times(1)
+                    .remoteInsertNote(noteEntity)
             }
         }
     }
@@ -64,10 +62,10 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: AssertComplete")
     fun cacheAndRemoteStoreSuccessThenAssertComplete(){
         stubContainer {
-            remoteDataStore
-                .stubInsertNote(param = noteEntity, stub = Completable.complete())
-            cacheDataStore
-                .stubInsertNote(param = noteEntity, stub = successRow)
+            rDataStoreStubber
+                .insertNote(param = noteEntity, stub = Completable.complete())
+            cDataStoreStubber
+                .insertNote(param = noteEntity, stub = successRow)
         }
 
         whenDataRepositoryInsertNote(note)
@@ -79,10 +77,10 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Complete, Cache SuccessRow]: AssertValue -> successRow ")
     fun cacheAndRemoteStoreSuccessThenAssertValueSuccessRow(){
         stubContainer {
-            remoteDataStore
-                .stubInsertNote(param = noteEntity, stub = Completable.complete())
-            cacheDataStore
-                .stubInsertNote(param = noteEntity, stub = successRow)
+            rDataStoreStubber
+                .insertNote(param = noteEntity, stub = Completable.complete())
+            cDataStoreStubber
+                .insertNote(param = noteEntity, stub = successRow)
         }
 
         whenDataRepositoryInsertNote(note)
@@ -94,20 +92,19 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    @DisplayName("TestCase[Cache Throwable]: Call CacheDataStore Insert ⭕ RemoteDataStore ❌")
    fun cacheDataStoreThrowThenOnlyCallCacheDataStore(){
        stubContainer {
-           remoteDataStore
-               .stubInsertNote(param = noteEntity, stub = Completable.complete())
-           cacheDataStore
-               .stubInsertThrowable(param = noteEntity, stub = RuntimeException())
+           rDataStoreStubber
+               .insertNote(param = noteEntity, stub = Completable.complete())
+           cDataStoreStubber
+               .insertThrowable(param = noteEntity, stub = RuntimeException())
        }
 
        whenDataRepositoryInsertNote(note)
            .test()
 
-       verifyContainer {
-           verify(cacheDataStore)
-               .insertCacheNewNote(noteEntity)
-           verify(remoteDataStore, never())
-               .insertRemoteNewNote(noteEntity)
+       dataStoreVerifyScope {
+           cacheInsertNote(noteEntity)
+           never()
+               .remoteInsertNote(noteEntity)
        }
    }
 
@@ -115,10 +112,10 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    @DisplayName("TestCase[Cache Throwable]: NoteDataRepo AssertComplete")
    fun cacheStoreThrowableThenAssertComplete(){
        stubContainer {
-           remoteDataStore
-               .stubInsertNote(param = noteEntity, stub = Completable.complete())
-           cacheDataStore
-               .stubInsertThrowable(param = noteEntity, stub = RuntimeException())
+           rDataStoreStubber
+               .insertNote(param = noteEntity, stub = Completable.complete())
+           cDataStoreStubber
+               .insertThrowable(param = noteEntity, stub = RuntimeException())
        }
 
        whenDataRepositoryInsertNote(note)
@@ -130,10 +127,10 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
    @DisplayName("TestCase[Cache Throwable]: AssertValue -> FailRow[-1L]")
    fun cacheAndRemoteStoreSuccessThenAssertValueFailRow(){
        stubContainer {
-           remoteDataStore
-               .stubInsertNote(param = noteEntity, stub = Completable.complete())
-           cacheDataStore
-               .stubInsertThrowable(param = noteEntity, stub = RuntimeException())
+           rDataStoreStubber
+               .insertNote(param = noteEntity, stub = Completable.complete())
+           cDataStoreStubber
+               .insertThrowable(param = noteEntity, stub = RuntimeException())
        }
 
        whenDataRepositoryInsertNote(note)
@@ -145,20 +142,19 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: Call RemoteDataStore Insert ⭕ CacheDataStore Insert ⭕")
     fun cacheDataStoreSuccessRemoteStoreThrowThenCallRemoteCacheDataStore(){
         stubContainer {
-            remoteDataStore
-                .stubInsertThrowable(noteEntity, RuntimeException())
-            cacheDataStore
-                .stubInsertNote(noteEntity, successRow)
+            rDataStoreStubber
+                .insertThrowable(noteEntity, RuntimeException())
+            cDataStoreStubber
+                .insertNote(noteEntity, successRow)
         }
 
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
-                .insertRemoteNewNote(noteEntity)
-            verify(cacheDataStore)
-                .insertCacheNewNote(noteEntity)
+        dataStoreVerifyScope {
+            times(1)
+                .remoteInsertNote(noteEntity)
+            cacheInsertNote(noteEntity)
         }
     }
     
@@ -166,21 +162,20 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: CacheStore Insert -> RemoteStore Insert")
     fun verifyOrderingFirstCacheStoreNextRemoteStore(){
         stubContainer {
-            remoteDataStore
-                .stubInsertThrowable(noteEntity, RuntimeException())
-            cacheDataStore
-                .stubInsertNote(noteEntity, successRow)
+            rDataStoreStubber
+                .insertThrowable(noteEntity, RuntimeException())
+            cDataStoreStubber
+                .insertNote(noteEntity, successRow)
         }
 
         whenDataRepositoryInsertNote(note)
             .test()
 
-        verifyContainer {
-            inOrder(cacheDataStore, remoteDataStore){
-                verify(cacheDataStore)
-                    .insertCacheNewNote(noteEntity)
-                verify(remoteDataStore)
-                    .insertRemoteNewNote(noteEntity)
+        dataStoreVerifyScope {
+            inOrder(cDataStore, rDataStore){
+                cacheInsertNote(noteEntity)
+                times(1)
+                    .remoteInsertNote(noteEntity)
             }
         }
     }
@@ -189,8 +184,8 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: AssertComplete")
     fun cacheStoreSuccessRemoteThrowableThenAssertComplete(){
         stubContainer {
-            remoteDataStore.stubInsertThrowable(noteEntity, RuntimeException())
-            cacheDataStore.stubInsertNote(noteEntity, successRow)
+            rDataStoreStubber.insertThrowable(noteEntity, RuntimeException())
+            cDataStoreStubber.insertNote(noteEntity, successRow)
         }
 
         whenDataRepositoryInsertNote(note)
@@ -202,10 +197,10 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
     @DisplayName("TestCase[Remote Throwable, Cache SuccessRow]: AssertValue -> SuccessRow")
     fun cacheStoreSuccessRemoteThrowableThenAssertValueSuccessRow(){
         stubContainer {
-            remoteDataStore
-                .stubInsertThrowable(noteEntity, RuntimeException())
-            cacheDataStore
-                .stubInsertNote(noteEntity, successRow)
+            rDataStoreStubber
+                .insertThrowable(noteEntity, RuntimeException())
+            cDataStoreStubber
+                .insertNote(noteEntity, successRow)
         }
 
         whenDataRepositoryInsertNote(note)
@@ -213,4 +208,5 @@ class NoteDataRepoInsertNoteTest: BaseNoteRepositoryTest() {
             .assertValue(successRow)
     }
 
+    private fun whenDataRepositoryInsertNote(note: Note) = noteDataRepository.insertNewNote(note)
 }

@@ -6,6 +6,7 @@ import com.cleannote.data.extensions.transQueryEntity
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.test.factory.NoteFactory
 import com.cleannote.data.test.factory.QueryFactory
+import com.cleannote.domain.model.Query
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
@@ -22,13 +23,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -36,11 +37,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
-            verify(cacheDataStore, never())
-                .searchNotes(defaultQuery.transQueryEntity())
+        dataStoreVerifyScope {
+            times(1)
+                .remoteSearchNotes (defaultQuery.transQueryEntity())
+            never()
+                .cacheSearchNotes(defaultQuery.transQueryEntity())
         }
     }
 
@@ -53,13 +54,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -67,23 +68,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore)
-                    .isCached(defaultQuery.page)
-                cacheDataStore
-                    .expectPageIsCached (defaultQuery.page to false)
-
-                verify(remoteDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore)
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                times(1).isCached(defaultQuery.page)
+                expectPageIsCached (defaultQuery.page to false)
+                times(1)
+                    .remoteSearchNotes(defaultQuery.transQueryEntity())
+                times(1)
                     .saveNotes(remoteNote, defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore, never())
-                    .searchNotes(defaultQuery.transQueryEntity())
-
+                never()
+                    .cacheSearchNotes(defaultQuery.transQueryEntity())
             }
         }
     }
@@ -97,13 +91,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -122,13 +116,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때 "){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -147,13 +141,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -161,11 +155,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
-            verify(cacheDataStore, never())
-                .searchNotes(defaultQuery.transQueryEntity())
+        dataStoreVerifyScope {
+            times(1)
+                .remoteSearchNotes(defaultQuery.transQueryEntity())
+            never()
+                .cacheSearchNotes(defaultQuery.transQueryEntity())
         }
     }
     
@@ -178,13 +172,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -192,23 +186,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore)
-                    .isCached(defaultQuery.page)
-                cacheDataStore
-                    .expectPageIsCached (defaultQuery.page to false)
-
-                verify(remoteDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore)
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                times(1).isCached(defaultQuery.page)
+                expectPageIsCached(defaultQuery.page to false)
+                times(1)
+                    .remoteSearchNotes(defaultQuery.transQueryEntity())
+                times(1)
                     .saveNotes(remoteNote, defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore, never())
-                    .searchNotes(defaultQuery.transQueryEntity())
-
+                never()
+                    .cacheSearchNotes(defaultQuery.transQueryEntity())
             }
         }
     }
@@ -222,13 +209,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -247,13 +234,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
                 }
             }
         }
@@ -272,14 +259,14 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -287,11 +274,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
-            verify(cacheDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
+        dataStoreVerifyScope {
+            times(1)
+                .remoteSearchNotes(defaultQuery.transQueryEntity())
+            times(1)
+                .cacheSearchNotes(defaultQuery.transQueryEntity())
         }
     }
 
@@ -304,14 +291,14 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -319,23 +306,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore)
-                    .isCached(defaultQuery.page)
-                cacheDataStore
-                    .expectPageIsCached (defaultQuery.page to false)
-
-                verify(remoteDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore)
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                times(1).isCached(defaultQuery.page)
+                expectPageIsCached(defaultQuery.page to false)
+                times(1)
+                    .remoteSearchNotes(defaultQuery.transQueryEntity())
+                times(1)
                     .saveNotes(remoteNote, defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
+                times(1)
+                    .cacheSearchNotes (defaultQuery.transQueryEntity())
             }
         }
     }
@@ -349,14 +329,14 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -375,14 +355,14 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubSaveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -400,13 +380,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
-                remoteDataStore {
-
-                }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                rDataStoreStubber {}
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = true)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -414,11 +392,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            verify(cacheDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
-            verify(remoteDataStore, never())
-                .searchNotes(defaultQuery.transQueryEntity())
+        dataStoreVerifyScope {
+            never()
+                .remoteSearchNotes(defaultQuery.transQueryEntity())
+            times(1)
+                .cacheSearchNotes(defaultQuery.transQueryEntity())
         }
     }
 
@@ -430,13 +408,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
-                remoteDataStore {
-
-                }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                rDataStoreStubber {}
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = true)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -444,23 +420,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore)
-                    .isCached(defaultQuery.page)
-                cacheDataStore
-                    .expectPageIsCached (defaultQuery.page to true)
-
-                verify(remoteDataStore, never())
-                    .searchNotes(defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore, never())
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                times(1).isCached(defaultQuery.page)
+                expectPageIsCached(defaultQuery.page to true)
+                never()
+                    .remoteSearchNotes(defaultQuery.transQueryEntity())
+                never()
                     .saveNotes(listOf(), defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
+                times(1)
+                    .cacheSearchNotes(defaultQuery.transQueryEntity())
             }
         }
     }
@@ -473,13 +442,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
-                remoteDataStore {
-
-                }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                rDataStoreStubber {}
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = true)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -497,13 +464,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
-                remoteDataStore {
-
-                }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = true)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                rDataStoreStubber {}
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = true)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -521,11 +486,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재할 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSaveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
+                cDataStoreStubber {
+                    saveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
                 }
             }
         }
@@ -533,11 +498,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(searchQuery)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
-                .searchNotes(searchQuery.transQueryEntity())
-            verify(cacheDataStore, never())
-                .searchNotes(searchQuery.transQueryEntity())
+        dataStoreVerifyScope {
+            times(1)
+                .remoteSearchNotes(searchQuery.transQueryEntity())
+            never()
+                .cacheSearchNotes(searchQuery.transQueryEntity())
         }
 
     }
@@ -550,11 +515,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재할 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSaveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
+                cDataStoreStubber {
+                    saveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
                 }
             }
         }
@@ -562,21 +527,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(searchQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore, never())
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                never()
                     .isCached(searchQuery.page)
-
-                verify(remoteDataStore)
-                    .searchNotes(searchQuery.transQueryEntity())
-
-                verify(cacheDataStore)
+                times(1)
+                    .remoteSearchNotes(searchQuery.transQueryEntity())
+                times(1)
                     .saveNotes(remoteNote, searchQuery.transQueryEntity())
-
-                verify(cacheDataStore, never())
-                    .searchNotes(searchQuery.transQueryEntity())
-
+                never()
+                    .cacheSearchNotes(searchQuery.transQueryEntity())
             }
         }
     }
@@ -589,11 +549,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재할 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSaveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
+                cDataStoreStubber {
+                    saveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
                 }
             }
         }
@@ -611,11 +571,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재할 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSaveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
+                cDataStoreStubber {
+                    saveNotes(remoteNote, searchQuery.transQueryEntity(), Completable.complete())
                 }
             }
         }
@@ -634,11 +594,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -646,10 +606,10 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(searchQuery)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
+        dataStoreVerifyScope {
+            verify(rDataStore)
                 .searchNotes(searchQuery.transQueryEntity())
-            verify(cacheDataStore)
+            verify(cDataStore)
                 .searchNotes(searchQuery.transQueryEntity())
         }
     }
@@ -663,11 +623,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -675,21 +635,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(searchQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore, never())
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                never()
                     .isCached(searchQuery.page)
-
-                verify(remoteDataStore)
-                    .searchNotes(searchQuery.transQueryEntity())
-
-                verify(cacheDataStore, never())
+                times(1)
+                    .remoteSearchNotes(searchQuery.transQueryEntity())
+                never()
                     .saveNotes(remoteNote, searchQuery.transQueryEntity())
-
-                verify(cacheDataStore)
-                    .searchNotes(searchQuery.transQueryEntity())
-
+                times(1)
+                    .cacheSearchNotes(searchQuery.transQueryEntity())
             }
         }
     }
@@ -703,11 +658,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -726,11 +681,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubSearchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    searchNotes(param = searchQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -749,13 +704,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -763,11 +718,11 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            verify(remoteDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
-            verify(cacheDataStore)
-                .searchNotes(defaultQuery.transQueryEntity())
+        dataStoreVerifyScope {
+            times(1)
+                .remoteSearchNotes(defaultQuery.transQueryEntity())
+            times(1)
+                .cacheSearchNotes(defaultQuery.transQueryEntity())
         }
     }
 
@@ -780,13 +735,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -794,23 +749,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
         whenDataRepositorySearchNotes(defaultQuery)
             .test()
 
-        verifyContainer {
-            inOrder(remoteDataStore, cacheDataStore){
-
-                verify(cacheDataStore)
-                    .isCached(defaultQuery.page)
-                cacheDataStore
-                    .expectPageIsCached(defaultQuery.page to false)
-
-                verify(remoteDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore, never())
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore){
+                times(1).isCached(defaultQuery.page)
+                expectPageIsCached(defaultQuery.page to false)
+                times(1)
+                    .remoteSearchNotes(defaultQuery.transQueryEntity())
+                never()
                     .saveNotes(remoteNote, defaultQuery.transQueryEntity())
-
-                verify(cacheDataStore)
-                    .searchNotes(defaultQuery.transQueryEntity())
-
+                times(1)
+                    .cacheSearchNotes(defaultQuery.transQueryEntity())
             }
         }
     }
@@ -824,13 +772,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -849,13 +797,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
         stubContainer {
             scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
-                remoteDataStore {
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
-                cacheDataStore {
-                    stubPageIsCache(param = defaultQuery.page, stub = false)
-                    stubCurrentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                    stubSearchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = cacheNote)
                 }
             }
         }
@@ -864,5 +812,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
             .assertValue(cacheNote.transNoteList())
     }
+
+    private fun whenDataRepositorySearchNotes(query: Query) = noteDataRepository.searchNotes(query)
 
 }
