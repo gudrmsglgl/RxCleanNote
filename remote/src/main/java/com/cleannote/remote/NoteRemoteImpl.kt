@@ -4,8 +4,11 @@ import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.model.UserEntity
 import com.cleannote.data.repository.NoteRemote
-import com.cleannote.remote.extensions.transNoteEntities
-import com.cleannote.remote.extensions.transUserEntities
+import com.cleannote.remote.extensions.*
+import com.cleannote.remote.extensions.NETWORK
+import com.cleannote.remote.extensions.TIMEOUT
+import com.cleannote.remote.extensions.applyRetryPolicy
+import com.cleannote.remote.model.NoteModel
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -39,8 +42,10 @@ class NoteRemoteImpl
             queryEntity.order,
             queryEntity.like,
             queryEntity.like
-        ).onErrorResumeNext(
-            Single.just(emptyList())
+        ).compose(
+            applyRetryPolicy(TIMEOUT, NETWORK, SERVICE_UNAVAILABLE) {
+                Single.just(emptyList<NoteModel>())
+            }
         ).map {
             it.transNoteEntities()
         }

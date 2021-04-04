@@ -63,6 +63,10 @@
     <string name="tv_rx">Rx</string>
     <string name="tv_clean_note">CleanNote</string>
 
+    <!-- NoteList -->
+    <string name="tv_warning">Wifi Cellular Not Connected</string>
+
+
     <!-- DetailEdit Footer -->
     <string name="tv_footer_add">사진 추가하기</string>
     <string name="tv_footer_no_images">첨부된 사진이 존재하지 않습니다.</string>
