@@ -1,6 +1,7 @@
 package com.cleannote.notelist
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.bumptech.glide.RequestManager
 import com.cleannote.NoteApplication
 
 import com.cleannote.app.R
@@ -38,6 +40,7 @@ import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.model.NoteView
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
+import dagger.Provides
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.layout_search_toolbar.view.*
 import java.util.concurrent.TimeUnit
@@ -53,13 +56,15 @@ constructor(
 {
 
     private val bundle: Bundle = Bundle()
+
+    @Inject lateinit var glideReqManager: RequestManager
+    @Inject lateinit var subjectManager: SubjectManager
+
     internal val viewModel: NoteListViewModel
         by navGraphViewModels(R.id.nav_app_graph) { viewModelFactory }
-
     private val tbFactory: NoteListTbFactory by lazy { NoteListTbFactory(this) }
-
-    @Inject lateinit var noteAdapter: NoteListAdapter
-    @Inject lateinit var swipeHelperCallback: SwipeHelperCallback
+    internal var noteAdapter by autoCleared<NoteListAdapter>()
+    private var swipeHelperCallback by autoCleared<SwipeHelperCallback>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -156,10 +161,10 @@ constructor(
         .apply {
             addItemDecoration(TopSpacingItemDecoration(20))
             setHasFixedSize(true)
+            assignNoteAdapter()
+            assignSwipeCallback()
 
-            ItemTouchHelper(
-                swipeHelperCallback.apply { setSwipeAdapter(this@NoteListFragment) }
-            ).attachToRecyclerView(this)
+            ItemTouchHelper(swipeHelperCallback).attachToRecyclerView(this)
 
             adapter = noteAdapter
 
@@ -331,6 +336,23 @@ constructor(
         Handler().postDelayed({
             binding.recyclerView.scrollToPosition(0)
         }, 100L)
+    }
+
+    private fun assignNoteAdapter() = NoteListAdapter(
+        this.requireContext(),
+        glideReqManager,
+        subjectManager
+    ).also {
+        it.setHasStableIds(true)
+        noteAdapter = it
+    }
+
+    private fun assignSwipeCallback() = SwipeHelperCallback(
+        clamp = this.requireContext().resources.getDimension(R.dimen.swipe_delete_clamp),
+        extendClamp = this.requireContext().resources.getDimension(R.dimen.swipe_clamp_extend)
+    ).also {
+        it.setSwipeAdapter(this@NoteListFragment)
+        swipeHelperCallback = it
     }
 
     private fun swipeDeleteMenuClose() = swipeHelperCallback.previousDeleteMenuClose(binding.recyclerView)
