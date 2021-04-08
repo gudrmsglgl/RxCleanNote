@@ -18,6 +18,7 @@ import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailEditBinding
 import com.cleannote.common.BaseFragment
 import com.cleannote.common.DateUtil
+import com.cleannote.common.autoCleared
 import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.extension.*
 import com.cleannote.extension.menu.showImageLoaderMenu
@@ -55,7 +56,7 @@ class NoteDetailEditFragment constructor(
             by lazy { ImageLoader(this, glideRequestManager) }
     private val lottieLoadingDialog: LoadingImageUpdateDialog
             by lazy { LoadingImageUpdateDialog.newInstance() }
-    private lateinit var imageAdapter: EditImagesAdapter
+    private var imageAdapter by autoCleared<EditImagesAdapter>()
 
     private val collapseBoundary = -85
     private var hasKeyOnBackPress: String? = null

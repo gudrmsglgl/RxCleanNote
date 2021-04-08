@@ -12,9 +12,9 @@ import com.cleannote.notedetail.holder.DetailViewImgHolder
 
 class ImageViewAdapter(
     private val requestManager: RequestManager
-): ListAdapter<NoteImageUiModel, DetailViewImgHolder>(DIFF_CALLBACK) {
+): ListAdapter<NoteImageUiModel, DetailViewImgHolder>(DiffCallback) {
 
-    object DIFF_CALLBACK: DiffUtil.ItemCallback<NoteImageUiModel>(){
+    object DiffCallback: DiffUtil.ItemCallback<NoteImageUiModel>(){
         override fun areItemsTheSame(
             oldItem: NoteImageUiModel,
             newItem: NoteImageUiModel
