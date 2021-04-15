@@ -46,4 +46,8 @@ class NoteCacheDataStoreStubber(
     fun deleteMultipleNotes(param: List<NoteEntity>, stub: Completable){
         whenever(cacheDataStore.deleteMultipleNotes(param)).thenReturn(stub)
     }
+
+    fun nextPageExist(param: QueryEntity, stub: Boolean) {
+        whenever(cacheDataStore.nextPageExist(param)).thenReturn(Single.just(stub))
+    }
 }

@@ -6,16 +6,10 @@ import com.cleannote.data.test.factory.NoteFactory
 import com.cleannote.data.test.factory.QueryFactory
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
-import java.lang.invoke.MethodHandles.catchException
 
 class NoteCacheDataStoreTest {
 
@@ -37,6 +31,7 @@ class NoteCacheDataStoreTest {
             on { deleteNote(noteEntity)} doReturn Completable.complete()
             on { deleteMultipleNotes(noteEntities)} doReturn Completable.complete()
             on { currentPageNoteSize(queryEntity) } doReturn Single.just(noteEntities.size)
+            on { nextPageExist(queryEntity) } doReturn Single.just(true)
         }
         noteCacheDataStore = NoteCacheDataStore(noteCache)
     }
@@ -63,9 +58,9 @@ class NoteCacheDataStoreTest {
 
     @Test
     fun insertRemoteNoteReturnThrow(){
-        Assertions.assertThrows(UnsupportedOperationException::class.java, Executable {
+        Assertions.assertThrows(UnsupportedOperationException::class.java){
             noteCacheDataStore.insertRemoteNewNote(noteEntity)
-        })
+        }
     }
 
     @Test
@@ -198,6 +193,29 @@ class NoteCacheDataStoreTest {
             .assertValue(noteEntities.size)
     }
 
+    @Test
+    fun nextPageExistCallCacheFunc(){
+        noteCacheDataStore
+            .nextPageExist(queryEntity)
+            .test()
+        verify(noteCache).nextPageExist(queryEntity)
+    }
+
+    @Test
+    fun nextPageExistComplete(){
+        noteCacheDataStore
+            .nextPageExist(queryEntity)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun nextPageExistReturnValueBool(){
+        noteCacheDataStore
+            .nextPageExist(queryEntity)
+            .test()
+            .assertValue(true)
+    }
 }
 
 
