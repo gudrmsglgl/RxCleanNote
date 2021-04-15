@@ -129,12 +129,11 @@ constructor(
     private fun noteOnCheck() = noteAdapter
         .subjectManager
         .checkNoteSubject
-        .subscribe {
-            val isChecked = it.second
+        .subscribe { (note, isChecked) ->
             if (isChecked)
-                noteAdapter.deleteChecked(it.first)
+                noteAdapter.deleteChecked(note)
             else
-                noteAdapter.deleteNotChecked(it.first)
+                noteAdapter.deleteNotChecked(note)
         }
         .addCompositeDisposable()
 

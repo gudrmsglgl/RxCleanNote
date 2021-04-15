@@ -43,4 +43,5 @@ class DataStoreVerifyScope(
     fun updateNote(param: NoteEntity) = verify(cDataStore).updateNote(param)
     fun deleteNote(param: NoteEntity) = verify(cDataStore).deleteNote(param)
     fun deleteMultipleNotes(param: List<NoteEntity>) = verify(cDataStore).deleteMultipleNotes(param)
+    fun nextPageExist(param: QueryEntity) = verify(cDataStore).nextPageExist(param)
 }
