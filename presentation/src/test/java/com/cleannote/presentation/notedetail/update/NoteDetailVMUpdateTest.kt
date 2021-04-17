@@ -1,6 +1,6 @@
 package com.cleannote.presentation.notedetail.update
 
-import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.notedetail.TextMode
 import com.cleannote.presentation.notedetail.NoteDetailViewModelTest
 import com.cleannote.presentation.notedetail.update.tester.UpdateFeatureTester
@@ -10,24 +10,24 @@ import com.nhaarman.mockitokotlin2.times
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
+class NoteDetailVMUpdateTest : NoteDetailViewModelTest() {
 
     private lateinit var updateFeatureTester: UpdateFeatureTester
     private lateinit var captors: UpdateUseCaseCaptors
 
     private val defaultNoteView
-        get() = NoteFactory.createNoteView(id = "#1",title = "defaultTitle",body = "defaultBody", date = "2020-12-30 08:00:00")
+        get() = NoteFactory.createNoteView(id = "#1", title = "defaultTitle", body = "defaultBody", date = "2020-12-30 08:00:00")
 
     @BeforeEach
-    fun updateTestSetup(){
+    fun updateTestSetup() {
         captors = UpdateUseCaseCaptors()
         updateFeatureTester = UpdateFeatureTester(viewModel, updateNote, captors)
     }
 
     @Test
-    fun updateNoteExecuteUseCase(){
+    fun updateNoteExecuteUseCase() {
         val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
                 .expectNoteMode(TextMode.DefaultMode)
@@ -40,9 +40,9 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
     }
 
     @Test
-    fun updateNoteStateLoadingReturnNoData(){
+    fun updateNoteStateLoadingReturnNoData() {
         val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
                 .expectNoteMode(TextMode.DefaultMode)
@@ -51,7 +51,7 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
             editDoneMode(editNoteView)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
                 .expectData(null)
 
             expectFinalNote(defaultNoteView)
@@ -59,9 +59,9 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
     }
 
     @Test
-    fun updateNoteStateLoadingToSuccessReturnData(){
+    fun updateNoteStateLoadingToSuccessReturnData() {
         val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
                 .expectNoteMode(TextMode.DefaultMode)
@@ -70,10 +70,10 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
             editDoneMode(editNoteView)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
 
             stubUseCaseOnComplete()
-                .verifyChangeState(SUCCESS)
+                .verifyChangeState(State.SUCCESS)
                 .expectNoteMode(TextMode.EditDoneMode)
                 .expectData(editNoteView)
 
@@ -81,12 +81,10 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
         }
     }
 
-
-
     @Test
-    fun updateNoteStateErrorReturnThrowableNoData_TriggerNotUpdatedFinalNote(){
+    fun updateNoteStateErrorReturnThrowableNoData_TriggerNotUpdatedFinalNote() {
         val editNoteView = defaultNoteView.copy(title = "updatedTitle", updatedAt = "2020-12-30 08:10:00")
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
                 .expectNoteMode(TextMode.DefaultMode)
@@ -95,10 +93,10 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
 
             editDoneMode(editNoteView)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
 
             stubUseCaseOnError(RuntimeException())
-                .verifyChangeState(ERROR)
+                .verifyChangeState(State.ERROR)
                 .expectNoteMode(TextMode.EditDoneMode)
                 .expectData(null)
 
@@ -108,8 +106,8 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
     }
 
     @Test
-    fun updateNoteEditToEditCancel_ThenDefaultMode_NotExecuteUpdateNote_TriggerFinalNote(){
-        with(updateFeatureTester){
+    fun updateNoteEditToEditCancel_ThenDefaultMode_NotExecuteUpdateNote_TriggerFinalNote() {
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
                 .expectNoteMode(TextMode.DefaultMode)
@@ -126,75 +124,71 @@ class NoteDetailVMUpdateTest: NoteDetailViewModelTest() {
     }
 
     @Test
-    fun uploadImageThenUpdateNoteExecute(){
+    fun uploadImageThenUpdateNoteExecute() {
         val imgPath = "https://testUpdateImgPath.co.kr?=adsf.png"
         val updateTime = "2020-12-30 08:10:00"
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
             uploadImage(imgPath, updateTime)
                 .verifyUseCaseExecute()
-
         }
     }
 
     @Test
-    fun uploadImageStateLoadingReturnNoData(){
+    fun uploadImageStateLoadingReturnNoData() {
         val imgPath = "https://testUpdateImgPath.co.kr?=adsf.png"
         val updateTime = "2020-12-30 08:10:00"
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
             uploadImage(imgPath, updateTime)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
                 .expectData(null)
             expectFinalNote(defaultNoteView)
-
         }
     }
 
     @Test
-    fun uploadImageStateLoadingToSuccess_ReturnFinalNoteFirstImgPath_UpdatedImagePath(){
+    fun uploadImageStateLoadingToSuccess_ReturnFinalNoteFirstImgPath_UpdatedImagePath() {
         val imgPath = "https://testUpdateImgPath.co.kr?=adsf.png"
         val updateTime = "2020-12-30 08:10:00"
 
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
             uploadImage(imgPath, updateTime)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
                 .expectData(null)
 
             stubUseCaseOnComplete()
-                .verifyChangeState(SUCCESS)
+                .verifyChangeState(State.SUCCESS)
                 .expectFinalNoteFirstImgPath(imgPath)
-
         }
     }
 
     @Test
-    fun uploadImageStateErrorReturnThrowableNoData(){
+    fun uploadImageStateErrorReturnThrowableNoData() {
         val imgPath = "https://testUpdateImgPath.co.kr?=adsf.png"
         val updateTime = "2020-12-30 08:10:00"
         val throwable = RuntimeException()
 
-        with(updateFeatureTester){
+        with(updateFeatureTester) {
 
             defaultMode(defaultNoteView)
             uploadImage(imgPath, updateTime)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
                 .expectData(null)
 
             stubUseCaseOnError(throwable)
-                .verifyChangeState(ERROR)
+                .verifyChangeState(State.ERROR)
                 .expectError(throwable)
                 .expectData(null)
 
             expectFinalNote(defaultNoteView)
         }
     }
-
 }

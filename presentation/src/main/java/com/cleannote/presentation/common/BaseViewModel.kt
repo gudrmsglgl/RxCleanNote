@@ -3,8 +3,8 @@ package com.cleannote.presentation.common
 import androidx.lifecycle.ViewModel
 import com.cleannote.domain.interactor.UseCase
 
-abstract class BaseViewModel(vararg useCases: UseCase<*,*>): ViewModel() {
-    private var useCaseList: MutableList<UseCase<*,*>> = mutableListOf()
+abstract class BaseViewModel(vararg useCases: UseCase<*, *>) : ViewModel() {
+    private var useCaseList: MutableList<UseCase<*, *>> = mutableListOf()
 
     init {
         useCaseList.addAll(useCases)
@@ -14,5 +14,4 @@ abstract class BaseViewModel(vararg useCases: UseCase<*,*>): ViewModel() {
         super.onCleared()
         useCaseList.forEach { it.dispose() }
     }
-
 }

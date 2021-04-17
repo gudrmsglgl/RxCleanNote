@@ -9,8 +9,6 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.cleannote.MainActivity
 import com.cleannote.TestNoteFragmentFactory
-import com.cleannote.ui.screen.MainActivityScreen
-import com.cleannote.ui.screen.NoteListScreen
 import com.cleannote.app.R
 import com.cleannote.domain.Constants.FILTER_ORDERING_KEY
 import com.cleannote.domain.Constants.ORDER_ASC
@@ -22,6 +20,8 @@ import com.cleannote.test.QueryFactory
 import com.cleannote.test.util.EspressoIdlingResourceRule
 import com.cleannote.ui.base.BaseTest
 import com.cleannote.ui.base.NoteItem
+import com.cleannote.ui.screen.MainActivityScreen
+import com.cleannote.ui.screen.NoteListScreen
 import io.mockk.every
 import io.reactivex.Single
 import org.junit.*
@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class NoteListFragmentTest: BaseTest() {
+class NoteListFragmentTest : BaseTest() {
 
     @get: Rule
     val espressoIdlingResourceRule = EspressoIdlingResourceRule()
@@ -51,12 +51,12 @@ class NoteListFragmentTest: BaseTest() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Before
-    fun setup(){
+    fun setup() {
         setupUIController()
     }
 
     @Test
-    fun searchNotesEmptyThenNoteNotDisplayed_onAndroid(){
+    fun searchNotesEmptyThenNoteNotDisplayed_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(emptyList()), query)
@@ -76,7 +76,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun searchNoteSuccessThenNotesDisplayed_onAndroid(){
+    fun searchNoteSuccessThenNotesDisplayed_onAndroid() {
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
@@ -101,7 +101,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun searchNotesThrowableThenErrorDialogMessage_onAndroid(){
+    fun searchNotesThrowableThenErrorDialogMessage_onAndroid() {
         val errorMsg = "Test Error"
         val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
@@ -119,7 +119,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun filterDialogDisplayedOfCheckedCacheOrder_onAndroid(){
+    fun filterDialogDisplayedOfCheckedCacheOrder_onAndroid() {
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
@@ -162,20 +162,20 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun filterSetOrderingThenReturnSortingNotes_onAndroid(){
+    fun filterSetOrderingThenReturnSortingNotes_onAndroid() {
         val defaultNotes = NoteFactory.makeNotes(10, cacheOrder())
-        val defaultQuery =  QueryFactory.makeQuery(cacheOrder())
+        val defaultQuery = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
         stubNoteRepositorySearchNotes(Single.just(defaultNotes), defaultQuery)
 
         val orderedNotes = NoteFactory.makeNotes(10, cacheOrderReverse())
         val orderQuery = QueryFactory.makeQuery(cacheOrderReverse())
         stubNoteRepositorySearchNotes(Single.just(orderedNotes), orderQuery)
-        
+
         launchFragmentInContainerNavController()
 
         screenNoteList {
-            searchToolbar{
+            searchToolbar {
                 filterMenu {
                     click()
                 }
@@ -207,7 +207,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun searchTextQueryThenReturnSearchedNotes_onAndroid(){
+    fun searchTextQueryThenReturnSearchedNotes_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -242,7 +242,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun searchTextQueryEmptyNotesThenNoDataTextView_onAndroid(){
+    fun searchTextQueryEmptyNotesThenNoDataTextView_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -276,7 +276,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun scrollRecyclerViewReturnNextNotes_onAndroid(){
+    fun scrollRecyclerViewReturnNextNotes_onAndroid() {
         val stubNotes = NoteFactory.makeNotes(20, cacheOrder())
 
         val initQuery = QueryFactory.makeQuery(cacheOrder())
@@ -301,7 +301,7 @@ class NoteListFragmentTest: BaseTest() {
                 scrollToEnd()
                 visibleLastItem<NoteItem> {
                     itemTitle {
-                        hasText(nextNotes[getLastVisiblePosition()-notes.size].title) // nextNote[0~9], so minus notes.size: 19 - 10
+                        hasText(nextNotes[getLastVisiblePosition() - notes.size].title) // nextNote[0~9], so minus notes.size: 19 - 10
                     }
                 }
             }
@@ -309,7 +309,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun createNoteThenInputTitleDialog_onAndroid(){
+    fun createNoteThenInputTitleDialog_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -317,7 +317,7 @@ class NoteListFragmentTest: BaseTest() {
 
         ActivityScenario.launch(MainActivity::class.java)
 
-        activity{
+        activity {
             screenNoteList {
                 insertBtn {
                     click()
@@ -335,7 +335,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun recyclerViewSwipeLeftThenVisibleDeleteMenu_onAndroid(){
+    fun recyclerViewSwipeLeftThenVisibleDeleteMenu_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -357,7 +357,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun swipeDeleteMenuSuccessThenNotesDelete_onAndroid(){
+    fun swipeDeleteMenuSuccessThenNotesDelete_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder()).apply { startIndex = null }
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -367,7 +367,7 @@ class NoteListFragmentTest: BaseTest() {
         launchFragmentInContainerNavController()
 
         screenNoteList {
-            recyclerView{
+            recyclerView {
                 firstItem<NoteItem> {
                     swipeLeft()
                     swipeDeleteMenu.click()
@@ -382,7 +382,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun swipeDeleteMenuFailThenNotDeleteNotes_onAndroid(){
+    fun swipeDeleteMenuFailThenNotDeleteNotes_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -392,7 +392,7 @@ class NoteListFragmentTest: BaseTest() {
         launchFragmentInContainerNavController()
 
         screenNoteList {
-            recyclerView{
+            recyclerView {
                 firstItem<NoteItem> {
                     swipeLeft()
                     swipeDeleteMenu.click()
@@ -410,7 +410,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun noteLongClickThenMultiSelectStateToolbar_onAndroid(){
+    fun noteLongClickThenMultiSelectStateToolbar_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -440,7 +440,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun multiDeleteModeNoteClickThenCheckBoxIsChecked_onAndroid(){
+    fun multiDeleteModeNoteClickThenCheckBoxIsChecked_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -473,7 +473,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun multiDeleteThrowableThenSearchStateDefaultNotes_onAndroid(){
+    fun multiDeleteThrowableThenSearchStateDefaultNotes_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -526,7 +526,7 @@ class NoteListFragmentTest: BaseTest() {
     }
 
     @Test
-    fun multiDeleteSuccessThenSearchStateDefaultNotesOfCheckDeleted_onAndroid(){
+    fun multiDeleteSuccessThenSearchStateDefaultNotesOfCheckDeleted_onAndroid() {
         val query = QueryFactory.makeQuery(cacheOrder())
         val notes = NoteFactory.makeNotes(10, cacheOrder())
         stubNextPageExist(false)
@@ -555,7 +555,7 @@ class NoteListFragmentTest: BaseTest() {
                         isChecked()
                     }
                 }
-                childAt<NoteItem>(1){
+                childAt<NoteItem>(1) {
                     click()
                     checkBox {
                         isDisplayed()
@@ -583,7 +583,7 @@ class NoteListFragmentTest: BaseTest() {
         }
     }
 
-    override fun setupUIController(){
+    override fun setupUIController() {
         every { mockUIController.isDisplayProgressBar() }.returns(false)
         fragmentFactory.uiController = mockUIController
     }
@@ -592,7 +592,7 @@ class NoteListFragmentTest: BaseTest() {
         getComponent().inject(this)
     }
 
-    private fun launchFragmentInContainerNavController(){
+    private fun launchFragmentInContainerNavController() {
         navController.setViewModelStore(ViewModelStore())
         navController.setGraph(R.navigation.nav_app_graph)
         launchFragmentInContainer {
@@ -614,7 +614,7 @@ class NoteListFragmentTest: BaseTest() {
         FILTER_ORDERING_KEY, ORDER_DESC
     ) ?: ORDER_DESC
 
-    private fun cacheOrderReverse(): String{
+    private fun cacheOrderReverse(): String {
         return if (cacheOrder() == ORDER_DESC)
             ORDER_ASC
         else

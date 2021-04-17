@@ -13,12 +13,12 @@ abstract class BaseDomainTest<D, Param> {
     protected lateinit var postExecutionThread: PostExecutionThread
 
     @BeforeEach
-    fun baseSetup(){
+    fun baseSetup() {
         mockRxSchedulers()
         repository = mock()
     }
 
-    private fun mockRxSchedulers(){
+    private fun mockRxSchedulers() {
         threadExecutor = mock()
         postExecutionThread = mock()
     }

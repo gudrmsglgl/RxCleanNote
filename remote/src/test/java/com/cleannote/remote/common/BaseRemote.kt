@@ -11,21 +11,25 @@ import io.reactivex.Single
 abstract class BaseRemote {
     lateinit var noteService: NoteService
 
-    infix fun NoteService.stubLogin(stub: Pair<String, List<UserModel>>){
+    infix fun NoteService.stubLogin(stub: Pair<String, List<UserModel>>) {
         whenever(this.login(stub.first)).thenReturn(Flowable.just(stub.second))
     }
 
-    infix fun NoteService.stubSearchNotes(stub: Pair<QueryEntity, List<NoteModel>>){
-        whenever(this.searchNotes(
-            stub.first.page, stub.first.limit, stub.first.sort,
-            stub.first.order, stub.first.like, stub.first.like
-        )).thenReturn(Single.just(stub.second))
+    infix fun NoteService.stubSearchNotes(stub: Pair<QueryEntity, List<NoteModel>>) {
+        whenever(
+            this.searchNotes(
+                stub.first.page, stub.first.limit, stub.first.sort,
+                stub.first.order, stub.first.like, stub.first.like
+            )
+        ).thenReturn(Single.just(stub.second))
     }
 
-    infix fun NoteService.stubSearchNotesThrow(stub: Pair<QueryEntity, Throwable>){
-        whenever(this.searchNotes(
-            stub.first.page, stub.first.limit, stub.first.sort,
-            stub.first.order, stub.first.like, stub.first.like
-        )).thenReturn(Single.error(stub.second))
+    infix fun NoteService.stubSearchNotesThrow(stub: Pair<QueryEntity, Throwable>) {
+        whenever(
+            this.searchNotes(
+                stub.first.page, stub.first.limit, stub.first.sort,
+                stub.first.order, stub.first.like, stub.first.like
+            )
+        ).thenReturn(Single.error(stub.second))
     }
 }

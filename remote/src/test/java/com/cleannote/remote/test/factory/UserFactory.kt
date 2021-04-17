@@ -1,6 +1,5 @@
 package com.cleannote.remote.test.factory
 
-import com.cleannote.data.model.UserEntity
 import com.cleannote.remote.model.UserModel
 
 object UserFactory {

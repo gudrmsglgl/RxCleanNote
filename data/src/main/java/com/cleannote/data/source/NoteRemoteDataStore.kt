@@ -14,7 +14,7 @@ open class NoteRemoteDataStore
 @Inject
 constructor(
     private val noteRemote: NoteRemote
-): NoteDataStore {
+) : NoteDataStore {
 
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> {
         throw UnsupportedOperationException()

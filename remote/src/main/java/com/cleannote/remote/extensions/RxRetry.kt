@@ -40,7 +40,5 @@ private fun Flowable<Throwable>.attemptFilterSource(
 ): Flowable<Throwable> = this.map { throwable ->
     if (predicates.count { it(throwable) } > 0) {
         throwable
-    }
-    else throw throwable
+    } else throw throwable
 }
-

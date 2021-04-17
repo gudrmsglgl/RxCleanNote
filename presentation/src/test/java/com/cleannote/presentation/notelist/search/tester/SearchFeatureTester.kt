@@ -16,8 +16,7 @@ open class SearchFeatureTester(
     private val viewModel: NoteListViewModel,
     private val usecase: SearchNotes,
     private val searchCaptors: SearchUseCaseCaptors
-): ViewModelFeatureTester<SearchFeatureTester, List<Note>, Query, List<NoteView>>(searchCaptors)
-{
+) : ViewModelFeatureTester<SearchFeatureTester, List<Note>, Query, List<NoteView>>(searchCaptors) {
     override fun verifyUseCaseExecute(): SearchFeatureTester {
         usecase.verifyExecute(searchCaptors, searchCaptors.paramCaptor)
         return this
@@ -72,13 +71,11 @@ open class SearchFeatureTester(
         return viewModel.noteList.value
     }
 
-    private fun assertPage(actualPage: Int, expectPage: Int){
+    private fun assertPage(actualPage: Int, expectPage: Int) {
         assertThat(actualPage, `is`(expectPage))
     }
 
-    private fun assertQuery(actual: String?, expect: String){
+    private fun assertQuery(actual: String?, expect: String) {
         assertThat(actual, `is`(expect))
-
     }
-
 }

@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 
-class Indicator: LinearLayoutCompat {
+class Indicator : LinearLayoutCompat {
 
     private var mContext: Context? = null
     private var mDefaultRes: Int = 0
@@ -13,15 +13,15 @@ class Indicator: LinearLayoutCompat {
 
     private val lineView: MutableList<TextView> = mutableListOf()
 
-    constructor(context: Context): super(context){
+    constructor(context: Context) : super(context) {
         mContext = context
     }
 
-    constructor(context: Context, attrs: AttributeSet?): super(context, attrs){
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         mContext = context
     }
 
-    fun create(size: Int?, defaultRes: Int, selectRes: Int, selectPosition: Int){
+    fun create(size: Int?, defaultRes: Int, selectRes: Int, selectPosition: Int) {
         this.removeAllViews()
         if (size == null || size == 1) return
 
@@ -33,8 +33,8 @@ class Indicator: LinearLayoutCompat {
         selectIndicator(selectPosition)
     }
 
-    private fun initLineView(size: Int){
-        for (i in 0 until size){
+    private fun initLineView(size: Int) {
+        for (i in 0 until size) {
             lineView.add(createLine(size))
             this.addView(lineView[i])
         }
@@ -43,7 +43,7 @@ class Indicator: LinearLayoutCompat {
     private fun createLine(size: Int) = TextView(mContext)
         .apply {
             layoutParams = LayoutParams(relativeSizeToWidth(size), 10)
-            setPadding(0,0,0,0)
+            setPadding(0, 0, 0, 0)
         }
 
     private fun relativeSizeToWidth(size: Int) = when {
@@ -52,8 +52,8 @@ class Indicator: LinearLayoutCompat {
         else -> 80
     }
 
-    fun selectIndicator(position: Int){
-        for (index in lineView.indices){
+    fun selectIndicator(position: Int) {
+        for (index in lineView.indices) {
             if (index == position) lineSelect(index)
             else lineDefault(index)
         }

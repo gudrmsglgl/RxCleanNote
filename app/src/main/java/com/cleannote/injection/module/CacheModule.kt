@@ -15,11 +15,11 @@ import dagger.Provides
 abstract class CacheModule {
 
     @Module
-    companion object{
+    companion object {
 
         @JvmStatic
         @Provides
-        fun provideNoteDb(app: NoteApplication): NoteDatabase{
+        fun provideNoteDb(app: NoteApplication): NoteDatabase {
             return Room
                 .databaseBuilder(app, NoteDatabase::class.java, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
@@ -28,13 +28,11 @@ abstract class CacheModule {
 
         @JvmStatic
         @Provides
-        fun provideCacheNoteDao(db: NoteDatabase): CachedNoteDao{
+        fun provideCacheNoteDao(db: NoteDatabase): CachedNoteDao {
             return db.noteDao()
         }
-
     }
 
     @Binds
     abstract fun bindNoteCache(noteCacheImpl: NoteCacheImpl): NoteCache
-
 }

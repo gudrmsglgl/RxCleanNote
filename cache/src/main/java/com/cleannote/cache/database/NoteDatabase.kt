@@ -9,7 +9,7 @@ import com.cleannote.cache.model.CachedImage
 import com.cleannote.cache.model.CachedNote
 
 @Database(entities = [CachedNote::class, CachedImage::class], version = 2, exportSchema = false)
-abstract class NoteDatabase: RoomDatabase() {
+abstract class NoteDatabase : RoomDatabase() {
 
     abstract fun noteDao(): CachedNoteDao
     private var INSTANCE: NoteDatabase? = null
@@ -20,8 +20,10 @@ abstract class NoteDatabase: RoomDatabase() {
         if (INSTANCE == null) {
             synchronized(sLock) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.applicationContext,
-                        NoteDatabase::class.java, DATABASE_NAME)
+                    INSTANCE = Room.databaseBuilder(
+                        context.applicationContext,
+                        NoteDatabase::class.java, DATABASE_NAME
+                    )
                         .build()
                 }
                 return INSTANCE!!
@@ -30,7 +32,7 @@ abstract class NoteDatabase: RoomDatabase() {
         return INSTANCE!!
     }
 
-    companion object{
+    companion object {
         val DATABASE_NAME = "note.db"
     }
 }

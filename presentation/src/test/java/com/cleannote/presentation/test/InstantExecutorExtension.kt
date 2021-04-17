@@ -15,10 +15,9 @@ class InstantExecutorExtension : BeforeEachCallback, AfterEachCallback {
                 override fun postToMainThread(runnable: Runnable) = runnable.run()
                 override fun isMainThread(): Boolean = true
             })
-        }
-
-    override fun afterEach(context: ExtensionContext?) {
-            ArchTaskExecutor.getInstance().setDelegate(null)
     }
 
+    override fun afterEach(context: ExtensionContext?) {
+        ArchTaskExecutor.getInstance().setDelegate(null)
+    }
 }

@@ -1,6 +1,6 @@
 package com.cleannote.presentation.model
 
-data class NoteView (
+data class NoteView(
     val id: String,
     val title: String,
     val body: String,

@@ -7,5 +7,4 @@ object QueryFactory {
     fun makeDefaultQuery() = Query()
 
     fun makeSearchQuery(search: String) = Query(like = search)
-
 }

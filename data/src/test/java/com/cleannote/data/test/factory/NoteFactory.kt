@@ -3,10 +3,11 @@ package com.cleannote.data.test.factory
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.domain.model.Note
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 object NoteFactory {
-    val dateFormat: SimpleDateFormat = SimpleDateFormat()
+    private val dateFormat: SimpleDateFormat = SimpleDateFormat()
 
     private fun getCurrentTimestamp(): String {
         return dateFormat.format(Date())
@@ -36,10 +37,11 @@ object NoteFactory {
         updatedAt = getCurrentTimestamp()
     )
 
-    fun createNoteEntityList(start:Int, count: Int): List<NoteEntity> = (start until count).map {
-        createNoteEntity("#$it", "title #it", "body #it")}.toList()
+    fun createNoteEntityList(start: Int, count: Int): List<NoteEntity> = (start until count).map {
+        createNoteEntity("#$it", "title #it", "body #it")
+    }.toList()
 
-    fun createNoteList(start:Int, count: Int): List<Note> = (start until count).map {
-        createNote("#$it", "title #it", "body #it")}.toList()
-
+    fun createNoteList(start: Int, count: Int): List<Note> = (start until count).map {
+        createNote("#$it", "title #it", "body #it")
+    }.toList()
 }

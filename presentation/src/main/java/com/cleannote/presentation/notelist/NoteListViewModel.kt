@@ -1,7 +1,10 @@
 package com.cleannote.presentation.notelist
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.cleannote.domain.Constants.ORDER_DESC
 import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
 import com.cleannote.domain.model.Note
@@ -19,7 +22,7 @@ class NoteListViewModel
 constructor(
     private val useCases: NoteListUseCases,
     internal val queryMgr: QueryManager
-): ViewModel() {
+) : ViewModel() {
 
     val queryLike get() = queryMgr.queryLike()
 
@@ -45,10 +48,10 @@ constructor(
 
     init {
         with(_mediatorNoteList) {
-            addSource(_insertNote){
+            addSource(_insertNote) {
                 if (it.status is SUCCESS) initNotes()
             }
-            addSource(queryMgr.query){
+            addSource(queryMgr.query) {
                 searchNotes()
             }
         }
@@ -62,20 +65,21 @@ constructor(
     }
 
     @VisibleForTesting
-    fun searchNotes(){
+    fun searchNotes() {
         _mediatorNoteList.postValue(DataState.loading())
         useCases.searchNotes.execute(
-                onSuccess = { loadNotes ->
-                    totalLoadNotes.addAllUpdate(loadNotes, isBackground = true)
-                    updateNextPageExist()
-                },
-                onError = {
-                    _mediatorNoteList.postValue(DataState.error(it))
-                },
-                params = queryMgr.getQuery())
+            onSuccess = { loadNotes ->
+                totalLoadNotes.addAllUpdate(loadNotes, isBackground = true)
+                updateNextPageExist()
+            },
+            onError = {
+                _mediatorNoteList.postValue(DataState.error(it))
+            },
+            params = queryMgr.getQuery()
+        )
     }
 
-    fun insertNotes(param: NoteView){
+    fun insertNotes(param: NoteView) {
         _insertNote.postValue(DataState.loading())
         useCases.insertNewNote.execute(
             onSuccess = {
@@ -84,20 +88,21 @@ constructor(
             onError = {
                 _insertNote.postValue(DataState.error(it))
             },
-            params = param.transNote())
+            params = param.transNote()
+        )
     }
 
-    fun reqUpdateFromDetailFragment(param: NoteView) = when(queryMgr.cacheOrdering()){
+    fun reqUpdateFromDetailFragment(param: NoteView) = when (queryMgr.cacheOrdering()) {
         ORDER_DESC -> totalLoadNotes.fetchFirstPositionUpdate(param)
         else -> initNotes()
     }
 
-    fun reqDeleteFromDetailFragment(param: NoteView){
+    fun reqDeleteFromDetailFragment(param: NoteView) {
         updateNextPageExist(param)
         totalLoadNotes.deleteSync(param, isBackground = false)
     }
 
-    fun deleteNote(param: NoteView){
+    fun deleteNote(param: NoteView) {
         _deleteResult.postValue(DataState.loading())
         useCases.deleteNote.execute(
             onSuccess = {},
@@ -113,7 +118,7 @@ constructor(
         )
     }
 
-    fun deleteMultiNotes(paramNotes: List<NoteView>){
+    fun deleteMultiNotes(paramNotes: List<NoteView>) {
         _deleteResult.postValue(DataState.loading())
         useCases.deleteMultipleNotes.execute(
             onSuccess = {},
@@ -128,7 +133,7 @@ constructor(
         )
     }
 
-    fun setOrdering(ordering: String){
+    fun setOrdering(ordering: String) {
         totalLoadNotes.clear()
         queryMgr.resortingByOrder(ordering)
     }
@@ -140,7 +145,7 @@ constructor(
 
     fun nextPage() = queryMgr.updateNextPage()
 
-    fun setToolbarState(toolbarState: ListToolbarState){
+    fun setToolbarState(toolbarState: ListToolbarState) {
         _toolbarState.value = toolbarState
     }
 
@@ -154,13 +159,13 @@ constructor(
     }
 
     @VisibleForTesting
-    fun updateNextPageExist() = with(queryMgr){
+    fun updateNextPageExist() = with(queryMgr) {
         executeNextPageExist(
             nextPageQuery()
         )
     }
 
-    private fun List<NoteView>.setNoteListSuccessState(isBackground: Boolean){
+    private fun List<NoteView>.setNoteListSuccessState(isBackground: Boolean) {
         if (isBackground)
             _mediatorNoteList.postValue(DataState.success(this))
         else
@@ -170,12 +175,12 @@ constructor(
     private fun MutableList<NoteView>.addAllUpdate(
         param: List<Note>,
         isBackground: Boolean
-    ){
+    ) {
         addAll(param.transNoteViews())
         setNoteListSuccessState(isBackground)
     }
 
-    private fun MutableList<NoteView>.fetchFirstPositionUpdate(param: NoteView){
+    private fun MutableList<NoteView>.fetchFirstPositionUpdate(param: NoteView) {
         val findNoteView = find { it.id == param.id }
         remove(findNoteView)
         add(0, param)
@@ -186,31 +191,31 @@ constructor(
         target: NoteView,
         isBackground: Boolean
     ) = if (isNextPageExist)
-            deleteSyncCacheNotes(target)
-        else
-            deleteUpdate(target, isBackground)
+        deleteSyncCacheNotes(target)
+    else
+        deleteUpdate(target, isBackground)
 
     private fun MutableList<NoteView>.deleteUpdate(
         target: NoteView,
         isBackground: Boolean
-    ){
+    ) {
         remove(target)
         setNoteListSuccessState(isBackground)
     }
 
-    private fun MutableList<NoteView>.deleteSyncCacheNotes(target: NoteView){
+    private fun MutableList<NoteView>.deleteSyncCacheNotes(target: NoteView) {
         val deletedPage = findPage(target)
         val deletedIndex = indexOf(target) % queryMgr.getQuery().limit
         removeAll(takeTargetToLast(target))
         queryMgr.resetPageWithIndex(deletedPage, deletedIndex)
     }
 
-    private fun List<NoteView>.takeTargetToLast(target: NoteView): List<NoteView>{
+    private fun List<NoteView>.takeTargetToLast(target: NoteView): List<NoteView> {
         val fromLastToDeleteIndex = (lastIndex - indexOf(target)).plus(1)
         return this.takeLast(fromLastToDeleteIndex)
     }
 
-    private fun List<NoteView>.findPage(target: NoteView): Int{
+    private fun List<NoteView>.findPage(target: NoteView): Int {
         return (indexOf(target) / queryMgr.getQuery().limit) + 1
     }
 
@@ -218,5 +223,4 @@ constructor(
         totalLoadNotes.clear()
         queryMgr.clearQuery()
     }
-
 }

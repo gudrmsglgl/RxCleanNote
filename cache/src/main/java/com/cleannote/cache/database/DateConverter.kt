@@ -1,7 +1,7 @@
 package com.cleannote.cache.database
 
 import androidx.room.TypeConverter
-import java.util.*
+import java.util.Date
 
 object DateConverter {
 
@@ -12,5 +12,4 @@ object DateConverter {
     @TypeConverter
     @JvmStatic
     fun dateToTimestamp(date: Date?): Long? = date?.time
-
 }

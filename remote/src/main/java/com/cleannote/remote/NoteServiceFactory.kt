@@ -12,9 +12,10 @@ import java.util.concurrent.TimeUnit
 object NoteServiceFactory {
     const val BASE_URL = "https://my-json-server.typicode.com/gudrmsglgl/memoapi/"
 
-    fun makeNoteService(isDebug: Boolean): NoteService{
+    fun makeNoteService(isDebug: Boolean): NoteService {
         val okHttpClient = makeOkHttpClient(
-            makeLoggingInterceptor(isDebug))
+            makeLoggingInterceptor(isDebug)
+        )
         return makeNoteService(okHttpClient, makeGson())
     }
 
@@ -39,8 +40,8 @@ object NoteServiceFactory {
     private fun makeGson(): Gson {
         return GsonBuilder()
             .setLenient()
-            //.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            //.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            // .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            // .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create()
     }
 

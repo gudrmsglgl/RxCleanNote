@@ -1,7 +1,6 @@
 package com.cleannote.notelist
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -14,14 +13,11 @@ import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.bumptech.glide.RequestManager
 import com.cleannote.NoteApplication
-
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteListBinding
 import com.cleannote.common.*
 import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.common.dialog.InputDialog
-import com.cleannote.presentation.data.State.*
-import com.cleannote.presentation.notelist.NoteListViewModel
 import com.cleannote.extension.*
 import com.cleannote.extension.rxbinding.*
 import com.cleannote.model.NoteMode.*
@@ -35,12 +31,13 @@ import com.cleannote.notedetail.Keys.REQ_UPDATE_KEY
 import com.cleannote.notelist.dialog.NoteDeleteDialog
 import com.cleannote.notelist.swipe.SwipeAdapter
 import com.cleannote.notelist.swipe.SwipeHelperCallback
+import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notelist.ListToolbarState.MultiSelectState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
 import com.cleannote.presentation.model.NoteView
+import com.cleannote.presentation.notelist.NoteListViewModel
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.recyclerview.scrollStateChanges
-import dagger.Provides
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.layout_search_toolbar.view.*
 import java.util.concurrent.TimeUnit
@@ -50,10 +47,9 @@ class NoteListFragment
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
     internal val sharedPref: SharedPreferences
-): BaseFragment<FragmentNoteListBinding>(R.layout.fragment_note_list),
+) : BaseFragment<FragmentNoteListBinding>(R.layout.fragment_note_list),
     OnBackPressListener,
-    SwipeAdapter
-{
+    SwipeAdapter {
 
     private val bundle: Bundle = Bundle()
 
@@ -88,7 +84,7 @@ constructor(
         noteOnCheck()
         noteOnLongClick()
         noteSwipeMenuOnDeleteClick()
-        setFragmentResultListener(REQUEST_KEY_ON_BACK){ _, bundle ->
+        setFragmentResultListener(REQUEST_KEY_ON_BACK) { _, bundle ->
             requestUpdate(bundle)
             requestDelete(bundle)
             requestScrollTop(bundle)
@@ -101,18 +97,21 @@ constructor(
 
     private fun subscribeToolbarState() = viewModel
         .toolbarState
-        .observe(viewLifecycleOwner, Observer { toolbarState ->
-            when(toolbarState){
-                is SearchState -> {
-                    tbFactory.addSearchViewToolbarContainer()
-                    noteAdapter.changeAllNoteMode(Default)
-                    noteAdapter.deleteCheckClear()
+        .observe(
+            viewLifecycleOwner,
+            Observer { toolbarState ->
+                when (toolbarState) {
+                    is SearchState -> {
+                        tbFactory.addSearchViewToolbarContainer()
+                        noteAdapter.changeAllNoteMode(Default)
+                        noteAdapter.deleteCheckClear()
+                    }
+                    is MultiSelectState -> {
+                        tbFactory.addMultiDeleteToolbarContainer()
+                        noteAdapter.changeAllNoteMode(MultiDefault)
+                    }
                 }
-                is MultiSelectState -> {
-                    tbFactory.addMultiDeleteToolbarContainer()
-                    noteAdapter.changeAllNoteMode(MultiDefault)
-                }
-            }}
+            }
         )
 
     private fun noteOnClick() = noteAdapter
@@ -176,7 +175,7 @@ constructor(
     private fun scrollEventNextPageSource() = binding
         .recyclerView
         .scrollEvents()
-        .filter {  it.lastVisibleItemPos() == it.shouldNextPagePos() && viewModel.isNextPageExist }
+        .filter { it.lastVisibleItemPos() == it.shouldNextPagePos() && viewModel.isNextPageExist }
         .throttleFirst(130L, TimeUnit.MILLISECONDS)
         .subscribe {
             viewModel.nextPage()
@@ -210,65 +209,74 @@ constructor(
 
     private fun subscribeNoteList() = viewModel
         .noteList
-        .observe(viewLifecycleOwner, Observer { dataState ->
-            if ( dataState != null ){
-                showLoadingProgressBar(dataState.isLoading)
-                when (dataState.status) {
-                    SUCCESS -> {
-                        noteAdapter.fetchRecyclerView(currentNoteMode(dataState.data!!))
-                    }
-                    ERROR -> {
-                        showErrorDialog(getString(R.string.searchErrorMsg))
-                        dataState.sendFirebaseThrowable()
+        .observe(
+            viewLifecycleOwner,
+            Observer { dataState ->
+                if (dataState != null) {
+                    showLoadingProgressBar(dataState.isLoading)
+                    when (dataState.status) {
+                        SUCCESS -> {
+                            noteAdapter.fetchRecyclerView(currentNoteMode(dataState.data!!))
+                        }
+                        ERROR -> {
+                            showErrorDialog(getString(R.string.searchErrorMsg))
+                            dataState.sendFirebaseThrowable()
+                        }
                     }
                 }
-            }}
+            }
         )
 
     private fun subscribeInsertResult() = viewModel
         .insertResult
-        .observe(viewLifecycleOwner, Observer { dataState ->
-            if (dataState != null){
-                showLoadingProgressBar(dataState.isLoading)
-                when (dataState.status) {
-                    SUCCESS -> {
-                        navDetailNote(dataState.data!!.transNoteUiModel(), isInsertExecute = true)
-                    }
-                    ERROR -> {
-                        showErrorDialog(getString(R.string.insertErrorMsg))
-                        dataState.sendFirebaseThrowable()
+        .observe(
+            viewLifecycleOwner,
+            Observer { dataState ->
+                if (dataState != null) {
+                    showLoadingProgressBar(dataState.isLoading)
+                    when (dataState.status) {
+                        SUCCESS -> {
+                            navDetailNote(dataState.data!!.transNoteUiModel(), isInsertExecute = true)
+                        }
+                        ERROR -> {
+                            showErrorDialog(getString(R.string.insertErrorMsg))
+                            dataState.sendFirebaseThrowable()
+                        }
                     }
                 }
             }
-        })
+        )
 
     private fun subscribeDeleteResult() = viewModel
         .deleteResult
-        .observe(viewLifecycleOwner, Observer { dataState ->
-            if (dataState != null) {
-                showLoadingProgressBar(dataState.isLoading)
-                when (dataState.status) {
-                    SUCCESS -> {
-                        noteAdapter.deleteCheckClear()
-                        transSearchState()
-                        swipeDeleteMenuClose()
-                        showToast(getString(R.string.deleteSuccessMsg))
-                    }
-                    ERROR -> {
-                        noteAdapter.deleteCheckClear()
-                        transSearchState()
-                        swipeDeleteMenuClose()
-                        showErrorDialog(getString(R.string.deleteErrorMsg))
-                        dataState.sendFirebaseThrowable()
+        .observe(
+            viewLifecycleOwner,
+            Observer { dataState ->
+                if (dataState != null) {
+                    showLoadingProgressBar(dataState.isLoading)
+                    when (dataState.status) {
+                        SUCCESS -> {
+                            noteAdapter.deleteCheckClear()
+                            transSearchState()
+                            swipeDeleteMenuClose()
+                            showToast(getString(R.string.deleteSuccessMsg))
+                        }
+                        ERROR -> {
+                            noteAdapter.deleteCheckClear()
+                            transSearchState()
+                            swipeDeleteMenuClose()
+                            showErrorDialog(getString(R.string.deleteErrorMsg))
+                            dataState.sendFirebaseThrowable()
+                        }
                     }
                 }
             }
-        })
+        )
 
     private fun navDetailNote(
         noteUiModel: NoteUiModel,
         isInsertExecute: Boolean
-    ){
+    ) {
         bundle.putParcelable(NOTE_DETAIL_BUNDLE_KEY, noteUiModel)
         bundle.putBoolean(IS_EXECUTE_INSERT, isInsertExecute)
         view?.clearFocus()
@@ -293,7 +301,7 @@ constructor(
         }
     }
 
-    private fun deleteNotes(param: List<NoteUiModel>){
+    private fun deleteNotes(param: List<NoteUiModel>) {
         when {
             param.size == 1 -> viewModel.deleteNote(param[0].transNoteView())
             param.size > 1 -> viewModel.deleteMultiNotes(param.transNoteViews())
@@ -301,20 +309,20 @@ constructor(
         }
     }
 
-    private fun requestUpdate(bundle: Bundle){
+    private fun requestUpdate(bundle: Bundle) {
         bundle.getParcelable<NoteUiModel>(REQ_UPDATE_KEY)?.let {
             viewModel.reqUpdateFromDetailFragment(it.transNoteView())
             scrollTop()
         }
     }
 
-    private fun requestDelete(bundle: Bundle){
+    private fun requestDelete(bundle: Bundle) {
         bundle.getParcelable<NoteUiModel>(REQ_DELETE_KEY)?.let {
             viewModel.reqDeleteFromDetailFragment(it.transNoteView())
         }
     }
 
-    private fun requestScrollTop(bundle: Bundle){
+    private fun requestScrollTop(bundle: Bundle) {
         val shouldScrollTop = bundle.getBoolean(REQ_SCROLL_TOP_KEY)
         if (shouldScrollTop)
             scrollTop()
@@ -326,15 +334,18 @@ constructor(
         viewModel.initNotes()
     }
 
-    fun transSearchState(){
+    fun transSearchState() {
         if (curToolbarState() != SearchState)
             viewModel.setToolbarState(SearchState)
     }
 
-    internal fun scrollTop(){
-        Handler().postDelayed({
-            binding.recyclerView.scrollToPosition(0)
-        }, 100L)
+    internal fun scrollTop() {
+        Handler().postDelayed(
+            {
+                binding.recyclerView.scrollToPosition(0)
+            },
+            100L
+        )
     }
 
     private fun assignNoteAdapter() = NoteListAdapter(
@@ -362,11 +373,11 @@ constructor(
 
     private fun curToolbarState() = viewModel.toolbarState.value
 
-    private fun inject() = activity?.let{
+    private fun inject() = activity?.let {
         (it.application as NoteApplication).applicationComponent.inject(this)
     }
 
-    override fun isSwipeEnabled(): Boolean  = noteAdapter.isDefaultMode()
+    override fun isSwipeEnabled(): Boolean = noteAdapter.isDefaultMode()
 
     override fun shouldBackPress(): Boolean = if (!noteAdapter.isDefaultMode()) {
         transSearchState()

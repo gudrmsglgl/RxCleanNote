@@ -6,7 +6,7 @@ import java.util.*
 
 class NoteFactory {
     companion object {
-        fun defaultNote(): NoteView{
+        fun defaultNote(): NoteView {
             val notePk = UUID.randomUUID().toString()
             return NoteView(
                 id = notePk,

@@ -12,5 +12,4 @@ class DateUtil @Inject constructor() {
         SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(
             Calendar.getInstance().time
         )
-
 }

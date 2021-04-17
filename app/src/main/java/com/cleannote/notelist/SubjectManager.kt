@@ -5,7 +5,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import javax.inject.Inject
 
-class SubjectManager @Inject constructor(){
+class SubjectManager @Inject constructor() {
 
     private val _clickNoteSubject: PublishSubject<NoteUiModel> = PublishSubject.create()
     val clickNoteSubject get() = _clickNoteSubject
@@ -22,7 +22,7 @@ class SubjectManager @Inject constructor(){
     private val subjects: Set<Subject<*>> =
         setOf(_clickNoteSubject, _longClickSubject, _deleteClickSubject, _checkNoteSubject)
 
-    fun releaseSubjects(){
+    fun releaseSubjects() {
         subjects.forEach {
             it.onComplete()
         }

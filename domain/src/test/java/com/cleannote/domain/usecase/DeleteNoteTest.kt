@@ -11,25 +11,25 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class DeleteNoteTest: BaseDomainTest<Completable, Note>(){
+class DeleteNoteTest : BaseDomainTest<Completable, Note>() {
 
     private lateinit var deleteNote: DeleteNote
     private val paramNote = NoteFactory.createSingleNote(title = "deleteNote")
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
         deleteNote = DeleteNote(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun buildUseCaseCallRepositoryDeleteNote(){
+    fun buildUseCaseCallRepositoryDeleteNote() {
         stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote).test()
         verifyRepositoryCallDeleteNote(paramNote)
     }
 
     @Test
-    fun buildUseCaseCompletableComplete(){
+    fun buildUseCaseCompletableComplete() {
         stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote)
             .test()
@@ -37,14 +37,14 @@ class DeleteNoteTest: BaseDomainTest<Completable, Note>(){
     }
 
     @Test
-    fun buildUseCaseDeleteNoteReturnNoValue(){
+    fun buildUseCaseDeleteNoteReturnNoValue() {
         stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote)
             .test()
             .assertNoValues()
     }
 
-    private fun verifyRepositoryCallDeleteNote(param: Note){
+    private fun verifyRepositoryCallDeleteNote(param: Note) {
         verify(repository).deleteNote(param)
     }
 

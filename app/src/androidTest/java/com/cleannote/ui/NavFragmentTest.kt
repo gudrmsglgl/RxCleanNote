@@ -32,7 +32,7 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class NavFragmentTest: BaseTest() {
+class NavFragmentTest : BaseTest() {
 
     val screenNoteList = NoteListScreen
     val screenDetailEdit = DetailEditNoteScreen
@@ -53,12 +53,12 @@ class NavFragmentTest: BaseTest() {
     }
 
     @Before
-    fun setup(){
+    fun setup() {
         setupUIController()
     }
 
     @Test
-    fun noteListItemClickThenNavDetailView_onAndroid(){
+    fun noteListItemClickThenNavDetailView_onAndroid() {
         val stubNotes = NoteFactory.makeNotes(10, cacheOrder())
         val query = QueryFactory.makeQuery(cacheOrder())
         stubNextPageExist(false)
@@ -75,7 +75,7 @@ class NavFragmentTest: BaseTest() {
     }
 
     @Test
-    fun detailEditBackIcThenNavDetailView_onAndroid(){
+    fun detailEditBackIcThenNavDetailView_onAndroid() {
         stubNoteRepositoryDelete()
         launchDetailEditFragmentInContainerNavController()
         navController.isCurDestId(R.id.noteDetailEditFragment)
@@ -86,7 +86,7 @@ class NavFragmentTest: BaseTest() {
     }
 
     @Test
-    fun detailEditDeleteNoteThenNavNoteList_onAndroid(){
+    fun detailEditDeleteNoteThenNavNoteList_onAndroid() {
         stubNoteRepositoryDelete()
         launchDetailEditFragmentInContainerNavController()
         screenDetailEdit {
@@ -101,7 +101,7 @@ class NavFragmentTest: BaseTest() {
     }
 
     @Test
-    fun detailEditDeleteNoteErrorThenNotNavDetailView_onAndroid(){
+    fun detailEditDeleteNoteErrorThenNotNavDetailView_onAndroid() {
         stubThrowableNoteRepositoryDelete(RuntimeException())
         launchDetailEditFragmentInContainerNavController()
         screenDetailEdit {
@@ -114,7 +114,7 @@ class NavFragmentTest: BaseTest() {
         navController.isCurDestId(R.id.noteDetailEditFragment)
     }
 
-    private fun launchNoteListFragmentInContainerNavController(){
+    private fun launchNoteListFragmentInContainerNavController() {
         navController.setViewModelStore(ViewModelStore())
         navController.setGraph(R.navigation.nav_app_graph)
         navController.setCurrentDestination(R.id.noteListFragment)
@@ -133,7 +133,7 @@ class NavFragmentTest: BaseTest() {
         }
     }
 
-    private fun launchDetailEditFragmentInContainerNavController(){
+    private fun launchDetailEditFragmentInContainerNavController() {
         navController.setViewModelStore(ViewModelStore())
         navController.setGraph(R.navigation.nav_detail_graph)
         navController.setCurrentDestination(R.id.noteDetailEditFragment)
@@ -145,7 +145,7 @@ class NavFragmentTest: BaseTest() {
             ).also { fragment ->
                 fragment.setUIController(mockUIController)
                 fragment.viewLifecycleOwnerLiveData.observeForever { lifecycleOwner ->
-                    if  (lifecycleOwner != null) {
+                    if (lifecycleOwner != null) {
                         Navigation.setViewNavController(fragment.requireView(), navController)
                         fragment.initNoteDefaultMode()
                     }
@@ -168,11 +168,11 @@ class NavFragmentTest: BaseTest() {
         Constants.ORDER_DESC
     ) ?: Constants.ORDER_DESC
 
-    private fun TestNavHostController.isCurDestId(@IdRes destIdRes: Int){
+    private fun TestNavHostController.isCurDestId(@IdRes destIdRes: Int) {
         assertThat(currentDestination?.id, `is`(destIdRes))
     }
 
-    private fun TestNavHostController.isNotCurDestId(@IdRes destIdRes: Int){
+    private fun TestNavHostController.isNotCurDestId(@IdRes destIdRes: Int) {
         assertThat(currentDestination?.id, not(`is`(destIdRes)))
     }
 }

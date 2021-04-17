@@ -1,7 +1,11 @@
 package com.cleannote.cache
 
 import com.cleannote.cache.dao.CachedNoteDao
-import com.cleannote.cache.extensions.*
+import com.cleannote.cache.extensions.currentNoteSize
+import com.cleannote.cache.extensions.divideCacheNote
+import com.cleannote.cache.extensions.nextPageIsExist
+import com.cleannote.cache.extensions.searchNoteBySorted
+import com.cleannote.cache.extensions.transEntity
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.repository.NoteCache
@@ -9,15 +13,15 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
 
-class NoteCacheImpl @Inject constructor(private val noteDao: CachedNoteDao,
-                                        private val preferencesHelper: PreferencesHelper): NoteCache
-{
+class NoteCacheImpl @Inject constructor(
+    private val noteDao: CachedNoteDao,
+    private val preferencesHelper: PreferencesHelper
+) : NoteCache {
 
     private val shouldUpdateTime = (60 * 3 * 1000).toLong()
 
-
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> =
-        Single.defer{
+        Single.defer {
             Single.just(noteDao.insertNote(noteEntity.divideCacheNote()))
         }
 

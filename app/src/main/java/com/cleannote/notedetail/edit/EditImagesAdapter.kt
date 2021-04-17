@@ -13,12 +13,12 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditImagesAdapter(
     val requestManager: RequestManager
-): ListAdapter<NoteImageUiModel, EditImageHolder>(ImageDiffCallback) {
+) : ListAdapter<NoteImageUiModel, EditImageHolder>(ImageDiffCallback) {
 
     private val _imgDeleteSubject: PublishSubject<NoteImageUiModel> = PublishSubject.create()
     val imageDeleteSubject get() = _imgDeleteSubject
 
-    object ImageDiffCallback: DiffUtil.ItemCallback<NoteImageUiModel>(){
+    object ImageDiffCallback : DiffUtil.ItemCallback<NoteImageUiModel>() {
         override fun areItemsTheSame(oldItem: NoteImageUiModel, newItem: NoteImageUiModel): Boolean {
             return oldItem == newItem
         }

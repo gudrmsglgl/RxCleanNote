@@ -36,7 +36,7 @@ class LinkImageDialog(
     override val context: Context,
     private val glideRequestManager: RequestManager,
     private val lifeCycleOwner: LifecycleOwner
-): BaseDialog  {
+) : BaseDialog {
 
     private lateinit var linkCustomView: View
     private val pathSubject: PublishSubject<String> = PublishSubject.create()
@@ -67,7 +67,6 @@ class LinkImageDialog(
             pathSubject.onComplete()
             compositeDisposable.dispose()
         }
-
     }
 
     fun onUploadImage(func: (String) -> Unit) = makeDefaultDialog()
@@ -115,7 +114,6 @@ class LinkImageDialog(
         dismiss()
     }.addCompositeDisposable()
 
-
     private fun inputLinkTextSource(
         view: View
     ) = view
@@ -132,7 +130,7 @@ class LinkImageDialog(
         glideRequestManager
             .asBitmap()
             .load(path)
-            .into(object : CustomTarget<Bitmap>(){
+            .into(object : CustomTarget<Bitmap>() {
 
                 override fun onLoadFailed(errorDrawable: Drawable?) {
                     super.onLoadFailed(errorDrawable)
@@ -168,17 +166,17 @@ class LinkImageDialog(
         if (path.isEmpty()) view.gone()
         else view.visible()
 
-    private fun TextView.activeOn(){
+    private fun TextView.activeOn() {
         this.changeTextColor(R.color.green)
         this.isEnabled = true
     }
 
-    private fun TextView.activeOff(){
+    private fun TextView.activeOff() {
         this.changeTextColor(R.color.default_grey)
         this.isEnabled = false
     }
 
-    private fun Disposable.addCompositeDisposable(){
+    private fun Disposable.addCompositeDisposable() {
         compositeDisposable.add(this)
     }
 }

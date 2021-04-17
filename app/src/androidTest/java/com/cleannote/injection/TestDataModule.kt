@@ -13,15 +13,13 @@ import javax.inject.Singleton
 abstract class TestDataModule {
 
     @Module
-    companion object{
+    companion object {
         @Provides
         @JvmStatic
         @Singleton
         fun provideNoteRepository(): NoteRepository = mockk()
     }
 
-
     @Binds
     abstract fun bindThreadExecutor(jobExecutor: JobExecutor): ThreadExecutor
-
 }

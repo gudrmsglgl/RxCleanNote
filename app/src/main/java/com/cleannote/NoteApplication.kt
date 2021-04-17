@@ -7,8 +7,7 @@ import com.cleannote.injection.module.DaggerApplicationComponent
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
-
-open class NoteApplication: Application() {
+open class NoteApplication : Application() {
 
     lateinit var applicationComponent: ApplicationComponent
 
@@ -20,8 +19,7 @@ open class NoteApplication: Application() {
         initApplicationComponent()
     }
 
-    open fun initApplicationComponent(){
+    open fun initApplicationComponent() {
         applicationComponent = DaggerApplicationComponent.factory().create(this)
     }
-
 }

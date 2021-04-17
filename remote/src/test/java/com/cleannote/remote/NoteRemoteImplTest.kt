@@ -5,45 +5,50 @@ import com.cleannote.remote.extensions.transNoteEntities
 import com.cleannote.remote.test.factory.NoteFactory
 import com.cleannote.remote.test.factory.QueryFactory
 import com.cleannote.remote.test.factory.UserFactory
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import io.reactivex.Completable
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.RuntimeException
 
-class NoteRemoteImplTest: BaseRemote() {
+class NoteRemoteImplTest : BaseRemote() {
 
     private lateinit var noteRemoteImpl: NoteRemoteImpl
 
     private val noteEntity = NoteFactory.createNoteEntity(
-        "7","title#7","body#7")
+        "7", "title#7", "body#7"
+    )
 
     @BeforeEach
-    fun setUp(){
-        noteService = mock{
-            on { insertNote(noteEntity.id, noteEntity.title,
-                noteEntity.body, noteEntity.updatedAt, noteEntity.createdAt)
+    fun setUp() {
+        noteService = mock {
+            on {
+                insertNote(
+                    noteEntity.id, noteEntity.title,
+                    noteEntity.body, noteEntity.updatedAt, noteEntity.createdAt
+                )
             } doReturn Completable.complete()
         }
         noteRemoteImpl = NoteRemoteImpl(noteService)
     }
 
-
     @Test
-    fun insertNewNoteComplete(){
+    fun insertNewNoteComplete() {
         val testObserver = noteRemoteImpl.insertRemoteNewNote(noteEntity).test()
         testObserver.assertComplete()
     }
 
     @Test
-    fun loginComplete(){
+    fun loginComplete() {
+        noteService stubLogin (UserFactory.USER_ID to UserFactory.makeUserModels(2))
         val testObserver = noteRemoteImpl.login(UserFactory.USER_ID).test()
         testObserver.assertComplete()
     }
 
     @Test
-    fun loginReturnData(){
+    fun loginReturnData() {
         val stubUserId = UserFactory.USER_ID
         val userModels = UserFactory.makeUserModels(2)
         noteService stubLogin (stubUserId to userModels)
@@ -54,7 +59,7 @@ class NoteRemoteImplTest: BaseRemote() {
     }
 
     @Test
-    fun searchNotesComplete(){
+    fun searchNotesComplete() {
         val defaultQuery = QueryFactory.makeQueryEntity()
         val noteModels = NoteFactory.createNoteModelList(defaultQuery.limit)
 
@@ -66,7 +71,7 @@ class NoteRemoteImplTest: BaseRemote() {
     }
 
     @Test
-    fun searchNotesNotEmptyThenReturnRemoteNotes(){
+    fun searchNotesNotEmptyThenReturnRemoteNotes() {
         val defaultQuery = QueryFactory.makeQueryEntity()
         val noteModels = NoteFactory.createNoteModelList(defaultQuery.limit)
 
@@ -88,9 +93,9 @@ class NoteRemoteImplTest: BaseRemote() {
     }
 
     @Test
-    fun updateNoteThrowUnsupportedOperationException(){
+    fun updateNoteThrowUnsupportedOperationException() {
         val updateNoteEntity = NoteFactory.createNoteEntity(title = "test")
-        Assertions.assertThrows(UnsupportedOperationException::class.java){
+        Assertions.assertThrows(UnsupportedOperationException::class.java) {
             noteRemoteImpl.updateNote(updateNoteEntity)
         }
     }

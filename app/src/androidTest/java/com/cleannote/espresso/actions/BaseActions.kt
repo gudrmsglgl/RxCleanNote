@@ -26,10 +26,9 @@ interface BaseActions {
         )
     }
 
-    fun pressBack(){
+    fun pressBack() {
         viewInteraction.perform(
             ViewActions.pressBack()
         )
     }
-
 }

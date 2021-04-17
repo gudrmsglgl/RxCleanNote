@@ -13,7 +13,7 @@ class DeleteNote
     val repository: NoteRepository,
     threadExecutor: ThreadExecutor,
     postExecutionThread: PostExecutionThread
-): CompletableUseCase<Note>(threadExecutor, postExecutionThread) {
+) : CompletableUseCase<Note>(threadExecutor, postExecutionThread) {
 
     public override fun buildUseCaseCompletable(params: Note?): Completable {
         return repository.deleteNote(params!!)

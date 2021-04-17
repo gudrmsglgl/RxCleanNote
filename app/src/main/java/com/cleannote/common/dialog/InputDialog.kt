@@ -10,13 +10,13 @@ import com.cleannote.app.R
 class InputDialog(
     override val context: Context,
     private val viewLifeCycleOwner: LifecycleOwner
-): BaseDialog {
+) : BaseDialog {
 
     private var hint: String? = null
     private var message: String? = null
     private var inputText: String? = null
 
-    fun setHint(hint: String): InputDialog{
+    fun setHint(hint: String): InputDialog {
         this.hint = hint
         return this
     }
@@ -29,7 +29,7 @@ class InputDialog(
     override fun makeDefaultDialog(): MaterialDialog = MaterialDialog(context)
         .show {
             message(text = message)
-            input(hint = hint){ _ , charSequence ->
+            input(hint = hint) { _, charSequence ->
                 inputText = charSequence.toString()
             }
             negativeButton {
@@ -43,5 +43,4 @@ class InputDialog(
         .positiveButton {
             func.invoke(inputText)
         }
-
 }

@@ -7,12 +7,12 @@ import com.cleannote.domain.model.Query
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-class NoteDataRepoNextPageExist: BaseNoteRepositoryTest() {
+class NoteDataRepoNextPageExist : BaseNoteRepositoryTest() {
     private val query = QueryFactory.makeQuery(page = 2)
 
     @Test
     @DisplayName("TestCase[Cache]: Call Cache DataStore Func")
-    fun testCase_callCacheDataStore(){
+    fun testCase_callCacheDataStore() {
         stubContainer {
             cDataStoreStubber {
                 nextPageExist(
@@ -31,7 +31,7 @@ class NoteDataRepoNextPageExist: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache]: AssertComplete")
-    fun testCase_assertComplete(){
+    fun testCase_assertComplete() {
         stubContainer {
             cDataStoreStubber {
                 nextPageExist(
@@ -47,7 +47,7 @@ class NoteDataRepoNextPageExist: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache]: AssertValue -> Boolean")
-    fun testCase_assertValue(){
+    fun testCase_assertValue() {
         stubContainer {
             cDataStoreStubber {
                 nextPageExist(
@@ -60,7 +60,6 @@ class NoteDataRepoNextPageExist: BaseNoteRepositoryTest() {
             .test()
             .assertValue(true)
     }
-
 
     private fun whenRepoNextPageExist(param: Query) = noteDataRepository.nextPageExist(param)
 }

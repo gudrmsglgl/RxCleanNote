@@ -12,7 +12,7 @@ import com.cleannote.model.NoteUiModel
 import com.cleannote.notelist.holder.BaseHolder
 import io.mockk.*
 
-abstract class BaseTest: RepoStubber {
+abstract class BaseTest : RepoStubber {
 
     override val repository: NoteRepository
         get() = getComponent().provideNoteRepository()
@@ -21,7 +21,7 @@ abstract class BaseTest: RepoStubber {
     val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
     private val application: TestBaseApplication
-        = ApplicationProvider.getApplicationContext() as TestBaseApplication
+    ApplicationProvider.getApplicationContext() as TestBaseApplication
 
     fun getComponent(): TestApplicationComponent {
         return application.applicationComponent as TestApplicationComponent

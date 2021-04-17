@@ -8,12 +8,12 @@ import com.cleannote.espresso.assertion.BaseAssertion
 import org.hamcrest.Matcher
 
 @Suppress("UNCHECKED_CAST")
-open class NBaseView<out T>(private val viewMatcher: Matcher<View>): BaseActions, BaseAssertion {
+open class NBaseView<out T>(private val viewMatcher: Matcher<View>) : BaseActions, BaseAssertion {
 
     override val viewInteraction: ViewInteraction
         get() = onView(viewMatcher)
 
-    operator fun invoke(function: T.() -> Unit){
+    operator fun invoke(function: T.() -> Unit) {
         function(this as T)
     }
 }

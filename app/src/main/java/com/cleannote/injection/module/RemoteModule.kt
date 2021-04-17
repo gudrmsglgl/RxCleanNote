@@ -13,11 +13,11 @@ import dagger.Provides
 abstract class RemoteModule {
 
     @Module
-    companion object{
+    companion object {
 
         @JvmStatic
         @Provides
-        fun provideNoteService(): NoteService{
+        fun provideNoteService(): NoteService {
             return NoteServiceFactory.makeNoteService(BuildConfig.DEBUG)
         }
     }

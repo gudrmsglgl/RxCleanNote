@@ -1,6 +1,5 @@
 package com.cleannote.injection
 
-import android.content.SharedPreferences
 import androidx.room.Room
 import com.cleannote.TestBaseApplication
 import com.cleannote.cache.PreferencesHelper
@@ -39,5 +38,4 @@ object TestCacheModule {
     @JvmStatic
     @Singleton
     fun providePreferencesHelper(): PreferencesHelper = mockk()
-
 }

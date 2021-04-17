@@ -8,11 +8,11 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
+class NoteDataRepoDeleteNoteTest : BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: Call CacheDataStore DeleteNote")
-    fun testCase_callCacheDataStore(){
+    fun testCase_callCacheDataStore() {
         val note = NoteFactory.createNote(id = "#1", title = "deleted")
 
         stubContainer {
@@ -29,7 +29,7 @@ class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: AssertComplete")
-    fun testCase_assertComplete(){
+    fun testCase_assertComplete() {
         val note = NoteFactory.createNote(id = "#1", title = "deleted")
 
         stubContainer {
@@ -43,7 +43,7 @@ class NoteDataRepoDeleteNoteTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: AssertValue -> NoValue")
-    fun testCase_assertValueNoValue(){
+    fun testCase_assertValueNoValue() {
         val note = NoteFactory.createNote(id = "#1", title = "deleted")
 
         stubContainer {

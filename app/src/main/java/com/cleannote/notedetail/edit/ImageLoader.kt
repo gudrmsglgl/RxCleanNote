@@ -13,16 +13,18 @@ class ImageLoader(
     private val glideManager: RequestManager
 ) {
 
-    fun onLoaded(@PickerType type: Int, resultOk: (String) -> Unit){
+    fun onLoaded(@PickerType type: Int, resultOk: (String) -> Unit) {
         when (type) {
-            LINK -> LinkImageDialog(fragment.requireActivity(),
-                                    glideManager,
-                                    fragment.viewLifecycleOwner).onUploadImage { resultOk.invoke(it) }
+            LINK -> LinkImageDialog(
+                fragment.requireActivity(),
+                glideManager,
+                fragment.viewLifecycleOwner
+            ).onUploadImage { resultOk.invoke(it) }
             else -> loadImagePicker(type, resultOk)
         }
     }
 
-    private inline fun loadImagePicker(@PickerType type: Int, crossinline resultOk: (String) -> Unit ){
+    private inline fun loadImagePicker(@PickerType type: Int, crossinline resultOk: (String) -> Unit) {
         val builder = ImagePicker.with(fragment)
         if (type == CAMERA)
             builder.cameraOnly()
@@ -32,8 +34,8 @@ class ImageLoader(
             .start { resultCode, data ->
                 when (resultCode) {
                     Activity.RESULT_OK -> {
-                        //You can also get File Path from intent
-                        val filePath:String = ImagePicker.getFilePath(data)!!
+                        // You can also get File Path from intent
+                        val filePath: String = ImagePicker.getFilePath(data)!!
                         resultOk.invoke(filePath)
                     }
                     ImagePicker.RESULT_ERROR -> {

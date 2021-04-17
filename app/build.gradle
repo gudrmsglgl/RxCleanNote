@@ -55,14 +55,11 @@ android {
         correctErrorTypes = true
     }
 
-    dataBinding{
-        enabled = true
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
     }
-
-    viewBinding {
-        enabled = true
-    }
-
+    
     kotlinOptions {
         jvmTarget = "1.8"
     }

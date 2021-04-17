@@ -10,11 +10,11 @@ import com.cleannote.espresso.actions.ScrollableActions
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 
-interface ScrollViewActions: ScrollableActions {
+interface ScrollViewActions : ScrollableActions {
 
     override fun scrollToStart() {
         viewInteraction
-            .perform(object: ViewAction{
+            .perform(object : ViewAction {
                 override fun getDescription(): String = "Scroll ScrollView to Start"
 
                 override fun getConstraints(): Matcher<View> =
@@ -30,7 +30,7 @@ interface ScrollViewActions: ScrollableActions {
 
     override fun scrollToEnd() {
         viewInteraction
-            .perform(object: ViewAction {
+            .perform(object : ViewAction {
                 override fun getDescription(): String = "Scroll scrollView to End"
 
                 override fun getConstraints(): Matcher<View> =
@@ -46,7 +46,7 @@ interface ScrollViewActions: ScrollableActions {
 
     override fun scrollTo(position: Int) {
         viewInteraction
-            .perform(object: ViewAction {
+            .perform(object : ViewAction {
                 override fun getDescription(): String = "Scroll scrollView to $position"
 
                 override fun getConstraints(): Matcher<View> =
@@ -59,5 +59,4 @@ interface ScrollViewActions: ScrollableActions {
                 }
             })
     }
-
 }

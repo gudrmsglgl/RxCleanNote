@@ -4,10 +4,12 @@ import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.model.UserEntity
 import com.cleannote.data.repository.NoteRemote
-import com.cleannote.remote.extensions.*
 import com.cleannote.remote.extensions.NETWORK
+import com.cleannote.remote.extensions.SERVICE_UNAVAILABLE
 import com.cleannote.remote.extensions.TIMEOUT
 import com.cleannote.remote.extensions.applyRetryPolicy
+import com.cleannote.remote.extensions.transNoteEntities
+import com.cleannote.remote.extensions.transUserEntities
 import com.cleannote.remote.model.NoteModel
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -15,7 +17,7 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class NoteRemoteImpl
-@Inject constructor(private val noteService: NoteService): NoteRemote {
+@Inject constructor(private val noteService: NoteService) : NoteRemote {
 
     override fun insertRemoteNewNote(noteEntity: NoteEntity): Completable {
         return noteService.insertNote(

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.lang.RuntimeException
 
-class NoteListVMNextPageTest: NoteListViewModelTest() {
+class NoteListVMNextPageTest : NoteListViewModelTest() {
 
     private lateinit var captors: NextUseCaseCaptors
     private lateinit var nextFeatureTester: NextFeatureTester

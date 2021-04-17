@@ -8,11 +8,11 @@ import java.lang.IllegalStateException
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class AutoClearedValue<T: Any>(val fragment: Fragment): ReadWriteProperty<Fragment, T> {
+class AutoClearedValue<T : Any>(val fragment: Fragment) : ReadWriteProperty<Fragment, T> {
     private var _value: T? = null
 
     init {
-        fragment.lifecycle.addObserver(object : LifecycleObserver{
+        fragment.lifecycle.addObserver(object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             fun onDestroy() {
                 _value = null
@@ -31,4 +31,4 @@ class AutoClearedValue<T: Any>(val fragment: Fragment): ReadWriteProperty<Fragme
     }
 }
 
-fun <T: Any> Fragment.autoCleared() = AutoClearedValue<T>(this)
+fun <T : Any> Fragment.autoCleared() = AutoClearedValue<T>(this)

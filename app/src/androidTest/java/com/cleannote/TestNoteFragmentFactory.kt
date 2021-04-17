@@ -21,15 +21,15 @@ class TestNoteFragmentFactory
     private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences,
     private val glideReqManager: RequestManager
-): FragmentFactory() {
+) : FragmentFactory() {
 
     lateinit var uiController: UIController
 
-    override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
+    override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when (className) {
 
         NoteListFragment::class.java.name -> {
             val fragment = NoteListFragment(viewModelFactory, sharedPreferences)
-            if (this::uiController.isInitialized){
+            if (this::uiController.isInitialized) {
                 fragment.setUIController(uiController)
             }
             fragment
@@ -37,7 +37,7 @@ class TestNoteFragmentFactory
 
         NoteDetailViewFragment::class.java.name -> {
             val fragment = NoteDetailViewFragment(viewModelFactory, glideReqManager)
-            if (this::uiController.isInitialized){
+            if (this::uiController.isInitialized) {
                 fragment.setUIController(uiController)
             }
             fragment
@@ -45,7 +45,7 @@ class TestNoteFragmentFactory
 
         NoteDetailEditFragment::class.java.name -> {
             val fragment = NoteDetailEditFragment(viewModelFactory, dateUtil, glideReqManager)
-            if (this::uiController.isInitialized){
+            if (this::uiController.isInitialized) {
                 fragment.setUIController(uiController)
             }
             fragment
@@ -53,7 +53,7 @@ class TestNoteFragmentFactory
 
         SplashFragment::class.java.name -> {
             val fragment = SplashFragment(viewModelFactory)
-            if (this::uiController.isInitialized){
+            if (this::uiController.isInitialized) {
                 fragment.setUIController(uiController)
             }
             fragment

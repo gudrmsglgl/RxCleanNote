@@ -2,9 +2,6 @@ package com.cleannote.presentation.extensions
 
 import com.cleannote.domain.interactor.UseCase
 import com.cleannote.presentation.ArgumentCaptors
-import com.cleannote.presentation.Complete
-import com.cleannote.presentation.OnError
-import com.cleannote.presentation.OnSuccess
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.verify
 

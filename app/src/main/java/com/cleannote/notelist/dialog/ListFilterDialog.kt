@@ -24,14 +24,14 @@ class ListFilterDialog(
     override val context: Context,
     private val sharedPref: SharedPreferences,
     private val viewLifeCycleOwner: LifecycleOwner
-): BaseDialog {
+) : BaseDialog {
 
     override fun makeDefaultDialog(): MaterialDialog = MaterialDialog(context).show {
         customView(R.layout.layout_filter)
         cancelable(true)
     }
 
-    fun showDialog(okBtnSource:(MaterialDialog, String) -> Unit)= makeDefaultDialog()
+    fun showDialog(okBtnSource: (MaterialDialog, String) -> Unit) = makeDefaultDialog()
         .show {
             val view = getCustomView()
             val filterOk = view.findViewById<Button>(R.id.filter_btn_ok)
@@ -52,14 +52,14 @@ class ListFilterDialog(
         okBtn.singleClick(),
         BiFunction { selectedRadioBtn: Int, _: Unit ->
             selectedRadioBtn
-        })
+        }
+    )
         .map {
             if (it == R.id.radio_btn_desc)
                 Constants.ORDER_DESC
             else
                 Constants.ORDER_ASC
         }
-
 
     private fun selectedRadioBtnSource(view: View) = initCheckedRadioGroup(view).checkedChanges()
 
@@ -72,11 +72,12 @@ class ListFilterDialog(
     }
 
     @IdRes
-    private fun getCachedRadioBtn(): Int{
+    private fun getCachedRadioBtn(): Int {
         return if (Constants.ORDER_DESC == sharedPref.getString(
                 Constants.FILTER_ORDERING_KEY,
                 Constants.ORDER_DESC
-            ))
+            )
+        )
             R.id.radio_btn_desc
         else
             R.id.radio_btn_asc

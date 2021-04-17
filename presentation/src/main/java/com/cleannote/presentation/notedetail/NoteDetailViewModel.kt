@@ -10,7 +10,6 @@ import com.cleannote.presentation.data.SingleLiveEvent
 import com.cleannote.presentation.data.notedetail.BeforeAfterNoteView
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
 import com.cleannote.presentation.data.notedetail.TextMode
-import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.extensions.createNoteImageView
 import com.cleannote.presentation.extensions.transNote
 import com.cleannote.presentation.model.NoteImageView
@@ -19,7 +18,7 @@ import com.cleannote.presentation.model.NoteView
 class NoteDetailViewModel
 constructor(
     private val detailUseCases: NoteDetailUseCases
-): ViewModel() {
+) : ViewModel() {
 
     private val _finalNote = MutableLiveData<NoteView>()
     val finalNote: LiveData<NoteView>
@@ -41,26 +40,26 @@ constructor(
     val noteMode: LiveData<TextMode>
         get() = _noteMode
 
-    fun setToolbarState(state: DetailToolbarState){
+    fun setToolbarState(state: DetailToolbarState) {
         _detailToolbarState.value = state
     }
 
-    fun defaultMode(param: NoteView?){
-        noteMode(DefaultMode)
+    fun defaultMode(param: NoteView?) {
+        noteMode(TextMode.DefaultMode)
         setFinalNote(param, isAsync = false)
     }
 
-    fun editMode(){
-        noteMode(EditMode)
+    fun editMode() {
+        noteMode(TextMode.EditMode)
     }
 
-    fun editCancel(){
-        noteMode(DefaultMode)
+    fun editCancel() {
+        noteMode(TextMode.DefaultMode)
         setFinalNote(finalNote(), isAsync = false)
     }
 
     fun editDoneMode(param: NoteView) = finalNote()?.let {
-        noteMode(EditDoneMode)
+        noteMode(TextMode.EditDoneMode)
         executeUpdate(
             BeforeAfterNoteView(before = it, after = param)
         )
@@ -83,7 +82,7 @@ constructor(
         noteImages = addImage(path, this.id)
     )
 
-    fun deleteImage(path: String, updateTime: String) = finalNote()?.let{
+    fun deleteImage(path: String, updateTime: String) = finalNote()?.let {
         executeUpdate(
             BeforeAfterNoteView(
                 before = it,
@@ -100,7 +99,7 @@ constructor(
         noteImages = removeImage(path)
     )
 
-    private fun executeUpdate(param: BeforeAfterNoteView){
+    private fun executeUpdate(param: BeforeAfterNoteView) {
         _updatedNote.postValue(DataState.loading())
         detailUseCases.updateNote.execute(
             onSuccess = {},
@@ -116,11 +115,11 @@ constructor(
         )
     }
 
-    private fun noteMode(mode: TextMode){
+    private fun noteMode(mode: TextMode) {
         _noteMode.value = mode
     }
 
-    private fun setFinalNote(param: NoteView?, isAsync: Boolean){
+    private fun setFinalNote(param: NoteView?, isAsync: Boolean) {
         if (isAsync) _finalNote.postValue(param)
         else _finalNote.value = param
     }

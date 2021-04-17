@@ -10,22 +10,22 @@ import com.cleannote.presentation.test.factory.NoteFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteListVMRequestTest: NoteListViewModelTest() {
+class NoteListVMRequestTest : NoteListViewModelTest() {
 
     private lateinit var captors: SearchUseCaseCaptors
     private lateinit var requestFeatureTester: RequestFeatureTester
 
     @BeforeEach
-    fun requestTestSetup(){
+    fun requestTestSetup() {
         captors = SearchUseCaseCaptors()
         requestFeatureTester = RequestFeatureTester(noteListViewModel, searchNotes, captors)
     }
 
     @Test
-    fun reqUpdateFromDetailFragmentSuccessThenSortingTop(){
+    fun reqUpdateFromDetailFragmentSuccessThenSortingTop() {
         val noteViews = NoteFactory.createNoteViewList(0, 10)
         val updateNoteView = NoteFactory.oneOfNotesUpdate(notes = noteViews, index = 2, title = "updateTitle", body = null)
-        with(requestFeatureTester){
+        with(requestFeatureTester) {
             search()
                 .verifyUseCaseExecute()
                 .verifyChangeState(LOADING)
@@ -37,15 +37,14 @@ class NoteListVMRequestTest: NoteListViewModelTest() {
             requestUpdate(updateNoteView)
                 .expectFirstNote(updateNoteView)
                 .verifyChangeState(SUCCESS)
-
         }
     }
 
     @Test
-    fun reqDeleteFromDetailFragmentSuccessThenHasNoData(){
+    fun reqDeleteFromDetailFragmentSuccessThenHasNoData() {
         val noteViews = NoteFactory.createNoteViewList(0, 10).toMutableList()
         val reqDeletedNote = noteViews[2]
-        with(requestFeatureTester){
+        with(requestFeatureTester) {
             search()
                 .verifyUseCaseExecute()
                 .verifyChangeState(LOADING)
@@ -59,7 +58,5 @@ class NoteListVMRequestTest: NoteListViewModelTest() {
                 .verifyChangeState(SUCCESS)
                 .expectData(noteViews.apply { remove(reqDeletedNote) })
         }
-
     }
-
 }

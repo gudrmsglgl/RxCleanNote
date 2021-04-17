@@ -8,7 +8,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 interface BaseDialog {
     val context: Context
     fun makeDefaultDialog(): MaterialDialog
-    fun showToast(@StringRes idRes: Int){
+    fun showToast(@StringRes idRes: Int) {
         Toast.makeText(context, context.resources.getString(idRes), Toast.LENGTH_SHORT).show()
     }
 }

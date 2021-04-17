@@ -12,7 +12,7 @@ import com.jakewharton.rxbinding4.view.longClicks
 class NoteViewHolder(
     val binding: ItemNoteListBinding,
     private val requestManager: RequestManager
-): BaseHolder<NoteUiModel>(binding){
+) : BaseHolder<NoteUiModel>(binding) {
 
     override fun bind(
         item: NoteUiModel,
@@ -37,10 +37,8 @@ class NoteViewHolder(
             itemNote
                 .longClicks { true }
                 .subscribe(subjectManager.longClickSubject)
-
         }
     }
 
     private fun isClamped(holder: NoteViewHolder) = holder.itemView.tag as? Boolean ?: false
-
 }

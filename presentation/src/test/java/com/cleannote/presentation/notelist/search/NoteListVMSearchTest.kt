@@ -3,7 +3,7 @@ package com.cleannote.presentation.notelist.search
 import com.cleannote.domain.Constants
 import com.cleannote.domain.Constants.ORDER_ASC
 import com.cleannote.domain.Constants.ORDER_DESC
-import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.extensions.transNotes
 import com.cleannote.presentation.notelist.NoteListViewModelTest
 import com.cleannote.presentation.notelist.search.tester.SearchFeatureTester
@@ -14,7 +14,7 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteListVMSearchTest: NoteListViewModelTest() {
+class NoteListVMSearchTest : NoteListViewModelTest() {
 
     private lateinit var captors: SearchUseCaseCaptors
     private lateinit var searchFeatureTester: SearchFeatureTester
@@ -26,8 +26,8 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
     }
 
     @Test
-    fun searchNotesExecuteUseCase(){
-        with(searchFeatureTester){
+    fun searchNotesExecuteUseCase() {
+        with(searchFeatureTester) {
             search()
                 .verifyUseCaseExecute()
         }
@@ -38,49 +38,48 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
     }
 
     @Test
-    fun searchNotesStateLoadingReturnNoData(){
-        with(searchFeatureTester){
+    fun searchNotesStateLoadingReturnNoData() {
+        with(searchFeatureTester) {
             search()
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
                 .expectData(null)
         }
     }
 
     @Test
-    fun searchNotesStateLoadingToSuccessReturnData(){
+    fun searchNotesStateLoadingToSuccessReturnData() {
         val notes = NoteFactory.createNoteViewList(0, 10)
         with(searchFeatureTester) {
 
             search()
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
 
             stubUseCaseOnSuccess(notes.transNotes())
-                .verifyChangeState(SUCCESS)
+                .verifyChangeState(State.SUCCESS)
                 .expectData(notes)
         }
     }
 
     @Test
-    fun searchNotesStateErrorReturnThrowableNoData(){
+    fun searchNotesStateErrorReturnThrowableNoData() {
         val errorMessage = "RunTimeException Test"
         val throwable = RuntimeException(errorMessage)
-        with(searchFeatureTester){
+        with(searchFeatureTester) {
 
             search()
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
 
             stubUseCaseOnError(throwable)
-                .verifyChangeState(ERROR)
+                .verifyChangeState(State.ERROR)
                 .expectData(null)
                 .expectError(throwable)
-
         }
     }
     @Test
-    fun searchNoteNextPageReturnDataTotalSize_20(){
+    fun searchNoteNextPageReturnDataTotalSize_20() {
         val noteList = NoteFactory.createNoteViewList(0, 20).asReversed()
         with(searchFeatureTester) {
 
@@ -90,21 +89,19 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
                 .expectQuery(page = 1)
                 .expectData(noteList.subList(0, 10))
 
-
             search(isNextPage = true)
                 .stubUseCaseOnSuccess(noteList.subList(10, 20).transNotes())
                 .expectQuery(page = 2)
                 .expectData(noteList)
 
-            verifyChangeState(LOADING, times(2))
-            verifyChangeState(SUCCESS, times(2))
-
+            verifyChangeState(State.LOADING, times(2))
+            verifyChangeState(State.SUCCESS, times(2))
         }
     }
 
     @Test
-    fun searchNoteDefaultOrderingDESC(){
-        with(searchFeatureTester){
+    fun searchNoteDefaultOrderingDESC() {
+        with(searchFeatureTester) {
             search()
                 .verifyUseCaseExecute()
                 .expectQuery(order = ORDER_DESC)
@@ -112,8 +109,8 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
     }
 
     @Test
-    fun searchNoteSetOrderingASC(){
-        with(searchFeatureTester){
+    fun searchNoteSetOrderingASC() {
+        with(searchFeatureTester) {
             setOrdering(ORDER_ASC)
             search()
                 .verifyUseCaseExecute()
@@ -122,9 +119,9 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
     }
 
     @Test
-    fun searchNoteKeyWordQuery(){
+    fun searchNoteKeyWordQuery() {
         val keyword = "TestQuery"
-        with(searchFeatureTester){
+        with(searchFeatureTester) {
             searchKeyword(keyword)
             search()
                 .verifyUseCaseExecute()
@@ -133,12 +130,12 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
     }
 
     @Test
-    fun searchNoteAfterKeyWordQuery_ReturnOnlyKeywordData(){
+    fun searchNoteAfterKeyWordQuery_ReturnOnlyKeywordData() {
         val keyword = "TestQuery"
-        val defaultNoteList = NoteFactory.createNoteViewList(0,10)
-        val keyWordNoteList = NoteFactory.createNoteViewList(0,5)
+        val defaultNoteList = NoteFactory.createNoteViewList(0, 10)
+        val keyWordNoteList = NoteFactory.createNoteViewList(0, 5)
 
-        with(searchFeatureTester){
+        with(searchFeatureTester) {
 
             search()
                 .verifyUseCaseExecute()
@@ -150,8 +147,6 @@ class NoteListVMSearchTest: NoteListViewModelTest() {
                 .stubUseCaseOnSuccess(keyWordNoteList.transNotes())
                 .expectQuery(like = keyword)
                 .expectData(keyWordNoteList)
-
         }
     }
-
 }

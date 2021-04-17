@@ -8,23 +8,27 @@ import org.hamcrest.Matchers
 interface BaseAssertion {
     val viewInteraction: ViewInteraction
 
-    fun isDisplayed(){
-        viewInteraction.check(ViewAssertions.matches(
-            ViewMatchers.isDisplayed()
-        ))
+    fun isDisplayed() {
+        viewInteraction.check(
+            ViewAssertions.matches(
+                ViewMatchers.isDisplayed()
+            )
+        )
     }
 
-    fun isNotDisplayed(){
-        viewInteraction.check(ViewAssertions.matches(
-            Matchers.not(ViewMatchers.isDisplayed())
-        ))
+    fun isNotDisplayed() {
+        viewInteraction.check(
+            ViewAssertions.matches(
+                Matchers.not(ViewMatchers.isDisplayed())
+            )
+        )
     }
 
-    fun doesNotExist(){
+    fun doesNotExist() {
         viewInteraction.check(ViewAssertions.doesNotExist())
     }
 
-    fun isVisible(){
+    fun isVisible() {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withEffectiveVisibility(
@@ -34,7 +38,7 @@ interface BaseAssertion {
         )
     }
 
-    fun isInVisible(){
+    fun isInVisible() {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withEffectiveVisibility(
@@ -44,7 +48,7 @@ interface BaseAssertion {
         )
     }
 
-    fun isGone(){
+    fun isGone() {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withEffectiveVisibility(

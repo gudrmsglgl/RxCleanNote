@@ -2,8 +2,6 @@ package com.cleannote.remote
 
 import com.cleannote.remote.model.NoteModel
 import com.cleannote.remote.model.UserModel
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

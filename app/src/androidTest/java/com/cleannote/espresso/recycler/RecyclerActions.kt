@@ -9,26 +9,26 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import com.cleannote.espresso.actions.ScrollableActions
 import com.cleannote.espresso.actions.SwipeableActions
-import com.cleannote.notelist.NoteListAdapter
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 
-interface RecyclerActions: ScrollableActions, SwipeableActions {
+interface RecyclerActions : ScrollableActions, SwipeableActions {
 
     override fun scrollToStart() {
         viewInteraction.perform(
-            RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(0))
+            RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(0)
+        )
     }
 
     override fun scrollToEnd() {
-        viewInteraction.perform(object : ViewAction{
+        viewInteraction.perform(object : ViewAction {
             override fun getDescription(): String = "Scroll RecyclerView to the bottom"
 
             override fun getConstraints(): Matcher<View> = ViewMatchers.isAssignableFrom(RecyclerView::class.java)
 
             override fun perform(uiController: UiController, view: View?) {
                 if (view is RecyclerView) {
-                    val position = view.adapter!!.itemCount-1
+                    val position = view.adapter!!.itemCount - 1
                     view.scrollToPosition(position)
                     uiController.loopMainThreadUntilIdle()
                     val lastView = view.findViewHolderForAdapterPosition(position)!!.itemView
@@ -46,7 +46,7 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
     fun getSize(): Int {
         var size = 0
 
-        viewInteraction.perform(object : ViewAction{
+        viewInteraction.perform(object : ViewAction {
             override fun getDescription(): String = "Get RecyclerView adapter size"
 
             override fun getConstraints(): Matcher<View> =
@@ -63,7 +63,7 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
     fun getLastVisiblePosition(): Int {
         var lastVisiblePosition = 0
 
-        viewInteraction.perform(object : ViewAction{
+        viewInteraction.perform(object : ViewAction {
             override fun getDescription(): String = "Get RecyclerView Item LastVisible size"
 
             override fun getConstraints(): Matcher<View> =
@@ -76,5 +76,4 @@ interface RecyclerActions: ScrollableActions, SwipeableActions {
         })
         return lastVisiblePosition
     }
-
 }

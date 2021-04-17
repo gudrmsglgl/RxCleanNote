@@ -13,8 +13,7 @@ class InsertNewNote
     val repository: NoteRepository,
     threadExecutor: ThreadExecutor,
     postExecutionThread: PostExecutionThread
-): SingleUseCase<Long, Note>(threadExecutor, postExecutionThread) {
+) : SingleUseCase<Long, Note>(threadExecutor, postExecutionThread) {
 
     override fun buildUseCaseSingle(params: Note?): Single<Long> = repository.insertNewNote(params!!)
-
 }

@@ -8,7 +8,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.cleannote.espresso.actions.ScrollableActions
 import org.hamcrest.Matcher
 
-interface ViewPager2Actions: ScrollableActions {
+interface ViewPager2Actions : ScrollableActions {
     override fun scrollToStart() {
         viewInteraction.perform(object : ViewAction {
             override fun getConstraints(): Matcher<View> = ViewMatchers.isAssignableFrom(ViewPager2::class.java)
@@ -16,7 +16,7 @@ interface ViewPager2Actions: ScrollableActions {
             override fun getDescription(): String = "Scroll view pager 2 to start"
 
             override fun perform(uiController: UiController, view: View?) {
-                if (view is ViewPager2){
+                if (view is ViewPager2) {
                     view.setCurrentItem(0, false)
                     uiController.loopMainThreadUntilIdle()
                 }
@@ -31,7 +31,7 @@ interface ViewPager2Actions: ScrollableActions {
             override fun getDescription(): String = "Scroll view pager 2 to end"
 
             override fun perform(uiController: UiController, view: View?) {
-                if (view is ViewPager2){
+                if (view is ViewPager2) {
                     val endPosition = view.adapter?.itemCount?.let { it - 1 } ?: 0
                     view.setCurrentItem(endPosition, false)
                     uiController.loopMainThreadUntilIdle()
@@ -47,7 +47,7 @@ interface ViewPager2Actions: ScrollableActions {
             override fun getDescription(): String = "Scroll view pager 2 to specific position"
 
             override fun perform(uiController: UiController, view: View?) {
-                if (view is ViewPager2){
+                if (view is ViewPager2) {
                     view.setCurrentItem(position, false)
                     uiController.loopMainThreadUntilIdle()
                 }

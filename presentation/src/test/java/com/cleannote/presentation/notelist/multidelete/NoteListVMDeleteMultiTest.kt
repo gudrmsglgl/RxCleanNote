@@ -1,6 +1,6 @@
 package com.cleannote.presentation.notelist.multidelete
 
-import com.cleannote.presentation.data.State.*
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.extensions.transNotes
 import com.cleannote.presentation.notelist.NoteListViewModelTest
 import com.cleannote.presentation.notelist.multidelete.tester.DeleteMultiUseCaseCaptors
@@ -11,7 +11,7 @@ import com.cleannote.presentation.test.factory.NoteFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NoteListVMDeleteMultiTest: NoteListViewModelTest() {
+class NoteListVMDeleteMultiTest : NoteListViewModelTest() {
 
     private lateinit var deleteMultiUseCaseCaptors: DeleteMultiUseCaseCaptors
     private lateinit var deleteMultipleFeatureTester: DeleteMultipleFeatureTester
@@ -20,7 +20,7 @@ class NoteListVMDeleteMultiTest: NoteListViewModelTest() {
     private lateinit var searchFeatureTester: SearchFeatureTester
 
     @BeforeEach
-    fun deleteMultiSetup(){
+    fun deleteMultiSetup() {
         deleteMultiUseCaseCaptors = DeleteMultiUseCaseCaptors()
         deleteMultipleFeatureTester = DeleteMultipleFeatureTester(noteListViewModel, useCases.deleteMultipleNotes, deleteMultiUseCaseCaptors)
 
@@ -29,25 +29,24 @@ class NoteListVMDeleteMultiTest: NoteListViewModelTest() {
     }
 
     @Test
-    fun deleteMultipleNotesExecuteUseCase(){
+    fun deleteMultipleNotesExecuteUseCase() {
         val deleteIndex = 0
         val deleteIndex2 = 2
 
-        val noteViews = NoteFactory.createNoteViewList(0,5)
+        val noteViews = NoteFactory.createNoteViewList(0, 5)
         val selectedNotes = listOf(noteViews[deleteIndex], noteViews[deleteIndex2])
 
-        with(deleteMultipleFeatureTester){
+        with(deleteMultipleFeatureTester) {
             deleteMultiNotes(selectedNotes)
                 .verifyUseCaseExecute()
         }
-
     }
 
     @Test
-    fun deleteMultipleNotesStateSuccessReturnDeletedNotes(){
+    fun deleteMultipleNotesStateSuccessReturnDeletedNotes() {
         val noteViewList = NoteFactory.createNoteViewList(0, 10).asReversed().toMutableList()
 
-        with(searchFeatureTester){
+        with(searchFeatureTester) {
             search()
                 .verifyUseCaseExecute()
                 .stubUseCaseOnSuccess(noteViewList.transNotes())
@@ -59,22 +58,22 @@ class NoteListVMDeleteMultiTest: NoteListViewModelTest() {
             selectDeleteNotes.forEach { remove(it) }
         }
 
-        with (deleteMultipleFeatureTester) {
+        with(deleteMultipleFeatureTester) {
             deleteMultiNotes(selectDeleteNotes)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
 
             stubUseCaseOnComplete()
-                .verifyChangeState(SUCCESS)
+                .verifyChangeState(State.SUCCESS)
                 .expectTotalNote(totalNotesAfterDeleted)
         }
     }
 
     @Test
-    fun deleteMultipleNotesStateErrorReturnThrowableNotDeletedNotes(){
+    fun deleteMultipleNotesStateErrorReturnThrowableNotDeletedNotes() {
         val noteViewList = NoteFactory.createNoteViewList(0, 10).asReversed().toMutableList()
 
-        with(searchFeatureTester){
+        with(searchFeatureTester) {
             search()
                 .verifyUseCaseExecute()
                 .stubUseCaseOnSuccess(noteViewList.transNotes())
@@ -84,15 +83,14 @@ class NoteListVMDeleteMultiTest: NoteListViewModelTest() {
         val throwable = RuntimeException()
         val selectDeleteNotes = listOf(noteViewList[0], noteViewList[2])
 
-        with (deleteMultipleFeatureTester) {
+        with(deleteMultipleFeatureTester) {
             deleteMultiNotes(selectDeleteNotes)
                 .verifyUseCaseExecute()
-                .verifyChangeState(LOADING)
+                .verifyChangeState(State.LOADING)
 
             stubUseCaseOnError(throwable)
-                .verifyChangeState(ERROR)
+                .verifyChangeState(State.ERROR)
                 .expectTotalNote(noteViewList)
         }
     }
-
 }

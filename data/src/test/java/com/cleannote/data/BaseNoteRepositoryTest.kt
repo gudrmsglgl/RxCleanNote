@@ -27,14 +27,14 @@ abstract class BaseNoteRepositoryTest {
     lateinit var dataStoreVerifyScope: DataStoreVerifyScope
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
         initMockDataStore()
         initMockStubDataStoreFactory()
         initContainer()
         noteDataRepository = NoteDataRepository(noteDataStoreFactory)
     }
 
-    private fun initMockStubDataStoreFactory(){
+    private fun initMockStubDataStoreFactory() {
         noteDataStoreFactory = mock {
             on { retrieveRemoteDataStore() } doReturn rDataStore
             on { retrieveCacheDataStore() } doReturn cDataStore
@@ -43,14 +43,13 @@ abstract class BaseNoteRepositoryTest {
         }
     }
 
-    private fun initMockDataStore(){
+    private fun initMockDataStore() {
         cDataStore = mock()
         rDataStore = mock()
     }
 
-    private fun initContainer(){
-        stubContainer = DataStoreStubberContainer(rDataStore,cDataStore)
+    private fun initContainer() {
+        stubContainer = DataStoreStubberContainer(rDataStore, cDataStore)
         dataStoreVerifyScope = DataStoreVerifyScope(noteDataStoreFactory, rDataStore, cDataStore)
     }
-
 }

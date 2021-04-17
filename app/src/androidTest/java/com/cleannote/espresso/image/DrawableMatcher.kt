@@ -22,7 +22,7 @@ class DrawableMatcher(
     private val drawable: Drawable? = null,
     @ColorRes private val tintColorId: Int? = null,
     private val toBitmap: ((drawable: Drawable) -> Bitmap)? = null
-): TypeSafeMatcher<View>(View::class.java) {
+) : TypeSafeMatcher<View>(View::class.java) {
 
     override fun describeTo(desc: Description) {
         desc.appendText("with drawable id $resId or provided instance")

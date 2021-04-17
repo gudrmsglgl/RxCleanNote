@@ -12,7 +12,7 @@ class NextFeatureTester(
     private val viewModel: NoteListViewModel,
     private val useCase: NextPageExist,
     private val nextUseCaseCaptors: NextUseCaseCaptors
-): ViewModelFeatureTester<NextFeatureTester, Boolean, Query, Boolean>(nextUseCaseCaptors) {
+) : ViewModelFeatureTester<NextFeatureTester, Boolean, Query, Boolean>(nextUseCaseCaptors) {
 
     fun nextPageExist(): NextFeatureTester {
         viewModel.updateNextPageExist()
@@ -30,5 +30,4 @@ class NextFeatureTester(
     }
 
     override fun currentState(): State? = vmCurrentData()?.status
-
 }

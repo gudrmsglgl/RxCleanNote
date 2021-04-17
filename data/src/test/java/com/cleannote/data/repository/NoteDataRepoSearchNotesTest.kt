@@ -12,135 +12,17 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
+class NoteDataRepoSearchNotesTest : BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
-    fun testCase1_callRemoteStoreSearchNotCallCacheStoreSearch(){
+    fun testCase1_callRemoteStoreSearchNotCallCacheStoreSearch() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,5)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 5)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때"){
-                rDataStoreStubber {
-                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
-                }
-                cDataStoreStubber {
-                    pageIsCache(param = defaultQuery.page, stub = false)
-                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                }
-            }
-        }
-
-        whenDataRepositorySearchNotes(defaultQuery)
-            .test()
-
-        dataStoreVerifyScope {
-            times(1)
-                .remoteSearchNotes (defaultQuery.transQueryEntity())
-            never()
-                .cacheSearchNotes(defaultQuery.transQueryEntity())
-        }
-    }
-
-    @Test
-    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: Cache isCache[false] -> Remote SearchNotes -> Cache SaveNotes")
-    fun testCase1_verifyOrderingRemoteStoreSearchSave(){
-        val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,5)
-
-        stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때"){
-                rDataStoreStubber {
-                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
-                }
-                cDataStoreStubber {
-                    pageIsCache(param = defaultQuery.page, stub = false)
-                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                }
-            }
-        }
-
-        whenDataRepositorySearchNotes(defaultQuery)
-            .test()
-
-        dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
-                times(1).isCached(defaultQuery.page)
-                expectPageIsCached (defaultQuery.page to false)
-                times(1)
-                    .remoteSearchNotes(defaultQuery.transQueryEntity())
-                times(1)
-                    .saveNotes(remoteNote, defaultQuery.transQueryEntity())
-                never()
-                    .cacheSearchNotes(defaultQuery.transQueryEntity())
-            }
-        }
-    }
-
-    @Test
-    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: AssertComplete")
-    fun testCase1_assertComplete(){
-        val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,5)
-
-        stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때"){
-                rDataStoreStubber {
-                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
-                }
-                cDataStoreStubber {
-                    pageIsCache(param = defaultQuery.page, stub = false)
-                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                }
-            }
-        }
-
-        whenDataRepositorySearchNotes(defaultQuery)
-            .test()
-            .assertComplete()
-    }
-
-    @Test
-    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: AssertValue -> Remote Notes")
-    fun testCase1_assertValueRemoteNotes(){
-        val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,5)
-
-        stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때 "){
-                rDataStoreStubber {
-                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
-                }
-                cDataStoreStubber {
-                    pageIsCache(param = defaultQuery.page, stub = false)
-                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
-                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
-                }
-            }
-        }
-
-        whenDataRepositorySearchNotes(defaultQuery)
-            .test()
-            .assertValue(remoteNote.transNoteList())
-    }
-
-    @Test
-    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
-    fun testCase2_callRemoteStoreSearchNotCallCacheStoreSearch(){
-        val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
-
-        stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -162,16 +44,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 .cacheSearchNotes(defaultQuery.transQueryEntity())
         }
     }
-    
+
     @Test
-    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: Cache isCache[false] -> Remote SearchNotes -> Cache SaveNotes")
-    fun testCase2_verifyOrderingRemoteStoreSearchSave(){
+    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: Cache isCache[false] -> Remote SearchNotes -> Cache SaveNotes")
+    fun testCase1_verifyOrderingRemoteStoreSearchSave() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 5)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -187,7 +69,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
 
         dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
+            inOrder(rDataStore, cDataStore) {
                 times(1).isCached(defaultQuery.page)
                 expectPageIsCached(defaultQuery.page to false)
                 times(1)
@@ -199,16 +81,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             }
         }
     }
-    
+
     @Test
-    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: AssertComplete")
-    fun testCase2_assertComplete(){
+    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: AssertComplete")
+    fun testCase1_assertComplete() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 5)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -224,16 +106,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
             .assertComplete()
     }
-    
+
     @Test
-    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: AssertValue -> RemoteNotes")
-    fun testCase2_assertValueRemoteNotes(){
+    @DisplayName("TestCase1[query: defaultQuery, isCache: false, remote notes:10 > cache notes:5]: AssertValue -> Remote Notes")
+    fun testCase1_assertValueRemoteNotes() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 5)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 클 때 ") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -249,16 +131,134 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
             .assertValue(remoteNote.transNoteList())
     }
-    
+
     @Test
-    @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
-    fun testCase3_callRemoteCacheDataStore(){
+    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
+    fun testCase2_callRemoteStoreSearchNotCallCacheStoreSearch() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,5)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때") {
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+
+        dataStoreVerifyScope {
+            times(1)
+                .remoteSearchNotes(defaultQuery.transQueryEntity())
+            never()
+                .cacheSearchNotes(defaultQuery.transQueryEntity())
+        }
+    }
+
+    @Test
+    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: Cache isCache[false] -> Remote SearchNotes -> Cache SaveNotes")
+    fun testCase2_verifyOrderingRemoteStoreSearchSave() {
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때") {
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+
+        dataStoreVerifyScope {
+            inOrder(rDataStore, cDataStore) {
+                times(1).isCached(defaultQuery.page)
+                expectPageIsCached(defaultQuery.page to false)
+                times(1)
+                    .remoteSearchNotes(defaultQuery.transQueryEntity())
+                times(1)
+                    .saveNotes(remoteNote, defaultQuery.transQueryEntity())
+                never()
+                    .cacheSearchNotes(defaultQuery.transQueryEntity())
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: AssertComplete")
+    fun testCase2_assertComplete() {
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때") {
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    @DisplayName("TestCase2[query: defaultQuery, isCache: false, remote notes:10 >= cache notes:10]: AssertValue -> RemoteNotes")
+    fun testCase2_assertValueRemoteNotes() {
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때") {
+                rDataStoreStubber {
+                    searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+                }
+                cDataStoreStubber {
+                    pageIsCache(param = defaultQuery.page, stub = false)
+                    saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+                    currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+                }
+            }
+        }
+
+        whenDataRepositorySearchNotes(defaultQuery)
+            .test()
+            .assertValue(remoteNote.transNoteList())
+    }
+
+    @Test
+    @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
+    fun testCase3_callRemoteCacheDataStore() {
+        val defaultQuery = QueryFactory.makeQuery()
+        val remoteNote = NoteFactory.createNoteEntityList(0, 5)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
+
+        stubContainer {
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -284,13 +284,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: Cache isCache[false] -> Remote SearchNotes -> Cache SaveNotes -> Cache SearchNotes")
-    fun testCase3_verifyOrderingRemoteSearchCacheSaveCacheSearch(){
+    fun testCase3_verifyOrderingRemoteSearchCacheSaveCacheSearch() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,5)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 5)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -307,7 +307,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
 
         dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
+            inOrder(rDataStore, cDataStore) {
                 times(1).isCached(defaultQuery.page)
                 expectPageIsCached(defaultQuery.page to false)
                 times(1)
@@ -315,20 +315,20 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
                 times(1)
                     .saveNotes(remoteNote, defaultQuery.transQueryEntity())
                 times(1)
-                    .cacheSearchNotes (defaultQuery.transQueryEntity())
+                    .cacheSearchNotes(defaultQuery.transQueryEntity())
             }
         }
     }
 
     @Test
     @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: AssertComplete")
-    fun testCase3_assertComplete(){
+    fun testCase3_assertComplete() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,5)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 5)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -348,13 +348,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase3[query: defaultQuery, isCache: false, remote notes: 5 < cache notes: 10]: AssertValue -> CacheNotes")
-    fun testCase3_assertValueCacheNotes(){
+    fun testCase3_assertValueCacheNotes() {
         val defaultQuery = QueryFactory.makeQuery()
-        val remoteNote = NoteFactory.createNoteEntityList(0,5)
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 5)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때"){
+            scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 작을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -374,12 +374,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase4[query: defaultQuery, isCache: true]: Call RemoteDataStore SearchNotes ❌ CacheDataStore SearchNotes ⭕")
-    fun testCase4_callCacheStoreSearchNotCallRemoteStoreSearch(){
+    fun testCase4_callCacheStoreSearchNotCallRemoteStoreSearch() {
         val defaultQuery = QueryFactory.makeQuery()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
+            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때") {
                 rDataStoreStubber {}
                 cDataStoreStubber {
                     pageIsCache(param = defaultQuery.page, stub = true)
@@ -402,12 +402,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase4[query: defaultQuery, isCache: true]: isCache true -> Cache SearchNotes")
-    fun testCase4_verifyOrderingCacheStoreIsCacheSearchNotes(){
+    fun testCase4_verifyOrderingCacheStoreIsCacheSearchNotes() {
         val defaultQuery = QueryFactory.makeQuery()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
+            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때") {
                 rDataStoreStubber {}
                 cDataStoreStubber {
                     pageIsCache(param = defaultQuery.page, stub = true)
@@ -421,7 +421,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
 
         dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
+            inOrder(rDataStore, cDataStore) {
                 times(1).isCached(defaultQuery.page)
                 expectPageIsCached(defaultQuery.page to true)
                 never()
@@ -436,12 +436,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase4[query: defaultQuery, isCache: true]: AssertComplete")
-    fun testCase4_assertComplete(){
+    fun testCase4_assertComplete() {
         val defaultQuery = QueryFactory.makeQuery()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
+            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때") {
                 rDataStoreStubber {}
                 cDataStoreStubber {
                     pageIsCache(param = defaultQuery.page, stub = true)
@@ -458,12 +458,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase4[query: defaultQuery, isCache: true]: AssertValue -> CacheNotes")
-    fun testCase4_assertValueCacheNotes(){
+    fun testCase4_assertValueCacheNotes() {
         val defaultQuery = QueryFactory.makeQuery()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때"){
+            scenario("현재 query page가 캐쉬 데이터를 로드해야 할 때") {
                 rDataStoreStubber {}
                 cDataStoreStubber {
                     pageIsCache(param = defaultQuery.page, stub = true)
@@ -480,12 +480,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase5[query: {like: 'keyword'}, remote notes not empty]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ❌")
-    fun testCase5_callRemoteDataStoreSearch(){
+    fun testCase5_callRemoteDataStoreSearch() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재할 때"){
+            scenario("검색어로 Search -> Remote Note 존재할 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -504,17 +504,16 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             never()
                 .cacheSearchNotes(searchQuery.transQueryEntity())
         }
-
     }
 
     @Test
     @DisplayName("TestCase5[query: {like: 'keyword'}, remote notes not empty]: RemoteStore Search -> CacheStore SaveNotes")
-    fun testCase5_verifyOrderingRemoteSearchCacheSaveNotes(){
+    fun testCase5_verifyOrderingRemoteSearchCacheSaveNotes() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재할 때"){
+            scenario("검색어로 Search -> Remote Note 존재할 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -528,7 +527,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
 
         dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
+            inOrder(rDataStore, cDataStore) {
                 never()
                     .isCached(searchQuery.page)
                 times(1)
@@ -543,12 +542,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase5[query: {like: 'keyword'}, remote notes not empty]: AssertComplete")
-    fun testCase5_assertComplete(){
+    fun testCase5_assertComplete() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재할 때"){
+            scenario("검색어로 Search -> Remote Note 존재할 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -565,12 +564,12 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase5[query: {like: 'keyword'}, remote notes not empty]: AssertValue -> RemoteNotes")
-    fun testCase5_assertValueRemoteNotes(){
+    fun testCase5_assertValueRemoteNotes() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
-        val remoteNote = NoteFactory.createNoteEntityList(0,10)
+        val remoteNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재할 때"){
+            scenario("검색어로 Search -> Remote Note 존재할 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -587,13 +586,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase6[query: {like: 'keyword'}, remote notes empty]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
-    fun testCase6_callRemoteCacheDataStore(){
+    fun testCase6_callRemoteCacheDataStore() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
         val remoteNote: List<NoteEntity> = emptyList()
         val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
+            scenario("검색어로 Search -> Remote Note 존재하지 않을 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -616,13 +615,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase6[query: {like: 'keyword'}, remote notes empty]: RemoteDataStore Search -> CacheDataStore Search")
-    fun testCase6_verifyOrderingRemoteSearchCacheSearch(){
+    fun testCase6_verifyOrderingRemoteSearchCacheSearch() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
         val remoteNote: List<NoteEntity> = emptyList()
         val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
+            scenario("검색어로 Search -> Remote Note 존재하지 않을 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -636,7 +635,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
 
         dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
+            inOrder(rDataStore, cDataStore) {
                 never()
                     .isCached(searchQuery.page)
                 times(1)
@@ -651,13 +650,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase6[query: {like: 'keyword'}, remote notes empty]: AssertComplete")
-    fun testCase6_assertComplete(){
+    fun testCase6_assertComplete() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
         val remoteNote: List<NoteEntity> = emptyList()
         val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
+            scenario("검색어로 Search -> Remote Note 존재하지 않을 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -674,13 +673,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase6[query: {like: 'keyword'}, remote notes empty]: AssertValue -> CacheNotes")
-    fun testCase6_assertValueCacheNotes(){
+    fun testCase6_assertValueCacheNotes() {
         val searchQuery = QueryFactory.makeQuery(search = "#todo")
         val remoteNote: List<NoteEntity> = emptyList()
         val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("검색어로 Search -> Remote Note 존재하지 않을 때"){
+            scenario("검색어로 Search -> Remote Note 존재하지 않을 때") {
                 rDataStoreStubber {
                     searchNotes(param = searchQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -697,13 +696,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: Call RemoteDataStore SearchNotes ⭕ CacheDataStore SearchNotes ⭕")
-    fun testCase7_callRemoteCacheDataStoreSearch(){
+    fun testCase7_callRemoteCacheDataStoreSearch() {
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = emptyList<NoteEntity>()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -728,13 +727,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: CacheStore isCache[false] -> RemoteStore SearchNotes -> CacheStore SearchNotes")
-    fun testCase7_verifyOrderingFirstCacheStoreNextRemoteStore(){
+    fun testCase7_verifyOrderingFirstCacheStoreNextRemoteStore() {
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = emptyList<NoteEntity>()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -750,7 +749,7 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
             .test()
 
         dataStoreVerifyScope {
-            inOrder(rDataStore, cDataStore){
+            inOrder(rDataStore, cDataStore) {
                 times(1).isCached(defaultQuery.page)
                 expectPageIsCached(defaultQuery.page to false)
                 times(1)
@@ -765,13 +764,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: AssertComplete")
-    fun testCase7_assertComplete(){
+    fun testCase7_assertComplete() {
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = emptyList<NoteEntity>()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -790,13 +789,13 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase7[query: defaultQuery, isCache: false, remote notes: empty]: AssertValue -> CacheNotes")
-    fun testCase7_assertValueCacheNotes(){
+    fun testCase7_assertValueCacheNotes() {
         val defaultQuery = QueryFactory.makeQuery()
         val remoteNote = emptyList<NoteEntity>()
-        val cacheNote = NoteFactory.createNoteEntityList(0,10)
+        val cacheNote = NoteFactory.createNoteEntityList(0, 10)
 
         stubContainer {
-            scenario("remote 를 로드해야 하는데 데이터가 없을 때"){
+            scenario("remote 를 로드해야 하는데 데이터가 없을 때") {
                 rDataStoreStubber {
                     searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
                 }
@@ -814,5 +813,4 @@ class NoteDataRepoSearchNotesTest: BaseNoteRepositoryTest() {
     }
 
     private fun whenDataRepositorySearchNotes(query: Query) = noteDataRepository.searchNotes(query)
-
 }
