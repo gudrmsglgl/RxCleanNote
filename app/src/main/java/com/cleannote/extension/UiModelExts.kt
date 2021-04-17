@@ -16,7 +16,7 @@ fun List<NoteImageView>?.transNoteImageUiModels() = this?.map { it.transNoteImag
 fun NoteImageView.transNoteImageUIModel() = NoteImageUiModel(this.imgPk, this.notePk, this.imagePath)
 
 fun List<NoteView>.transNoteUiModels(mode: NoteMode) = map { it.transNoteUiModel(mode) }
-fun NoteView.transNoteUiModel(mode: NoteMode = Default) = NoteUiModel(this.id, this.title, this.body, this.updatedAt, this.createdAt, mode , this.noteImages.transNoteImageUiModels())
+fun NoteView.transNoteUiModel(mode: NoteMode = Default) = NoteUiModel(this.id, this.title, this.body, this.updatedAt, this.createdAt, mode, this.noteImages.transNoteImageUiModels())
 
 fun List<NoteUiModel>.transNoteViews() = map { it.transNoteView() }
 fun NoteUiModel.transNoteView() =

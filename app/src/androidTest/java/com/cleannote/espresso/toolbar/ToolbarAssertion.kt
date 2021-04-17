@@ -4,7 +4,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import com.cleannote.espresso.text.TextViewAssertions
 import com.cleannote.espresso.util.getResourceString
 
-interface ToolbarAssertion: TextViewAssertions {
+interface ToolbarAssertion : TextViewAssertions {
     override fun hasEmptyText() {
         viewInteraction.check(ViewAssertions.matches(ToolbarTitleMatcher("")))
     }

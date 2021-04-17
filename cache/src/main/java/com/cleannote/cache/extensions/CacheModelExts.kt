@@ -18,10 +18,10 @@ fun NoteEntity.divideCacheNote(): CachedNote = CachedNote(
     this.id, this.title, this.body, this.updatedAt, this.createdAt
 )
 
-fun NoteEntity.divideCacheNoteImages(): List<CachedImage> = this.images?.map { it.transCache() }?: emptyList()
+fun NoteEntity.divideCacheNoteImages(): List<CachedImage> = this.images?.map { it.transCache() } ?: emptyList()
 
 fun CachedNoteImages.transEntity(): NoteEntity = NoteEntity(
     this.cachedNote.id, this.cachedNote.title, this.cachedNote.body,
-    this.cachedNote.updatedAt, this.cachedNote.createdAt ,
+    this.cachedNote.updatedAt, this.cachedNote.createdAt,
     this.images.map { it.transEntity() }
 )

@@ -1,4 +1,5 @@
 package com.cleannote.espresso
+
 import androidx.test.espresso.idling.CountingIdlingResource
 
 object EspressoIdlingResource {
@@ -15,5 +16,4 @@ object EspressoIdlingResource {
             countingIdlingResource.decrement()
         }
     }
-
 }

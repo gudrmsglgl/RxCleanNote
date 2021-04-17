@@ -26,7 +26,7 @@ import org.junit.Before
 import org.junit.Test
 import javax.inject.Inject
 
-class NoteDetailViewFragmentTest: BaseTest() {
+class NoteDetailViewFragmentTest : BaseTest() {
 
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
@@ -44,18 +44,18 @@ class NoteDetailViewFragmentTest: BaseTest() {
     }
 
     @Before
-    fun setup(){
+    fun setup() {
         setupUIController()
         IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
 
     @After
-    fun unregister(){
+    fun unregister() {
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
     @Test
-    fun startDetailViewDisplay_onAndroid(){
+    fun startDetailViewDisplay_onAndroid() {
         val note = NoteFactory.defaultNote()
         launchDetailViewFragment(note)
 
@@ -87,7 +87,7 @@ class NoteDetailViewFragmentTest: BaseTest() {
     }
 
     @Test
-    fun detailViewImgLoadFail_onAndroid(){
+    fun detailViewImgLoadFail_onAndroid() {
         val note = NoteFactory.errorImageNote()
         launchDetailViewFragment(note)
 
@@ -109,7 +109,7 @@ class NoteDetailViewFragmentTest: BaseTest() {
     }
 
     @Test
-    fun detailViewImgNull_onAndroid(){
+    fun detailViewImgNull_onAndroid() {
         val note = NoteFactory.emptyImageNote()
         launchDetailViewFragment(note)
 
@@ -119,7 +119,7 @@ class NoteDetailViewFragmentTest: BaseTest() {
         }
     }
 
-    private fun launchDetailViewFragment(note: NoteUiModel){
+    private fun launchDetailViewFragment(note: NoteUiModel) {
         val stubBundle = Bundle().apply {
             putParcelable(NOTE_DETAIL_BUNDLE_KEY, note)
             putBoolean(IS_EXECUTE_INSERT, false)

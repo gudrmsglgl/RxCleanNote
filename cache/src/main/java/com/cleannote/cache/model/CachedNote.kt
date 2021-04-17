@@ -22,8 +22,7 @@ data class CachedNote(
 
     @ColumnInfo(name = "created_at")
     var createdAt: String
-)
-{
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -46,5 +45,4 @@ data class CachedNote(
         result = 31 * result + createdAt.hashCode()
         return result
     }
-
 }

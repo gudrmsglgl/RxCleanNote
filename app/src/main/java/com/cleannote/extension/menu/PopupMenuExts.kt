@@ -10,18 +10,16 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import androidx.annotation.MenuRes
 import androidx.fragment.app.FragmentActivity
 import com.cleannote.app.R
 import com.cleannote.notedetail.edit.PickerType
 import com.cleannote.notedetail.edit.PickerType.Companion.GALLERY
 import com.jakewharton.rxbinding4.widget.itemClicks
-import io.reactivex.rxjava3.disposables.Disposable
 
 inline fun FragmentActivity.showImageLoaderMenu(
     anchor: View,
     crossinline receiver: (Int) -> Unit
-){
+) {
     PopupMenu(this, anchor).apply {
         menuInflater.inflate(R.menu.menu_image_add, menu)
         visibleIcon(this@showImageLoaderMenu)
@@ -43,10 +41,10 @@ inline fun FragmentActivity.showImageLoaderMenu(
     }
 }
 
-fun PopupMenu.visibleIcon(context: Context){
+fun PopupMenu.visibleIcon(context: Context) {
     val menu = this.menu
-    if (hasIcon(menu)){
-        for (i in 0 until menu.size()){
+    if (hasIcon(menu)) {
+        for (i in 0 until menu.size()) {
             insertMenuItemIcon(context, menu.getItem(i))
         }
     }
@@ -55,8 +53,8 @@ fun PopupMenu.visibleIcon(context: Context){
 /**
  * @return true if the menu has at least one MenuItem with an icon.
  */
-private fun hasIcon(menu: Menu): Boolean{
-    for (i in 0 until menu.size()){
+private fun hasIcon(menu: Menu): Boolean {
+    for (i in 0 until menu.size()) {
         if (menu.getItem(i).icon != null) return true
     }
     return false

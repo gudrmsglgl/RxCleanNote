@@ -1,9 +1,9 @@
 package com.cleannote
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), UIController {
         firebaseAnalytics = Firebase.analytics
     }
 
-    private fun inject(){
+    private fun inject() {
         (application as NoteApplication).applicationComponent.inject(this)
     }
 
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), UIController {
             .navigateUp(appBarConfiguration as AppBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun setFragmentFactory(){
+    private fun setFragmentFactory() {
         supportFragmentManager.fragmentFactory = fragmentFactory
     }
 
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), UIController {
             ?.childFragmentManager
             ?.fragments
             ?.forEach { fragment ->
-                when (fragment){
+                when (fragment) {
                     is OnBackPressListener -> if (fragment.shouldBackPress()) super.onBackPressed()
                     is NoteDetailViewFragment -> fragment.navPopBackStack()
                     is NoteDetailEditFragment -> fragment.navPopBackStack()
@@ -69,5 +69,4 @@ class MainActivity : AppCompatActivity(), UIController {
                 }
             }
     }
-
 }

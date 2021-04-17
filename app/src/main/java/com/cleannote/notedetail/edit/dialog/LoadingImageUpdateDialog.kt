@@ -10,7 +10,7 @@ import android.view.Window
 import androidx.fragment.app.DialogFragment
 import com.cleannote.app.R
 
-class LoadingImageUpdateDialog: DialogFragment() {
+class LoadingImageUpdateDialog : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -25,5 +25,4 @@ class LoadingImageUpdateDialog: DialogFragment() {
     companion object {
         fun newInstance(): LoadingImageUpdateDialog = LoadingImageUpdateDialog()
     }
-
 }

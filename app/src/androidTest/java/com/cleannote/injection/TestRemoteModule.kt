@@ -19,5 +19,4 @@ object TestRemoteModule {
     @JvmStatic
     @Singleton
     fun provideNoteRemote(): NoteRemote = mockk()
-
 }

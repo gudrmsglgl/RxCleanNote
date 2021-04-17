@@ -10,17 +10,17 @@ import io.reactivex.Single
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class NextPageExistTest: BaseDomainTest<Single<Boolean>, Query>() {
+class NextPageExistTest : BaseDomainTest<Single<Boolean>, Query>() {
     private lateinit var nextPageExist: NextPageExist
     private val query = QueryFactory.makeDefaultQuery()
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         nextPageExist = NextPageExist(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun buildUseCaseCallRepositoryFunc(){
+    fun buildUseCaseCallRepositoryFunc() {
         stubRepositoryReturnValue(query, Single.just(false))
         whenBuildUseCase(query)
             .test()
@@ -28,7 +28,7 @@ class NextPageExistTest: BaseDomainTest<Single<Boolean>, Query>() {
     }
 
     @Test
-    fun buildUseCaseRepoFuncReturnValue(){
+    fun buildUseCaseRepoFuncReturnValue() {
         stubRepositoryReturnValue(query, Single.just(false))
         whenBuildUseCase(query)
             .test()
@@ -36,7 +36,7 @@ class NextPageExistTest: BaseDomainTest<Single<Boolean>, Query>() {
     }
 
     @Test
-    fun buildUseCaseRxObservableComplete(){
+    fun buildUseCaseRxObservableComplete() {
         stubRepositoryReturnValue(query, Single.just(false))
         whenBuildUseCase(query)
             .test()
@@ -51,7 +51,7 @@ class NextPageExistTest: BaseDomainTest<Single<Boolean>, Query>() {
         whenever(repository.nextPageExist(param!!)).thenReturn(stubValue)
     }
 
-    private fun verifyRepoNextPageExist(param: Query){
+    private fun verifyRepoNextPageExist(param: Query) {
         verify(repository).nextPageExist(param)
     }
 }

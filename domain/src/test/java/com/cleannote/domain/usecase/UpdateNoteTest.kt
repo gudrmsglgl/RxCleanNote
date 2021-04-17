@@ -11,25 +11,25 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class UpdateNoteTest: BaseDomainTest<Completable, Note>(){
+class UpdateNoteTest : BaseDomainTest<Completable, Note>() {
 
     private lateinit var updateNote: UpdateNote
     private val paramNote = NoteFactory.createSingleNote(title = "testUpdateNote")
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
         updateNote = UpdateNote(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun buildUseCaseCallRepositoryUpdateNote(){
+    fun buildUseCaseCallRepositoryUpdateNote() {
         stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote).test()
         verifyRepositoryCallUpdateNote(paramNote)
     }
 
     @Test
-    fun buildUseCaseCompletableComplete(){
+    fun buildUseCaseCompletableComplete() {
         stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote)
             .test()
@@ -37,14 +37,14 @@ class UpdateNoteTest: BaseDomainTest<Completable, Note>(){
     }
 
     @Test
-    fun buildUseCaseUpdateNoteReturnNoValue(){
+    fun buildUseCaseUpdateNoteReturnNoValue() {
         stubRepositoryReturnValue(paramNote, Completable.complete())
         whenBuildUseCase(paramNote)
             .test()
             .assertNoValues()
     }
 
-    private fun verifyRepositoryCallUpdateNote(param: Note){
+    private fun verifyRepositoryCallUpdateNote(param: Note) {
         verify(repository).updateNote(param)
     }
 

@@ -1,6 +1,10 @@
 package com.cleannote.data
 
-import com.cleannote.data.extensions.*
+import com.cleannote.data.extensions.transNoteEntity
+import com.cleannote.data.extensions.transNoteEntityList
+import com.cleannote.data.extensions.transNoteList
+import com.cleannote.data.extensions.transQueryEntity
+import com.cleannote.data.extensions.transUserList
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import com.cleannote.data.source.NoteDataStoreFactory
@@ -19,7 +23,7 @@ class NoteDataRepository
 @Inject
 constructor(
     private val factory: NoteDataStoreFactory
-): NoteRepository{
+) : NoteRepository {
 
     override fun insertNewNote(note: Note): Single<Long> = factory.retrieveCacheDataStore()
         .insertCacheNewNote(note.transNoteEntity())
@@ -54,7 +58,7 @@ constructor(
         .retrieveCacheDataStore()
         .deleteNote(note.transNoteEntity())
 
-    override fun deleteMultipleNotes(notes: List<Note>): Completable  = factory
+    override fun deleteMultipleNotes(notes: List<Note>): Completable = factory
         .retrieveCacheDataStore()
         .deleteMultipleNotes(notes.transNoteEntityList())
 
@@ -101,14 +105,14 @@ constructor(
         factory
             .retrieveCacheDataStore()
             .currentPageNoteSize(queryEntity),
-        Function3<Boolean, List<NoteEntity>, Int, Triple<Boolean, List<NoteEntity>, Int>>{ s1, s2, s3 ->
+        Function3<Boolean, List<NoteEntity>, Int, Triple<Boolean, List<NoteEntity>, Int>> { s1, s2, s3 ->
             Triple(s1, s2, s3)
         }
     )
 
     private fun isNotEmptyRemoteNotesGreaterThanOrEqCacheNotes(
-        pendingData: Triple<Boolean, List<NoteEntity> , Int>
-    ): Boolean{
+        pendingData: Triple<Boolean, List<NoteEntity>, Int>
+    ): Boolean {
         val isCache = pendingData.first
         val remoteData = pendingData.second
         val currentCacheNoteSize = pendingData.third
@@ -117,18 +121,18 @@ constructor(
     }
 
     private fun isNotEmptyRemoteNotesLessThanCachedNotes(
-        pendingData: Triple<Boolean, List<NoteEntity> , Int>
-    ): Boolean{
+        pendingData: Triple<Boolean, List<NoteEntity>, Int>
+    ): Boolean {
         val isCache = pendingData.first
         val remoteData = pendingData.second
         val currentCacheNoteSize = pendingData.third
         val isRemoteNoteLessThanCacheNotes = remoteData.size < currentCacheNoteSize
         return !isCache && remoteData.isNotEmpty() && isRemoteNoteLessThanCacheNotes
     }
-    
+
     private fun isEmptyRemoteNotes(
-        pendingData: Triple<Boolean, List<NoteEntity> , Int>
-    ): Boolean{
+        pendingData: Triple<Boolean, List<NoteEntity>, Int>
+    ): Boolean {
         val isCache = pendingData.first
         val remoteData = pendingData.second
         return !isCache && remoteData.isEmpty()
@@ -178,5 +182,4 @@ constructor(
     private fun saveRemoteNotesToCache(remoteEntities: List<NoteEntity>, queryEntity: QueryEntity): Completable {
         return factory.retrieveCacheDataStore().saveNotes(remoteEntities, queryEntity)
     }
-
 }

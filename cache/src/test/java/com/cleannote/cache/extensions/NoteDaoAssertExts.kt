@@ -10,24 +10,24 @@ import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.not
 import org.junit.Assert.assertFalse
 
-fun Long.assertGreaterThan(expect: Long){
+fun Long.assertGreaterThan(expect: Long) {
     assertThat(this, greaterThan(expect))
 }
 
-fun Int.expectNoteSize(expect: Int){
+fun Int.expectNoteSize(expect: Int) {
     assertThat(this, `is`(expect))
 }
 
-fun List<CachedImage>.expectImages(param: List<CachedImage>){
+fun List<CachedImage>.expectImages(param: List<CachedImage>) {
     assertThat(this, `is`(param))
 }
 
-fun CachedNoteImages.hasNote(expect: CachedNote): CachedNoteImages{
+fun CachedNoteImages.hasNote(expect: CachedNote): CachedNoteImages {
     assertThat(this.cachedNote, `is`(expect))
     return this
 }
 
-fun CachedNoteImages.hasImages(expect: List<CachedImage>): CachedNoteImages{
+fun CachedNoteImages.hasImages(expect: List<CachedImage>): CachedNoteImages {
     assertThat(this.images, `is`(expect))
     return this
 }
@@ -43,13 +43,13 @@ fun List<CachedNoteImages>.assertSortedValue(expect: List<NoteEntity>) =
                 .hasImages(savedNote.divideCacheNoteImages())
         }
 
-fun List<CachedNoteImages>.assertValueAt(index: Int, expect: NoteEntity){
+fun List<CachedNoteImages>.assertValueAt(index: Int, expect: NoteEntity) {
     this[index]
         .hasNote(expect.divideCacheNote())
         .hasImages(expect.divideCacheNoteImages())
 }
 
-fun List<CachedNoteImages>.hasNotes(expect: CachedNote): List<CachedNoteImages>{
+fun List<CachedNoteImages>.hasNotes(expect: CachedNote): List<CachedNoteImages> {
     assertThat(
         this.map { it.cachedNote },
         not(hasItem(expect))
@@ -57,7 +57,7 @@ fun List<CachedNoteImages>.hasNotes(expect: CachedNote): List<CachedNoteImages>{
     return this
 }
 
-fun List<CachedNoteImages>.notHasNote(expect: CachedNote): List<CachedNoteImages>{
+fun List<CachedNoteImages>.notHasNote(expect: CachedNote): List<CachedNoteImages> {
     assertThat(
         this.map { it.cachedNote },
         not(hasItem(expect))
@@ -65,13 +65,13 @@ fun List<CachedNoteImages>.notHasNote(expect: CachedNote): List<CachedNoteImages
     return this
 }
 
-fun List<CachedNoteImages>.notHasNotes(expectSubList: List<CachedNote>){
+fun List<CachedNoteImages>.notHasNotes(expectSubList: List<CachedNote>) {
     val allNote = this.map { it.cachedNote }
-    assertFalse( expectSubList.stream().allMatch(allNote::contains) )
+    assertFalse(expectSubList.stream().allMatch(allNote::contains))
 }
 
-fun List<CachedNoteImages>.notHasImages(expectSubList: List<CachedImage>): List<CachedNoteImages>{
+fun List<CachedNoteImages>.notHasImages(expectSubList: List<CachedImage>): List<CachedNoteImages> {
     val allImages: List<CachedImage> = this.flatMap { it.images }
-    assertFalse( expectSubList.stream().allMatch(allImages::contains))
+    assertFalse(expectSubList.stream().allMatch(allImages::contains))
     return this
 }

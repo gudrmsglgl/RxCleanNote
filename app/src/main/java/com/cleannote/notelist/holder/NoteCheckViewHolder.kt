@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 class NoteCheckViewHolder(
     private val binding: ItemCheckNoteListBinding,
     private val requestManager: RequestManager
-): BaseHolder<NoteUiModel>(binding) {
+) : BaseHolder<NoteUiModel>(binding) {
 
     override fun bind(
         item: NoteUiModel,
@@ -25,7 +25,7 @@ class NoteCheckViewHolder(
             noteUiModel = item
             glideReqManager = requestManager
         }
-        with (binding) {
+        with(binding) {
             initCheckNote(item)
 
             val clickSource = itemNote.clicks()
@@ -36,23 +36,21 @@ class NoteCheckViewHolder(
                 checkboxDelete.checkedChanges().skipInitialValue(),
                 BiFunction { _: Unit, isChecked: Boolean ->
                     isChecked
-                })
+                }
+            )
                 .debounce(1000L, TimeUnit.MILLISECONDS)
                 .map {
                     item to checkboxDelete.isChecked
                 }
                 .subscribe(subjectManager.checkNoteSubject)
-
         }
     }
 
-    private fun ItemCheckNoteListBinding.initCheckNote(item: NoteUiModel){
+    private fun ItemCheckNoteListBinding.initCheckNote(item: NoteUiModel) {
         if (item.mode == NoteMode.MultiDefault) {
             checkboxDelete.isChecked = false
-        }
-        else if (item.mode == NoteMode.MultiSelect) {
+        } else if (item.mode == NoteMode.MultiSelect) {
             checkboxDelete.isChecked = true
         }
     }
-
 }

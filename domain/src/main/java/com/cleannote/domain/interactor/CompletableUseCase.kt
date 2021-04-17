@@ -8,7 +8,8 @@ import io.reactivex.schedulers.Schedulers
 
 abstract class CompletableUseCase<in Params> protected constructor(
     private val threadExecutor: ThreadExecutor,
-    private val postExecutionThread: PostExecutionThread): UseCase<Nothing,Params> {
+    private val postExecutionThread: PostExecutionThread
+) : UseCase<Nothing, Params> {
 
     override var disposables: CompositeDisposable = CompositeDisposable()
 

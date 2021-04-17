@@ -2,13 +2,9 @@ package com.cleannote
 
 import android.app.Application
 import android.content.Context
-import android.os.Bundle
 import androidx.test.runner.AndroidJUnitRunner
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 
-class MyTestRunner: AndroidJUnitRunner() {
+class MyTestRunner : AndroidJUnitRunner() {
 
     /*override fun onStart() {
         RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }

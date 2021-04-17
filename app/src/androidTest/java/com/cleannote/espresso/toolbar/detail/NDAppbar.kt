@@ -11,12 +11,12 @@ import com.cleannote.espresso.view.NBaseView
 import com.google.android.material.appbar.AppBarLayout
 import org.hamcrest.Matcher
 
-class NDAppbar(matcher: Matcher<View>): NBaseView<NDAppbar>(matcher) {
+class NDAppbar(matcher: Matcher<View>) : NBaseView<NDAppbar>(matcher) {
     val toolbar = NDVToolbar(ViewMatchers.withId(R.id.tb_detail_view))
 
-    fun collapse(){
+    fun collapse() {
 
-        viewInteraction.perform(object : ViewAction{
+        viewInteraction.perform(object : ViewAction {
             override fun getConstraints(): Matcher<View> {
                 return isAssignableFrom(AppBarLayout::class.java)
             }
@@ -26,7 +26,7 @@ class NDAppbar(matcher: Matcher<View>): NBaseView<NDAppbar>(matcher) {
             }
 
             override fun perform(uiController: UiController, view: View?) {
-                if (view is AppBarLayout){
+                if (view is AppBarLayout) {
                     view.clearAnimation()
                     view.setExpanded(false, false)
                     uiController.loopMainThreadForAtLeast(100)
@@ -35,7 +35,7 @@ class NDAppbar(matcher: Matcher<View>): NBaseView<NDAppbar>(matcher) {
         })
     }
 
-    fun swipeUp(){
+    fun swipeUp() {
         viewInteraction.perform(ViewActions.swipeUp())
     }
 }

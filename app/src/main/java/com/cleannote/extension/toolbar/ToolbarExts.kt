@@ -13,9 +13,9 @@ import com.cleannote.extension.resolveColor
 inline fun Toolbar.setToolbar(
     @DrawableRes homeIcon: Int,
     @MenuRes menuRes: Int,
-    crossinline onHomeClick: () -> Unit ,
+    crossinline onHomeClick: () -> Unit,
     crossinline onMenuClick: (MenuItem) -> Boolean
-){
+) {
     setNavigationIcon(homeIcon)
     inflateMenu(menuRes)
     setNavigationOnClickListener {

@@ -1,13 +1,11 @@
 package com.cleannote.domain.interactor.usecases.notedetail
 
 import com.cleannote.domain.interactor.CompletableUseCase
-import com.cleannote.domain.interactor.FlowableUseCase
 import com.cleannote.domain.interactor.executor.PostExecutionThread
 import com.cleannote.domain.interactor.executor.ThreadExecutor
 import com.cleannote.domain.interactor.repository.NoteRepository
 import com.cleannote.domain.model.Note
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import javax.inject.Inject
 
 class UpdateNote

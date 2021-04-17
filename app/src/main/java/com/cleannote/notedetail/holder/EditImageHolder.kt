@@ -9,12 +9,12 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class EditImageHolder(
     val binding: ItemAttachImageBinding,
-    val requestManager: RequestManager
-): RecyclerView.ViewHolder(binding.root) {
+    private val requestManager: RequestManager
+) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: NoteImageUiModel, subject: PublishSubject<NoteImageUiModel>){
+    fun bind(item: NoteImageUiModel, subject: PublishSubject<NoteImageUiModel>) {
 
-        binding.apply{
+        binding.apply {
             reqManager = requestManager
             imageModel = item
         }

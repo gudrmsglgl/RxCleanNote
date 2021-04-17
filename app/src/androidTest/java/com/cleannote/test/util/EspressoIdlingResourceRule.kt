@@ -5,7 +5,7 @@ import com.cleannote.espresso.EspressoIdlingResource
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-class EspressoIdlingResourceRule: TestWatcher() {
+class EspressoIdlingResourceRule : TestWatcher() {
 
     private val idlingResource = EspressoIdlingResource.countingIdlingResource
 

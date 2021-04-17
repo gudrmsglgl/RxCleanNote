@@ -8,12 +8,12 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
+class NoteDataRepoDeleteMultipleNotesTest : BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: Call CacheDataStore DeleteMultipleNotes")
-    fun testCase_callCacheDataStore(){
-        val selectedNotes = NoteFactory.createNoteList(0,5)
+    fun testCase_callCacheDataStore() {
+        val selectedNotes = NoteFactory.createNoteList(0, 5)
 
         stubContainer {
             cDataStoreStubber.deleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
@@ -29,8 +29,8 @@ class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: AssertComplete")
-    fun testCase_assertComplete(){
-        val selectedNotes = NoteFactory.createNoteList(0,5)
+    fun testCase_assertComplete() {
+        val selectedNotes = NoteFactory.createNoteList(0, 5)
 
         stubContainer {
             cDataStoreStubber.deleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())
@@ -43,8 +43,8 @@ class NoteDataRepoDeleteMultipleNotesTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: AssertValue -> NoValue")
-    fun testCase_assertValue(){
-        val selectedNotes = NoteFactory.createNoteList(0,5)
+    fun testCase_assertValue() {
+        val selectedNotes = NoteFactory.createNoteList(0, 5)
 
         stubContainer {
             cDataStoreStubber.deleteMultipleNotes(param = selectedNotes.transNoteEntityList(), stub = Completable.complete())

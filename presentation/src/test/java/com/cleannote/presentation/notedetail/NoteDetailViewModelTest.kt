@@ -18,13 +18,13 @@ open class NoteDetailViewModelTest {
     lateinit var updateNote: UpdateNote
 
     @BeforeEach
-    fun detailVMTestSetup(){
+    fun detailVMTestSetup() {
         useCaseMock()
         usecases = NoteDetailUseCases(updateNote, deleteNote)
         viewModel = NoteDetailViewModel(usecases)
     }
 
-    private fun useCaseMock(){
+    private fun useCaseMock() {
         deleteNote = mock()
         updateNote = mock()
     }

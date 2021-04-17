@@ -9,13 +9,13 @@ import com.cleannote.app.R
 class DeleteDialog(
     override val context: Context,
     private val viewLifeCycleOwner: LifecycleOwner
-): BaseDeleteDialog {
+) : BaseDeleteDialog {
 
     override fun makeDefaultDialog() = MaterialDialog(context)
         .show {
             title(R.string.delete_title)
             positiveButton(R.string.dialog_ok)
-            negativeButton(R.string.dialog_cancel){
+            negativeButton(R.string.dialog_cancel) {
                 showToast(R.string.deleteCancelMsg)
                 dismiss()
             }

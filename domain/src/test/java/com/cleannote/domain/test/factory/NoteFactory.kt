@@ -2,11 +2,12 @@ package com.cleannote.domain.test.factory
 
 import com.cleannote.domain.model.Note
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 object NoteFactory {
 
-    val dateFormat: SimpleDateFormat = SimpleDateFormat()
+    private val dateFormat: SimpleDateFormat = SimpleDateFormat()
 
     private fun getCurrentTimestamp(): String {
         return dateFormat.format(Date())
@@ -29,7 +30,6 @@ object NoteFactory {
             id = UUID.randomUUID().toString(),
             title = UUID.randomUUID().toString(),
             body = UUID.randomUUID().toString()
-        )}
-        .toList()
-
+        )
+    }.toList()
 }

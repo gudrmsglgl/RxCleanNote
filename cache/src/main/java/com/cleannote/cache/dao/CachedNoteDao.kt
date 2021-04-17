@@ -1,6 +1,12 @@
 package com.cleannote.cache.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.cleannote.cache.extensions.divideCacheNote
 import com.cleannote.cache.extensions.divideCacheNoteImages
 import com.cleannote.cache.model.CachedImage
@@ -21,7 +27,7 @@ abstract class CachedNoteDao {
     abstract fun saveImages(images: List<CachedImage>)
 
     @Transaction
-    open fun saveNoteAndImages(notes: List<NoteEntity>){
+    open fun saveNoteAndImages(notes: List<NoteEntity>) {
         val cacheNotes = notes.map { it.divideCacheNote() }
         saveNotes(cacheNotes)
         notes.forEach {
@@ -30,12 +36,14 @@ abstract class CachedNoteDao {
     }
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT * FROM notes 
         WHERE title LIKE '%' || :like || '%' 
         OR body LIKE '%' || :like || '%'
         ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
-    """)
+    """
+    )
     abstract fun searchNotesDESC(
         page: Int,
         limit: Int,
@@ -44,12 +52,14 @@ abstract class CachedNoteDao {
     ): List<CachedNoteImages>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT * FROM notes 
         WHERE title LIKE '%' || :like || '%' 
         OR body LIKE '%' || :like || '%'
         ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
-    """)
+    """
+    )
     abstract fun searchNotesASC(
         page: Int,
         limit: Int,
@@ -58,14 +68,16 @@ abstract class CachedNoteDao {
     ): List<CachedNoteImages>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT EXISTS (
             SELECT * FROM notes
             WHERE title LIKE '%' || :like || '%'
             OR body LIKE '%' || :like || '%'
             ORDER BY updated_at DESC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
         )
-    """)
+    """
+    )
     abstract fun nextPageIsExistOnDESC(
         page: Int,
         limit: Int,
@@ -74,14 +86,16 @@ abstract class CachedNoteDao {
     ): Boolean
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT EXISTS (
             SELECT * FROM notes
             WHERE title LIKE '%' || :like || '%'
             OR body LIKE '%' || :like || '%'
             ORDER BY updated_at ASC LIMIT (:limit) OFFSET ((:page-1) * :limit) + :startIndex
         )
-    """)
+    """
+    )
     abstract fun nextPageIsExistOnASC(
         page: Int,
         limit: Int,
@@ -93,10 +107,10 @@ abstract class CachedNoteDao {
     abstract fun updateNote(note: CachedNote)
 
     @Transaction
-    open fun updateNoteAndImages(noteEntity: NoteEntity){
+    open fun updateNoteAndImages(noteEntity: NoteEntity) {
         updateNote(noteEntity.divideCacheNote())
         deleteNoteImagesByNotePk(noteEntity.id)
-        if (noteEntity.divideCacheNoteImages().isNotEmpty()){
+        if (noteEntity.divideCacheNoteImages().isNotEmpty()) {
             saveImages(noteEntity.divideCacheNoteImages())
         }
     }
@@ -117,7 +131,7 @@ abstract class CachedNoteDao {
     abstract fun currentPageNoteSizeOnDESC(page: Int, limit: Int, startIndex: Int): Int
 
     @Transaction
-    open fun insertNoteAndImages(note: NoteEntity): Long{
+    open fun insertNoteAndImages(note: NoteEntity): Long {
         val insertResult = insertNote(note.divideCacheNote())
         if (!note.images.isNullOrEmpty())
             saveImages(note.divideCacheNoteImages())
@@ -139,5 +153,4 @@ abstract class CachedNoteDao {
     @Transaction
     @Query("SELECT * FROM notes WHERE id = :pk")
     abstract fun loadNoteAndImagesByPk(pk: String): CachedNoteImages
-
 }

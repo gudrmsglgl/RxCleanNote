@@ -17,7 +17,7 @@ class PagerBehavior(
 ) : CoordinatorLayout.Behavior<ViewPager2>(context, attrs) {
 
     private val INTERPOLATOR = FastOutSlowInInterpolator()
-    private val ANIMATION_DURATION:Long = 200
+    private val ANIMATION_DURATION: Long = 200
 
     private var dyDirectionSum = 0
     var isShowing: Boolean = true
@@ -44,7 +44,7 @@ class PagerBehavior(
         type: Int
     ) {
         // 스크롤이 반대방향으로 전환
-        if (dy > 0 && dyDirectionSum < 0 || dy < 0 && dyDirectionSum > 0){
+        if (dy > 0 && dyDirectionSum < 0 || dy < 0 && dyDirectionSum > 0) {
             child.animate().cancel()
             dyDirectionSum = 0
         }
@@ -53,7 +53,7 @@ class PagerBehavior(
 
         if (dyDirectionSum > child.height) {
             hideView(child)
-        } else if (dyDirectionSum < -child.height){
+        } else if (dyDirectionSum < -child.height) {
             showView(child)
         }
     }
@@ -68,7 +68,7 @@ class PagerBehavior(
             .setInterpolator(INTERPOLATOR)
             .setDuration(ANIMATION_DURATION)
 
-        animator.setListener(object: Animator.AnimatorListener{
+        animator.setListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
                 isHiding = true
             }
@@ -101,7 +101,7 @@ class PagerBehavior(
             .setInterpolator(INTERPOLATOR)
             .setDuration(ANIMATION_DURATION)
 
-        animator.setListener(object: Animator.AnimatorListener{
+        animator.setListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
                 isShowing = true
                 view.visibility = VISIBLE
@@ -123,5 +123,4 @@ class PagerBehavior(
         })
         animator.start()
     }
-
 }

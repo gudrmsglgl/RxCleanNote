@@ -10,7 +10,7 @@ import com.cleannote.presentation.extensions.transUserView
 import com.cleannote.presentation.model.UserView
 
 class SplashViewModel
-constructor(private val login: Login): BaseViewModel(login) {
+constructor(private val login: Login) : BaseViewModel(login) {
 
     private val TAG = "RxCleanNote"
     private var loginId: String = "gudrms"
@@ -19,7 +19,7 @@ constructor(private val login: Login): BaseViewModel(login) {
     val loginResult: LiveData<DataState<List<UserView>>>
         get() = _loginResult
 
-    fun tryLogin(){
+    fun tryLogin() {
         _loginResult.value = DataState.loading()
         login.execute(
             onSuccess = {
@@ -28,11 +28,12 @@ constructor(private val login: Login): BaseViewModel(login) {
             onError = {
                 _loginResult.postValue(DataState.error(it))
             },
-            params =  loginId)
+            params = loginId
+        )
     }
 
-    fun setUserId(id: String){
-       loginId = id
+    fun setUserId(id: String) {
+        loginId = id
     }
 
     private fun setUser(users: List<User>) =

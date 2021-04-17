@@ -16,14 +16,12 @@ abstract class ApplicationModule {
     abstract fun bindContext(application: NoteApplication): Context
 
     @Module
-    companion object{
+    companion object {
 
         @Singleton
         @Provides
         @JvmStatic
         fun provideSharedPreferences(context: Context) =
             context.getSharedPreferences(PREF_NOTE_PACKAGE_NAME, MODE_PRIVATE)
-
     }
-
 }

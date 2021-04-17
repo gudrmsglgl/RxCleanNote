@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.matcher.BoundedMatcher
 import org.hamcrest.Description
 
-class RecyclerViewAdapterSizeMatcher(private val expectedSize: Int): BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
+class RecyclerViewAdapterSizeMatcher(private val expectedSize: Int) : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
     private var itemCount: Int = 0
 
     override fun describeTo(description: Description) {
@@ -20,5 +20,4 @@ class RecyclerViewAdapterSizeMatcher(private val expectedSize: Int): BoundedMatc
         itemCount = view.adapter?.itemCount ?: 0
         itemCount == expectedSize
     }
-
 }

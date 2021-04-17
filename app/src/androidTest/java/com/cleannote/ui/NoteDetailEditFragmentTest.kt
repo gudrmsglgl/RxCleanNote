@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class NoteDetailEditFragmentTest: BaseTest() {
+class NoteDetailEditFragmentTest : BaseTest() {
 
     @Inject
     lateinit var fragmentFactory: TestNoteFragmentFactory
@@ -43,13 +43,13 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Before
-    fun setup(){
+    fun setup() {
         setupUIController()
         launchFragmentInContainerNavController()
     }
 
     @Test
-    fun noteDetailEditDisplay_onAndroid(){
+    fun noteDetailEditDisplay_onAndroid() {
         screenDetailEdit {
             toolbar {
                 primaryMenu {
@@ -78,7 +78,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun appBarCollapseThenToolbarTitleVisible_onAndroid(){
+    fun appBarCollapseThenToolbarTitleVisible_onAndroid() {
         screenDetailEdit {
             scrollview.body.swipeUp()
             toolbar.toolbarTitle.hasText(note.title)
@@ -87,7 +87,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun appBarExpandedThenEditTitleVisible_onAndroid(){
+    fun appBarExpandedThenEditTitleVisible_onAndroid() {
         screenDetailEdit {
             scrollview.body {
                 swipeUp()
@@ -102,7 +102,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun editTitleTypeTextThenTbMenuChangeUpdateMenu_onAndroid(){
+    fun editTitleTypeTextThenTbMenuChangeUpdateMenu_onAndroid() {
         screenDetailEdit {
             editTitle.typeText("test")
             toolbar {
@@ -113,7 +113,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun titleUpdateThenEditTitleContainTypeText_onAndroid(){
+    fun titleUpdateThenEditTitleContainTypeText_onAndroid() {
         stubNoteRepositoryUpdate()
         val updateTitle = "updatedTitle"
         screenDetailEdit {
@@ -124,7 +124,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun titleUpdateAndCollapseThenTbTitleUpdated_onAndroid(){
+    fun titleUpdateAndCollapseThenTbTitleUpdated_onAndroid() {
         stubNoteRepositoryUpdate()
         val updateTitle = "updatedTitle"
         screenDetailEdit {
@@ -137,7 +137,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun titleUpdateCancelThenNotContainUpdateText_onAndroid(){
+    fun titleUpdateCancelThenNotContainUpdateText_onAndroid() {
         val updateTitle = "updatedTitle"
         screenDetailEdit {
             editTitle.typeText(updateTitle)
@@ -147,7 +147,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun titleUpdateErrorThenNotContainUpdateText_onAndroid(){
+    fun titleUpdateErrorThenNotContainUpdateText_onAndroid() {
         stubThrowableNoteRepositoryUpdate(RuntimeException())
         val updateTitle = "updatedTitle"
         screenDetailEdit {
@@ -166,7 +166,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun bodyUpdateThenContainTypeText_onAndroid(){
+    fun bodyUpdateThenContainTypeText_onAndroid() {
         val updateBody = "updatedBody"
         stubNoteRepositoryUpdate()
         screenDetailEdit {
@@ -177,7 +177,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun bodyUpdateCancelThenNotContainTypeText_onAndroid(){
+    fun bodyUpdateCancelThenNotContainTypeText_onAndroid() {
         val updateBody = "updatedBody"
         stubNoteRepositoryUpdate()
         screenDetailEdit {
@@ -188,7 +188,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun bodyUpdateErrorThenNotContainUpdateText_onAndroid(){
+    fun bodyUpdateErrorThenNotContainUpdateText_onAndroid() {
         stubThrowableNoteRepositoryUpdate(RuntimeException())
         val updateBody = "updatedBody"
         screenDetailEdit {
@@ -207,9 +207,9 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun footerPopupMenuDisplay_onAndroid(){
+    fun footerPopupMenuDisplay_onAndroid() {
         screenDetailEdit {
-            footer.popupMenu{
+            footer.popupMenu {
                 click()
                 cameraMenu.isDisplayed()
                 albumMenu.isDisplayed()
@@ -219,7 +219,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun attachImgDeleteClickThenShowDeleteDialog_onAndroid(){
+    fun attachImgDeleteClickThenShowDeleteDialog_onAndroid() {
         screenDetailEdit {
             footer.imageRcv {
                 firstItem {
@@ -233,7 +233,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
     }
 
     @Test
-    fun attachImgDeleteThenTvNoImgDisplay_onAndroid(){
+    fun attachImgDeleteThenTvNoImgDisplay_onAndroid() {
         stubNoteRepositoryUpdate()
         screenDetailEdit {
             footer.imageRcv {
@@ -249,7 +249,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
         }
     }
 
-    private fun launchFragmentInContainerNavController(){
+    private fun launchFragmentInContainerNavController() {
         navController.setViewModelStore(ViewModelStore())
         navController.setGraph(R.navigation.nav_detail_graph)
         launchFragmentInContainer {
@@ -260,7 +260,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
             ).also { fragment ->
                 fragment.setUIController(mockUIController)
                 fragment.viewLifecycleOwnerLiveData.observeForever { lifecycleOwner ->
-                    if  (lifecycleOwner != null) {
+                    if (lifecycleOwner != null) {
                         Navigation.setViewNavController(fragment.requireView(), navController)
                         fragment.initNoteDefaultMode()
                     }
@@ -273,7 +273,7 @@ class NoteDetailEditFragmentTest: BaseTest() {
         getComponent().inject(this)
     }
 
-    override fun setupUIController(){
+    override fun setupUIController() {
         every { mockUIController.isDisplayProgressBar() }.returns(false)
         fragmentFactory.uiController = mockUIController
     }

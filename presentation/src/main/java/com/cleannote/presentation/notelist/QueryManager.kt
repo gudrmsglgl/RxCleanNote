@@ -12,7 +12,6 @@ import com.cleannote.domain.Constants.SORT_UPDATED_AT
 import com.cleannote.domain.interactor.usecases.notelist.NextPageExist
 import com.cleannote.domain.model.Query
 import com.cleannote.presentation.data.DataState
-import com.cleannote.presentation.model.NoteView
 import javax.inject.Inject
 
 class QueryManager
@@ -31,7 +30,7 @@ class QueryManager
     val isNextPageExist: Boolean
         get() = _isNextPageExist.value?.data ?: false
 
-    fun executeNextPageExist(query: Query){
+    fun executeNextPageExist(query: Query) {
         _isNextPageExist.postValue(DataState.loading())
         nextPageExist.execute(
             onSuccess = {
@@ -44,12 +43,12 @@ class QueryManager
         )
     }
 
-    fun nextPageQuery(): Query{
+    fun nextPageQuery(): Query {
         val nextPage = getQuery().page + 1
         return getQuery().copy(page = nextPage)
     }
 
-    fun nextPageQuery(nextPage: Int, startIndex: Int): Query{
+    fun nextPageQuery(nextPage: Int, startIndex: Int): Query {
         return getQuery().copy(
             page = nextPage, startIndex = startIndex
         )
@@ -83,7 +82,7 @@ class QueryManager
         index: Int
     ) = updateQuery(
         getQuery().apply {
-            page =  targetPage
+            page = targetPage
             startIndex = index
         }
     )
@@ -100,7 +99,7 @@ class QueryManager
             }
     )
 
-    private fun updateQuery(param: Query, isBackGround: Boolean = false){
+    private fun updateQuery(param: Query, isBackGround: Boolean = false) {
         if (!isBackGround)
             _query.value = param
         else

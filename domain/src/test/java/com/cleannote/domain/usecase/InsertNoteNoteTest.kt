@@ -10,25 +10,25 @@ import io.reactivex.Single
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class InsertNoteNoteTest: BaseDomainTest<Single<Long>, Note>() {
+class InsertNoteNoteTest : BaseDomainTest<Single<Long>, Note>() {
 
     private lateinit var insertNewNote: InsertNewNote
     private val paramNote = NoteFactory.createSingleNote(id = "#1", title = "insertTitle", body = "insertBody")
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         insertNewNote = InsertNewNote(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun buildUseCaseCallRepositoryInsertNewNote(){
+    fun buildUseCaseCallRepositoryInsertNewNote() {
         stubRepositoryReturnValue(paramNote, Single.just(1L))
         whenBuildUseCase(paramNote).test()
         verifyRepositoryCallInsertNewNote(paramNote)
     }
 
     @Test
-    fun buildUseCaseSingleComplete(){
+    fun buildUseCaseSingleComplete() {
         stubRepositoryReturnValue(paramNote, Single.just(1L))
         whenBuildUseCase(paramNote)
             .test()
@@ -36,7 +36,7 @@ class InsertNoteNoteTest: BaseDomainTest<Single<Long>, Note>() {
     }
 
     @Test
-    fun buildUseCaseInsertNewNoteReturnRow(){
+    fun buildUseCaseInsertNewNoteReturnRow() {
         val insertedRow = 1L
         stubRepositoryReturnValue(paramNote, Single.just(insertedRow))
         whenBuildUseCase(paramNote)
@@ -44,7 +44,7 @@ class InsertNoteNoteTest: BaseDomainTest<Single<Long>, Note>() {
             .assertValue(insertedRow)
     }
 
-    private fun verifyRepositoryCallInsertNewNote(param: Note){
+    private fun verifyRepositoryCallInsertNewNote(param: Note) {
         verify(repository).insertNewNote(param)
     }
 

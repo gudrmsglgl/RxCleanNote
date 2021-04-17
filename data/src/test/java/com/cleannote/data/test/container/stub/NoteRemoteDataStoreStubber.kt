@@ -9,18 +9,17 @@ import io.reactivex.Single
 
 class NoteRemoteDataStoreStubber(
     private val remoteDataStore: NoteRemoteDataStore
-): Stubber<NoteRemoteDataStoreStubber>() {
+) : Stubber<NoteRemoteDataStoreStubber>() {
 
-    fun searchNotes(param: QueryEntity, stub: List<NoteEntity>){
+    fun searchNotes(param: QueryEntity, stub: List<NoteEntity>) {
         whenever(remoteDataStore.searchNotes(param)).thenReturn(Single.just(stub))
     }
 
-    fun insertNote(param: NoteEntity, stub: Completable){
+    fun insertNote(param: NoteEntity, stub: Completable) {
         whenever(remoteDataStore.insertRemoteNewNote(param)).thenReturn(stub)
     }
 
-    fun insertThrowable(param: NoteEntity, stub: Throwable){
+    fun insertThrowable(param: NoteEntity, stub: Throwable) {
         whenever(remoteDataStore.insertRemoteNewNote(param)).thenReturn(Completable.error(stub))
     }
-
 }

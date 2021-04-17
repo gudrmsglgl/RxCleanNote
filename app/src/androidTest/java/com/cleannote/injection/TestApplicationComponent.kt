@@ -15,16 +15,18 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [
-    TestCacheModule::class,
-    TestDataModule::class,
-    DomainModule::class,
-    PresentationModule::class,
-    TestRemoteModule::class,
-    UiModule::class,
-    TestApplicationModule::class
-])
-interface TestApplicationComponent: ApplicationComponent {
+@Component(
+    modules = [
+        TestCacheModule::class,
+        TestDataModule::class,
+        DomainModule::class,
+        PresentationModule::class,
+        TestRemoteModule::class,
+        UiModule::class,
+        TestApplicationModule::class
+    ]
+)
+interface TestApplicationComponent : ApplicationComponent {
 
     fun provideNoteRepository(): NoteRepository
 
@@ -35,7 +37,7 @@ interface TestApplicationComponent: ApplicationComponent {
     fun provideThreadExecutor(): ThreadExecutor
 
     @Component.Factory
-    interface Factory{
+    interface Factory {
         fun create(@BindsInstance testApplication: TestBaseApplication): TestApplicationComponent
     }
 
@@ -43,5 +45,5 @@ interface TestApplicationComponent: ApplicationComponent {
     fun inject(noteDetailViewFragmentTest: NoteDetailViewFragmentTest)
     fun inject(noteDetailFragmentTest: NoteDetailEditFragmentTest)
     fun inject(navFragmentTest: NavFragmentTest)
-    //fun inject(notesNavigationTest: NotesNavigationTest)
+    // fun inject(notesNavigationTest: NotesNavigationTest)
 }

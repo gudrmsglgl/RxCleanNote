@@ -11,19 +11,19 @@ import com.cleannote.data.model.QueryEntity
 open class BaseNoteDaoTest {
     lateinit var noteDao: CachedNoteDao
 
-    protected fun whenInsertNote(param: CachedNote): Long{
+    protected fun whenInsertNote(param: CachedNote): Long {
         return noteDao.insertNote(param)
     }
 
-    protected fun whenInsertNoteAndImages(param: NoteEntity): Long{
+    protected fun whenInsertNoteAndImages(param: NoteEntity): Long {
         return noteDao.insertNoteAndImages(param)
     }
 
-    protected fun whenSaveNotesAndImages(noteEntities: List<NoteEntity>){
+    protected fun whenSaveNotesAndImages(noteEntities: List<NoteEntity>) {
         noteDao.saveNoteAndImages(noteEntities)
     }
 
-    protected fun whenSearchNotesBySorted(query: QueryEntity): List<CachedNoteImages>{
+    protected fun whenSearchNotesBySorted(query: QueryEntity): List<CachedNoteImages> {
         return noteDao.searchNoteBySorted(query)
     }
 
@@ -31,15 +31,15 @@ open class BaseNoteDaoTest {
         noteDao.updateNoteAndImages(updateNoteEntity)
     }
 
-    protected fun whenDeleteMultipleNotes(notes: List<CachedNote>){
+    protected fun whenDeleteMultipleNotes(notes: List<CachedNote>) {
         noteDao.deleteMultipleNotes(notes)
     }
 
-    protected fun whenDeleteNote(note: CachedNote){
+    protected fun whenDeleteNote(note: CachedNote) {
         noteDao.deleteNote(note)
     }
 
-    protected fun whenCurrentPageNoteSize(query: QueryEntity): Int{
+    protected fun whenCurrentPageNoteSize(query: QueryEntity): Int {
         return noteDao.currentNoteSize(query)
     }
 
@@ -47,7 +47,7 @@ open class BaseNoteDaoTest {
         return noteDao.loadNoteByPk(pk)
     }
 
-    protected fun loadImages(pk: String): List<CachedImage>{
+    protected fun loadImages(pk: String): List<CachedImage> {
         return noteDao.loadImagesByPk(pk)
     }
 
@@ -56,5 +56,4 @@ open class BaseNoteDaoTest {
     }
 
     protected fun loadAllCacheNoteAndImages() = noteDao.loadAllCacheNoteAndImages()
-
 }

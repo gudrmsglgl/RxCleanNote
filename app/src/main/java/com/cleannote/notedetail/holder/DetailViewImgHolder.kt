@@ -8,13 +8,12 @@ import com.cleannote.model.NoteImageUiModel
 class DetailViewImgHolder(
     val binding: ItemDetailViewImgBinding,
     val requestManager: RequestManager
-): RecyclerView.ViewHolder(binding.root) {
+) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: NoteImageUiModel){
+    fun bind(item: NoteImageUiModel) {
         binding.apply {
             reqManager = requestManager
             imageModel = item
         }
     }
-
 }

@@ -6,10 +6,10 @@ import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-
 abstract class FlowableUseCase<T, in Params> constructor(
     private val threadExecutor: ThreadExecutor,
-    private val postExecutionThread: PostExecutionThread): UseCase<T, Params> {
+    private val postExecutionThread: PostExecutionThread
+) : UseCase<T, Params> {
 
     override var disposables: CompositeDisposable = CompositeDisposable()
 
@@ -32,5 +32,4 @@ abstract class FlowableUseCase<T, in Params> constructor(
                 addDisposable(it)
             }
     }
-
 }

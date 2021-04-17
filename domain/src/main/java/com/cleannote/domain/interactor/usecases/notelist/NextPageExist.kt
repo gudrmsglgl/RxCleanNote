@@ -14,7 +14,7 @@ constructor(
     val repository: NoteRepository,
     threadExecutor: ThreadExecutor,
     postExecutionThread: PostExecutionThread
-): SingleUseCase<Boolean, Query>(threadExecutor, postExecutionThread) {
+) : SingleUseCase<Boolean, Query>(threadExecutor, postExecutionThread) {
     override fun buildUseCaseSingle(params: Query?): Single<Boolean> =
         repository.nextPageExist(params!!)
 }

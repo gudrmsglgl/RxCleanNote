@@ -6,18 +6,20 @@ import io.reactivex.disposables.Disposable
 interface UseCase<T, in Params> {
     var disposables: CompositeDisposable
 
-    fun execute(onSuccess: (t: T) -> Unit,
-                onError: (t: Throwable) -> Unit,
-                afterFinished: () -> Unit = {},
-                onComplete: () -> Unit = {},
-                params: Params?)
+    fun execute(
+        onSuccess: (t: T) -> Unit,
+        onError: (t: Throwable) -> Unit,
+        afterFinished: () -> Unit = {},
+        onComplete: () -> Unit = {},
+        params: Params?
+    )
 
-    fun dispose(){
+    fun dispose() {
         if (!disposables.isDisposed) disposables.dispose()
     }
 
-    fun addDisposable(disposable: Disposable){
-        if (disposables.isDisposed){
+    fun addDisposable(disposable: Disposable) {
+        if (disposables.isDisposed) {
             disposables = CompositeDisposable()
         }
         disposables.add(disposable)

@@ -21,11 +21,10 @@ import com.cleannote.model.NoteImageUiModel
 import com.cleannote.model.NoteUiModel
 import com.cleannote.notedetail.Keys.GLIDE_DETAIL_VIEW_STATE_KEY
 import com.cleannote.notedetail.edit.EditImagesAdapter
-import com.cleannote.notedetail.view.ImageViewAdapter
 import com.cleannote.notedetail.view.GlideLoadState.Companion.STATE_FAIL
 import com.cleannote.notedetail.view.GlideLoadState.Companion.STATE_SUCCESS
+import com.cleannote.notedetail.view.ImageViewAdapter
 import com.cleannote.presentation.data.notedetail.TextMode
-
 
 object BindingAdapter {
 
@@ -41,7 +40,7 @@ object BindingAdapter {
         imageView: ImageView,
         glideRequestManager: RequestManager,
         noteUiModel: NoteUiModel
-    ){
+    ) {
         val image: Any =
             if (noteUiModel.images.isNullOrEmpty()) R.drawable.empty_holder
             else noteUiModel.images.get(0).imgPath
@@ -59,19 +58,18 @@ object BindingAdapter {
     fun submitViewPagerAdapterOnDetailView(
         pager: ViewPager2,
         images: List<NoteImageUiModel>?
-    ){
+    ) {
         (pager.adapter as ImageViewAdapter).submitList(images)
     }
-
 
     @JvmStatic
     @BindingAdapter(value = ["attachImages"])
     fun submitRcvAdapterOnDetailEditView(
         recyclerView: RecyclerView,
         images: List<NoteImageUiModel>?
-    ){
+    ) {
         (recyclerView.adapter as EditImagesAdapter).submitList(images)
-        val scroller = object : LinearSmoothScroller(recyclerView.context){
+        val scroller = object : LinearSmoothScroller(recyclerView.context) {
             override fun getHorizontalSnapPreference(): Int {
                 return LinearSmoothScroller.SNAP_TO_END
             }
@@ -86,12 +84,12 @@ object BindingAdapter {
         imageView: ImageView,
         glideManager: RequestManager,
         item: NoteImageUiModel
-    ){
+    ) {
         if (BuildConfig.DEBUG) {
             glideManager
                 .load(item.imgPath)
                 .thumbnail(0.1f)
-                .into(object : CustomTarget<Drawable>(){
+                .into(object : CustomTarget<Drawable>() {
                     override fun onResourceReady(
                         resource: Drawable,
                         transition: Transition<in Drawable>?
@@ -127,7 +125,7 @@ object BindingAdapter {
         imageView: ImageView,
         glideManager: RequestManager,
         imageModel: NoteImageUiModel
-    ){
+    ) {
         glideManager
             .applyDefaultRequestOptions(
                 RequestOptions.bitmapTransform(RoundedCorners(30))
@@ -142,11 +140,10 @@ object BindingAdapter {
     fun releaseFocus(
         view: View,
         textMode: TextMode
-    ){
-        if (textMode != TextMode.EditMode){
+    ) {
+        if (textMode != TextMode.EditMode) {
             view.takeIf { it.isFocused }?.clearFocus()
             view.hideKeyboard()
         }
     }
-
 }

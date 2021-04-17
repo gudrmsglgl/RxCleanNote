@@ -5,7 +5,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.test.espresso.matcher.BoundedMatcher
 import org.hamcrest.Description
 
-class ToolbarTitleMatcher(private val title: String?): BoundedMatcher<View, Toolbar>(Toolbar::class.java) {
+class ToolbarTitleMatcher(private val title: String?) : BoundedMatcher<View, Toolbar>(Toolbar::class.java) {
 
     private var actualTitle: String? = null
 

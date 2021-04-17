@@ -11,25 +11,25 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class DeleteMultipleNotesTest: BaseDomainTest<Completable, List<Note>>(){
+class DeleteMultipleNotesTest : BaseDomainTest<Completable, List<Note>>() {
 
     private lateinit var deleteMultipleNotes: DeleteMultipleNotes
     private val paramNotes: List<Note> = NoteFactory.createNoteList(3)
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
         deleteMultipleNotes = DeleteMultipleNotes(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun buildUseCaseCallRepositoryDeleteMultipleNotes(){
+    fun buildUseCaseCallRepositoryDeleteMultipleNotes() {
         stubRepositoryReturnValue(paramNotes, Completable.complete())
         whenBuildUseCase(paramNotes).test()
         verifyRepositoryCallDeleteMultipleNotes(paramNotes)
     }
 
     @Test
-    fun buildUseCaseCompletableComplete(){
+    fun buildUseCaseCompletableComplete() {
         stubRepositoryReturnValue(paramNotes, Completable.complete())
         whenBuildUseCase(paramNotes)
             .test()
@@ -37,14 +37,14 @@ class DeleteMultipleNotesTest: BaseDomainTest<Completable, List<Note>>(){
     }
 
     @Test
-    fun buildUseCaseDeleteMultipleNotesReturnNoValue(){
+    fun buildUseCaseDeleteMultipleNotesReturnNoValue() {
         stubRepositoryReturnValue(paramNotes, Completable.complete())
         whenBuildUseCase(paramNotes)
             .test()
             .assertNoValues()
     }
 
-    private fun verifyRepositoryCallDeleteMultipleNotes(param: List<Note>){
+    private fun verifyRepositoryCallDeleteMultipleNotes(param: List<Note>) {
         verify(repository).deleteMultipleNotes(param)
     }
 

@@ -9,41 +9,41 @@ import io.reactivex.Single
 
 class NoteCacheDataStoreStubber(
     private val cacheDataStore: NoteCacheDataStore
-): Stubber<NoteCacheDataStoreStubber>() {
+) : Stubber<NoteCacheDataStoreStubber>() {
 
-    fun pageIsCache(param: Int, stub: Boolean){
+    fun pageIsCache(param: Int, stub: Boolean) {
         whenever(cacheDataStore.isCached(param)).thenReturn(Single.just(stub))
     }
 
-    fun saveNotes(remoteNotes: List<NoteEntity>, queryEntity: QueryEntity, stub: Completable){
+    fun saveNotes(remoteNotes: List<NoteEntity>, queryEntity: QueryEntity, stub: Completable) {
         whenever(cacheDataStore.saveNotes(remoteNotes, queryEntity)).thenReturn(stub)
     }
 
-    fun currentPageNoteSize(param: QueryEntity, stub: Int){
+    fun currentPageNoteSize(param: QueryEntity, stub: Int) {
         whenever(cacheDataStore.currentPageNoteSize(param)).thenReturn(Single.just(stub))
     }
 
-    fun searchNotes(param: QueryEntity, stub: List<NoteEntity>){
+    fun searchNotes(param: QueryEntity, stub: List<NoteEntity>) {
         whenever(cacheDataStore.searchNotes(param)).thenReturn(Single.just(stub))
     }
 
-    fun insertNote(param: NoteEntity, stub:Long){
+    fun insertNote(param: NoteEntity, stub: Long) {
         whenever(cacheDataStore.insertCacheNewNote(param)).thenReturn(Single.just(stub))
     }
 
-    fun insertThrowable(param: NoteEntity, stub: Throwable){
+    fun insertThrowable(param: NoteEntity, stub: Throwable) {
         whenever(cacheDataStore.insertCacheNewNote(param)).thenReturn(Single.error(stub))
     }
 
-    fun updateNote(param: NoteEntity, stub: Completable){
+    fun updateNote(param: NoteEntity, stub: Completable) {
         whenever(cacheDataStore.updateNote(param)).thenReturn(stub)
     }
 
-    fun deleteNote(param: NoteEntity, stub: Completable){
+    fun deleteNote(param: NoteEntity, stub: Completable) {
         whenever(cacheDataStore.deleteNote(param)).thenReturn(stub)
     }
 
-    fun deleteMultipleNotes(param: List<NoteEntity>, stub: Completable){
+    fun deleteMultipleNotes(param: List<NoteEntity>, stub: Completable) {
         whenever(cacheDataStore.deleteMultipleNotes(param)).thenReturn(stub)
     }
 

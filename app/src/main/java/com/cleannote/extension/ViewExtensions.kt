@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.absoluteValue
 
-
 fun View.visible() {
     visibility = View.VISIBLE
 }
@@ -25,7 +24,7 @@ fun View.isVisible(): Boolean {
 
 fun AppBarLayout.offsetChangeRatio() = (this.y / this.totalScrollRange).absoluteValue
 
-fun TextView.changeTextColor(@ColorRes res: Int){
+fun TextView.changeTextColor(@ColorRes res: Int) {
     this.setTextColor(ContextCompat.getColor(this.context, res))
 }
 

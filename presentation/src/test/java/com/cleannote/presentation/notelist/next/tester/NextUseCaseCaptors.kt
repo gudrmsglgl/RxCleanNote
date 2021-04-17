@@ -5,6 +5,6 @@ import com.cleannote.presentation.ArgumentCaptors
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.argumentCaptor
 
-class NextUseCaseCaptors: ArgumentCaptors<Boolean>() {
+class NextUseCaseCaptors : ArgumentCaptors<Boolean>() {
     val paramCaptor: KArgumentCaptor<Query> = argumentCaptor()
 }

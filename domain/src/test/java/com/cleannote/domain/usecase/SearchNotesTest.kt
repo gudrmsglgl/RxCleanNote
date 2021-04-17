@@ -6,26 +6,25 @@ import com.cleannote.domain.model.Note
 import com.cleannote.domain.model.Query
 import com.cleannote.domain.test.factory.NoteFactory
 import com.cleannote.domain.test.factory.QueryFactory
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Single
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class SearchNotesTest: BaseDomainTest<Single<List<Note>>, Query>() {
+class SearchNotesTest : BaseDomainTest<Single<List<Note>>, Query>() {
 
     private lateinit var searchNotes: SearchNotes
 
     private val defaultQuery = QueryFactory.makeDefaultQuery()
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         searchNotes = SearchNotes(repository, threadExecutor, postExecutionThread)
     }
 
     @Test
-    fun buildUseCaseCallRepositorySearchNotes(){
+    fun buildUseCaseCallRepositorySearchNotes() {
         stubRepositoryReturnValue(
             param = defaultQuery,
             stubValue = Single.just(NoteFactory.createNoteList(2))
@@ -35,7 +34,7 @@ class SearchNotesTest: BaseDomainTest<Single<List<Note>>, Query>() {
     }
 
     @Test
-    fun buildUseCaseSingleComplete(){
+    fun buildUseCaseSingleComplete() {
         stubRepositoryReturnValue(
             param = defaultQuery,
             stubValue = Single.just(NoteFactory.createNoteList(2))
@@ -46,7 +45,7 @@ class SearchNotesTest: BaseDomainTest<Single<List<Note>>, Query>() {
     }
 
     @Test
-    fun buildUseCaseSearchQueryReturnNotes(){
+    fun buildUseCaseSearchQueryReturnNotes() {
         val stubNotes = NoteFactory.createNoteList(2)
         stubRepositoryReturnValue(
             param = defaultQuery,

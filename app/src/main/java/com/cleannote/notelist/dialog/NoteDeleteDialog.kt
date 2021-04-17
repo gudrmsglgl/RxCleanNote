@@ -6,7 +6,7 @@ import com.cleannote.common.dialog.BaseDeleteDialog
 import com.cleannote.common.dialog.DeleteDialog
 import com.cleannote.model.NoteUiModel
 
-class NoteDeleteDialog(val dialog: DeleteDialog): BaseDeleteDialog by dialog {
+class NoteDeleteDialog(val dialog: DeleteDialog) : BaseDeleteDialog by dialog {
 
     fun showDialog(notes: List<NoteUiModel>): MaterialDialog = showDialog(message(notes))
 
@@ -24,5 +24,4 @@ class NoteDeleteDialog(val dialog: DeleteDialog): BaseDeleteDialog by dialog {
         }
         else -> ""
     }
-
 }

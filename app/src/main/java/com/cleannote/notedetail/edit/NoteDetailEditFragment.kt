@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.RequestManager
-
 import com.cleannote.app.R
 import com.cleannote.app.databinding.FragmentNoteDetailEditBinding
 import com.cleannote.common.BaseFragment
@@ -31,9 +30,9 @@ import com.cleannote.notedetail.edit.dialog.LoadingImageUpdateDialog
 import com.cleannote.notedetail.edit.factory.NoteFactory
 import com.cleannote.presentation.data.State.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState
-import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbCollapse
 import com.cleannote.presentation.data.notedetail.DetailToolbarState.TbExpanded
+import com.cleannote.presentation.data.notedetail.TextMode.*
 import com.cleannote.presentation.notedetail.NoteDetailViewModel
 import com.jakewharton.rxbinding4.core.scrollChangeEvents
 import com.jakewharton.rxbinding4.material.offsetChanges
@@ -51,11 +50,11 @@ class NoteDetailEditFragment constructor(
 ) : BaseFragment<FragmentNoteDetailEditBinding>(R.layout.fragment_note_detail_edit) {
 
     private val viewModel
-            by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
+        by navGraphViewModels<NoteDetailViewModel>(R.id.nav_detail_graph) { viewModelFactory }
     private val imageLoader: ImageLoader
-            by lazy { ImageLoader(this, glideRequestManager) }
+        by lazy { ImageLoader(this, glideRequestManager) }
     private val lottieLoadingDialog: LoadingImageUpdateDialog
-            by lazy { LoadingImageUpdateDialog.newInstance() }
+        by lazy { LoadingImageUpdateDialog.newInstance() }
     private var imageAdapter by autoCleared<EditImagesAdapter>()
 
     private val collapseBoundary = -85
@@ -103,9 +102,10 @@ class NoteDetailEditFragment constructor(
         body: EditText
     ) = Observable.merge(
         title.textChanges()
-            .filter { title.isFocused && !viewModel.isTitleModified(title.text.toString())},
+            .filter { title.isFocused && !viewModel.isTitleModified(title.text.toString()) },
         body.textChanges()
-            .filter { body.isFocused && !viewModel.isBodyModified(body.text.toString())})
+            .filter { body.isFocused && !viewModel.isBodyModified(body.text.toString()) }
+    )
         .subscribe { viewModel.editMode() }
         .addCompositeDisposable()
 
@@ -146,43 +146,49 @@ class NoteDetailEditFragment constructor(
 
     private fun subscribeUpdateNote() = viewModel
         .updatedNote
-        .observe(viewLifecycleOwner, Observer {
-            if (it != null){
-                when (it.status) {
-                    is LOADING -> {
-                        hideLottieImgLoadingDialog()
-                    }
-                    is SUCCESS -> {
-                        showUpdateMsg()
-                        hasKeyOnBackPress = REQ_UPDATE_KEY
-                    }
-                    is ERROR -> {
-                        showErrorDialog(getString(R.string.updateErrorMsg))
-                        it.sendFirebaseThrowable()
+        .observe(
+            viewLifecycleOwner,
+            Observer {
+                if (it != null) {
+                    when (it.status) {
+                        is LOADING -> {
+                            hideLottieImgLoadingDialog()
+                        }
+                        is SUCCESS -> {
+                            showUpdateMsg()
+                            hasKeyOnBackPress = REQ_UPDATE_KEY
+                        }
+                        is ERROR -> {
+                            showErrorDialog(getString(R.string.updateErrorMsg))
+                            it.sendFirebaseThrowable()
+                        }
                     }
                 }
             }
-        })
+        )
 
     private fun subscribeDeleteNote() = viewModel
         .deletedNote
-        .observe( viewLifecycleOwner, Observer {
-            if (it != null){
-                when (it.status) {
-                    is SUCCESS -> {
-                        showToast(getString(R.string.deleteSuccessMsg))
-                        hasKeyOnBackPress = REQ_DELETE_KEY
-                        navPopBackStack(inclusive = true)
-                    }
-                    is ERROR -> {
-                        showErrorDialog(getString(R.string.deleteErrorMsg))
-                        it.sendFirebaseThrowable()
+        .observe(
+            viewLifecycleOwner,
+            Observer {
+                if (it != null) {
+                    when (it.status) {
+                        is SUCCESS -> {
+                            showToast(getString(R.string.deleteSuccessMsg))
+                            hasKeyOnBackPress = REQ_DELETE_KEY
+                            navPopBackStack(inclusive = true)
+                        }
+                        is ERROR -> {
+                            showErrorDialog(getString(R.string.deleteErrorMsg))
+                            it.sendFirebaseThrowable()
+                        }
                     }
                 }
             }
-        })
+        )
 
-    fun navPopBackStack(inclusive: Boolean = false){
+    fun navPopBackStack(inclusive: Boolean = false) {
         view?.clearFocus()
         requestToNoteList()
         if (inclusive)
@@ -191,7 +197,7 @@ class NoteDetailEditFragment constructor(
             findNavController().popBackStack()
     }
 
-    private fun showNoteDeleteDialog() = activity?.let{
+    private fun showNoteDeleteDialog() = activity?.let {
         DeleteDialog(it, viewLifecycleOwner)
             .showDialog(getString(R.string.delete_message))
             .positiveButton {
@@ -207,14 +213,14 @@ class NoteDetailEditFragment constructor(
             }
     }
 
-    fun addImagePopupMenu(view: View){
+    fun addImagePopupMenu(view: View) {
         activity?.let {
             getView()?.clearFocus()
             view.hideKeyboard()
-            it.showImageLoaderMenu(view){ menuType ->
+            it.showImageLoaderMenu(view) { menuType ->
                 imageLoader
                     .onLoaded(menuType) { path ->
-                        if (path.isNotEmpty()){
+                        if (path.isNotEmpty()) {
                             viewModel.uploadImage(path, dateUtil.getCurrentTimestamp())
                             showLottieImgLoadingDialog()
                         }
@@ -232,7 +238,7 @@ class NoteDetailEditFragment constructor(
     )
 
     private fun transToolbarState(offset: Int): DetailToolbarState {
-        return if (offset < collapseBoundary){
+        return if (offset < collapseBoundary) {
             binding.etTitleDetailEdit.contentDescription = getString(R.string.desc_state_collapse)
             TbCollapse
         } else {
@@ -241,13 +247,13 @@ class NoteDetailEditFragment constructor(
         }
     }
 
-    private fun noteTitleAlpha(){
+    private fun noteTitleAlpha() {
         val alpha = binding.appBar.offsetChangeRatio()
         binding.etTitleDetailEdit.alpha = 1 - alpha
         binding.detailToolbar.toolBarTitle.alpha = alpha
     }
 
-    private fun requestToNoteList(){
+    private fun requestToNoteList() {
         hasKeyOnBackPress?.let { reqIdentityKey ->
             setFragmentResult(
                 REQUEST_KEY_ON_BACK,
@@ -256,25 +262,30 @@ class NoteDetailEditFragment constructor(
         }
     }
 
-    private fun showLottieImgLoadingDialog(){
+    private fun showLottieImgLoadingDialog() {
         if (!lottieLoadingDialog.isAdded) lottieLoadingDialog.show(childFragmentManager, "lottie_dialog")
     }
 
-    private fun hideLottieImgLoadingDialog(){
-        if (lottieLoadingDialog.isAdded){
-            Handler().postDelayed({
-                lottieLoadingDialog.dismiss()
-            }, 1700)
+    private fun hideLottieImgLoadingDialog() {
+        if (lottieLoadingDialog.isAdded) {
+            Handler().postDelayed(
+                {
+                    lottieLoadingDialog.dismiss()
+                },
+                1700
+            )
         }
     }
 
-    private fun showUpdateMsg(){
-        if (lottieLoadingDialog.isAdded){
-            Handler().postDelayed({
-                showToast(getString(R.string.updateSuccessMsg))
-            }, 1600)
-        }
-        else
+    private fun showUpdateMsg() {
+        if (lottieLoadingDialog.isAdded) {
+            Handler().postDelayed(
+                {
+                    showToast(getString(R.string.updateSuccessMsg))
+                },
+                1600
+            )
+        } else
             showToast(getString(R.string.updateSuccessMsg))
     }
 
@@ -283,7 +294,7 @@ class NoteDetailEditFragment constructor(
     private fun isEditDoneMenu(): Boolean = binding.detailToolbar.rightIcon.drawable.equalDrawable(R.drawable.ic_done_24dp)
 
     @VisibleForTesting(otherwise = PRIVATE)
-    fun initNoteDefaultMode(){
+    fun initNoteDefaultMode() {
         viewModel.defaultMode(currentNote())
     }
 }

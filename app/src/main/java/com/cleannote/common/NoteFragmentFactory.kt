@@ -16,9 +16,9 @@ class NoteFragmentFactory @Inject constructor(
     private val dateUtil: DateUtil,
     private val sharedPreferences: SharedPreferences,
     private val glideReqManager: RequestManager
-): FragmentFactory(){
+) : FragmentFactory() {
 
-    override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when(className){
+    override fun instantiate(classLoader: ClassLoader, className: String): Fragment = when (className) {
 
         NoteListFragment::class.java.name -> {
             val fragment = NoteListFragment(viewModelFactory, sharedPreferences)
@@ -42,5 +42,4 @@ class NoteFragmentFactory @Inject constructor(
 
         else -> super.instantiate(classLoader, className)
     }
-
 }

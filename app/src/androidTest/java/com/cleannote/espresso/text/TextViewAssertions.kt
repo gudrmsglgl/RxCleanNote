@@ -7,9 +7,9 @@ import com.cleannote.espresso.assertion.BaseAssertion
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.not
 
-interface TextViewAssertions: BaseAssertion {
+interface TextViewAssertions : BaseAssertion {
 
-    fun hasEmptyText(){
+    fun hasEmptyText() {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withText("")
@@ -17,7 +17,7 @@ interface TextViewAssertions: BaseAssertion {
         )
     }
 
-    fun hasText(text: String){
+    fun hasText(text: String) {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withText(text)
@@ -41,7 +41,7 @@ interface TextViewAssertions: BaseAssertion {
         )
     }
 
-    fun notContainText(text: String){
+    fun notContainText(text: String) {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.withText(not(text))
@@ -49,13 +49,13 @@ interface TextViewAssertions: BaseAssertion {
         )
     }
 
-    fun isChecked(){
+    fun isChecked() {
         viewInteraction.check(
             ViewAssertions.matches(ViewMatchers.isChecked())
         )
     }
 
-    fun isNotChecked(){
+    fun isNotChecked() {
         viewInteraction.check(
             ViewAssertions.matches(ViewMatchers.isNotChecked())
         )

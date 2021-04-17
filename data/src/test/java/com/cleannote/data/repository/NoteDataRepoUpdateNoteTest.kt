@@ -8,11 +8,11 @@ import io.reactivex.Completable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-class NoteDataRepoUpdateNoteTest: BaseNoteRepositoryTest() {
+class NoteDataRepoUpdateNoteTest : BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: Call CacheDataStore Update")
-    fun testCase_callCacheDataStore(){
+    fun testCase_callCacheDataStore() {
         val updatedNote = NoteFactory.createNote(id = "#1", title = "updatedTitle", body = "updatedBody")
 
         stubContainer {
@@ -29,7 +29,7 @@ class NoteDataRepoUpdateNoteTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: AssertComplete")
-    fun testCase_assertComplete(){
+    fun testCase_assertComplete() {
         val updatedNote = NoteFactory.createNote(id = "#1", title = "updatedTitle", body = "updatedBody")
 
         stubContainer {
@@ -43,7 +43,7 @@ class NoteDataRepoUpdateNoteTest: BaseNoteRepositoryTest() {
 
     @Test
     @DisplayName("TestCase[Cache Complete]: AssertValue -> NoValue")
-    fun testCase_assertValueNoValue(){
+    fun testCase_assertValueNoValue() {
         val updatedNote = NoteFactory.createNote(id = "#1", title = "updatedTitle", body = "updatedBody")
 
         stubContainer {

@@ -9,12 +9,11 @@ import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
 
-
 class DeleteFeatureTester(
     private val viewModel: NoteListViewModel,
     private val usecase: DeleteNote,
     private val deleteCaptor: DeleteUseCaseCaptors
-): ViewModelFeatureTester<DeleteFeatureTester, Nothing, Note, NoteView>(deleteCaptor) {
+) : ViewModelFeatureTester<DeleteFeatureTester, Nothing, Note, NoteView>(deleteCaptor) {
 
     fun delete(param: NoteView): DeleteFeatureTester {
         viewModel.deleteNote(param)
@@ -34,5 +33,4 @@ class DeleteFeatureTester(
     override fun vmCurrentData(): DataState<NoteView>? {
         return viewModel.deleteResult.value
     }
-
 }

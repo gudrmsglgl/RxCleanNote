@@ -14,7 +14,7 @@ open class NoteCacheDataStore
 @Inject
 constructor(
     private val noteCache: NoteCache
-): NoteDataStore {
+) : NoteDataStore {
 
     override fun insertCacheNewNote(noteEntity: NoteEntity): Single<Long> =
         noteCache.insertCacheNewNote(noteEntity)

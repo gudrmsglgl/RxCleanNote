@@ -3,7 +3,6 @@ package com.cleannote.data.repository
 import com.cleannote.data.model.NoteEntity
 import com.cleannote.data.model.QueryEntity
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 
 interface NoteCache {

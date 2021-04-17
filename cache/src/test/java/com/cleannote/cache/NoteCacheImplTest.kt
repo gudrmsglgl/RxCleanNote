@@ -18,7 +18,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.lang.IndexOutOfBoundsException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
@@ -28,7 +29,7 @@ class NoteCacheImplTest {
     private lateinit var noteCacheImpl: NoteCacheImpl
 
     @Before
-    fun cacheImplSetup(){
+    fun cacheImplSetup() {
         database = Room
             .inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), NoteDatabase::class.java)
             .allowMainThreadQueries()
@@ -39,12 +40,12 @@ class NoteCacheImplTest {
     }
 
     @After
-    fun releaseDB(){
+    fun releaseDB() {
         database.close()
     }
 
     @Test
-    fun insertCacheNewNoteComplete(){
+    fun insertCacheNewNoteComplete() {
         val insertNoteEntity = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
         noteCacheImpl.insertCacheNewNote(insertNoteEntity)
             .test()
@@ -52,7 +53,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun insertCacheNewNoteReturnRow(){
+    fun insertCacheNewNoteReturnRow() {
         val insertNoteEntity = NoteFactory.createNoteEntity("#1", "title#1", null, "20", 3)
         noteCacheImpl.insertCacheNewNote(insertNoteEntity)
             .test()
@@ -60,7 +61,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNoteComplete(){
+    fun searchNoteComplete() {
         val queryEntity = QueryFactory.makeQueryEntity()
         noteCacheImpl.searchNotes(queryEntity)
             .test()
@@ -68,7 +69,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNoteOnCacheEmptyReturnEmpty(){
+    fun searchNoteOnCacheEmptyReturnEmpty() {
         val queryEntity = QueryFactory.makeQueryEntity()
         noteCacheImpl.searchNotes(queryEntity)
             .test()
@@ -76,7 +77,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNotesOnDescReturnNotesDESC(){
+    fun searchNotesOnDescReturnNotesDESC() {
         val queryDesc = QueryFactory.makeQueryEntity(order = NOTE_SORT_DESC) // default order DESC
         val notes = NoteFactory.createNoteEntityList(end = 5)
 
@@ -89,7 +90,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNotesOnAscReturnNotesASC(){
+    fun searchNotesOnAscReturnNotesASC() {
         val queryDesc = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC) // default order DESC
         val notes = NoteFactory.createNoteEntityList(end = 5)
 
@@ -102,7 +103,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNotesNextPageReturnNextNotes(){
+    fun searchNotesNextPageReturnNextNotes() {
         val p1Query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
         val p1Notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(p1Notes).test()
@@ -123,7 +124,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNotesLikeQueryOnCacheNotEmptyThenReturnSpecificNotes(){
+    fun searchNotesLikeQueryOnCacheNotEmptyThenReturnSpecificNotes() {
         val like = "title 2"
         val specificQuery = QueryFactory.makeQueryEntity(search = like)
         val notes = NoteFactory.createNoteEntityList(end = 5)
@@ -138,7 +139,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun searchNotesLikeQueryOnCacheEmptyThenReturnEmpty(){
+    fun searchNotesLikeQueryOnCacheEmptyThenReturnEmpty() {
         val like = "i'm android"
         val specificQuery = QueryFactory.makeQueryEntity(search = like)
         val notes = NoteFactory.createNoteEntityList(end = 5)
@@ -151,16 +152,18 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun updateNoteOnCacheExistNoteThenComplete(){
+    fun updateNoteOnCacheExistNoteThenComplete() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
 
-        val updatedNote = existNoteUpdate(TempUpdateParam.apply {
-            existNotes = notes
-            updateIndex = 1
-            imageSize = 2
-        })
+        val updatedNote = existNoteUpdate(
+            TempUpdateParam.apply {
+                existNotes = notes
+                updateIndex = 1
+                imageSize = 2
+            }
+        )
 
         noteCacheImpl.updateNote(updatedNote)
             .test()
@@ -168,14 +171,16 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun updateNoteOnCacheEmptyNoteThenNotComplete(){
+    fun updateNoteOnCacheEmptyNoteThenNotComplete() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
 
-        val updatedNote = existNoteUpdate(TempUpdateParam.apply {
-            existNotes = notes
-            updateIndex = 1
-            imageSize = 2
-        })
+        val updatedNote = existNoteUpdate(
+            TempUpdateParam.apply {
+                existNotes = notes
+                updateIndex = 1
+                imageSize = 2
+            }
+        )
 
         noteCacheImpl.updateNote(updatedNote)
             .test()
@@ -183,16 +188,18 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun updateNoteReturnNoValue(){
+    fun updateNoteReturnNoValue() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
 
-        val updatedNote = existNoteUpdate(TempUpdateParam.apply {
-            existNotes = notes
-            updateIndex = 1
-            imageSize = 2
-        })
+        val updatedNote = existNoteUpdate(
+            TempUpdateParam.apply {
+                existNotes = notes
+                updateIndex = 1
+                imageSize = 2
+            }
+        )
 
         noteCacheImpl.updateNote(updatedNote)
             .test()
@@ -200,7 +207,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun deleteNoteOnCacheExistNoteThenComplete(){
+    fun deleteNoteOnCacheExistNoteThenComplete() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
@@ -211,7 +218,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun deleteNoteOnCacheNotExistPkThenComplete(){
+    fun deleteNoteOnCacheNotExistPkThenComplete() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
@@ -225,7 +232,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun deleteNoteReturnNoValue(){
+    fun deleteNoteReturnNoValue() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
@@ -236,24 +243,24 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun deleteMultipleNotesComplete(){
+    fun deleteMultipleNotesComplete() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
 
-        val selectedNotes = selectedNoteEntity(notes, 1,3)
+        val selectedNotes = selectedNoteEntity(notes, 1, 3)
         noteCacheImpl.deleteMultipleNotes(selectedNotes)
             .test()
             .assertComplete()
     }
 
     @Test
-    fun deleteMultipleNotesThenOnCacheRemoved(){
+    fun deleteMultipleNotesThenOnCacheRemoved() {
         val notes = NoteFactory.createNoteEntityList(end = 5)
         noteCacheImpl.saveNotes(notes)
             .test()
 
-        val selectedNotes = selectedNoteEntity(notes, 1,3)
+        val selectedNotes = selectedNoteEntity(notes, 1, 3)
         noteCacheImpl.deleteMultipleNotes(selectedNotes)
             .test()
             .assertComplete()
@@ -264,7 +271,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun currentNoteSizeComplete(){
+    fun currentNoteSizeComplete() {
         val p1Query = QueryFactory.makeQueryEntity()
         noteCacheImpl.currentPageNoteSize(p1Query)
             .test()
@@ -272,7 +279,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun currentNoteSizeOnCacheEmptyThenReturnZero(){
+    fun currentNoteSizeOnCacheEmptyThenReturnZero() {
         val p1Query = QueryFactory.makeQueryEntity()
         noteCacheImpl.currentPageNoteSize(p1Query)
             .test()
@@ -280,7 +287,7 @@ class NoteCacheImplTest {
     }
 
     @Test
-    fun currentNoteSizeOnCacheNotEmptyThenCurrentPageNoteSize(){
+    fun currentNoteSizeOnCacheNotEmptyThenCurrentPageNoteSize() {
         val p1Query = QueryFactory.makeQueryEntity(order = NOTE_SORT_ASC)
         val savedNote = NoteFactory.createNoteEntityList(end = 3)
 
@@ -292,7 +299,7 @@ class NoteCacheImplTest {
             .assertValue(savedNote.size)
     }
 
-    private fun existNoteUpdate(param: TempUpdateParam): NoteEntity{
+    private fun existNoteUpdate(param: TempUpdateParam): NoteEntity {
         val images = NoteFactory.createNoteImgEntities(param.updateId, param.imageSize)
         return NoteFactory
             .oneOfNotesUpdate(
@@ -302,7 +309,7 @@ class NoteCacheImplTest {
             )
     }
 
-    private fun selectedNoteEntity(savedNotes: List<NoteEntity>, vararg index: Int): List<NoteEntity>{
+    private fun selectedNoteEntity(savedNotes: List<NoteEntity>, vararg index: Int): List<NoteEntity> {
         val result = mutableListOf<NoteEntity>()
         index.forEach {
             if (it > savedNotes.lastIndex) IndexOutOfBoundsException("저장된 마지막 인덱스의 범위를 초과 했습니다.")

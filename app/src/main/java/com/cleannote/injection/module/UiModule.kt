@@ -2,15 +2,11 @@ package com.cleannote.injection.module
 
 import android.content.Context
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.cleannote.UiThread
 import com.cleannote.app.R
 import com.cleannote.domain.interactor.executor.PostExecutionThread
-import com.cleannote.notelist.SubjectManager
-import com.cleannote.notelist.NoteListAdapter
-import com.cleannote.notelist.swipe.SwipeHelperCallback
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -22,7 +18,7 @@ abstract class UiModule {
     abstract fun bindPostExecutionThread(uiThread: UiThread): PostExecutionThread
 
     @Module
-    companion object{
+    companion object {
 
         @JvmStatic
         @Singleton
@@ -41,6 +37,5 @@ abstract class UiModule {
             context: Context,
             requestOptions: RequestOptions
         ) = Glide.with(context).setDefaultRequestOptions(requestOptions)
-
     }
 }

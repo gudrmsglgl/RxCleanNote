@@ -8,18 +8,14 @@ import com.cleannote.presentation.data.State
 import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.nullValue
-import org.hamcrest.MatcherAssert.assertThat
-
 
 class InsertFeatureTester(
     private val viewModel: NoteListViewModel,
     private val useCase: InsertNewNote,
     private val insertCaptors: InsertUseCaseCaptors
-): ViewModelFeatureTester<InsertFeatureTester, Long, Note, NoteView>(insertCaptors) {
+) : ViewModelFeatureTester<InsertFeatureTester, Long, Note, NoteView>(insertCaptors) {
 
-    fun insertNote(param: NoteView): InsertFeatureTester{
+    fun insertNote(param: NoteView): InsertFeatureTester {
         viewModel.insertNotes(param)
         setState(currentState())
         return this

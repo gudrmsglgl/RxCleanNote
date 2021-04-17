@@ -4,7 +4,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import com.cleannote.espresso.assertion.BaseAssertion
 
-interface CheckableAssertions: BaseAssertion {
+interface CheckableAssertions : BaseAssertion {
 
     fun isChecked() {
         viewInteraction.check(
@@ -14,7 +14,7 @@ interface CheckableAssertions: BaseAssertion {
         )
     }
 
-    fun isNotChecked(){
+    fun isNotChecked() {
         viewInteraction.check(
             ViewAssertions.matches(
                 ViewMatchers.isNotChecked()

@@ -23,10 +23,9 @@ import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
 import com.jakewharton.rxbinding4.view.layoutChangeEvents
 
-
 class SplashFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory
-): BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash), MotionLayout.TransitionListener {
+) : BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash), MotionLayout.TransitionListener {
 
     companion object {
         const val LOGO_MAX_FRAME = 59
@@ -44,12 +43,12 @@ class SplashFragment constructor(
         binding.splashFragmentContainer.setTransitionListener(this)
     }
 
-    private fun initTextLogoGradation(){
+    private fun initTextLogoGradation() {
         binding.tvRx.layoutChangeEvents()
             .subscribe {
-                val rxColorArray = intArrayOf(Color.parseColor("#FBBBE2"), Color.parseColor("#B80083"),Color.parseColor("#410055"))
+                val rxColorArray = intArrayOf(Color.parseColor("#FBBBE2"), Color.parseColor("#B80083"), Color.parseColor("#410055"))
                 val textShader: Shader = LinearGradient(
-                    0f, 0f, it.view.width.toFloat(), it.view.height.toFloat(), rxColorArray,null, Shader.TileMode.CLAMP
+                    0f, 0f, it.view.width.toFloat(), it.view.height.toFloat(), rxColorArray, null, Shader.TileMode.CLAMP
                 )
                 binding.tvRx.paint.shader = textShader
             }
@@ -80,13 +79,13 @@ class SplashFragment constructor(
         playAnimation()
     }
 
-    private fun ovalDefaultToYellow(tv: TextView){
+    private fun ovalDefaultToYellow(tv: TextView) {
         tv.background = ContextCompat.getDrawable(this@SplashFragment.requireContext(), R.drawable.bg_oval_solid)
         tv.changeTextColor(R.color.black)
     }
 
     override fun onTransitionStarted(motion: MotionLayout, startId: Int, endId: Int) {
-        if (startId == R.id.const_delay){
+        if (startId == R.id.const_delay) {
             viewModel.noteList.observe(viewLifecycleOwner, noteObserver)
         }
     }

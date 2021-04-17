@@ -20,12 +20,12 @@ class SwipeHelperCallback(
     private val extendClamp: Float
 ) : ItemTouchHelper.Callback() {
 
-    companion object{
+    companion object {
         const val ESCAPE_VELOCITY = 10
     }
 
     private var currentPosition: Int? = null
-    private var previousPosition: Int?= null
+    private var previousPosition: Int? = null
     private var currentDx = 0f
 
     private lateinit var swipeAdapter: SwipeAdapter
@@ -74,7 +74,7 @@ class SwipeHelperCallback(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        if (actionState == ACTION_STATE_SWIPE){
+        if (actionState == ACTION_STATE_SWIPE) {
             val view = swipeView(viewHolder)
             val drawDx = clampViewPositionHorizontal(viewHolder, dX, isClamp(viewHolder), isCurrentlyActive)
 
@@ -98,9 +98,9 @@ class SwipeHelperCallback(
         dX: Float,
         isClamped: Boolean,
         isCurrentlyActive: Boolean
-    ): Float{
-        return if (isClamped){
-            if (isCurrentlyActive){
+    ): Float {
+        return if (isClamped) {
+            if (isCurrentlyActive) {
                 drawLeftDxAfterClamped(dX, clamp)
             } else {
                 drawLeftDxToClamp(clamp)
@@ -115,7 +115,7 @@ class SwipeHelperCallback(
         dX: Float,
         clampedDx: Float
     ) = drawLeftDx(
-        dxUpToLimit(-extendClamp -clampedDx, dX - clampedDx)
+        dxUpToLimit(-extendClamp - clampedDx, dX - clampedDx)
     )
 
     private fun dxUpToLimit(limit: Float, dX: Float) = max(limit, dX)
@@ -131,15 +131,15 @@ class SwipeHelperCallback(
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float =
         defaultValue * ESCAPE_VELOCITY
 
-    private fun setClamp(viewHolder: RecyclerView.ViewHolder, isClamped: Boolean){
+    private fun setClamp(viewHolder: RecyclerView.ViewHolder, isClamped: Boolean) {
         viewHolder.itemView.tag = isClamped
     }
 
-    private fun isClamp(viewHolder: RecyclerView.ViewHolder): Boolean{
+    private fun isClamp(viewHolder: RecyclerView.ViewHolder): Boolean {
         return viewHolder.itemView.tag as? Boolean ?: false
     }
 
-    fun removePreviousClamp(recyclerView: RecyclerView){
+    fun removePreviousClamp(recyclerView: RecyclerView) {
         if (currentPosition == previousPosition) return
         else {
             previousDeleteMenuClose(recyclerView)
@@ -148,19 +148,19 @@ class SwipeHelperCallback(
 
     fun previousDeleteMenuClose(
         recyclerView: RecyclerView
-    ): Boolean{
+    ): Boolean {
         return previousPosition?.let {
             val viewHolder = recyclerView.findViewHolderForAdapterPosition(it) ?: return false
             closeDeleteMenu(viewHolder)
             true
-        }?: false
+        } ?: false
     }
 
     fun isVisibleDeleteMenu(): Boolean = previousPosition?.let {
         true
     } ?: false
 
-    private fun closeDeleteMenu(holder: RecyclerView.ViewHolder){
+    private fun closeDeleteMenu(holder: RecyclerView.ViewHolder) {
         swipeRight(holder)
             .withStartAction {
                 deleteMenuOnCancel(holder)
@@ -180,7 +180,7 @@ class SwipeHelperCallback(
     private fun visibleDeleteMenu(
         viewHolder: RecyclerView.ViewHolder,
         setVisible: Boolean
-    ){
+    ) {
         if (setVisible)
             (viewHolder as NoteViewHolder).binding.swipeMenuDelete.visible()
         else
@@ -203,7 +203,7 @@ class SwipeHelperCallback(
     private fun deleteMenuAlpha(
         holder: RecyclerView.ViewHolder,
         dX: Float
-    ){
+    ) {
         deleteMenuView(holder)
             .apply {
                 this.alpha = abs(dX) / clamp
@@ -216,13 +216,12 @@ class SwipeHelperCallback(
         .translationX(0f)
         .setDuration(300L)
 
-    private fun releaseClamp(holder: RecyclerView.ViewHolder){
+    private fun releaseClamp(holder: RecyclerView.ViewHolder) {
         setClamp(holder, false)
         previousPosition = null
     }
 
-    fun setSwipeAdapter(adapter: SwipeAdapter){
+    fun setSwipeAdapter(adapter: SwipeAdapter) {
         swipeAdapter = adapter
     }
-
 }

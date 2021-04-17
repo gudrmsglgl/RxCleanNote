@@ -6,7 +6,7 @@ import com.cleannote.domain.model.User
 import com.cleannote.presentation.model.NoteImageView
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.model.UserView
-import java.util.*
+import java.util.UUID
 
 fun NoteImageView.transNoteImage() = NoteImage(this.imgPk, this.notePk, this.imagePath)
 fun List<NoteImageView>.transNoteImages() = map { it.transNoteImage() }

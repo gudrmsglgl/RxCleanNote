@@ -13,9 +13,9 @@ class DeleteFeatureTester(
     private val viewModel: NoteDetailViewModel,
     private val deleteNote: DeleteNote,
     private val deleteCaptors: DeleteUseCaseCaptors
-): ViewModelFeatureTester<DeleteFeatureTester, Nothing, Note, NoteView>(deleteCaptors) {
+) : ViewModelFeatureTester<DeleteFeatureTester, Nothing, Note, NoteView>(deleteCaptors) {
 
-    fun deleteNote(param: NoteView): DeleteFeatureTester{
+    fun deleteNote(param: NoteView): DeleteFeatureTester {
         viewModel.deleteNote(param)
         setState(currentState())
         return this
@@ -33,5 +33,4 @@ class DeleteFeatureTester(
     override fun currentState(): State? {
         return vmCurrentData()?.status
     }
-
 }

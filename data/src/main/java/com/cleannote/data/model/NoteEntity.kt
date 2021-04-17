@@ -6,5 +6,5 @@ data class NoteEntity(
     val body: String,
     val updatedAt: String,
     val createdAt: String,
-    val images: List<NoteImageEntity> ?= null
+    val images: List<NoteImageEntity> ? = null
 )

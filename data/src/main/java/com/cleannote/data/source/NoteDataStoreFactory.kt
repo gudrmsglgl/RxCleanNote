@@ -8,7 +8,7 @@ open class NoteDataStoreFactory
 constructor(
     private val noteCacheDataStore: NoteCacheDataStore,
     private val noteRemoteDataStore: NoteRemoteDataStore
-){
+) {
     open fun retrieveDataStore(isCached: Boolean): NoteDataStore =
         if (isCached)
             noteCacheDataStore

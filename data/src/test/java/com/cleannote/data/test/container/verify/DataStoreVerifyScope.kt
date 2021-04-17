@@ -15,7 +15,7 @@ class DataStoreVerifyScope(
     @Mock val factory: NoteDataStoreFactory,
     @Mock val rDataStore: NoteRemoteDataStore,
     @Mock val cDataStore: NoteCacheDataStore
-){
+) {
 
     operator fun invoke(func: DataStoreVerifyScope.() -> Unit) {
         func(this)

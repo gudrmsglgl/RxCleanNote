@@ -9,7 +9,7 @@ import com.cleannote.app.R
 class ErrorDialog(
     override val context: Context,
     private val viewLifeCycleOwner: LifecycleOwner
-): BaseDialog {
+) : BaseDialog {
 
     override fun makeDefaultDialog(): MaterialDialog = MaterialDialog(context)
         .title(R.string.dialog_title_error)

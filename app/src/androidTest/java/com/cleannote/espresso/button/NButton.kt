@@ -5,5 +5,6 @@ import com.cleannote.espresso.text.TextViewAssertions
 import com.cleannote.espresso.view.NBaseView
 import org.hamcrest.Matcher
 
-class NButton(private val matcher: Matcher<View>): NBaseView<NButton>(matcher),
+class NButton(private val matcher: Matcher<View>) :
+    NBaseView<NButton>(matcher),
     TextViewAssertions

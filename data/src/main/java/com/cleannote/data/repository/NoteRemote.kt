@@ -11,5 +11,5 @@ interface NoteRemote {
     fun insertRemoteNewNote(noteEntity: NoteEntity): Completable
     fun login(userId: String): Flowable<List<UserEntity>>
     fun searchNotes(queryEntity: QueryEntity): Single<List<NoteEntity>>
-    fun updateNote(noteEntity: NoteEntity):Completable
+    fun updateNote(noteEntity: NoteEntity): Completable
 }

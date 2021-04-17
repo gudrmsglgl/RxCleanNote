@@ -28,8 +28,7 @@ import timber.log.Timber
 
 abstract class BaseFragment<DataBinding : ViewDataBinding>(
     @LayoutRes layoutRes: Int
-): Fragment(layoutRes)
-{
+) : Fragment(layoutRes) {
 
     private lateinit var uiController: UIController
 
@@ -48,7 +47,7 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         setUIController(mockController = null)
     }
 
-    fun showLoadingProgressBar(show: Boolean) = with(uiController){
+    fun showLoadingProgressBar(show: Boolean) = with(uiController) {
         displayProgressBar(show)
     }
 
@@ -61,7 +60,7 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         return 0
     }
 
-    fun dimenPx(@DimenRes res: Int): Int{
+    fun dimenPx(@DimenRes res: Int): Int {
         return context?.resources?.getDimensionPixelSize(res) ?: 0
     }
 
@@ -73,12 +72,12 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         ErrorDialog(it, viewLifecycleOwner).showDialog(errorMsg)
     }
 
-    fun setUIController(mockController: UIController?){
+    fun setUIController(mockController: UIController?) {
         if (mockController != null) this.uiController = mockController
         else
-            try{
+            try {
                 uiController = context as UIController
-            }catch (e: ClassCastException) {
+            } catch (e: ClassCastException) {
                 Timber.tag("RxCleanNote").d("$context must implement com.cleannote.common.UIController")
             }
     }
@@ -89,18 +88,18 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
         disposables?.dispose()
     }
 
-    private fun hideProgressBar() = with(uiController){
+    private fun hideProgressBar() = with(uiController) {
         if (isDisplayProgressBar())
             displayProgressBar(false)
     }
 
-    fun Disposable.addCompositeDisposable(){
+    fun Disposable.addCompositeDisposable() {
         disposables?.add(this)
     }
 
-    fun Drawable?.equalDrawable(@DrawableRes drawable: Int): Boolean = activity?.let{
+    fun Drawable?.equalDrawable(@DrawableRes drawable: Int): Boolean = activity?.let {
         var isEqualDrawable: Boolean = true
-        val loadDrawableBitmap  = ContextCompat.getDrawable(it, drawable)?.toBitmap()
+        val loadDrawableBitmap = ContextCompat.getDrawable(it, drawable)?.toBitmap()
 
         return if (loadDrawableBitmap == null || this == null)
             !isEqualDrawable
@@ -108,32 +107,32 @@ abstract class BaseFragment<DataBinding : ViewDataBinding>(
             isEqualDrawable = this.toBitmap().sameAs(loadDrawableBitmap)
             isEqualDrawable
         }
-    }?: false
+    } ?: false
 
-    fun <T> DataState<T>.sendFirebaseThrowable(){
+    fun <T> DataState<T>.sendFirebaseThrowable() {
         this.throwable?.let { FirebaseCrashlytics.getInstance().recordException(it) }
     }
 
-    fun setStatusBarColor(@ColorRes color: Int){
+    fun setStatusBarColor(@ColorRes color: Int) {
         activity?.window?.statusBarColor = getColor(color)
     }
 
     private fun getColor(@ColorRes color: Int): Int = ContextCompat.getColor(requireContext(), color)
 
-    fun setStatusBarTextBlack(){
+    fun setStatusBarTextBlack() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
 
-    fun setStatusBarTextTrans(){
-        val decorView: View = activity?.window?.decorView!! //set status background black
+    fun setStatusBarTextTrans() {
+        val decorView: View = activity?.window?.decorView!! // set status background black
 
         decorView.systemUiVisibility =
-            decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() //set status text  light
+            decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() // set status text  light
     }
 
-    fun <T: ViewDataBinding> bindingInflate(@LayoutRes layoutRes: Int, parent: ViewGroup): T {
+    fun <T : ViewDataBinding> bindingInflate(@LayoutRes layoutRes: Int, parent: ViewGroup): T {
         return DataBindingUtil.inflate(LayoutInflater.from(context), layoutRes, parent, false)
     }
 }

@@ -10,7 +10,7 @@ import com.cleannote.test.util.RecyclerViewMatcher
 class NImgRecyclerItem(
     @IdRes private val idRes: Int,
     private val position: Int
-): NBaseView<NImgRecyclerItem>(
+) : NBaseView<NImgRecyclerItem>(
     RecyclerViewMatcher(idRes).atPositionOnView(position, -1)
 ) {
     val img = NEImageView(withId(R.id.attach_image))

@@ -6,10 +6,9 @@ import com.cleannote.presentation.ArgumentCaptors
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.argumentCaptor
 
-class SearchUseCaseCaptors: ArgumentCaptors<List<Note>>() {
+class SearchUseCaseCaptors : ArgumentCaptors<List<Note>>() {
 
     val paramCaptor: KArgumentCaptor<Query> = argumentCaptor()
     val paramValue
         get() = paramCaptor.firstValue
-
 }
