@@ -5,7 +5,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.cleannote.TestBaseApplication
 import com.cleannote.common.UIController
 import com.cleannote.domain.interactor.repository.NoteRepository
-import com.cleannote.espresso.recycler.edit.NImgRecyclerItem
 import com.cleannote.espresso.recycler.list.NRecyclerItem
 import com.cleannote.injection.TestApplicationComponent
 import com.cleannote.model.NoteUiModel
@@ -20,8 +19,8 @@ abstract class BaseTest : RepoStubber {
     val mockUIController: UIController = mockk(relaxUnitFun = true)
     val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-    private val application: TestBaseApplication
-    ApplicationProvider.getApplicationContext() as TestBaseApplication
+    private val application: TestBaseApplication =
+        ApplicationProvider.getApplicationContext() as TestBaseApplication
 
     fun getComponent(): TestApplicationComponent {
         return application.applicationComponent as TestApplicationComponent
@@ -32,4 +31,3 @@ abstract class BaseTest : RepoStubber {
 }
 
 typealias NoteItem = NRecyclerItem<BaseHolder<NoteUiModel>>
-typealias ImageItem = NImgRecyclerItem
