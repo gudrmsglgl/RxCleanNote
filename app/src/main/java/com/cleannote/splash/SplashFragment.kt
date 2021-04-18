@@ -25,7 +25,9 @@ import com.jakewharton.rxbinding4.view.layoutChangeEvents
 
 class SplashFragment constructor(
     private val viewModelFactory: ViewModelProvider.Factory
-) : BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash), MotionLayout.TransitionListener {
+) : BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash),
+    MotionLayout.TransitionListener
+{
 
     companion object {
         const val LOGO_MAX_FRAME = 59
@@ -105,5 +107,7 @@ class SplashFragment constructor(
         }
     }
 
-    override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {}
+    override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {
+        //not used
+    }
 }
