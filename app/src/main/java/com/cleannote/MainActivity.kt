@@ -8,14 +8,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.cleannote.app.R
-import com.cleannote.common.*
+import com.cleannote.app.databinding.ActivityMainBinding
+import com.cleannote.common.NoteFragmentFactory
+import com.cleannote.common.OnBackPressListener
+import com.cleannote.common.UIController
 import com.cleannote.extension.isVisible
 import com.cleannote.notedetail.edit.NoteDetailEditFragment
 import com.cleannote.notedetail.view.NoteDetailViewFragment
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), UIController {
@@ -27,11 +29,14 @@ class MainActivity : AppCompatActivity(), UIController {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         inject()
         setFragmentFactory()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         firebaseAnalytics = Firebase.analytics
     }
 
@@ -48,12 +53,12 @@ class MainActivity : AppCompatActivity(), UIController {
         supportFragmentManager.fragmentFactory = fragmentFactory
     }
 
-    override fun displayProgressBar(isProceed: Boolean) {
+    override fun displayProgressBar(isProceed: Boolean) = with(binding) {
         if (isProceed) progress.visibility = VISIBLE
         else progress.visibility = GONE
     }
 
-    override fun isDisplayProgressBar(): Boolean = progress.isVisible()
+    override fun isDisplayProgressBar(): Boolean = binding.progress.isVisible()
 
     override fun onBackPressed() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)

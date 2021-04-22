@@ -9,7 +9,6 @@ import com.cleannote.presentation.extensions.verifyExecute
 import com.cleannote.presentation.model.NoteView
 import com.cleannote.presentation.notelist.NoteListViewModel
 import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
 
 class DeleteMultipleFeatureTester(
@@ -38,7 +37,7 @@ class DeleteMultipleFeatureTester(
     }
 
     override fun expectData(data: NoteView?): DeleteMultipleFeatureTester {
-        // throw UnsupportedOperationException("DeleteMultipleNotes Usecase Don't Return deleteResult, replace function expectData() to expectTotalNotes()")
+        // throw UnsupportedOperationException("DeleteMultipleNotes Use case Don't Return deleteResult, replace function expectData() to expectTotalNotes()")
         return this
     }
 
