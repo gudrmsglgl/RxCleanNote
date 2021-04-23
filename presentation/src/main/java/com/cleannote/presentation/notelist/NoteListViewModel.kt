@@ -10,6 +10,7 @@ import com.cleannote.domain.interactor.usecases.notelist.NoteListUseCases
 import com.cleannote.domain.model.Note
 import com.cleannote.presentation.data.DataState
 import com.cleannote.presentation.data.SingleLiveEvent
+import com.cleannote.presentation.data.State
 import com.cleannote.presentation.data.State.SUCCESS
 import com.cleannote.presentation.data.notelist.ListToolbarState
 import com.cleannote.presentation.data.notelist.ListToolbarState.SearchState
@@ -143,7 +144,10 @@ constructor(
         queryMgr.resetSearchQuery(search)
     }
 
-    fun nextPage() = queryMgr.updateNextPage()
+    fun nextPage() {
+        if (!isProcessSearch())
+            queryMgr.updateNextPage()
+    }
 
     fun setToolbarState(toolbarState: ListToolbarState) {
         _toolbarState.value = toolbarState
@@ -223,4 +227,7 @@ constructor(
         totalLoadNotes.clear()
         queryMgr.clearQuery()
     }
+
+    private fun isProcessSearch(): Boolean = noteList.value?.status == State.LOADING
 }
+

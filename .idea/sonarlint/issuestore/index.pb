@@ -1,3 +1,35 @@
 
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+w
+Gapp/src/androidTest/java/com/cleannote/ui/NoteDetailEditFragmentTest.kt,2/7/279b5ff2211c62448d1aa6ed821bc1f50e7b3223
+w
+Gapp/src/androidTest/java/com/cleannote/ui/NoteDetailViewFragmentTest.kt,e/4/e40e05752e5a0af893bde4854d2e60165f608b38
+s
+Capp/src/androidTest/java/com/cleannote/DataBindingIdlingResource.kt,0/4/044e9a3708f2604ac5a5df34d16d6042b8bfb769
+
+Opresentation/src/test/java/com/cleannote/presentation/ViewModelFeatureTester.kt,b/f/bfbad51cf32a8ef6adf7fae657f6f6c57c67a0ad
+l
+<cache/src/test/java/com/cleannote/cache/NoteCacheImplTest.kt,0/2/0233514893fb0de99c1f2736e5334031c9ae5a4a
+p
+@cache/src/test/java/com/cleannote/cache/dao/CachedNoteDaoTest.kt,5/c/5c6254c5e8861004301393b96d8a43d0b9f914c3
+ƒ
+Spresentation/src/main/java/com/cleannote/presentation/notelist/NoteListViewModel.kt,1/0/1072e7035efeedde1d819471e1f7b7162a74aa50
+q
+Aapp/src/androidTest/java/com/cleannote/ui/NoteListFragmentTest.kt,d/6/d6baa1c92c4d675f602cb7074470f4bbc0787b07
+_
+/app/src/main/java/com/cleannote/MainActivity.kt,0/8/0865a33f117caf280de5a4326a0757d97efa15a4
+h
+8app/src/main/java/com/cleannote/splash/SplashFragment.kt,2/3/2330808d1e9059a76da7a6e6a7c3c54459f25046
+l
+<app/src/main/java/com/cleannote/notelist/NoteListFragment.kt,6/c/6c59c66bee7f0e0c78926d5012e92e676c97b0f5
+l
+<app/src/androidTest/java/com/cleannote/ui/NavFragmentTest.kt,6/9/695a14e3380f7bcd5c5805c69b9db3e220efbbf4
+
+_presentation/src/test/java/com/cleannote/presentation/notelist/request/NoteListVMRequestTest.kt,7/9/79c07b26f9012d3d8b300a0da3272d56db55ca46
+—
+gpresentation/src/test/java/com/cleannote/presentation/notelist/multidelete/NoteListVMDeleteMultiTest.kt,9/2/924591cfe13af9f1712def1d08cbd3cc573fe761
+ 
+ppresentation/src/test/java/com/cleannote/presentation/notelist/multidelete/tester/DeleteMultipleFeatureTester.kt,d/d/dde06168fbbe25407be7914ac32dd8c1f2f6941b
+~
+Npresentation/src/main/java/com/cleannote/presentation/notelist/QueryManager.kt,d/8/d8e52ce183901715b54b66fced85615b6f419b22

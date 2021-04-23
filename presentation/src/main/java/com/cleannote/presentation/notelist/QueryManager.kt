@@ -74,7 +74,8 @@ class QueryManager
     )
 
     fun updateNextPage() = updateQuery(
-        getQuery().apply { page += 1 }
+        getQuery().apply { page += 1 },
+        isBackGround = true
     )
 
     fun resetPageWithIndex(
