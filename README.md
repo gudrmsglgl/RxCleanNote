@@ -9,8 +9,8 @@ RxCleanNote 프로젝트는 메모앱 입니다.
 <br>코드를 작성함에 있어 SOLID 원칙과 마틴 파울러의 '리팩터링' 을 의식하여
 <br>코드와 데이터의 설계의 명확함을 최대한 살리고자 노력 하였습니다.
 <br>또한 MVVM + CleanArchitecture 를 적용하여 관심사를 분리하여 수평적 확장과 테스트를 용이하게 설계 하였습니다.
-<br>테스트 코드는 
-<br>(UI 37) (domain 18) (presentation [ notelist: 26 ], [ detail: 13]) (data: [dataStore: 42], [repo: 51]) (remote: 7) (cache: [dao: 16], [cacheimpl:20])
+<br>테스트 코드는 UI를 포함한 230여개를 작성 하였습니다.
+
 
 ## Tech-stack
 - 100% Kotlin Project
@@ -26,7 +26,7 @@ RxCleanNote 프로젝트는 메모앱 입니다.
 
 - UI
   - Single Activity Architecture - 하나의 Activity에 다수의 프래그먼트 사용
-  - Material Design - 
+  - Material Design 
   - MotionLayout - Transition과 Animation 관리
   - RxBinding - UI 의 이벤트를 조합 및 변경 처리
   - Lottie - UI 애니메이션 아이콘  
@@ -53,3 +53,74 @@ RxCleanNote 프로젝트는 메모앱 입니다.
 
 ## Clean Architecture
 ![스크린샷 2021-04-21 오후 11 01 02](https://user-images.githubusercontent.com/16537977/115673977-2b2a3c00-a388-11eb-95ce-7434d835b405.png)
+
+## Test Code
+테스트 코드는 다음과 같이 작성 하였습니다. 
+
+- BDD Style
+  - Given - 테스트 시작 전 사전조건 
+  - When - 사용자가 지정하는 동작
+  - Then - 예상되는 변경 사항
+
+- bind into Class
+  - Readable - 테스트 코드 가독성 향상
+  - Comprehensibility - 테스트 코드 이해 향상
+
+### [ UI Layer ]
+```kotlin
+ screenNoteList {
+    recyclerView {
+        isDisplayed()
+        hasSize(notes.size)
+        firstItem<NoteItem> {
+            itemTitle {
+                hasText(notes[0].title)
+            }            
+        }
+    }
+    noDataTextView {
+        isGone()
+    }
+ }
+```
+
+### [ Presentation Layer ]
+```kotlin
+with(searchFeatureTester) {
+    search()
+       .verifyUseCaseExecute()
+       .verifyChangeState(State.LOADING)
+
+    stubUseCaseOnSuccess(notes.transNotes())
+       .verifyChangeState(State.SUCCESS)
+       .expectData(notes)          
+}
+```
+
+### [ Data Layer ]
+```kotlin
+stubContainer {
+    scenario("remote 를 로드해야 하고 현재 page의 Cache 데이터보다 사이즈가 같거나 클 때") {
+        rDataStoreStubber {
+            searchNotes(param = defaultQuery.transQueryEntity(), stub = remoteNote)
+        }
+        cDataStoreStubber {
+            pageIsCache(param = defaultQuery.page, stub = false)
+            saveNotes(remoteNote, defaultQuery.transQueryEntity(), Completable.complete())
+            currentPageNoteSize(param = defaultQuery.transQueryEntity(), stub = cacheNote.size)
+        }
+    }
+}
+
+whenDataRepositorySearchNotes(defaultQuery)
+    .test()
+
+dataStoreVerifyScope {
+    times(1)
+        .remoteSearchNotes(defaultQuery.transQueryEntity())
+    never()
+        .cacheSearchNotes(defaultQuery.transQueryEntity())
+}
+
+```
+
