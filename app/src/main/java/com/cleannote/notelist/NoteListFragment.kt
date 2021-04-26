@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.cleannote.NoteApplication
 import com.cleannote.app.R
@@ -165,6 +166,7 @@ constructor(
             ItemTouchHelper(swipeHelperCallback).attachToRecyclerView(this)
 
             adapter = noteAdapter
+            adapter!!.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
             setOnTouchListener { _, _ ->
                 swipeHelperCallback.removePreviousClamp(this)
