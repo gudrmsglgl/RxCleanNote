@@ -152,13 +152,15 @@ class NoteDetailEditFragment constructor(
                 if (it != null) {
                     when (it.status) {
                         is LOADING -> {
-                            hideLottieImgLoadingDialog()
+                            // not used
                         }
                         is SUCCESS -> {
+                            hideLottieImgLoadingDialog()
                             showUpdateMsg()
                             hasKeyOnBackPress = REQ_UPDATE_KEY
                         }
                         is ERROR -> {
+                            hideLottieImgLoadingDialog()
                             showErrorDialog(getString(R.string.updateErrorMsg))
                             it.sendFirebaseThrowable()
                         }
@@ -174,6 +176,9 @@ class NoteDetailEditFragment constructor(
             Observer {
                 if (it != null) {
                     when (it.status) {
+                        is LOADING -> {
+                            // not used
+                        }
                         is SUCCESS -> {
                             showToast(getString(R.string.deleteSuccessMsg))
                             hasKeyOnBackPress = REQ_DELETE_KEY

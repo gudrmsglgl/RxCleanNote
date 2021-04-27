@@ -33,3 +33,5 @@ gpresentation/src/test/java/com/cleannote/presentation/notelist/multidelete/Note
 ppresentation/src/test/java/com/cleannote/presentation/notelist/multidelete/tester/DeleteMultipleFeatureTester.kt,d/d/dde06168fbbe25407be7914ac32dd8c1f2f6941b
 ~
 Npresentation/src/main/java/com/cleannote/presentation/notelist/QueryManager.kt,d/8/d8e52ce183901715b54b66fced85615b6f419b22
+q
+Aapp/src/main/java/com/cleannote/notelist/holder/NoteViewHolder.kt,5/7/57da4c59081e197529b6ab2754cccaca5007a095
