@@ -11,6 +11,8 @@ RxCleanNote 프로젝트는 메모앱 입니다.
 <br>또한 MVVM + CleanArchitecture 를 적용하여 관심사를 분리하여 수평적 확장과 테스트를 용이하게 설계 하였습니다.
 <br>테스트 코드는 UI를 포함한 230여개를 작성 하였습니다.
 
+![app_slash](https://user-images.githubusercontent.com/16537977/118366110-5cd6a180-b5da-11eb-9e31-5c219f0d6dd2.gif)
+![app_edit](https://user-images.githubusercontent.com/16537977/118366401-0b7ae200-b5db-11eb-9a63-766a09d19ca4.gif)
 
 ## Tech-stack
 - 100% Kotlin Project
@@ -41,6 +43,7 @@ RxCleanNote 프로젝트는 메모앱 입니다.
 - Third Party
   - Glide - Image Loading 
   - ReactiveX - 비동기 처리
+
   - Dagger2 - DI 라이브러리
   - Retrofit2 - Http 처리
   - Timber - Debug Logger
