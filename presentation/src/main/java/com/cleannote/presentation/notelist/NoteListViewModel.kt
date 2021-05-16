@@ -47,6 +47,11 @@ constructor(
     val deleteResult: SingleLiveEvent<DataState<NoteView>>
         get() = _deleteResult
 
+    private val _mulDeleteResult: SingleLiveEvent<DataState<NoteView>> = SingleLiveEvent()
+    val mulDeleteResult: SingleLiveEvent<DataState<NoteView>>
+        get() = _mulDeleteResult
+
+
     init {
         with(_mediatorNoteList) {
             addSource(_insertNote) {
@@ -120,14 +125,14 @@ constructor(
     }
 
     fun deleteMultiNotes(paramNotes: List<NoteView>) {
-        _deleteResult.postValue(DataState.loading())
+        _mulDeleteResult.postValue(DataState.loading())
         useCases.deleteMultipleNotes.execute(
             onSuccess = {},
             onError = {
-                _deleteResult.postValue(DataState.error(it))
+                _mulDeleteResult.postValue(DataState.error(it))
             },
             onComplete = {
-                _deleteResult.postValue(DataState.success(null))
+                _mulDeleteResult.postValue(DataState.success(null))
                 initNotes()
             },
             params = paramNotes.transNotes()
@@ -230,4 +235,3 @@ constructor(
 
     private fun isProcessSearch(): Boolean = noteList.value?.status == State.LOADING
 }
-

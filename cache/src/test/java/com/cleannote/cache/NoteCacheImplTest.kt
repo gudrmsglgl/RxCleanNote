@@ -299,6 +299,28 @@ class NoteCacheImplTest {
             .assertValue(savedNote.size)
     }
 
+    @Test
+    fun nextPageExistComplete(){
+        val savedNote = NoteFactory.createNoteEntityList(end = 10)
+        noteCacheImpl.saveNotes(savedNote)
+
+        val p2Query = QueryFactory.makeQueryEntity(page = 2, order = NOTE_SORT_ASC, limit = 5)
+        noteCacheImpl.nextPageExist(p2Query)
+            .test()
+            .assertComplete()
+    }
+
+    @Test
+    fun nextPageExistReturnBoolean(){
+        val savedNote = NoteFactory.createNoteEntityList(end = 10)
+        noteCacheImpl.saveNotes(savedNote)
+
+        val p2Query = QueryFactory.makeQueryEntity(page = 2, order = NOTE_SORT_ASC, limit = 5)
+        noteCacheImpl.nextPageExist(p2Query)
+            .test()
+            .assertValue(false)
+    }
+
     private fun existNoteUpdate(param: TempUpdateParam): NoteEntity {
         val images = NoteFactory.createNoteImgEntities(param.updateId, param.imageSize)
         return NoteFactory
