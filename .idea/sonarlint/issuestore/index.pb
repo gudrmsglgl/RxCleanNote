@@ -35,3 +35,23 @@ ppresentation/src/test/java/com/cleannote/presentation/notelist/multidelete/test
 Npresentation/src/main/java/com/cleannote/presentation/notelist/QueryManager.kt,d/8/d8e52ce183901715b54b66fced85615b6f419b22
 q
 Aapp/src/main/java/com/cleannote/notelist/holder/NoteViewHolder.kt,5/7/57da4c59081e197529b6ab2754cccaca5007a095
+P
+ app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
+‚
+Rapp/src/main/java/com/cleannote/notedetail/edit/dialog/LoadingImageUpdateDialog.kt,5/9/593a17e346cf4ca9daf48523d9309b3ed5fa74cc
+y
+Iapp/src/main/java/com/cleannote/notedetail/edit/NoteDetailEditFragment.kt,c/c/ccfc5f492fe806a1cf4f209220b146f94945c8f1
+n
+>cache/src/test/java/com/cleannote/cache/dao/BaseNoteDaoTest.kt,b/d/bda2b6e52275feda6faa8f55feefd3b0fb5cc897
+h
+8cache/src/main/java/com/cleannote/cache/NoteCacheImpl.kt,1/4/14f64e1afac510d993d7933fc3a50d46a8d9dad9
+t
+Dcache/src/test/java/com/cleannote/cache/test/factory/QueryFactory.kt,b/5/b59daebe60d801a8e3dfc16438934afbd48aa6d8
+R
+"buildSrc/src/main/java/Versions.kt,1/7/17cc39576120ea39e86f37255d0843f33952bb99
+g
+7buildSrc/src/main/java/dependencies/TestDependencies.kt,5/5/553e2b44e11f05e9e35f24dda3269c2cd9c96c33
+o
+?remote/src/test/java/com/cleannote/remote/NoteRemoteImplTest.kt,d/d/ddaa3665e28dad6b1253d1413c4c3217dfa62f7d
+@
+app/build.gradle,f/4/f4a01d6a4fcb971362ec00a83903fd3902f52164

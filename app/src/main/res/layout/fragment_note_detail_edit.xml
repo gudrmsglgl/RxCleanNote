@@ -108,7 +108,7 @@
                 android:hint="@string/detail_note_hint"
                 android:layout_marginTop="@dimen/default_view_margin"
                 android:importantForAutofill="no"
-                android:inputType="text" />
+                android:inputType="textMultiLine" />
 
             <include
                 android:id="@+id/footer"

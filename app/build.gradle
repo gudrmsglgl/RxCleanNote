@@ -28,6 +28,11 @@ android {
     }
 
     testOptions {
+        testOptions {
+            unitTests {
+                includeAndroidResources = true
+            }
+        }
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         animationsDisabled = true
     }
