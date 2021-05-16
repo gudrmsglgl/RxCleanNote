@@ -230,7 +230,7 @@ constructor(
 
     fun initNotes() {
         totalLoadNotes.clear()
-        queryMgr.clearQuery()
+        queryMgr.clearQuery() 
     }
 
     private fun isProcessSearch(): Boolean = noteList.value?.status == State.LOADING
