@@ -97,7 +97,8 @@ class QueryManager
                 order = cacheOrdering()
                 like = null
                 startIndex = null
-            }
+            },
+        isBackGround = true
     )
 
     private fun updateQuery(param: Query, isBackGround: Boolean = false) {

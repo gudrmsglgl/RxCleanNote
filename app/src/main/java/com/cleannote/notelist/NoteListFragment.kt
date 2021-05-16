@@ -57,8 +57,7 @@ constructor(
     @Inject lateinit var glideReqManager: RequestManager
     @Inject lateinit var subjectManager: SubjectManager
 
-    internal val viewModel: NoteListViewModel
-        by navGraphViewModels(R.id.nav_app_graph) { viewModelFactory }
+    internal val viewModel: NoteListViewModel by navGraphViewModels(R.id.nav_app_graph) { viewModelFactory }
     private val tbFactory: NoteListTbFactory by lazy { NoteListTbFactory(this) }
     internal var noteAdapter by autoCleared<NoteListAdapter>()
     private var swipeHelperCallback by autoCleared<SwipeHelperCallback>()
@@ -81,6 +80,7 @@ constructor(
         createNote()
         subscribeInsertResult()
         subscribeDeleteResult()
+        subscribeMulDeleteResult()
         noteOnClick()
         noteOnCheck()
         noteOnLongClick()
@@ -258,15 +258,36 @@ constructor(
                     showLoadingProgressBar(dataState.isLoading)
                     when (dataState.status) {
                         SUCCESS -> {
+                            swipeDeleteMenuClose()
+                            showToast(getString(R.string.deleteSuccessMsg))
+                        }
+                        ERROR -> {
+                            swipeDeleteMenuClose()
+                            showErrorDialog(getString(R.string.deleteErrorMsg))
+                            dataState.sendFirebaseThrowable()
+                        }
+                    }
+                }
+            }
+        )
+
+    private fun subscribeMulDeleteResult() = viewModel
+        .mulDeleteResult
+        .observe(
+            viewLifecycleOwner,
+            Observer { dataState ->
+                if (dataState != null) {
+                    showLoadingProgressBar(dataState.isLoading)
+                    when (dataState.status) {
+                        SUCCESS -> {
+                            scrollTop()
                             noteAdapter.deleteCheckClear()
                             transSearchState()
-                            swipeDeleteMenuClose()
                             showToast(getString(R.string.deleteSuccessMsg))
                         }
                         ERROR -> {
                             noteAdapter.deleteCheckClear()
                             transSearchState()
-                            swipeDeleteMenuClose()
                             showErrorDialog(getString(R.string.deleteErrorMsg))
                             dataState.sendFirebaseThrowable()
                         }
